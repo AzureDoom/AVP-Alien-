@@ -1,0 +1,27 @@
+plugins {
+	// see https://fabricmc.net/develop/ for new versions
+	id 'fabric-loom' version '1.11-SNAPSHOT' apply false
+	// see https://projects.neoforged.net/neoforged/moddevgradle for new versions
+	id 'net.neoforged.moddev' version '2.0.49-beta' apply false
+
+	// Manual plugins added here
+	id 'java'
+	id "me.modmuss50.mod-publish-plugin" version "0.8.4"
+	id 'org.moddedmc.wiki.toolkit' version '0.2.7'
+}
+
+// #####################################################################################
+// # Convenience task that runs data gen for both NeoForge and Fabric (in that order). #
+// #####################################################################################
+tasks.register("runAllDatagen") {
+	dependsOn(":neoforge:runData", ":fabric:runDatagen")
+}
+
+afterEvaluate {
+	project(":fabric").afterEvaluate { fabricProject ->
+		fabricProject.tasks.named("runDatagen").configure {
+			mustRunAfter(":neoforge:runData")
+		}
+	}
+}
+// End

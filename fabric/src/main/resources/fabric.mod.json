@@ -1,0 +1,41 @@
+{
+	"schemaVersion": 1,
+	"id": "avp_alien",
+	"version": "${version}",
+	"name": "${mod_name}",
+	"description": "${description}",
+	"accessWidener": "avp_alien.accesswidener",
+	"authors": [],
+	"contact": {
+		"homepage": "https://www.curseforge.com/minecraft/mc-mods/avp",
+		"sources": "https://github.com/AliensVsPredator/AliensVsPredator"
+	},
+	"license": "${license}",
+	"icon": "${icon}",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.alien.fabric.AlienFabric"
+		],
+		"client": [
+			"com.alien.fabric.client.AlienFabricClient"
+		],
+		"fabric-datagen": [
+			"com.alien.fabric.data.AlienDataGenerator"
+		],
+		"rei_client": [],
+		"jei_mod_plugin": []
+	},
+	"mixins": [
+		"${mod_id}.mixins.json",
+		"${mod_id}.fabric.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=${fabric_loader_version}",
+		"minecraft": "~${minecraft_version}",
+		"java": ">=${java_version}",
+		"fabric-api": "*",
+		"avp": ">=${avp_version}",
+		"azurelib": ">=${azurelib_version}"
+	}
+}
