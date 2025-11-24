@@ -6,6 +6,5 @@ import java.util.function.Consumer;
 
 public class EnUsConfigProvider {
 
-    public static final Consumer<FabricLanguageProvider.TranslationBuilder> CONSUMER = builder -> {
-    };
+    public static final Consumer<FabricLanguageProvider.TranslationBuilder> CONSUMER = builder -> {};
 }

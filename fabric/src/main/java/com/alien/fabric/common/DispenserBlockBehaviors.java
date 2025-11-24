@@ -1,5 +1,6 @@
 package com.alien.fabric.common;
 
+import com.alien.Alien;
 import com.alien.common.registry.init.item.AlienSpawnEggItems;
 import net.minecraft.core.Direction;
 import net.minecraft.core.dispenser.BlockSource;
@@ -10,8 +11,6 @@ import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.gameevent.GameEvent;
 import org.jetbrains.annotations.NotNull;
-
-import com.alien.Alien;
 
 public class DispenserBlockBehaviors {
 

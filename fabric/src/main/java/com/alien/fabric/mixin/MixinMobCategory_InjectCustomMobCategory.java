@@ -1,5 +1,8 @@
 package com.alien.fabric.mixin;
 
+import com.alien.common.registry.init.AlienMobCategoryData;
+import com.avp.fabric.service.FabricBridgeService;
+import com.avp.service.Services;
 import net.minecraft.world.entity.MobCategory;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,10 +16,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import com.alien.common.registry.init.AlienMobCategoryData;
-import com.avp.fabric.service.FabricBridgeService;
-import com.avp.service.Services;
 
 // TODO: Rename this.
 @Mixin(MobCategory.class)

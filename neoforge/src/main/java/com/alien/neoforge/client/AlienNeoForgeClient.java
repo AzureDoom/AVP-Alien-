@@ -15,6 +15,5 @@ public class AlienNeoForgeClient {
         AlienClient.initialize();
     }
 
-    public AlienNeoForgeClient(IEventBus modBus) {
-    }
+    public AlienNeoForgeClient(IEventBus modBus) {}
 }

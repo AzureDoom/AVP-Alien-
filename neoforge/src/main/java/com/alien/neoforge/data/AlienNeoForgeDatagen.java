@@ -1,9 +1,9 @@
 package com.alien.neoforge.data;
 
-import com.avp.neoforge.service.NeoForgeRegistryService;
-import com.avp.service.Services;
 import com.alien.Alien;
 import com.alien.AlienResources;
+import com.avp.neoforge.service.NeoForgeRegistryService;
+import com.avp.service.Services;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;

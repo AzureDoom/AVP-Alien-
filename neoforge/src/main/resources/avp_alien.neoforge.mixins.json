@@ -3,7 +3,10 @@
   "minVersion": "0.8",
   "package": "com.alien.neoforge.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [],
+  "mixins": [
+    "MixinBlock_FlammableResinBlock",
+    "MixinBlock_FlammableResinNode"
+  ],
   "client": [],
   "server": [],
   "injectors": {

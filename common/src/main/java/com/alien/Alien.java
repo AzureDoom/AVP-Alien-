@@ -1,18 +1,28 @@
 package com.alien;
 
-import com.avp.service.Services;
 import com.alien.common.registry.init.AlienArmorMaterials;
 import com.alien.common.registry.init.AlienBlockEntityTypes;
-import com.alien.common.registry.init.AlienBlockItems;
-import com.alien.common.registry.init.AlienBlocks;
+import com.alien.common.registry.init.AlienCompostingChances;
 import com.alien.common.registry.init.AlienEntitySpawns;
 import com.alien.common.registry.init.AlienEntityTypes;
+import com.alien.common.registry.init.AlienGameEvents;
+import com.alien.common.registry.init.AlienParticleTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
+import com.alien.common.registry.init.block.AlienBlocks;
+import com.alien.common.registry.init.block.AlienChitinBlocks;
+import com.alien.common.registry.init.block.AlienResinBlocks;
 import com.alien.common.registry.init.creative_mode_tab.AlienCreativeModeTabs;
 import com.alien.common.registry.init.item.AlienArmorItems;
 import com.alien.common.registry.init.item.AlienItems;
 import com.alien.common.registry.init.item.AlienSpawnEggItems;
+import com.alien.common.registry.init.item.block.AlienBlockItems;
+import com.alien.common.registry.init.item.block.AlienChitinBlockItems;
+import com.alien.common.registry.init.item.block.AlienResinBlockItems;
 import com.alien.common.registry.key.AlienJukeboxSongKeys;
+import com.avp.AVP;
+import com.avp.common.config.AVPConfig;
+import com.avp.service.Services;
+import mod.azure.azurelib.common.config.format.ConfigFormats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,21 +33,37 @@ public class Alien {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
     public static void initialize() {
+        AVP.config = AVP.registerConfig(AVPConfig.class, ConfigFormats.json()).getConfigInstance();
+
         LOGGER.info("Initializing AVP (Alien) for platform '{}'", Services.PLATFORM.getPlatformName());
 
         AlienBlocks.initialize();
+        AlienChitinBlocks.initialize();
+        AlienResinBlocks.initialize();
+
         AlienBlockItems.initialize();
+        AlienChitinBlockItems.initialize();
+        AlienResinBlockItems.initialize();
+
         AlienItems.initialize();
+        AlienSpawnEggItems.initialize();
+
         AlienArmorMaterials.initialize();
         AlienArmorItems.initialize();
-        AlienSpawnEggItems.initialize();
+
         AlienEntityTypes.initialize();
         AlienBlockEntityTypes.initialize();
+
         AlienCreativeModeTabs.initialize();
         AlienSoundEvents.initialize();
         AlienJukeboxSongKeys.initialize();
 
+        AlienGameEvents.initialize();
+
+        AlienParticleTypes.initialize();
+
         // Functionality
+        AlienCompostingChances.initialize();
         AlienEntitySpawns.initialize();
     }
 }

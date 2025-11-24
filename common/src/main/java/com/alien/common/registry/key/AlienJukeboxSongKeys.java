@@ -7,6 +7,8 @@ import net.minecraft.world.item.JukeboxSong;
 
 public class AlienJukeboxSongKeys {
 
+    public static final ResourceKey<JukeboxSong> ALIEN_MUSIC_1 = register("alien_music_1");
+
     private static ResourceKey<JukeboxSong> register(String id) {
         var resourceLocation = AlienResources.location(id);
         return ResourceKey.create(Registries.JUKEBOX_SONG, resourceLocation);

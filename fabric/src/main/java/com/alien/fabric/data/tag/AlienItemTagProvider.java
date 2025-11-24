@@ -1,6 +1,11 @@
 package com.alien.fabric.data.tag;
 
+import com.alien.common.registry.init.item.AlienArmorItems;
 import com.alien.common.registry.init.item.AlienItems;
+import com.alien.common.registry.init.item.block.AlienResinBlockItems;
+import com.alien.common.registry.tag.AlienItemTags;
+import com.avp.common.registry.tag.AVPItemTags;
+import com.compat.CommonItemTags;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.core.HolderLookup;
@@ -34,6 +39,43 @@ public class AlienItemTagProvider extends FabricTagProvider.ItemTagProvider {
         addAutomatedTagItems();
 
         addCompatibilityTags();
+
+        // Acid-resistant items
+        getOrCreateTagBuilder(AlienItemTags.ACID_IMMUNE)
+            .addTag(AlienItemTags.CHITIN_ARMORS)
+            .addTag(AlienItemTags.PLATED_CHITIN_ARMORS)
+            .add(
+                AlienItems.CHITIN.get(),
+                AlienItems.NETHER_CHITIN.get(),
+                AlienItems.ABERRANT_CHITIN.get(),
+                AlienItems.IRRADIATED_CHITIN.get(),
+                AlienItems.PLATED_CHITIN.get(),
+                AlienItems.PLATED_NETHER_CHITIN.get(),
+                AlienItems.PLATED_ABERRANT_CHITIN.get(),
+                AlienItems.PLATED_IRRADIATED_CHITIN.get()
+            );
+
+        getOrCreateTagBuilder(AVPItemTags.DECORATIVE_POT_SHERDS)
+            .add(
+                AlienItems.OVOID_POTTERY_SHERD.get(),
+                AlienItems.PARASITE_POTTERY_SHERD.get(),
+                AlienItems.ROYALTY_POTTERY_SHERD.get(),
+                AlienItems.VECTOR_POTTERY_SHERD.get()
+            );
+
+        getOrCreateTagBuilder(AVPItemTags.RADIOACTIVE_ITEMS)
+            .add(
+                AlienItems.IRRADIATED_CHITIN.get(),
+                AlienItems.PLATED_IRRADIATED_CHITIN.get(),
+                AlienItems.IRRADIATED_RESIN_BALL.get(),
+                AlienResinBlockItems.IRRADIATED_RESIN.get(),
+                AlienResinBlockItems.IRRADIATED_RESIN_NODE.get(),
+                AlienResinBlockItems.IRRADIATED_RESIN_VEIN.get(),
+                AlienResinBlockItems.IRRADIATED_RESIN_WEB.get()
+            );
+
+        getOrCreateTagBuilder(AVPItemTags.URANIUM_NUGGET_LIKE)
+            .add(AlienItems.IRRADIATED_CHITIN.get());
     }
 
     private void addAutomatedTagItems() {
@@ -129,8 +171,107 @@ public class AlienItemTagProvider extends FabricTagProvider.ItemTagProvider {
     }
 
     private void addArmors() {
+        getOrCreateTagBuilder(AlienItemTags.NETHER_CHITIN_ARMOR)
+            .add(
+                AlienArmorItems.NETHER_CHITIN_BOOTS.get(),
+                AlienArmorItems.NETHER_CHITIN_CHESTPLATE.get(),
+                AlienArmorItems.NETHER_CHITIN_HELMET.get(),
+                AlienArmorItems.NETHER_CHITIN_LEGGINGS.get()
+            );
+
+        getOrCreateTagBuilder(AlienItemTags.PLATED_NETHER_CHITIN_ARMOR)
+            .add(
+                AlienArmorItems.PLATED_NETHER_CHITIN_BOOTS.get(),
+                AlienArmorItems.PLATED_NETHER_CHITIN_CHESTPLATE.get(),
+                AlienArmorItems.PLATED_NETHER_CHITIN_HELMET.get(),
+                AlienArmorItems.PLATED_NETHER_CHITIN_LEGGINGS.get()
+            );
+
+        getOrCreateTagBuilder(AlienItemTags.ABERRANT_CHITIN_ARMOR)
+            .add(
+                AlienArmorItems.ABERRANT_CHITIN_HELMET.get(),
+                AlienArmorItems.ABERRANT_CHITIN_CHESTPLATE.get(),
+                AlienArmorItems.ABERRANT_CHITIN_LEGGINGS.get(),
+                AlienArmorItems.ABERRANT_CHITIN_BOOTS.get()
+            );
+
+        getOrCreateTagBuilder(AlienItemTags.NORMAL_CHITIN_ARMOR)
+            .add(
+                AlienArmorItems.CHITIN_HELMET.get(),
+                AlienArmorItems.CHITIN_CHESTPLATE.get(),
+                AlienArmorItems.CHITIN_LEGGINGS.get(),
+                AlienArmorItems.CHITIN_BOOTS.get()
+            );
+
+        getOrCreateTagBuilder(AlienItemTags.IRRADIATED_CHITIN_ARMOR)
+            .add(
+                AlienArmorItems.IRRADIATED_CHITIN_HELMET.get(),
+                AlienArmorItems.IRRADIATED_CHITIN_CHESTPLATE.get(),
+                AlienArmorItems.IRRADIATED_CHITIN_LEGGINGS.get(),
+                AlienArmorItems.IRRADIATED_CHITIN_BOOTS.get()
+            );
+
+        getOrCreateTagBuilder(AlienItemTags.NETHER_CHITIN_ARMOR)
+            .add(
+                AlienArmorItems.NETHER_CHITIN_HELMET.get(),
+                AlienArmorItems.NETHER_CHITIN_CHESTPLATE.get(),
+                AlienArmorItems.NETHER_CHITIN_LEGGINGS.get(),
+                AlienArmorItems.NETHER_CHITIN_BOOTS.get()
+            );
+
+        getOrCreateTagBuilder(AlienItemTags.PLATED_ABERRANT_CHITIN_ARMOR)
+            .add(
+                AlienArmorItems.PLATED_ABERRANT_CHITIN_HELMET.get(),
+                AlienArmorItems.PLATED_ABERRANT_CHITIN_CHESTPLATE.get(),
+                AlienArmorItems.PLATED_ABERRANT_CHITIN_LEGGINGS.get(),
+                AlienArmorItems.PLATED_ABERRANT_CHITIN_BOOTS.get()
+            );
+
+        getOrCreateTagBuilder(AlienItemTags.PLATED_NORMAL_CHITIN_ARMOR)
+            .add(
+                AlienArmorItems.PLATED_CHITIN_HELMET.get(),
+                AlienArmorItems.PLATED_CHITIN_CHESTPLATE.get(),
+                AlienArmorItems.PLATED_CHITIN_LEGGINGS.get(),
+                AlienArmorItems.PLATED_CHITIN_BOOTS.get()
+            );
+
+        getOrCreateTagBuilder(AlienItemTags.PLATED_IRRADIATED_CHITIN_ARMOR)
+            .add(
+                AlienArmorItems.PLATED_IRRADIATED_CHITIN_HELMET.get(),
+                AlienArmorItems.PLATED_IRRADIATED_CHITIN_CHESTPLATE.get(),
+                AlienArmorItems.PLATED_IRRADIATED_CHITIN_LEGGINGS.get(),
+                AlienArmorItems.PLATED_IRRADIATED_CHITIN_BOOTS.get()
+            );
+
+        getOrCreateTagBuilder(AlienItemTags.PLATED_NETHER_CHITIN_ARMOR)
+            .add(
+                AlienArmorItems.PLATED_NETHER_CHITIN_HELMET.get(),
+                AlienArmorItems.PLATED_NETHER_CHITIN_CHESTPLATE.get(),
+                AlienArmorItems.PLATED_NETHER_CHITIN_LEGGINGS.get(),
+                AlienArmorItems.PLATED_NETHER_CHITIN_BOOTS.get()
+            );
+
+        // Start composite tags
+
+        getOrCreateTagBuilder(AlienItemTags.CHITIN_ARMORS)
+            .addTag(AlienItemTags.ABERRANT_CHITIN_ARMOR)
+            .addTag(AlienItemTags.IRRADIATED_CHITIN_ARMOR)
+            .addTag(AlienItemTags.NETHER_CHITIN_ARMOR)
+            .addTag(AlienItemTags.NORMAL_CHITIN_ARMOR);
+
+        getOrCreateTagBuilder(AVPItemTags.FIRE_RESISTANT_ARMORS)
+            .addTag(AlienItemTags.NETHER_CHITIN_ARMOR)
+            .addTag(AlienItemTags.PLATED_NETHER_CHITIN_ARMOR);
+
+        getOrCreateTagBuilder(AlienItemTags.PLATED_CHITIN_ARMORS)
+            .addTag(AlienItemTags.PLATED_ABERRANT_CHITIN_ARMOR)
+            .addTag(AlienItemTags.PLATED_IRRADIATED_CHITIN_ARMOR)
+            .addTag(AlienItemTags.PLATED_NETHER_CHITIN_ARMOR)
+            .addTag(AlienItemTags.PLATED_NORMAL_CHITIN_ARMOR);
     }
 
     private void addCompatibilityTags() {
+        getOrCreateTagBuilder(CommonItemTags.MUSIC_DISCS)
+            .add(AlienItems.ALIEN_MUSIC_DISC_1.get());
     }
 }

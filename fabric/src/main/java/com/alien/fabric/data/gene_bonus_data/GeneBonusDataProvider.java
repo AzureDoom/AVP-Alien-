@@ -1,5 +1,6 @@
 package com.alien.fabric.data.gene_bonus_data;
 
+import com.alien.AlienResources;
 import com.alien.common.data.GeneBonusDataReloadListener;
 import com.lib.common.gameplay.gene.GeneBonusData;
 import com.mojang.serialization.JsonOps;
@@ -12,8 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-
-import com.alien.AlienResources;
 
 public abstract class GeneBonusDataProvider implements DataProvider {
 
