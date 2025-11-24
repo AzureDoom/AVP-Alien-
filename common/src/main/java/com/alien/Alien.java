@@ -33,6 +33,7 @@ public class Alien {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
     public static void initialize() {
+        // FIXME:
         AVP.config = AVP.registerConfig(AVPConfig.class, ConfigFormats.json()).getConfigInstance();
 
         LOGGER.info("Initializing AVP (Alien) for platform '{}'", Services.PLATFORM.getPlatformName());
