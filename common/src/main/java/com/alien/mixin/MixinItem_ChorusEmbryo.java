@@ -4,7 +4,6 @@ import com.alien.common.data.AlienAdvancements;
 import com.alien.common.model.alien.Host;
 import com.alien.common.util.AlienEmbryoUtil;
 import com.alien.common.util.AlienPredicates;
-import com.avp.common.util.AVPPredicates;
 import com.lib.common.gameplay.gene.GeneOperationType;
 import com.lib.common.gameplay.gene.Genes;
 import com.lib.common.model.GeneCarrier;

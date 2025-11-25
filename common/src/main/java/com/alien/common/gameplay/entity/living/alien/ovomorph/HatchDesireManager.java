@@ -2,7 +2,6 @@ package com.alien.common.gameplay.entity.living.alien.ovomorph;
 
 import com.alien.common.util.AlienPredicates;
 import com.avp.common.registry.init.AVPDataKeys;
-import com.avp.common.util.AVPPredicates;
 import com.lib.common.network.DataAccessor;
 import net.minecraft.world.level.gameevent.vibrations.VibrationInfo;
 

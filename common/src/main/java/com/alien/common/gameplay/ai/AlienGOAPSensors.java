@@ -2,7 +2,6 @@ package com.alien.common.gameplay.ai;
 
 import com.alien.common.gameplay.entity.living.alien.ovomorph.Ovomorph;
 import com.alien.common.util.AlienPredicates;
-import com.avp.common.util.AVPPredicates;
 import com.just.goap.sensor.Sensor;
 import com.just.goap.sensor.Sensors;
 import com.lib.common.gameplay.goap.GOAPSensors;
