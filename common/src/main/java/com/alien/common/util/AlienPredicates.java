@@ -6,7 +6,10 @@ import com.alien.common.model.alien.Host;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.tag.AlienBlockTags;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
+import com.alien.common.registry.tag.AlienItemTags;
 import com.avp.common.util.AVPPredicates;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ambient.Bat;
@@ -72,9 +75,9 @@ public class AlienPredicates {
             // AND can't attack immortal players.
             && (!(potentialTarget instanceof Player) || !AVPPredicates.IS_IMMORTAL.test(potentialTarget))
             // AND *shouldn't* attack entities with an embryo inside them.
-            && (!AVPPredicates.hasEmbryo(potentialTarget) || doesTargetHaveEnemyVariantEmbryo(selfVariant, potentialTarget))
+            && (!AlienPredicates.hasEmbryo(potentialTarget) || doesTargetHaveEnemyVariantEmbryo(selfVariant, potentialTarget))
             // AND *shouldn't* attack entities with a parasite attached.
-            && !AVPPredicates.isParasiteAttached(potentialTarget);
+            && !AlienPredicates.isParasiteAttached(potentialTarget);
     }
 
     private static boolean doesTargetHaveEnemyVariantEmbryo(AlienVariant selfVariant, @NotNull LivingEntity potentialTarget) {
@@ -123,5 +126,39 @@ public class AlienPredicates {
 
         return potentialTarget.getType().is(AlienEntityTypeTags.HATED_BY_XENOMORPHS)
             || isTargetingHiveMember(alien, potentialTarget);
+    }
+
+    public static boolean hasEmbryo(Entity target) {
+        return target instanceof Host host && host.getEmbryoType().isSome();
+    }
+
+    public static boolean isFreeHost(Entity parasite, Entity hostTarget) {
+        return AVPPredicates.isLiving(hostTarget) &&
+            isHost(hostTarget) &&
+            !hasEmbryo(hostTarget) &&
+            !isSelfOrOtherParasiteAttached(parasite, hostTarget)
+            && !hasFacehuggerResistantHelmet((LivingEntity) hostTarget);
+    }
+
+    public static boolean isHost(Entity target) {
+        return target.getType().is(AlienEntityTypeTags.HOSTS) &&
+            AVPPredicates.isLiving(target) &&
+            !AVPPredicates.isBaby(target) &&
+            !AVPPredicates.IS_IMMORTAL.test((LivingEntity) target);
+    }
+
+    public static boolean isParasiteAttached(Entity target) {
+        return target.hasPassenger(passenger -> passenger.getType().is(AlienEntityTypeTags.PARASITES));
+    }
+
+    public static boolean isSelfOrOtherParasiteAttached(Entity parasite, Entity target) {
+        return target.hasPassenger(
+            passenger -> passenger.equals(parasite) || passenger.getType().is(AlienEntityTypeTags.PARASITES)
+        );
+    }
+
+    public static boolean hasFacehuggerResistantHelmet(LivingEntity livingEntity) {
+        return livingEntity.getItemBySlot(EquipmentSlot.HEAD)
+            .is(AlienItemTags.FACEHUGGER_RESISTANT_HELMETS);
     }
 }

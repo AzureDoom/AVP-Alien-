@@ -2,6 +2,7 @@ package com.alien.common.gameplay.entity.living.alien.parasite;
 
 import com.alien.common.model.alien.FreeMob;
 import com.alien.common.model.alien.Host;
+import com.alien.common.util.AlienPredicates;
 import com.avp.common.registry.init.AVPDataKeys;
 import com.avp.common.registry.key.AVPDamageTypeKeys;
 import com.avp.common.util.AVPPredicates;
@@ -46,7 +47,7 @@ public class ParasiteAttachmentManager {
 
         Objects.requireNonNull(host);
 
-        if (!AVPPredicates.isHost(host)) {
+        if (!AlienPredicates.isHost(host)) {
             parasite.unRide();
 
             if (host instanceof ServerPlayer serverPlayer) {

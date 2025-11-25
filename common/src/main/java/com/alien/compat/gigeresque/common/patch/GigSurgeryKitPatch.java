@@ -2,6 +2,7 @@ package com.alien.compat.gigeresque.common.patch;
 
 import com.alien.common.model.alien.Host;
 import com.alien.common.util.AlienEmbryoUtil;
+import com.alien.common.util.AlienPredicates;
 import com.alien.compat.gigeresque.GigResources;
 import com.avp.common.util.AVPPredicates;
 import mods.cybercat.gigeresque.CommonMod;
@@ -20,7 +21,7 @@ public class GigSurgeryKitPatch {
                 // OR level is client side...
                 || player.level().isClientSide()
                 // OR the host doesn't have an embryo...
-                || !AVPPredicates.hasEmbryo(livingEntity)
+                || !AlienPredicates.hasEmbryo(livingEntity)
                 // OR this item is not a Gigeresque surgery kit...
                 || !itemStack.is(GigItems.SURGERY_KIT.get())
         ) {

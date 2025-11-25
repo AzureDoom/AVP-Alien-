@@ -1,5 +1,6 @@
 package com.alien.common.gameplay.entity.living.alien.ovomorph;
 
+import com.alien.common.util.AlienPredicates;
 import com.avp.common.registry.init.AVPDataKeys;
 import com.avp.common.util.AVPPredicates;
 import com.lib.common.network.DataAccessor;
@@ -45,7 +46,7 @@ public class HatchDesireManager {
             var sourceEntity = vibrationInfo.entity();
 
             if (
-                sourceEntity != null && AVPPredicates.isFreeHost(ovomorph, sourceEntity) && ovomorph.getSensing()
+                sourceEntity != null && AlienPredicates.isFreeHost(ovomorph, sourceEntity) && ovomorph.getSensing()
                     .hasLineOfSight(sourceEntity)
             ) {
                 var baseDesire = (int) Math.abs(radius - vibrationInfo.distance()) * 2;

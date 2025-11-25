@@ -8,6 +8,7 @@ import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
+import com.alien.common.util.AlienPredicates;
 import com.avp.AVP;
 import com.avp.common.registry.init.AVPDataKeys;
 import com.avp.common.util.AVPPredicates;
@@ -199,7 +200,7 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
             return;
         }
 
-        if (AVPPredicates.isFreeHost(this, entity)) {
+        if (AlienPredicates.isFreeHost(this, entity)) {
             tryHatch();
         }
 

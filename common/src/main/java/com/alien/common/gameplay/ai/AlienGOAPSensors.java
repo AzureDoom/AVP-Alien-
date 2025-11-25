@@ -1,6 +1,7 @@
 package com.alien.common.gameplay.ai;
 
 import com.alien.common.gameplay.entity.living.alien.ovomorph.Ovomorph;
+import com.alien.common.util.AlienPredicates;
 import com.avp.common.util.AVPPredicates;
 import com.just.goap.sensor.Sensor;
 import com.just.goap.sensor.Sensors;
@@ -16,7 +17,7 @@ public class AlienGOAPSensors {
         GOAPSensors.NEARBY_LIVING_ENTITIES.key(),
         AlienGOAPKeys.NEARBY_HOSTS,
         (entity, nearbyEntities) -> nearbyEntities.stream()
-            .filter(e -> AVPPredicates.isFreeHost(entity, e))
+            .filter(e -> AlienPredicates.isFreeHost(entity, e))
             .toList()
     );
 

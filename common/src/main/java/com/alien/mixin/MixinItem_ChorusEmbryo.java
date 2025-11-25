@@ -3,6 +3,7 @@ package com.alien.mixin;
 import com.alien.common.data.AlienAdvancements;
 import com.alien.common.model.alien.Host;
 import com.alien.common.util.AlienEmbryoUtil;
+import com.alien.common.util.AlienPredicates;
 import com.avp.common.util.AVPPredicates;
 import com.lib.common.gameplay.gene.GeneOperationType;
 import com.lib.common.gameplay.gene.Genes;
@@ -35,7 +36,7 @@ public class MixinItem_ChorusEmbryo {
                 // OR level is client side...
                 || level.isClientSide()
                 // OR the host doesn't have an embryo...
-                || !AVPPredicates.hasEmbryo(livingEntity)
+                || !AlienPredicates.hasEmbryo(livingEntity)
         ) {
             // Then return, there's no embryo to teleport out of the host. Returning here will let the normal
             // chorus fruit behavior play out.
