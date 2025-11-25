@@ -2,11 +2,12 @@ package com.alien.fabric.data.recipe.impl;
 
 import com.alien.common.registry.init.block.AlienChitinBlocks;
 import com.alien.common.registry.init.item.AlienItems;
-import com.avp.common.registry.AVPDeferredHolder;
 import com.avp.fabric.data.recipe.builder.RecipeBuilder;
 import com.avp.fabric.data.recipe.util.RecipeUtil;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+
+import java.util.function.Supplier;
 
 public class ChitinRecipeProvider {
 
@@ -140,21 +141,21 @@ public class ChitinRecipeProvider {
     }
 
     private record ChitinSet(
-        AVPDeferredHolder<Item> chitinItem,
-        AVPDeferredHolder<Item> platedChitinItem,
-        AVPDeferredHolder<Block> chitinBlock,
-        AVPDeferredHolder<Block> chitinBlockSlab,
-        AVPDeferredHolder<Block> chitinBlockStairs,
-        AVPDeferredHolder<Block> chitinBlockWall,
-        AVPDeferredHolder<Block> bricks,
-        AVPDeferredHolder<Block> brickSlab,
-        AVPDeferredHolder<Block> brickStairs,
-        AVPDeferredHolder<Block> brickWall,
-        AVPDeferredHolder<Block> chiseledBricks,
-        AVPDeferredHolder<Block> chiseledBricksEmbryo,
-        AVPDeferredHolder<Block> polished,
-        AVPDeferredHolder<Block> polishedSlab,
-        AVPDeferredHolder<Block> polishedStairs,
-        AVPDeferredHolder<Block> polishedWall
+        Supplier<Item> chitinItem,
+        Supplier<Item> platedChitinItem,
+        Supplier<Block> chitinBlock,
+        Supplier<Block> chitinBlockSlab,
+        Supplier<Block> chitinBlockStairs,
+        Supplier<Block> chitinBlockWall,
+        Supplier<Block> bricks,
+        Supplier<Block> brickSlab,
+        Supplier<Block> brickStairs,
+        Supplier<Block> brickWall,
+        Supplier<Block> chiseledBricks,
+        Supplier<Block> chiseledBricksEmbryo,
+        Supplier<Block> polished,
+        Supplier<Block> polishedSlab,
+        Supplier<Block> polishedStairs,
+        Supplier<Block> polishedWall
     ) {}
 }
