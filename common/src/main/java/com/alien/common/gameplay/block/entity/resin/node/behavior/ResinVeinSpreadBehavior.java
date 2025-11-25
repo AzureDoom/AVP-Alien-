@@ -15,6 +15,7 @@ import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.function.Supplier;
 
 public class ResinVeinSpreadBehavior implements VeinSpreadBehavior {
 
@@ -33,7 +34,7 @@ public class ResinVeinSpreadBehavior implements VeinSpreadBehavior {
         var nodeBlock = levelAccessor.getBlockState(nodePos).getBlock();
         var resinVeinBlock = AlienVariantTypes.getFor(nodeBlock)
             .map(AlienVariantType::resinVein)
-            .map(AVPDeferredHolder::get)
+            .map(Supplier::get)
             .unwrapOr(null);
 
         if (resinVeinBlock == null) {
