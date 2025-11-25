@@ -1,7 +1,7 @@
 package com.alien.fabric.data.jukebox_song;
 
 import com.alien.common.registry.init.AlienSoundEvents;
-import com.avp.common.registry.key.AVPJukeboxSongKeys;
+import com.alien.common.registry.key.AlienJukeboxSongKeys;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricDynamicRegistryProvider;
 import net.minecraft.core.HolderLookup;
@@ -19,7 +19,7 @@ public class AlienJukeboxSongsProvider extends FabricDynamicRegistryProvider {
 
     @Override
     protected void configure(HolderLookup.Provider registries, Entries entries) {
-        entries.add(AVPJukeboxSongKeys.ALIEN_MUSIC_1, createAlienMusic1Song());
+        entries.add(AlienJukeboxSongKeys.ALIEN_MUSIC_1, createAlienMusic1Song());
     }
 
     private JukeboxSong createAlienMusic1Song() {
