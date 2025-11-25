@@ -32,9 +32,9 @@ public record AlienVariantType(
     AVPDeferredHolder<Item> resinBall,
 
     // Game Events
-    AVPDeferredHolder<GameEvent> cryForHelpEvent,
-    @Nullable AVPDeferredHolder<GameEvent> eggPickupRequestEvent,
-    AVPDeferredHolder<GameEvent> resinSpreadEvent,
+    BLibHolder<GameEvent> cryForHelpEvent,
+    @Nullable BLibHolder<GameEvent> eggPickupRequestEvent,
+    BLibHolder<GameEvent> resinSpreadEvent,
 
     // Particle Types
     AVPDeferredHolder<SimpleParticleType> acidParticleType,
