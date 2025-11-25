@@ -21,6 +21,8 @@ import com.alien.common.registry.init.item.block.AlienResinBlockItems;
 import com.alien.common.registry.key.AlienJukeboxSongKeys;
 import com.avp.AVP;
 import com.avp.common.config.AVPConfig;
+import com.blib.BLib;
+import com.blib.BLibMod;
 import com.blib.service.BLibServices;
 import mod.azure.azurelib.common.config.format.ConfigFormats;
 import org.slf4j.Logger;
@@ -29,6 +31,8 @@ import org.slf4j.LoggerFactory;
 public class Alien {
 
     public static final String MOD_ID = "avp_alien";
+
+    public static final BLibMod MOD = BLib.createMod(MOD_ID);
 
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
