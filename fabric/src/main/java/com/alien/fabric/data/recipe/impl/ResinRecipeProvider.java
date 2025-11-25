@@ -3,13 +3,14 @@ package com.alien.fabric.data.recipe.impl;
 import com.alien.common.gameplay.block.resin.vein.ResinVeinBlock;
 import com.alien.common.registry.init.block.AlienResinBlocks;
 import com.alien.common.registry.init.item.AlienItems;
-import com.avp.common.registry.AVPDeferredHolder;
 import com.avp.fabric.data.recipe.RecipeTemplates;
 import com.avp.fabric.data.recipe.builder.RecipeBuilder;
 import com.avp.fabric.data.recipe.util.RecipeUtil;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+
+import java.util.function.Supplier;
 
 public class ResinRecipeProvider {
 
@@ -144,19 +145,19 @@ public class ResinRecipeProvider {
     }
 
     private record ResinSet(
-        AVPDeferredHolder<Item> resinBallItem,
-        AVPDeferredHolder<Block> resinBlock,
-        AVPDeferredHolder<Block> resinBlockSlab,
-        AVPDeferredHolder<Block> resinBlockStairs,
-        AVPDeferredHolder<Block> brick,
-        AVPDeferredHolder<Block> brickSlab,
-        AVPDeferredHolder<Block> brickStairs,
-        AVPDeferredHolder<Block> brickWall,
-        AVPDeferredHolder<Block> smooth,
-        AVPDeferredHolder<Block> smoothSlab,
-        AVPDeferredHolder<Block> smoothStairs,
-        AVPDeferredHolder<Block> smoothWall,
-        AVPDeferredHolder<ResinVeinBlock> vein,
-        AVPDeferredHolder<Block> web
+        Supplier<Item> resinBallItem,
+        Supplier<Block> resinBlock,
+        Supplier<Block> resinBlockSlab,
+        Supplier<Block> resinBlockStairs,
+        Supplier<Block> brick,
+        Supplier<Block> brickSlab,
+        Supplier<Block> brickStairs,
+        Supplier<Block> brickWall,
+        Supplier<Block> smooth,
+        Supplier<Block> smoothSlab,
+        Supplier<Block> smoothStairs,
+        Supplier<Block> smoothWall,
+        Supplier<ResinVeinBlock> vein,
+        Supplier<Block> web
     ) {}
 }
