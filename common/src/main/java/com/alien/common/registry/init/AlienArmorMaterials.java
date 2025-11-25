@@ -1,9 +1,10 @@
 package com.alien.common.registry.init;
 
+import com.alien.Alien;
 import com.alien.AlienResources;
 import com.alien.common.registry.init.item.AlienItems;
-import com.avp.common.registry.AVPDeferredHolder;
-import com.avp.service.Services;
+import com.blib.BLibHolder;
+import com.blib.BLibRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.sounds.SoundEvent;
@@ -19,8 +20,10 @@ import java.util.function.Supplier;
 
 public class AlienArmorMaterials {
 
+    private static final BLibRegistry<ArmorMaterial> REGISTRY = Alien.MOD.createRegistry(BuiltInRegistries.ARMOR_MATERIAL);
+
     // Should be slightly stronger than iron.
-    public static final AVPDeferredHolder<ArmorMaterial> ABERRANT_CHITIN = register(
+    public static final BLibHolder<ArmorMaterial> ABERRANT_CHITIN = create(
         "aberrant_chitin",
         relativeDefense(
             ArmorMaterials.IRON,
@@ -38,7 +41,7 @@ public class AlienArmorMaterials {
     );
 
     // Should be slightly stronger than iron.
-    public static final AVPDeferredHolder<ArmorMaterial> CHITIN = register(
+    public static final BLibHolder<ArmorMaterial> CHITIN = create(
         "chitin",
         relativeDefense(
             ArmorMaterials.IRON,
@@ -56,7 +59,7 @@ public class AlienArmorMaterials {
     );
 
     // Should be slightly stronger than iron.
-    public static final AVPDeferredHolder<ArmorMaterial> IRRADIATED_CHITIN = register(
+    public static final BLibHolder<ArmorMaterial> IRRADIATED_CHITIN = create(
         "irradiated_chitin",
         relativeDefense(
             ArmorMaterials.IRON,
@@ -73,7 +76,7 @@ public class AlienArmorMaterials {
         false
     );
 
-    public static final AVPDeferredHolder<ArmorMaterial> NETHER_CHITIN = register(
+    public static final BLibHolder<ArmorMaterial> NETHER_CHITIN = create(
         "nether_chitin",
         relativeDefense(
             ArmorMaterials.IRON,
@@ -90,7 +93,7 @@ public class AlienArmorMaterials {
         false
     );
 
-    public static final AVPDeferredHolder<ArmorMaterial> PLATED_ABERRANT_CHITIN = register(
+    public static final BLibHolder<ArmorMaterial> PLATED_ABERRANT_CHITIN = create(
         "plated_aberrant_chitin",
         relativeDefense(ArmorMaterials.DIAMOND, Map.of()),
         7,
@@ -101,7 +104,7 @@ public class AlienArmorMaterials {
         false
     );
 
-    public static final AVPDeferredHolder<ArmorMaterial> PLATED_CHITIN = register(
+    public static final BLibHolder<ArmorMaterial> PLATED_CHITIN = create(
         "plated_chitin",
         relativeDefense(ArmorMaterials.DIAMOND, Map.of()),
         7,
@@ -112,7 +115,7 @@ public class AlienArmorMaterials {
         false
     );
 
-    public static final AVPDeferredHolder<ArmorMaterial> PLATED_IRRADIATED_CHITIN = register(
+    public static final BLibHolder<ArmorMaterial> PLATED_IRRADIATED_CHITIN = create(
         "plated_irradiated_chitin",
         relativeDefense(ArmorMaterials.DIAMOND, Map.of()),
         7,
@@ -123,7 +126,7 @@ public class AlienArmorMaterials {
         false
     );
 
-    public static final AVPDeferredHolder<ArmorMaterial> PLATED_NETHER_CHITIN = register(
+    public static final BLibHolder<ArmorMaterial> PLATED_NETHER_CHITIN = create(
         "plated_nether_chitin",
         relativeDefense(ArmorMaterials.DIAMOND, Map.of()),
         7,
@@ -134,8 +137,8 @@ public class AlienArmorMaterials {
         false
     );
 
-    public static AVPDeferredHolder<ArmorMaterial> register(
-        String id,
+    public static BLibHolder<ArmorMaterial> create(
+        String path,
         Map<ArmorItem.Type, Integer> defensePoints,
         int enchantability,
         Supplier<Holder<SoundEvent>> equipSoundHolderSupplier,
@@ -144,15 +147,14 @@ public class AlienArmorMaterials {
         float knockbackResistance,
         boolean dyeable
     ) {
-        var resourceLocation = AlienResources.location(id);
+        var resourceLocation = AlienResources.location(path);
 
         List<ArmorMaterial.Layer> layers = List.of(
             new ArmorMaterial.Layer(resourceLocation, "", dyeable)
         );
 
-        return Services.REGISTRY.register(
-            BuiltInRegistries.ARMOR_MATERIAL,
-            AlienResources.location(id),
+        return REGISTRY.createHolder(
+            path,
             () -> new ArmorMaterial(
                 defensePoints,
                 enchantability,
@@ -187,5 +189,7 @@ public class AlienArmorMaterials {
         return Map.entry(type, armorMaterial.getDefense(type) + additiveDefense.getOrDefault(type, 0));
     }
 
-    public static void initialize() {}
+    public static void initialize() {
+        REGISTRY.registerAll();
+    }
 }
