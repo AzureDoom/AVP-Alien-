@@ -4,7 +4,14 @@
   "package": "com.alien.mixin",
   "refmap": "${mod_id}.refmap.json",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [],
+  "mixins": [
+    "MixinItem_ChorusEmbryo",
+    "MixinItem_GigSurgeryKit",
+    "MixinLivingEntity_Host",
+    "MixinMob_IncapacitateHost",
+    "MixinProjectileUtil_AllowHittingVehicle",
+    "MixinVillagerHostilesSensor_RunAwayFromAVPMonsters"
+  ],
   "client": [],
   "server": [],
   "injectors": {
