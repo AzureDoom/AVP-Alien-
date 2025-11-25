@@ -94,11 +94,11 @@ public class AlienItems {
         return create(name, new Item.Properties());
     }
 
-    public static BLibHolder<Item> create(String name, Item.Properties properties) {
+    private static BLibHolder<Item> create(String name, Item.Properties properties) {
         return create(name, () -> new Item(properties));
     }
 
-    public static <T extends Item> BLibHolder<T> create(String name, Supplier<T> itemSupplier) {
+    private static <T extends Item> BLibHolder<T> create(String name, Supplier<T> itemSupplier) {
         return REGISTRY.createHolder(name, itemSupplier);
     }
 

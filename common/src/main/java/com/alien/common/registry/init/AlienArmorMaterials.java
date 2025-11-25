@@ -137,7 +137,7 @@ public class AlienArmorMaterials {
         false
     );
 
-    public static BLibHolder<ArmorMaterial> create(
+    private static BLibHolder<ArmorMaterial> create(
         String path,
         Map<ArmorItem.Type, Integer> defensePoints,
         int enchantability,
@@ -167,7 +167,7 @@ public class AlienArmorMaterials {
         );
     }
 
-    public static Map<ArmorItem.Type, Integer> relativeDefense(
+    private static Map<ArmorItem.Type, Integer> relativeDefense(
         Holder<ArmorMaterial> armorMaterialHolder,
         Map<ArmorItem.Type, Integer> additiveDefense
     ) {
