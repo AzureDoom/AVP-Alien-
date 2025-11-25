@@ -1,7 +1,7 @@
 package com.alien.mixin;
 
-import com.alien.compat.gigeresque.Gig;
-import com.alien.compat.gigeresque.common.patch.GigSurgeryKitPatch;
+import com.alien.compat.gigeresque.Gigeresque;
+import com.alien.compat.gigeresque.common.patch.GigeresqueSurgeryKitPatch;
 import com.blib.service.BLibServices;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Item.class)
-public class MixinItem_GigSurgeryKit {
+public class MixinItem_GigeresqueSurgeryKit {
 
     @Inject(method = "interactLivingEntity", at = @At("HEAD"))
     private void avp$removeParasiteOnEntity(
@@ -27,8 +27,8 @@ public class MixinItem_GigSurgeryKit {
         InteractionHand usedHand,
         CallbackInfoReturnable<InteractionResult> cir
     ) {
-        if (BLibServices.MOD_LOADER.isModLoaded(Gig.MOD_ID)) {
-            GigSurgeryKitPatch.removeParasite(player, interactionTarget, stack);
+        if (BLibServices.MOD_LOADER.isModLoaded(Gigeresque.MOD_ID)) {
+            GigeresqueSurgeryKitPatch.removeParasite(player, interactionTarget, stack);
         }
     }
 
@@ -39,8 +39,8 @@ public class MixinItem_GigSurgeryKit {
         InteractionHand usedHand,
         CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir
     ) {
-        if (BLibServices.MOD_LOADER.isModLoaded(Gig.MOD_ID)) {
-            GigSurgeryKitPatch.removeParasite(player, player, player.getItemInHand(usedHand));
+        if (BLibServices.MOD_LOADER.isModLoaded(Gigeresque.MOD_ID)) {
+            GigeresqueSurgeryKitPatch.removeParasite(player, player, player.getItemInHand(usedHand));
         }
     }
 }

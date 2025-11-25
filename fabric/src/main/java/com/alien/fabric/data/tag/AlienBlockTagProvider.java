@@ -3,7 +3,7 @@ package com.alien.fabric.data.tag;
 import com.alien.common.registry.init.block.AlienChitinBlocks;
 import com.alien.common.registry.init.block.AlienResinBlocks;
 import com.alien.common.registry.tag.AlienBlockTags;
-import com.alien.compat.gigeresque.common.registry.tag.GigBlockTags;
+import com.alien.compat.gigeresque.common.registry.tag.GigeresqueBlockTags;
 import com.avp.common.registry.tag.AVPBlockTags;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
@@ -355,6 +355,6 @@ public class AlienBlockTagProvider extends FabricTagProvider.BlockTagProvider {
 
     private void addCompatibilityTags() {
         getOrCreateTagBuilder(AlienBlockTags.ACID_IMMUNE)
-            .addOptionalTag(GigBlockTags.ACID_RESISTANT);
+            .addOptionalTag(GigeresqueBlockTags.ACID_RESISTANT);
     }
 }

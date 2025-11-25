@@ -3,8 +3,7 @@ package com.alien.compat.gigeresque.common.patch;
 import com.alien.common.model.alien.Host;
 import com.alien.common.util.AlienEmbryoUtil;
 import com.alien.common.util.AlienPredicates;
-import com.alien.compat.gigeresque.GigResources;
-import com.avp.common.util.AVPPredicates;
+import com.alien.compat.gigeresque.GigeresqueResources;
 import mods.cybercat.gigeresque.CommonMod;
 import mods.cybercat.gigeresque.common.item.GigItems;
 import net.minecraft.server.level.ServerPlayer;
@@ -12,7 +11,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-public class GigSurgeryKitPatch {
+public class GigeresqueSurgeryKitPatch {
 
     public static void removeParasite(Player player, LivingEntity livingEntity, ItemStack itemStack) {
         if (
@@ -47,7 +46,7 @@ public class GigSurgeryKitPatch {
         }
 
         if (player instanceof ServerPlayer serverPlayer) {
-            var advancement = serverPlayer.server.getAdvancements().get(GigResources.location("surgery_kit"));
+            var advancement = serverPlayer.server.getAdvancements().get(GigeresqueResources.location("surgery_kit"));
 
             if (advancement != null && !serverPlayer.getAdvancements().getOrStartProgress(advancement).isDone()) {
                 for (var s : serverPlayer.getAdvancements().getOrStartProgress(advancement).getRemainingCriteria()) {
