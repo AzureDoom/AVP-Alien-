@@ -2,7 +2,7 @@ package com.alien.mixin;
 
 import com.alien.compat.gigeresque.Gig;
 import com.alien.compat.gigeresque.common.patch.GigSurgeryKitPatch;
-import com.avp.service.Services;
+import com.blib.service.BLibServices;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -27,7 +27,7 @@ public class MixinItem_GigSurgeryKit {
         InteractionHand usedHand,
         CallbackInfoReturnable<InteractionResult> cir
     ) {
-        if (Services.PLATFORM.isModLoaded(Gig.MOD_ID)) {
+        if (BLibServices.MOD_LOADER.isModLoaded(Gig.MOD_ID)) {
             GigSurgeryKitPatch.removeParasite(player, interactionTarget, stack);
         }
     }
@@ -39,7 +39,7 @@ public class MixinItem_GigSurgeryKit {
         InteractionHand usedHand,
         CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir
     ) {
-        if (Services.PLATFORM.isModLoaded(Gig.MOD_ID)) {
+        if (BLibServices.MOD_LOADER.isModLoaded(Gig.MOD_ID)) {
             GigSurgeryKitPatch.removeParasite(player, player, player.getItemInHand(usedHand));
         }
     }

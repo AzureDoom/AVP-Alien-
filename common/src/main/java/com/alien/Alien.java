@@ -21,7 +21,7 @@ import com.alien.common.registry.init.item.block.AlienResinBlockItems;
 import com.alien.common.registry.key.AlienJukeboxSongKeys;
 import com.avp.AVP;
 import com.avp.common.config.AVPConfig;
-import com.avp.service.Services;
+import com.blib.service.BLibServices;
 import mod.azure.azurelib.common.config.format.ConfigFormats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +36,7 @@ public class Alien {
         // FIXME:
         AVP.config = AVP.registerConfig(AVPConfig.class, ConfigFormats.json()).getConfigInstance();
 
-        LOGGER.info("Initializing AVP (Alien) for platform '{}'", Services.PLATFORM.getPlatformName());
+        LOGGER.info("Initializing AVP (Alien) for mod loader '{}'", BLibServices.MOD_LOADER.getModLoaderName());
 
         AlienBlocks.initialize();
         AlienChitinBlocks.initialize();
