@@ -1,8 +1,8 @@
 {
-  "biomes": "#avp:has_desert_altar",
+  "biomes": "#avp_alien:has_desert_altar",
   "adapt_noise": false,
   "type": "minecraft:jigsaw",
-  "start_pool": "avp:desert_royal_altar_main",
+  "start_pool": "avp_alien:desert_royal_altar_main",
   "size": 1,
   "step": "surface_structures",
   "start_height": {

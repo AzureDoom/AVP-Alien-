@@ -1,5 +1,5 @@
 {
-  "name": "avp:deepslate_royal_ovomorph",
+  "name": "avp_alien:deepslate_royal_ovomorph",
   "fallback": "minecraft:empty",
   "elements": [
     {
@@ -7,7 +7,7 @@
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
-        "location": "avp:altar/deepslate/deepslate_royal_ovomorph",
+        "location": "avp_alien:altar/deepslate/deepslate_royal_ovomorph",
         "processors": "minecraft:empty"
       }
     }

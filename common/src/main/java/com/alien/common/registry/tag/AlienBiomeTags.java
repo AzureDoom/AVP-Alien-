@@ -1,5 +1,6 @@
 package com.alien.common.registry.tag;
 
+import com.alien.AlienResources;
 import com.avp.AVPResources;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
@@ -22,6 +23,6 @@ public class AlienBiomeTags {
     public static final TagKey<Biome> HAS_XENOMORPHS = create("has_xenomorphs");
 
     private static TagKey<Biome> create(String name) {
-        return TagKey.create(Registries.BIOME, AVPResources.location(name));
+        return TagKey.create(Registries.BIOME, AlienResources.location(name));
     }
 }

@@ -1,7 +1,7 @@
 {
   "structures": [
     {
-      "structure": "avp:badlands_royal_altar",
+      "structure": "avp_alien:badlands_royal_altar",
       "weight": 1
     }
   ],

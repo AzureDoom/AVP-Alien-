@@ -1,5 +1,5 @@
 {
-  "name": "avp:nether_royal_ovomorph",
+  "name": "avp_alien:nether_royal_ovomorph",
   "fallback": "minecraft:empty",
   "elements": [
     {
@@ -7,7 +7,7 @@
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
-        "location": "avp:altar/nether/nether_royal_ovomorph",
+        "location": "avp_alien:altar/nether/nether_royal_ovomorph",
         "processors": "minecraft:empty"
       }
     }
