@@ -42,29 +42,30 @@ public class Alien {
 
         LOGGER.info("Initializing AVP (Alien) for mod loader '{}'", BLibServices.MOD_LOADER.getModLoaderName());
 
+        // No dependencies.
         AlienBlocks.initialize();
         AlienChitinBlocks.initialize();
         AlienResinBlocks.initialize();
+        AlienItems.initialize();
+        AlienEntityTypes.initialize();
+        AlienSoundEvents.initialize();
 
+        // Depends on blocks.
         AlienBlockItems.initialize();
         AlienChitinBlockItems.initialize();
         AlienResinBlockItems.initialize();
-
-        AlienItems.initialize();
-        AlienSpawnEggItems.initialize();
-
+        // Depends on sound events.
         AlienArmorMaterials.initialize();
+        // Depends on armor materials.
         AlienArmorItems.initialize();
-
-        AlienEntityTypes.initialize();
+        // Depends on entity types.
+        AlienSpawnEggItems.initialize();
+        // Depends on blocks.
         AlienBlockEntityTypes.initialize();
-
+        // Depends on blocks, items, block items, etc.
         AlienCreativeModeTabs.initialize();
-        AlienSoundEvents.initialize();
-        AlienJukeboxSongKeys.initialize();
 
         AlienGameEvents.initialize();
-
         AlienParticleTypes.initialize();
 
         // Functionality

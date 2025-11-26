@@ -86,7 +86,7 @@ public class EnUsEntityProvider {
         addEntity(builder, AlienEntityTypes.WARRIOR, "Warrior");
 
         AVPRegistryValidation.throwIfMissingEntries(
-            AlienEntityTypes.getAll(),
+            AlienEntityTypes.REGISTRY.getAll(),
             TOUCHED_ENTRIES::contains,
             EntityType::getDescriptionId,
             "Entity type translation did not complete successfully - there are unhandled entity types that need to be handled."
