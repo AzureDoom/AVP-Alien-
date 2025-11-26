@@ -6,6 +6,7 @@ import com.alien.common.gameplay.ai.goal.QueenLayEggGoal;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
+import com.alien.common.gameplay.level.saveddata.QueenSpawnChunkData;
 import com.alien.common.gameplay.level.saveddata.StrainLeakData;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.model.resin.ResinData;
@@ -138,9 +139,8 @@ public class Queen extends Xenomorph {
     }
 
     private void resetQueenSpawnCooldown() {
-        ((ServerLevelManagerAccessor) level()).avp$getServerLevelManager()
-            .getQueenSpawnCooldown()
-            .reset();
+        QueenSpawnChunkData.getOrCreate(level())
+            .ifSome(queenSpawnChunkData -> queenSpawnChunkData.getSpawnCooldown().reset());
     }
 
     @Override

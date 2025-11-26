@@ -171,4 +171,8 @@ public class QueenSpawnChunkData extends SavedData {
 
         return buffer.array();
     }
+
+    public Cooldown getSpawnCooldown() {
+        return spawnCooldown;
+    }
 }

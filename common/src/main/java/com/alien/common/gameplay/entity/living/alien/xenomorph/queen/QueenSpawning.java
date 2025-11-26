@@ -4,7 +4,6 @@ import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.level.saveddata.HiveLevelData;
 import com.alien.common.gameplay.level.saveddata.QueenSpawnChunkData;
 import com.alien.common.gameplay.level.saveddata.StrainLeakData;
-import com.avp.server.ServerLevelManagerAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
@@ -29,9 +28,8 @@ public class QueenSpawning {
         randomSource
     ) -> {
         var serverLevel = serverLevelAccessor.getLevel();
-        var serverLevelManager = ((ServerLevelManagerAccessor) serverLevel).avp$getServerLevelManager();
 
-        if (serverLevelManager.getQueenSpawnCooldown().isActive()) {
+        if (QueenSpawnChunkData.getOrCreate(serverLevel).isSomeAnd(queenSpawnChunkData -> queenSpawnChunkData.getSpawnCooldown().isActive())) {
             return false;
         }
 
