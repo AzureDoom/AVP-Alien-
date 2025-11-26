@@ -2,6 +2,9 @@ package com.alien;
 
 import com.alien.common.AlienEvents;
 import com.alien.common.data.AlienReloadListeners;
+import com.alien.common.gameplay.level.saveddata.HiveLevelData;
+import com.alien.common.gameplay.level.saveddata.QueenSpawnChunkData;
+import com.alien.common.registry.AlienDataKeys;
 import com.alien.common.registry.init.AlienArmorMaterials;
 import com.alien.common.registry.init.AlienBlockEntityTypes;
 import com.alien.common.registry.init.AlienCompostingChances;
@@ -24,6 +27,7 @@ import com.avp.AVP;
 import com.avp.common.config.AVPConfig;
 import com.blib.BLib;
 import com.blib.BLibMod;
+import com.blib.event.BLibLevelTickEvent;
 import com.blib.event.key.BLibEventKeys;
 import com.blib.service.BLibServices;
 import mod.azure.azurelib.common.config.format.ConfigFormats;
@@ -78,6 +82,30 @@ public class Alien {
         // Listeners/Events
         AlienReloadListeners.initialize();
 
+        MOD.addEventListener(BLibEventKeys.LEVEL_TICK_POST, Alien::tickHivesInLevel);
+        MOD.addEventListener(BLibEventKeys.LEVEL_TICK_POST, Alien::tickQueenSpawnCooldown);
         MOD.addEventListener(BLibEventKeys.TAGS_UPDATED, $ -> AlienEvents.onTagsUpdated());
+    }
+
+    private static void tickHivesInLevel(BLibLevelTickEvent.Post event) {
+        var level = event.level();
+
+        if (level.isClientSide) {
+            return;
+        }
+
+        HiveLevelData.getOrCreate(level)
+            .ifSome(HiveLevelData::tick);
+    }
+
+    private static void tickQueenSpawnCooldown(BLibLevelTickEvent.Post event) {
+        var level = event.level();
+
+        if (level.isClientSide) {
+            return;
+        }
+
+        QueenSpawnChunkData.getOrCreate(level)
+            .ifSome(QueenSpawnChunkData::tick);
     }
 }

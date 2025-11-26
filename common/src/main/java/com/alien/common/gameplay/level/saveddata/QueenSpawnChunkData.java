@@ -1,6 +1,7 @@
 package com.alien.common.gameplay.level.saveddata;
 
 import com.just.core.functional.option.Option;
+import com.lib.common.data.Cooldown;
 import com.lib.common.gameplay.util.spatial.region.RegionPos;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -13,6 +14,7 @@ import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.ByteBuffer;
+import java.time.Duration;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,12 +28,24 @@ public class QueenSpawnChunkData extends SavedData {
 
     private static final String NBT_REGIONS = "blacklistedRegions";
 
-    private final Map<RegionPos, BitSet> regionChunkBits = new HashMap<>();
+    private static final String NBT_SPAWN_COOLDOWN_IN_TICKS = "spawnCooldownInTicks";
 
-    private QueenSpawnChunkData() {}
+    private final Map<RegionPos, BitSet> regionChunkBits;
+
+    private final Cooldown spawnCooldown;
+
+    private QueenSpawnChunkData() {
+        this(Map.of());
+    }
 
     private QueenSpawnChunkData(Map<RegionPos, BitSet> regionChunkBits) {
+        this.regionChunkBits = new HashMap<>();
         this.regionChunkBits.putAll(regionChunkBits);
+        this.spawnCooldown = Cooldown.withCooldownTime(NBT_SPAWN_COOLDOWN_IN_TICKS, Duration.ofMinutes(5));
+    }
+
+    public void tick() {
+        spawnCooldown.tick();
     }
 
     public void addChunkToBlacklist(BlockPos pos) {
@@ -79,6 +93,7 @@ public class QueenSpawnChunkData extends SavedData {
         }
 
         compoundTag.put(NBT_REGIONS, regionsTag);
+        spawnCooldown.save(compoundTag);
 
         return compoundTag;
     }
@@ -99,7 +114,11 @@ public class QueenSpawnChunkData extends SavedData {
             regionMap.put(region, bitSet);
         }
 
-        return new QueenSpawnChunkData(regionMap);
+        var queenSpawnChunkData = new QueenSpawnChunkData(regionMap);
+
+        queenSpawnChunkData.spawnCooldown.load(compoundTag);
+
+        return queenSpawnChunkData;
     }
 
     public static Option<QueenSpawnChunkData> getOrCreate(Level level) {
@@ -111,7 +130,7 @@ public class QueenSpawnChunkData extends SavedData {
             );
     }
 
-    public static Factory<QueenSpawnChunkData> factory(Level level) {
+    private static Factory<QueenSpawnChunkData> factory(Level level) {
         return new Factory<>(QueenSpawnChunkData::new, QueenSpawnChunkData::load, null);
     }
 
