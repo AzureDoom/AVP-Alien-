@@ -225,16 +225,16 @@ public class AlienChitinBlockItems {
         AlienChitinBlocks.POLISHED_NETHER_CHITIN_WALL
     );
 
-    private static BLibHolder<BlockItem> create(String id, Supplier<? extends Block> blockSupplier) {
-        return create(id, blockSupplier, new Item.Properties());
+    private static BLibHolder<BlockItem> create(String path, Supplier<? extends Block> blockSupplier) {
+        return create(path, blockSupplier, new Item.Properties());
     }
 
-    private static BLibHolder<BlockItem> create(String id, Supplier<? extends Block> blockSupplier, Item.Properties properties) {
-        return createWithSupplier(id, () -> new BlockItem(blockSupplier.get(), properties));
+    private static BLibHolder<BlockItem> create(String path, Supplier<? extends Block> blockSupplier, Item.Properties properties) {
+        return createWithSupplier(path, () -> new BlockItem(blockSupplier.get(), properties));
     }
 
-    private static BLibHolder<BlockItem> createWithSupplier(String id, Supplier<BlockItem> blockItemSupplier) {
-        return REGISTRY.createHolder(id, blockItemSupplier);
+    private static BLibHolder<BlockItem> createWithSupplier(String path, Supplier<BlockItem> blockItemSupplier) {
+        return REGISTRY.createHolder(path, blockItemSupplier);
     }
 
     public static void initialize() {

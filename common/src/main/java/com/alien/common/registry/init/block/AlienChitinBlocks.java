@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 
 public class AlienChitinBlocks {
 
-    public static final BLibRegistry<Block> REGISTRY = Alien.MOD.createRegistry(BuiltInRegistries.BLOCK);
+    private static final BLibRegistry<Block> REGISTRY = Alien.MOD.createRegistry(BuiltInRegistries.BLOCK);
 
     public static final BLibHolder<Block> ABERRANT_CHITIN_BLOCK = create(
         "aberrant_chitin_block",

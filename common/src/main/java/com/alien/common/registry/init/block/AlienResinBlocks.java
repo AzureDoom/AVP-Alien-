@@ -25,7 +25,7 @@ import java.util.function.Supplier;
 
 public class AlienResinBlocks {
 
-    public static final BLibRegistry<Block> REGISTRY = Alien.MOD.createRegistry(BuiltInRegistries.BLOCK);
+    private static final BLibRegistry<Block> REGISTRY = Alien.MOD.createRegistry(BuiltInRegistries.BLOCK);
 
     public static final BLibHolder<Block> ABERRANT_RESIN = create(
         "aberrant_resin",

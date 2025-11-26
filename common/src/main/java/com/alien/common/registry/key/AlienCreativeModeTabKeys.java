@@ -23,6 +23,4 @@ public class AlienCreativeModeTabKeys {
             AlienResources.location(name)
         );
     }
-
-    public static void initialize() {}
 }
