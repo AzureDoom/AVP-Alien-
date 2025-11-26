@@ -475,7 +475,10 @@ public class AlienEntityTypes {
         BLibServices.REGISTRY.registerEntityAttributes(ABERRANT_OVOMORPH, Ovomorph::createOvomorphAttributes);
         BLibServices.REGISTRY.registerEntityAttributes(ABERRANT_PRAETORIAN, Praetorian::createPraetorianAttributes);
         BLibServices.REGISTRY.registerEntityAttributes(ABERRANT_PREDALIEN, Predalien::createPredalienAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(ABERRANT_PREDALIEN_ADOLESCENT, PredalienAdolescent::createPredalienAdolescentAttributes);
+        BLibServices.REGISTRY.registerEntityAttributes(
+            ABERRANT_PREDALIEN_ADOLESCENT,
+            PredalienAdolescent::createPredalienAdolescentAttributes
+        );
         BLibServices.REGISTRY.registerEntityAttributes(
             ABERRANT_PREDALIEN_CHESTBURSTER,
             PredalienChestburster::createPredalienChestbursterAttributes
@@ -508,7 +511,10 @@ public class AlienEntityTypes {
         BLibServices.REGISTRY.registerEntityAttributes(NETHER_OVOMORPH, Ovomorph::createOvomorphAttributes);
         BLibServices.REGISTRY.registerEntityAttributes(NETHER_PRAETORIAN, Praetorian::createPraetorianAttributes);
         BLibServices.REGISTRY.registerEntityAttributes(NETHER_PREDALIEN, Predalien::createPredalienAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(NETHER_PREDALIEN_ADOLESCENT, PredalienAdolescent::createPredalienAdolescentAttributes);
+        BLibServices.REGISTRY.registerEntityAttributes(
+            NETHER_PREDALIEN_ADOLESCENT,
+            PredalienAdolescent::createPredalienAdolescentAttributes
+        );
         BLibServices.REGISTRY.registerEntityAttributes(
             NETHER_PREDALIEN_CHESTBURSTER,
             PredalienChestburster::createPredalienChestbursterAttributes
@@ -523,7 +529,10 @@ public class AlienEntityTypes {
         BLibServices.REGISTRY.registerEntityAttributes(PRAETORIAN, Praetorian::createPraetorianAttributes);
         BLibServices.REGISTRY.registerEntityAttributes(PREDALIEN, Predalien::createPredalienAttributes);
         BLibServices.REGISTRY.registerEntityAttributes(PREDALIEN_ADOLESCENT, PredalienAdolescent::createPredalienAdolescentAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(PREDALIEN_CHESTBURSTER, PredalienChestburster::createPredalienChestbursterAttributes);
+        BLibServices.REGISTRY.registerEntityAttributes(
+            PREDALIEN_CHESTBURSTER,
+            PredalienChestburster::createPredalienChestbursterAttributes
+        );
         BLibServices.REGISTRY.registerEntityAttributes(PROWLER, Prowler::createProwlerAttributes);
         BLibServices.REGISTRY.registerEntityAttributes(QUEEN, Queen::createQueenAttributes);
         BLibServices.REGISTRY.registerEntityAttributes(ROYAL_ABERRANT_ADOLESCENT, Adolescent::createAdolescentAttributes);

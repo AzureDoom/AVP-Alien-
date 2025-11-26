@@ -314,7 +314,7 @@ public class AlienResinBlockItems {
         "smooth_resin_wall",
         AlienResinBlocks.SMOOTH_RESIN_WALL
     );
-    
+
     private static BLibHolder<BlockItem> create(String id, Supplier<? extends Block> blockSupplier) {
         return create(id, blockSupplier, new Item.Properties());
     }

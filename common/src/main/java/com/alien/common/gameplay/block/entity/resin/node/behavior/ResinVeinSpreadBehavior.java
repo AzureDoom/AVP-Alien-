@@ -5,7 +5,6 @@ import com.alien.common.gameplay.block.entity.resin.node.ChargeCursor;
 import com.alien.common.gameplay.block.entity.resin.node.ResinSpreader;
 import com.alien.common.gameplay.block.resin.vein.ResinVeinRegrowUtil;
 import com.alien.common.model.alien.variant.AlienVariantType;
-import com.avp.common.registry.AVPDeferredHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
