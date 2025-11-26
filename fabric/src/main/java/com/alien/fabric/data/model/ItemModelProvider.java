@@ -29,7 +29,7 @@ public class ItemModelProvider extends FabricModelProvider {
 
         var spawnEggLocation = ModelLocationUtils.decorateItemModelLocation("template_spawn_egg");
 
-        AlienSpawnEggItems.getAll()
+        AlienSpawnEggItems.REGISTRY.getAll()
             .forEach(spawnEggItem -> generators.delegateItemModel(spawnEggItem.get(), spawnEggLocation));
     }
 

@@ -103,7 +103,7 @@ public class AlienItemTagProvider extends FabricTagProvider.ItemTagProvider {
         // Weapons
         var swordTagProvider = getOrCreateTagBuilder(ItemTags.SWORDS);
 
-        AlienItems.getAll().forEach(deferredHolder -> {
+        AlienItems.REGISTRY.getAll().forEach(deferredHolder -> {
             var item = deferredHolder.get();
 
             if (item instanceof ArmorItem armorItem) {

@@ -144,7 +144,7 @@ public class EnUsItemProvider {
         addItem(builder, AlienSpawnEggItems.ROYAL_ABERRANT_CHESTBURSTER_SPAWN_EGG, "Royal Aberrant Chestburster Spawn Egg");
 
         AVPRegistryValidation.throwIfMissingEntries(
-            AlienItems.getAll()
+            AlienItems.REGISTRY.getAll()
                 .stream()
                 .filter(deferredHolder -> !(deferredHolder.get() instanceof BlockItem))
                 .toList(),

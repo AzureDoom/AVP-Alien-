@@ -1,12 +1,9 @@
 package com.alien.common.registry.init.item;
 
 import com.alien.Alien;
-import com.alien.AlienResources;
 import com.alien.common.gameplay.item.PoisonJellyItem;
 import com.alien.common.gameplay.item.RoyalJellyItem;
 import com.alien.common.registry.key.AlienJukeboxSongKeys;
-import com.avp.common.registry.AVPDeferredHolder;
-import com.avp.service.Services;
 import com.blib.BLibHolder;
 import com.blib.BLibRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -14,20 +11,11 @@ import net.minecraft.world.item.DiscFragmentItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.function.Supplier;
 
 public class AlienItems {
 
     public static final BLibRegistry<Item> REGISTRY = Alien.MOD.createRegistry(BuiltInRegistries.ITEM);
-
-    private static final List<AVPDeferredHolder<? extends Item>> HOLDERS = new ArrayList<>();
-
-    public static List<AVPDeferredHolder<? extends Item>> getAll() {
-        return Collections.unmodifiableList(HOLDERS);
-    }
 
     public static final BLibHolder<Item> ABERRANT_CHITIN = create(
         "aberrant_chitin",
@@ -100,18 +88,6 @@ public class AlienItems {
 
     private static <T extends Item> BLibHolder<T> create(String name, Supplier<T> itemSupplier) {
         return REGISTRY.createHolder(name, itemSupplier);
-    }
-
-    @Deprecated(forRemoval = true)
-    public static AVPDeferredHolder<Item> register(String name, Item.Properties properties) {
-        return register(name, () -> new Item(properties));
-    }
-
-    @Deprecated(forRemoval = true)
-    public static <T extends Item> AVPDeferredHolder<T> register(String name, Supplier<T> itemSupplier) {
-        var holder = Services.REGISTRY.register(BuiltInRegistries.ITEM, AlienResources.location(name), itemSupplier);
-        HOLDERS.add(holder);
-        return holder;
     }
 
     public static void initialize() {
