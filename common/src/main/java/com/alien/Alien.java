@@ -72,6 +72,7 @@ public class Alien {
 
         // Functionality
         AlienCompostingChances.initialize();
+        AlienDataKeys.initialize();
         AlienEntitySpawns.initialize();
 
         // Listeners/Events

@@ -2,9 +2,9 @@ package com.alien.common.gameplay.entity.living.alien.ovomorph;
 
 import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.Facehugger;
 import com.alien.common.model.alien.HatchState;
+import com.alien.common.registry.AlienDataKeys;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.avp.AVP;
-import com.avp.common.registry.init.AVPDataKeys;
 import com.lib.common.network.DataAccessor;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -26,13 +26,13 @@ public class HatchManager {
         this.hatchDesireManager = new HatchDesireManager(ovomorph);
         this.ovomorph = ovomorph;
 
-        this.remainingHatchDurationInTicks = new DataAccessor<>(ovomorph, AVPDataKeys.OVOMORPH_HATCH_DURATION_IN_TICKS);
+        this.remainingHatchDurationInTicks = new DataAccessor<>(ovomorph, AlienDataKeys.OVOMORPH_HATCH_DURATION_IN_TICKS);
         remainingHatchDurationInTicks.set(hatchDurationInTicks);
 
-        this.remainingSpawnDelayInTicks = new DataAccessor<>(ovomorph, AVPDataKeys.OVOMORPH_REMAINING_SPAWN_DELAY_IN_TICKS);
+        this.remainingSpawnDelayInTicks = new DataAccessor<>(ovomorph, AlienDataKeys.OVOMORPH_REMAINING_SPAWN_DELAY_IN_TICKS);
         remainingSpawnDelayInTicks.set(spawnDelayInTicks);
 
-        this.spawnCount = new DataAccessor<>(ovomorph, AVPDataKeys.OVOMORPH_SPAWN_COUNT);
+        this.spawnCount = new DataAccessor<>(ovomorph, AlienDataKeys.OVOMORPH_SPAWN_COUNT);
     }
 
     public void tick() {

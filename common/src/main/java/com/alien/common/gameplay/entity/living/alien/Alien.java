@@ -6,6 +6,7 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
 import com.alien.common.gameplay.level.saveddata.HiveLevelData;
 import com.alien.common.gameplay.level.saveddata.StrainLeakData;
 import com.alien.common.model.alien.variant.AlienVariant;
+import com.alien.common.registry.AlienDataKeys;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.registry.tag.AlienMobEffectTags;
 import com.alien.common.util.AcidBleedUtil;
@@ -87,7 +88,7 @@ public abstract class Alien extends Monster implements DataUser {
         super(entityType, level);
 
         this.hasTarget = new DataAccessor<>(this, AVPDataKeys.ENTITY_HAS_TARGET);
-        this.isPoisoned = new DataAccessor<>(this, AVPDataKeys.ALIEN_IS_POISONED);
+        this.isPoisoned = new DataAccessor<>(this, AlienDataKeys.ALIEN_IS_POISONED);
         this.isMovingHorizontally = new DataAccessor<>(this, AVPDataKeys.ENTITY_IS_MOVING_HORIZONTALLY);
 
         this.hiveManager = new HiveManager(this);

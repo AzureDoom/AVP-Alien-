@@ -2,8 +2,8 @@ package com.alien.common.gameplay.entity.living.alien.parasite;
 
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.model.alien.FreeMob;
+import com.alien.common.registry.AlienDataKeys;
 import com.alien.common.util.AlienPredicates;
-import com.avp.common.registry.init.AVPDataKeys;
 import com.avp.common.util.AVPPredicates;
 import com.lib.common.network.DataAccessor;
 import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
@@ -24,7 +24,7 @@ public abstract class Parasite extends Alien {
     protected Parasite(EntityType<? extends Parasite> entityType, Level level) {
         super(entityType, level);
 
-        this.isFertile = new DataAccessor<>(this, AVPDataKeys.PARASITE_IS_FERTILE);
+        this.isFertile = new DataAccessor<>(this, AlienDataKeys.PARASITE_IS_FERTILE);
 
         this.attachmentManager = new ParasiteAttachmentManager(this);
 

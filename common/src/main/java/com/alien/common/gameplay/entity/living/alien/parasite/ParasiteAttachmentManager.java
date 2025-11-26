@@ -2,8 +2,8 @@ package com.alien.common.gameplay.entity.living.alien.parasite;
 
 import com.alien.common.model.alien.FreeMob;
 import com.alien.common.model.alien.Host;
+import com.alien.common.registry.AlienDataKeys;
 import com.alien.common.util.AlienPredicates;
-import com.avp.common.registry.init.AVPDataKeys;
 import com.avp.common.registry.key.AVPDamageTypeKeys;
 import com.lib.common.network.DataAccessor;
 import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
@@ -24,7 +24,7 @@ public class ParasiteAttachmentManager {
 
     public ParasiteAttachmentManager(Parasite parasite) {
         this.parasite = parasite;
-        this.ticksAttachedToHost = new DataAccessor<>(parasite, AVPDataKeys.PARASITE_TICKS_ATTACHED_TO_HOST);
+        this.ticksAttachedToHost = new DataAccessor<>(parasite, AlienDataKeys.PARASITE_TICKS_ATTACHED_TO_HOST);
     }
 
     public void tick() {

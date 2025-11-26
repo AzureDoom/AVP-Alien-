@@ -8,12 +8,12 @@ import com.alien.common.gameplay.entity.living.alien.GrowthManager;
 import com.alien.common.gameplay.entity.living.alien.ResinManager;
 import com.alien.common.model.resin.ResinData;
 import com.alien.common.model.resin.ResinProducer;
+import com.alien.common.registry.AlienDataKeys;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.util.AlienPredicates;
 import com.alien.common.util.XenomorphGrowthUtil;
 import com.avp.common.gameplay.ai.goal.StrollAroundInWaterGoal;
-import com.avp.common.registry.init.AVPDataKeys;
 import com.lib.common.network.DataAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -63,7 +63,7 @@ public abstract class Xenomorph extends Alien implements ResinProducer {
     public Xenomorph(EntityType<? extends Xenomorph> entityType, Level level) {
         super(entityType, level);
 
-        this.isCrawling = new DataAccessor<>(this, AVPDataKeys.XENOMORPH_IS_CRAWLING);
+        this.isCrawling = new DataAccessor<>(this, AlienDataKeys.XENOMORPH_IS_CRAWLING);
 
         this.crawlingManager = new CrawlingManager(this, isCrawling);
         this.growthManager = new GrowthManager(this, XenomorphGrowthUtil.GROW_UP_CALLBACK)

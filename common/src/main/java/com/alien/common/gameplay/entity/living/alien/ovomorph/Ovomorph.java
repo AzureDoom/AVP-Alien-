@@ -5,12 +5,12 @@ import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.ovomorph.ai.OvomorphGOAP;
 import com.alien.common.model.alien.HatchState;
 import com.alien.common.model.alien.variant.AlienVariant;
+import com.alien.common.registry.AlienDataKeys;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.util.AlienPredicates;
 import com.avp.AVP;
-import com.avp.common.registry.init.AVPDataKeys;
 import com.just.core.functional.option.Option;
 import com.just.goap.graph.Graph;
 import com.lib.common.gameplay.entity.manager.VibrationSystemManager;
@@ -59,9 +59,9 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
         super(entityType, level);
 
         // FIXME:
-        this.hatchStateId = new DataAccessor<>(this, null);
-        this.maxSpawnCount = new DataAccessor<>(this, AVPDataKeys.OVOMORPH_MAXIMUM_SPAWN_COUNT);
-        this.isRooted = new DataAccessor<>(this, AVPDataKeys.OVOMORPH_IS_ROOTED);
+        this.hatchStateId = new DataAccessor<>(this, AlienDataKeys.OVOMORPH_HATCH_STATE);
+        this.maxSpawnCount = new DataAccessor<>(this, AlienDataKeys.OVOMORPH_MAXIMUM_SPAWN_COUNT);
+        this.isRooted = new DataAccessor<>(this, AlienDataKeys.OVOMORPH_IS_ROOTED);
 
         this.animationDispatcher = new OvomorphAnimationDispatcher(this);
         this.hatchManager = new HatchManager(this, 3 * 20, 3 * 20);

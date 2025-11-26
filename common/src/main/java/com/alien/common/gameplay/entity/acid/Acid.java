@@ -1,7 +1,7 @@
 package com.alien.common.gameplay.entity.acid;
 
 import com.alien.common.data.AlienVariantTypes;
-import com.avp.common.registry.init.AVPDataKeys;
+import com.alien.common.registry.AlienDataKeys;
 import com.lib.common.gameplay.util.GravityUtil;
 import com.lib.common.network.DataAccessor;
 import com.lib.common.network.DataUser;
@@ -49,8 +49,8 @@ public class Acid extends Entity implements DataUser {
     public Acid(EntityType<? extends Entity> entityType, Level level) {
         super(entityType, level);
 
-        this.multiplier = new DataAccessor<>(this, AVPDataKeys.ACID_MULTIPLIER);
-        this.tickCountForCurrentMultiplier = new DataAccessor<>(this, AVPDataKeys.ACID_TICK_COUNT_FOR_MULTIPLIER);
+        this.multiplier = new DataAccessor<>(this, AlienDataKeys.ACID_MULTIPLIER);
+        this.tickCountForCurrentMultiplier = new DataAccessor<>(this, AlienDataKeys.ACID_TICK_COUNT_FOR_MULTIPLIER);
 
         setNoGravity(false);
         refreshDimensions();
