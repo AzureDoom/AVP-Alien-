@@ -6,7 +6,7 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
 import com.alien.common.gameplay.level.saveddata.HiveLevelData;
 import com.alien.common.gameplay.level.saveddata.StrainLeakData;
 import com.alien.common.model.alien.variant.AlienVariant;
-import com.alien.common.registry.AlienDataKeys;
+import com.alien.common.registry.init.AlienDataKeys;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.registry.tag.AlienMobEffectTags;
 import com.alien.common.util.AcidBleedUtil;

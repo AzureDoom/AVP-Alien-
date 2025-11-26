@@ -1,7 +1,7 @@
 package com.alien.common.gameplay.entity.acid;
 
 import com.alien.common.data.AlienVariantTypes;
-import com.alien.common.registry.AlienDataKeys;
+import com.alien.common.registry.init.AlienDataKeys;
 import com.lib.common.gameplay.util.GravityUtil;
 import com.lib.common.network.DataAccessor;
 import com.lib.common.network.DataUser;

@@ -1,4 +1,4 @@
-package com.alien.common.registry;
+package com.alien.common.registry.init;
 
 import com.alien.AlienResources;
 import com.alien.common.gameplay.entity.living.alien.ovomorph.Ovomorph;

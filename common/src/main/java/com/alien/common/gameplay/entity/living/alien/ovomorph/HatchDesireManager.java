@@ -1,6 +1,6 @@
 package com.alien.common.gameplay.entity.living.alien.ovomorph;
 
-import com.alien.common.registry.AlienDataKeys;
+import com.alien.common.registry.init.AlienDataKeys;
 import com.alien.common.util.AlienPredicates;
 import com.lib.common.network.DataAccessor;
 import net.minecraft.world.level.gameevent.vibrations.VibrationInfo;

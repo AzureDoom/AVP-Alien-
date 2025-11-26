@@ -2,7 +2,7 @@ package com.alien.common.gameplay.entity.living.alien.ovomorph;
 
 import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.Facehugger;
 import com.alien.common.model.alien.HatchState;
-import com.alien.common.registry.AlienDataKeys;
+import com.alien.common.registry.init.AlienDataKeys;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.avp.AVP;
 import com.lib.common.network.DataAccessor;

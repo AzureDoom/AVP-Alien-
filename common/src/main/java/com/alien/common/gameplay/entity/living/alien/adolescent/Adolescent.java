@@ -3,7 +3,7 @@ package com.alien.common.gameplay.entity.living.alien.adolescent;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.GrowthManager;
 import com.alien.common.model.alien.variant.AlienVariant;
-import com.alien.common.registry.AlienDataKeys;
+import com.alien.common.registry.init.AlienDataKeys;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.util.AlienPredicates;

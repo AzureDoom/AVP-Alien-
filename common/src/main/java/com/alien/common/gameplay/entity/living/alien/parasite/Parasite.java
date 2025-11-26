@@ -2,7 +2,7 @@ package com.alien.common.gameplay.entity.living.alien.parasite;
 
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.model.alien.FreeMob;
-import com.alien.common.registry.AlienDataKeys;
+import com.alien.common.registry.init.AlienDataKeys;
 import com.alien.common.util.AlienPredicates;
 import com.avp.common.util.AVPPredicates;
 import com.lib.common.network.DataAccessor;
