@@ -1,8 +1,8 @@
 {
   "ambientocclusion": false,
   "textures": {
-    "particle": "avp:block/nether_resin_vein",
-    "nether_resin_vein": "avp:block/nether_resin_vein"
+    "particle": "avp_alien:block/nether_resin_vein",
+    "nether_resin_vein": "avp_alien:block/nether_resin_vein"
   },
   "elements": [
     {

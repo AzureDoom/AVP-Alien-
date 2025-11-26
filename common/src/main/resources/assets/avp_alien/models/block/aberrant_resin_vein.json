@@ -1,8 +1,8 @@
 {
   "ambientocclusion": false,
   "textures": {
-    "particle": "avp:block/aberrant_resin_vein",
-    "aberrant_resin_vein": "avp:block/aberrant_resin_vein"
+    "particle": "avp_alien:block/aberrant_resin_vein",
+    "aberrant_resin_vein": "avp_alien:block/aberrant_resin_vein"
   },
   "elements": [
     {
