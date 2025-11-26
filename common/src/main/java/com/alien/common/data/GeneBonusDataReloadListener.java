@@ -1,5 +1,6 @@
 package com.alien.common.data;
 
+import com.alien.Alien;
 import com.avp.AVP;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -41,7 +42,7 @@ public class GeneBonusDataReloadListener extends SimpleJsonResourceReloadListene
             var jsonElement = entry.getValue();
 
             GeneBonusData.CODEC.parse(JsonOps.INSTANCE, jsonElement)
-                .resultOrPartial(err -> AVP.LOGGER.error("Failed to parse GeneBonusData {}: {}", resourceLocation, err))
+                .resultOrPartial(err -> Alien.LOGGER.error("Failed to parse GeneBonusData {}: {}", resourceLocation, err))
                 .ifPresent(GeneBonusDataRegistry::register);
         }
     }

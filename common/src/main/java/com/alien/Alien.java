@@ -1,5 +1,7 @@
 package com.alien;
 
+import com.alien.common.AlienEvents;
+import com.alien.common.data.AlienReloadListeners;
 import com.alien.common.registry.init.AlienArmorMaterials;
 import com.alien.common.registry.init.AlienBlockEntityTypes;
 import com.alien.common.registry.init.AlienCompostingChances;
@@ -18,11 +20,11 @@ import com.alien.common.registry.init.item.AlienSpawnEggItems;
 import com.alien.common.registry.init.item.block.AlienBlockItems;
 import com.alien.common.registry.init.item.block.AlienChitinBlockItems;
 import com.alien.common.registry.init.item.block.AlienResinBlockItems;
-import com.alien.common.registry.key.AlienJukeboxSongKeys;
 import com.avp.AVP;
 import com.avp.common.config.AVPConfig;
 import com.blib.BLib;
 import com.blib.BLibMod;
+import com.blib.event.key.BLibEventKeys;
 import com.blib.service.BLibServices;
 import mod.azure.azurelib.common.config.format.ConfigFormats;
 import org.slf4j.Logger;
@@ -71,5 +73,10 @@ public class Alien {
         // Functionality
         AlienCompostingChances.initialize();
         AlienEntitySpawns.initialize();
+
+        // Listeners/Events
+        AlienReloadListeners.initialize();
+
+        MOD.addEventListener(BLibEventKeys.TAGS_UPDATED, $ -> AlienEvents.onTagsUpdated());
     }
 }
