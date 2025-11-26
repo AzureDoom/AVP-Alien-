@@ -1,5 +1,6 @@
 package com.alien.fabric.data.loot;
 
+import com.alien.Alien;
 import com.alien.common.registry.init.block.AlienBlocks;
 import com.alien.common.registry.init.block.AlienChitinBlocks;
 import com.alien.common.registry.init.block.AlienResinBlocks;
@@ -8,6 +9,7 @@ import com.avp.common.registry.AVPRegistryValidation;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -33,7 +35,7 @@ public class BlockLootTableProvider extends FabricBlockLootTableProvider {
         generateSlabDrops();
 
         AVPRegistryValidation.throwIfMissingEntries(
-            AlienBlocks.REGISTRY.getAll(),
+            Alien.MOD.getAllHolders(BuiltInRegistries.BLOCK),
             TOUCHED_ENTRIES::contains,
             Block::getDescriptionId,
             "Block loot table generation did not complete successfully - there are unhandled blocks that need to be handled."

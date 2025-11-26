@@ -1,5 +1,6 @@
 package com.alien.fabric.data.tag;
 
+import com.alien.Alien;
 import com.alien.common.registry.init.item.AlienArmorItems;
 import com.alien.common.registry.init.item.AlienItems;
 import com.alien.common.registry.init.item.block.AlienResinBlockItems;
@@ -9,6 +10,7 @@ import com.compat.CommonItemTags;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.AxeItem;
@@ -103,7 +105,7 @@ public class AlienItemTagProvider extends FabricTagProvider.ItemTagProvider {
         // Weapons
         var swordTagProvider = getOrCreateTagBuilder(ItemTags.SWORDS);
 
-        AlienItems.REGISTRY.getAll().forEach(deferredHolder -> {
+        Alien.MOD.getAllHolders(BuiltInRegistries.ITEM).forEach(deferredHolder -> {
             var item = deferredHolder.get();
 
             if (item instanceof ArmorItem armorItem) {

@@ -1,10 +1,12 @@
 package com.alien.fabric.data.lang.en_us.provider;
 
+import com.alien.Alien;
 import com.alien.common.registry.init.item.AlienArmorItems;
 import com.alien.common.registry.init.item.AlienItems;
 import com.alien.common.registry.init.item.AlienSpawnEggItems;
 import com.avp.common.registry.AVPRegistryValidation;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 
@@ -144,7 +146,7 @@ public class EnUsItemProvider {
         addItem(builder, AlienSpawnEggItems.ROYAL_ABERRANT_CHESTBURSTER_SPAWN_EGG, "Royal Aberrant Chestburster Spawn Egg");
 
         AVPRegistryValidation.throwIfMissingEntries(
-            AlienItems.REGISTRY.getAll()
+            Alien.MOD.getAllHolders(BuiltInRegistries.ITEM)
                 .stream()
                 .filter(deferredHolder -> !(deferredHolder.get() instanceof BlockItem))
                 .toList(),
