@@ -133,7 +133,7 @@ public class EnUsBlockProvider {
         addBlock(builder, AlienChitinBlocks.POLISHED_NETHER_CHITIN_WALL, "Polished Nether Chitin Wall");
 
         AVPRegistryValidation.throwIfMissingEntries(
-            AlienBlocks.getAll(),
+            AlienBlocks.REGISTRY.getAll(),
             TOUCHED_ENTRIES::contains,
             Block::getDescriptionId,
             "Block translation did not complete successfully - there are unhandled blocks that need to be handled."

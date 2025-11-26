@@ -1,37 +1,30 @@
 package com.alien.common.registry.init.block;
 
-import com.alien.AlienResources;
+import com.alien.Alien;
 import com.alien.common.registry.init.block.property.AlienBlockProperties;
 import com.avp.common.gameplay.block.property.BlockPropertyBuilder;
-import com.avp.common.registry.AVPDeferredHolder;
-import com.avp.service.Services;
+import com.blib.BLibHolder;
+import com.blib.BLibRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Block;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.function.Supplier;
 
 public class AlienBlocks {
 
-    private static final List<AVPDeferredHolder<? extends Block>> HOLDERS = new ArrayList<>();
+    public static final BLibRegistry<Block> REGISTRY = Alien.MOD.createRegistry(BuiltInRegistries.BLOCK);
 
-    public static List<AVPDeferredHolder<? extends Block>> getAll() {
-        return Collections.unmodifiableList(HOLDERS);
+    public static final BLibHolder<Block> ROYAL_JELLY_BLOCK = create("royal_jelly_block", AlienBlockProperties.JELLY);
+
+    private static BLibHolder<Block> create(String path, BlockPropertyBuilder blockPropertyBuilder) {
+        return create(path, () -> new Block(blockPropertyBuilder.build()));
     }
 
-    public static final AVPDeferredHolder<Block> ROYAL_JELLY_BLOCK = register("royal_jelly_block", AlienBlockProperties.JELLY);
-
-    public static AVPDeferredHolder<Block> register(String id, BlockPropertyBuilder blockPropertyBuilder) {
-        return register(id, () -> new Block(blockPropertyBuilder.build()));
+    private static <T extends Block> BLibHolder<T> create(String path, Supplier<T> blockSupplier) {
+        return REGISTRY.createHolder(path, blockSupplier);
     }
 
-    public static <T extends Block> AVPDeferredHolder<T> register(String id, Supplier<T> blockSupplier) {
-        var holder = Services.REGISTRY.register(BuiltInRegistries.BLOCK, AlienResources.location(id), blockSupplier);
-        HOLDERS.add(holder);
-        return holder;
+    public static void initialize() {
+        REGISTRY.registerAll();
     }
-
-    public static void initialize() {}
 }
