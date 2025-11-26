@@ -1,7 +1,6 @@
 package com.alien.fabric;
 
 import com.alien.Alien;
-import com.alien.fabric.common.DispenserBlockBehaviors;
 import com.alien.fabric.common.FlammableBlockRegistry;
 import com.alien.fabric.data.loot.LootTableModifier;
 import com.avp.common.AVPEvents;
@@ -19,7 +18,6 @@ public class AlienFabric implements ModInitializer {
         Alien.initialize();
 
         // Functionality
-        DispenserBlockBehaviors.initialize();
         LootTableModifier.initialize();
         FlammableBlockRegistry.initialize();
 
