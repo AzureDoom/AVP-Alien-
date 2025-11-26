@@ -2,6 +2,7 @@ package com.alien.fabric.data.lang.en_us;
 
 import com.alien.common.gameplay.hive.HiveBossBarManager;
 import com.alien.fabric.data.lang.en_us.provider.EnUsAdvancementProvider;
+import com.alien.fabric.data.lang.en_us.provider.EnUsBiomeTagProvider;
 import com.alien.fabric.data.lang.en_us.provider.EnUsBlockProvider;
 import com.alien.fabric.data.lang.en_us.provider.EnUsBlockTagProvider;
 import com.alien.fabric.data.lang.en_us.provider.EnUsConfigProvider;
@@ -67,5 +68,6 @@ public class EnglishLanguageProvider extends FabricLanguageProvider {
         EnUsItemTagProvider.CONSUMER.accept(builder);
         EnUsEntityTypeTagProvider.CONSUMER.accept(builder);
         EnUsMobEffectTagProvider.CONSUMER.accept(builder);
+        EnUsBiomeTagProvider.CONSUMER.accept(builder);
     }
 }

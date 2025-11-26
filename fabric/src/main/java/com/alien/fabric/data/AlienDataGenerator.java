@@ -11,6 +11,7 @@ import com.alien.fabric.data.loot.EntityLootTableProvider;
 import com.alien.fabric.data.model.BlockModelProvider;
 import com.alien.fabric.data.model.ItemModelProvider;
 import com.alien.fabric.data.recipe.RecipeProvider;
+import com.alien.fabric.data.tag.AlienBiomeTagProvider;
 import com.alien.fabric.data.tag.AlienBlockTagProvider;
 import com.alien.fabric.data.tag.AlienEntityTypeTagProvider;
 import com.alien.fabric.data.tag.AlienItemTagProvider;
@@ -39,6 +40,7 @@ public class AlienDataGenerator implements DataGeneratorEntrypoint {
 
         // Tag providers
         pack.addProvider(AlienBlockTagProvider::new);
+        pack.addProvider(AlienBiomeTagProvider::new);
         pack.addProvider(AlienEntityTypeTagProvider::new);
         pack.addProvider(AlienItemTagProvider::new);
         pack.addProvider(AVPMobEffectTagProvider::new);
