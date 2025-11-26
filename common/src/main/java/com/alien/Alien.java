@@ -2,6 +2,7 @@ package com.alien;
 
 import com.alien.common.AlienEvents;
 import com.alien.common.data.AlienReloadListeners;
+import com.alien.common.data.fixer.migration.AlienDataMigrations;
 import com.alien.common.gameplay.level.saveddata.HiveLevelData;
 import com.alien.common.gameplay.level.saveddata.QueenSpawnChunkData;
 import com.alien.common.registry.init.AlienArmorMaterials;
@@ -78,6 +79,9 @@ public class Alien {
         AlienCompostingChances.initialize();
         AlienDataKeys.initialize();
         AlienEntitySpawns.initialize();
+
+        // Data Migration
+        AlienDataMigrations.initialize();
 
         // Listeners/Events
         AlienReloadListeners.initialize();
