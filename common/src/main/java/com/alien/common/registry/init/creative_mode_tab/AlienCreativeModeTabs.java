@@ -1,7 +1,6 @@
 package com.alien.common.registry.init.creative_mode_tab;
 
 import com.alien.Alien;
-import com.alien.AlienResources;
 import com.alien.common.registry.init.block.AlienResinBlocks;
 import com.alien.common.registry.init.creative_mode_tab.initializer.BlocksCreativeModeTabInitializer;
 import com.alien.common.registry.init.creative_mode_tab.initializer.CombatCreativeModeTabInitializer;
@@ -12,8 +11,8 @@ import com.alien.common.registry.init.item.AlienArmorItems;
 import com.alien.common.registry.init.item.AlienItems;
 import com.alien.common.registry.init.item.AlienSpawnEggItems;
 import com.alien.common.registry.key.AlienCreativeModeTabKeys;
-import com.avp.common.registry.AVPDeferredHolder;
-import com.avp.service.Services;
+import com.blib.BLibHolder;
+import com.blib.BLibRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -25,48 +24,49 @@ import java.util.function.Supplier;
 
 public class AlienCreativeModeTabs {
 
+    private static final BLibRegistry<CreativeModeTab> REGISTRY = Alien.MOD.createRegistry(BuiltInRegistries.CREATIVE_MODE_TAB);
+
     private static final String BASE_PATH = "creativeModeTab";
 
-    public static final AVPDeferredHolder<CreativeModeTab> BLOCKS = register(
+    public static final BLibHolder<CreativeModeTab> BLOCKS = create(
         AlienCreativeModeTabKeys.BLOCKS_KEY,
         () -> new ItemStack(AlienResinBlocks.RESIN.get()),
         BlocksCreativeModeTabInitializer.OUTPUT_CONSUMER
     );
 
-    public static final AVPDeferredHolder<CreativeModeTab> COMBAT = register(
+    public static final BLibHolder<CreativeModeTab> COMBAT = create(
         AlienCreativeModeTabKeys.COMBAT_KEY,
         () -> new ItemStack(AlienArmorItems.CHITIN_HELMET.get()),
         CombatCreativeModeTabInitializer.OUTPUT_CONSUMER
     );
 
-    public static final AVPDeferredHolder<CreativeModeTab> INGREDIENTS = register(
+    public static final BLibHolder<CreativeModeTab> INGREDIENTS = create(
         AlienCreativeModeTabKeys.INGREDIENTS_KEY,
         () -> new ItemStack(AlienItems.CHITIN.get()),
         IngredientsCreativeModeTabInitializer.OUTPUT_CONSUMER
     );
 
-    public static final AVPDeferredHolder<CreativeModeTab> SPAWN_EGGS = register(
+    public static final BLibHolder<CreativeModeTab> SPAWN_EGGS = create(
         AlienCreativeModeTabKeys.SPAWN_EGGS_KEY,
         () -> new ItemStack(AlienSpawnEggItems.DRONE_SPAWN_EGG.get()),
         SpawnEggsCreativeModeTabInitializer.OUTPUT_CONSUMER
     );
 
-    public static final AVPDeferredHolder<CreativeModeTab> TOOLS_AND_UTILITIES = register(
+    public static final BLibHolder<CreativeModeTab> TOOLS_AND_UTILITIES = create(
         AlienCreativeModeTabKeys.TOOLS_AND_UTILITIES_KEY,
         () -> new ItemStack(AlienItems.ALIEN_MUSIC_DISC_1.get()),
         ToolsAndUtilitiesCreativeModeTabInitializer.OUTPUT_CONSUMER
     );
 
-    public static AVPDeferredHolder<CreativeModeTab> register(
+    private static BLibHolder<CreativeModeTab> create(
         ResourceKey<CreativeModeTab> resourceKey,
         Supplier<ItemStack> iconSupplier,
         Consumer<CreativeModeTab.Output> outputConsumer
     ) {
         var path = resourceKey.location().getPath();
 
-        return Services.REGISTRY.register(
-            BuiltInRegistries.CREATIVE_MODE_TAB,
-            AlienResources.location(path),
+        return REGISTRY.createHolder(
+            path,
             () -> CreativeModeTab.builder(CreativeModeTab.Row.TOP, 0)
                 .icon(iconSupplier)
                 .title(Component.translatable(BASE_PATH + "." + Alien.MOD_ID + "." + path))
@@ -75,5 +75,7 @@ public class AlienCreativeModeTabs {
         );
     }
 
-    public static void initialize() {}
+    public static void initialize() {
+        REGISTRY.registerAll();
+    }
 }
