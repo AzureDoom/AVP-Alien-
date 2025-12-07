@@ -6,7 +6,6 @@ import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.util.AlienPredicates;
-import com.avp.AVP;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;

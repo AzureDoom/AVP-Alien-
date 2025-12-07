@@ -4,7 +4,6 @@ import com.alien.common.config.AlienConfig;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.hive.Hive;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
-import com.avp.AVP;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 

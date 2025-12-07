@@ -31,12 +31,6 @@ import com.blib.BLibMod;
 import com.blib.event.BLibLevelTickEvent;
 import com.blib.event.key.BLibEventKeys;
 import com.blib.service.BLibServices;
-import mod.azure.azurelib.common.config.Config;
-import mod.azure.azurelib.common.config.ConfigHolder;
-import mod.azure.azurelib.common.config.ConfigHolderRegistry;
-import mod.azure.azurelib.common.config.format.ConfigFormats;
-import mod.azure.azurelib.common.config.format.IConfigFormatHandler;
-import mod.azure.azurelib.common.config.io.ConfigIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -4,8 +4,6 @@ import com.alien.common.registry.key.AlienDamageTypeKeys;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.world.damagesource.DamageType;
 
-import com.avp.common.registry.key.AVPDamageTypeKeys;
-
 public class DamageTypeBootstrapper {
 
     public static void bootstrap(BootstrapContext<DamageType> registry) {

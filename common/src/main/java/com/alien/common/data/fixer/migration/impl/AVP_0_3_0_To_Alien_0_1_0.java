@@ -44,13 +44,20 @@ public class AVP_0_3_0_To_Alien_0_1_0 implements BLibDataMigration {
         register(createResourceKeyEntry(Registries.TEMPLATE_POOL, "nether_royal_altar_egg"));
     }
 
-    private static BLibDataFixerRegistry.Entry.@NotNull Resource createResourceKeyEntry(ResourceKey<Registry<StructureTemplatePool>> registry, String path) {
+    private static BLibDataFixerRegistry.Entry.@NotNull Resource createResourceKeyEntry(
+        ResourceKey<Registry<StructureTemplatePool>> registry,
+        String path
+    ) {
         return new BLibDataFixerRegistry.Entry.Resource(registry, AVPResources.location(path), AlienResources.location(path));
     }
 
     private static void registerMigrationsForRegistry(Registry<?> registry) {
         Alien.MOD.getAllHolders(registry)
-            .forEach(holder -> register(new BLibDataFixerRegistry.Entry.Direct(registry, AVPResources.location(holder.getPath()), holder.getResourceLocation())));
+            .forEach(
+                holder -> register(
+                    new BLibDataFixerRegistry.Entry.Direct(registry, AVPResources.location(holder.getPath()), holder.getResourceLocation())
+                )
+            );
     }
 
     public static void register(BLibDataFixerRegistry.Entry entry) {

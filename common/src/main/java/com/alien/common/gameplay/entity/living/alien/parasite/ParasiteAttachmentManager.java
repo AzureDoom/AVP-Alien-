@@ -5,7 +5,6 @@ import com.alien.common.model.alien.Host;
 import com.alien.common.registry.init.AlienDataKeys;
 import com.alien.common.registry.key.AlienDamageTypeKeys;
 import com.alien.common.util.AlienPredicates;
-import com.avp.common.registry.key.AVPDamageTypeKeys;
 import com.lib.common.network.DataAccessor;
 import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
 import net.minecraft.server.level.ServerPlayer;

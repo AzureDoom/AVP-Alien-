@@ -8,7 +8,6 @@ import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.util.AcidBleedUtil;
-import com.avp.AVP;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;

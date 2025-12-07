@@ -1,7 +1,6 @@
 package com.alien.common.gameplay.hive;
 
 import com.alien.common.config.AlienConfig;
-import com.avp.AVP;
 import com.lib.common.gameplay.util.spatial.Vec3Like;
 import com.lib.common.gameplay.util.spatial.block.BlockPosVec3;
 import com.lib.common.gameplay.util.spatial.sphere.layer.LayeredSphere;

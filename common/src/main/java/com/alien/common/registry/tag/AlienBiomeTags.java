@@ -1,7 +1,6 @@
 package com.alien.common.registry.tag;
 
 import com.alien.AlienResources;
-import com.avp.AVPResources;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;

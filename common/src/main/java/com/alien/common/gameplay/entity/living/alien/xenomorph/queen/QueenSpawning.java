@@ -29,7 +29,9 @@ public class QueenSpawning {
     ) -> {
         var serverLevel = serverLevelAccessor.getLevel();
 
-        if (QueenSpawnChunkData.getOrCreate(serverLevel).isSomeAnd(queenSpawnChunkData -> queenSpawnChunkData.getSpawnCooldown().isActive())) {
+        if (
+            QueenSpawnChunkData.getOrCreate(serverLevel).isSomeAnd(queenSpawnChunkData -> queenSpawnChunkData.getSpawnCooldown().isActive())
+        ) {
             return false;
         }
 

@@ -21,7 +21,6 @@ import com.alien.common.gameplay.hive.vent.HiveVentManager;
 import com.alien.common.gameplay.level.saveddata.QueenSpawnChunkData;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
-import com.avp.AVP;
 import com.lib.common.gameplay.NBTSerializable;
 import com.lib.common.gameplay.util.spatial.chunk.ChunkPosUtil;
 import net.minecraft.core.BlockPos;

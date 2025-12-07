@@ -4,8 +4,6 @@ import com.alien.common.config.AlienConfig;
 import com.alien.common.registry.key.AlienDamageTypeKeys;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.registry.tag.AlienItemTags;
-import com.avp.AVP;
-import com.avp.common.registry.key.AVPDamageTypeKeys;
 import com.avp.common.util.AVPPredicates;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;

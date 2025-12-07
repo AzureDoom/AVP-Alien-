@@ -12,7 +12,6 @@ import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.registry.tag.AlienMobEffectTags;
 import com.alien.common.util.AcidBleedUtil;
 import com.alien.common.util.AlienTransitionUtil;
-import com.avp.AVP;
 import com.avp.common.registry.init.AVPDataKeys;
 import com.avp.common.registry.key.AVPBiomeKeys;
 import com.avp.common.registry.tag.AVPDamageTypesTags;

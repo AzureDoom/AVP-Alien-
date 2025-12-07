@@ -4,7 +4,6 @@ import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.model.alien.Host;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.key.AlienDamageTypeKeys;
-import com.avp.common.registry.key.AVPDamageTypeKeys;
 import com.lib.common.model.GeneCarrier;
 import com.lib.common.util.EmbryoUtil;
 import net.minecraft.sounds.SoundSource;

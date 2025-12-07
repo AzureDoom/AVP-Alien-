@@ -7,7 +7,6 @@ import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.util.AlienPredicates;
 import com.alien.common.util.XenomorphGrowthUtil;
-import com.avp.AVP;
 import com.avp.common.util.AVPPredicates;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;

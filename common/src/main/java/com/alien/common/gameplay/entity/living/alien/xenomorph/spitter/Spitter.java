@@ -7,7 +7,6 @@ import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
-import com.avp.AVP;
 import com.avp.common.gameplay.ai.goal.combat.LungeAtTargetGoal;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;

@@ -11,7 +11,6 @@ import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.util.AlienPredicates;
-import com.avp.AVP;
 import com.just.core.functional.option.Option;
 import com.just.goap.graph.Graph;
 import com.lib.common.gameplay.entity.manager.VibrationSystemManager;

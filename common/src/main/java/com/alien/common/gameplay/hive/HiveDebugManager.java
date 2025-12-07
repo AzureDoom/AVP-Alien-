@@ -1,7 +1,6 @@
 package com.alien.common.gameplay.hive;
 
 import com.alien.common.config.AlienConfig;
-import com.avp.AVP;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
