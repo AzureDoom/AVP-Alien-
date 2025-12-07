@@ -5,9 +5,8 @@ import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.AlienSpawning;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.QueenSpawning;
 import com.alien.common.registry.tag.AlienBiomeTags;
-import com.avp.common.config.AVPConfig;
 import com.avp.common.model.spawning.AVPEntitySpawnData;
-import com.avp.common.registry.tag.AVPBiomeTags;
+import com.avp.common.model.spawning.SpawnSettings;
 import com.avp.service.Services;
 import com.blib.BLibHolder;
 import net.minecraft.world.entity.EntityType;
@@ -66,7 +65,8 @@ public class AlienEntitySpawns {
         register(AlienEntityTypes.IRRADIATED_RUNNER, AlienConfig.INSTANCE.spawnConfigs.IRRADIATED_RUNNER_SPAWN);
         Services.REGISTRY.registerEntitySpawnData(
             AVPEntitySpawnData.builder(AlienEntityTypes.IRRADIATED_QUEEN)
-                .withBiomeTagKey(AVPBiomeTags.IS_IRRADIATED)
+                // FIXME:
+                // .withBiomeTagKey(AVPBiomeTags.IS_IRRADIATED)
                 .withSpawnPredicate(QueenSpawning.PREDICATE)
                 .withSpawnSettings(convert(AlienConfig.INSTANCE.spawnConfigs.IRRADIATED_QUEEN_SPAWN))
                 .build()
@@ -102,8 +102,8 @@ public class AlienEntitySpawns {
         );
     }
 
-    private static AVPConfig.SpawnConfigs.SpawnSettings convert(AlienConfig.SpawnConfigs.SpawnSettings spawnSettings) {
-        return new AVPConfig.SpawnConfigs.SpawnSettings(
+    private static SpawnSettings convert(AlienConfig.SpawnConfigs.SpawnSettings spawnSettings) {
+        return new SpawnSettings(
             spawnSettings.enabled,
             spawnSettings.minGroupSize,
             spawnSettings.maxGroupSize,

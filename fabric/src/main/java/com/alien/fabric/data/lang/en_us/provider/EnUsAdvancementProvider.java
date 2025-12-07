@@ -1,7 +1,7 @@
 package com.alien.fabric.data.lang.en_us.provider;
 
 import com.alien.common.data.AlienAdvancements;
-import com.lib.common.data.AdvancementAccess;
+import com.blib.common.data.BLibAdvancementAccess;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
 
 import java.util.function.Consumer;
@@ -79,7 +79,7 @@ public class EnUsAdvancementProvider {
 
     private static void addAdvancement(
         FabricLanguageProvider.TranslationBuilder builder,
-        AdvancementAccess advancementAccess,
+        BLibAdvancementAccess advancementAccess,
         String title,
         String description
     ) {

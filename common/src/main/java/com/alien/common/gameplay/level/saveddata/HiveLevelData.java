@@ -3,7 +3,7 @@ package com.alien.common.gameplay.level.saveddata;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.hive.Hive;
 import com.avp.AVP;
-import com.avp.common.util.AVPPredicates;
+import com.blib.common.gameplay.util.BLibEntityPredicates;
 import com.just.core.functional.option.Option;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -55,7 +55,7 @@ public class HiveLevelData extends SavedData {
     }
 
     public Option<Hive> findNearestHive(BlockPos blockPos) {
-        return findNearestHive(blockPos, AVPPredicates.alwaysTrue());
+        return findNearestHive(blockPos, BLibEntityPredicates.alwaysTrue());
     }
 
     public Option<Hive> findNearestHive(BlockPos blockPos, Predicate<Hive> hivePredicate) {

@@ -4,7 +4,7 @@ import com.alien.common.registry.init.block.AlienChitinBlocks;
 import com.alien.common.registry.init.block.AlienResinBlocks;
 import com.alien.common.registry.tag.AlienBlockTags;
 import com.alien.compat.gigeresque.common.registry.tag.GigeresqueBlockTags;
-import com.avp.common.registry.tag.AVPBlockTags;
+import com.blib.common.registry.tag.BLibBlockTags;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.core.HolderLookup;
@@ -258,7 +258,7 @@ public class AlienBlockTagProvider extends FabricTagProvider.BlockTagProvider {
 
         // Acid-immune blocks
         getOrCreateTagBuilder(AlienBlockTags.ACID_IMMUNE)
-            .addOptionalTag(AVPBlockTags.SHOULD_NOT_BE_DESTROYED)
+            .addOptionalTag(BLibBlockTags.SHOULD_NOT_BE_DESTROYED)
             .addTag(AlienBlockTags.CHITIN)
             .addTag(AlienBlockTags.RESIN)
             .add(Blocks.AIR)
@@ -276,7 +276,7 @@ public class AlienBlockTagProvider extends FabricTagProvider.BlockTagProvider {
             );
 
         getOrCreateTagBuilder(AlienBlockTags.XENOMORPH_IMMUNE)
-            .addOptionalTag(AVPBlockTags.SHOULD_NOT_BE_DESTROYED)
+            .addOptionalTag(BLibBlockTags.SHOULD_NOT_BE_DESTROYED)
             .addTag(AlienBlockTags.RESIN_VENTS)
             .addTag(AlienBlockTags.RESIN_WEBS);
 

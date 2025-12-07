@@ -5,7 +5,6 @@ import com.alien.common.model.alien.Host;
 import com.alien.common.registry.InfectionRegistry;
 import com.alien.common.util.AlienEmbryoUtil;
 import com.just.core.functional.option.Option;
-import com.lib.common.gameplay.entity.manager.GeneContainer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -39,8 +38,9 @@ public abstract class MixinLivingEntity_Host extends Entity implements Host {
     @Unique
     private Option<EntityType<?>> embryoTypeOption = Option.none();
 
-    @Unique
-    private GeneContainer parasiteGeneContainer;
+    // FIXME:
+    // @Unique
+    // private GeneContainer parasiteGeneContainer;
 
     public MixinLivingEntity_Host(EntityType<?> entityType, Level level) {
         super(entityType, level);
@@ -68,7 +68,8 @@ public abstract class MixinLivingEntity_Host extends Entity implements Host {
 
         if (compoundTag.contains(NBT_PARASITE_GENES)) {
             var tag = compoundTag.getCompound(NBT_PARASITE_GENES);
-            getOrCreateParasiteGeneContainer().load(tag);
+            // FIXME:
+            // getOrCreateParasiteGeneContainer().load(tag);
         }
     }
 
@@ -82,7 +83,8 @@ public abstract class MixinLivingEntity_Host extends Entity implements Host {
         });
 
         var tag = new CompoundTag();
-        getOrCreateParasiteGeneContainer().save(tag);
+        // FIXME:
+        // getOrCreateParasiteGeneContainer().save(tag);
         compoundTag.put(NBT_PARASITE_GENES, tag);
     }
 
@@ -93,9 +95,10 @@ public abstract class MixinLivingEntity_Host extends Entity implements Host {
         infectionOption.ifSome(infection -> {
             setEmbryoType(infection.embryoType());
             // Assign the active genes from the parasite to the embryo's gene container.
-            parasite.getGeneManager()
-                .getGeneContainer()
-                .transfer(getOrCreateParasiteGeneContainer(), false);
+            // FIXME:
+            // parasite.getGeneManager()
+            // .getGeneContainer()
+            // .transfer(getOrCreateParasiteGeneContainer(), false);
 
             var self = LivingEntity.class.cast(this);
 
@@ -106,14 +109,15 @@ public abstract class MixinLivingEntity_Host extends Entity implements Host {
         });
     }
 
-    @Override
-    public GeneContainer getOrCreateParasiteGeneContainer() {
-        if (parasiteGeneContainer == null) {
-            this.parasiteGeneContainer = new GeneContainer();
-        }
-
-        return parasiteGeneContainer;
-    }
+    // FIXME:
+    // @Override
+    // public GeneContainer getOrCreateParasiteGeneContainer() {
+    // if (parasiteGeneContainer == null) {
+    // this.parasiteGeneContainer = new GeneContainer();
+    // }
+    //
+    // return parasiteGeneContainer;
+    // }
 
     @Override
     public Option<EntityType<?>> getEmbryoType() {

@@ -4,8 +4,6 @@ import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.model.alien.Host;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.key.AlienDamageTypeKeys;
-import com.lib.common.model.GeneCarrier;
-import com.lib.common.util.EmbryoUtil;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -106,12 +104,14 @@ public class AlienEmbryoUtil {
     }
 
     public static List<Entity> birthEmbryos(LivingEntity parentEntity) {
-        return EmbryoUtil.birthEmbryos(
-            parentEntity,
-            ((Host) parentEntity).getOrCreateParasiteGeneContainer(),
-            AlienEmbryoUtil::alienEmbryoFactory,
-            1
-        );
+        // FIXME:
+        return List.of();
+        // return EmbryoUtil.birthEmbryos(
+        // parentEntity,
+        // ((Host) parentEntity).getOrCreateParasiteGeneContainer(),
+        // AlienEmbryoUtil::alienEmbryoFactory,
+        // 1
+        // );
     }
 
     public static @Nullable Entity alienEmbryoFactory(@NotNull LivingEntity hostEntity) {
@@ -134,12 +134,13 @@ public class AlienEmbryoUtil {
         }
 
         if (embryo instanceof Alien alien) {
-            EmbryoUtil.applyGenesToEmbryo(
-                hostEntity.getType(),
-                host.getOrCreateParasiteGeneContainer(),
-                (GeneCarrier) alien,
-                true
-            );
+            // FIXME:
+            // EmbryoUtil.applyGenesToEmbryo(
+            // hostEntity.getType(),
+            // host.getOrCreateParasiteGeneContainer(),
+            // (GeneCarrier) alien,
+            // true
+            // );
             alien.setHostType(hostEntity.getType());
         }
 

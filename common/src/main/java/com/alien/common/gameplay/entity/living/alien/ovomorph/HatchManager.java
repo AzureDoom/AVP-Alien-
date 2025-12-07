@@ -132,9 +132,10 @@ public class HatchManager {
             return;
         }
 
-        ovomorph.getGeneManager()
-            .getGeneContainer()
-            .transfer(facehugger.getGeneManager().getGeneContainer(), false);
+        // FIXME:
+        // ovomorph.getGeneManager()
+        // .getGeneContainer()
+        // .transfer(facehugger.getGeneManager().getGeneContainer(), false);
 
         var ovomorphAbovePos = ovomorph.blockPosition().above();
         var ovomorphSuffocatingAboveCheck = ovomorph.level()

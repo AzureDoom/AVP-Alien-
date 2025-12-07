@@ -1,7 +1,7 @@
 package com.alien.fabric.data.tag;
 
 import com.alien.common.registry.key.AlienDamageTypeKeys;
-import com.avp.common.registry.tag.AVPDamageTypesTags;
+import com.alien.common.registry.tag.AlienDamageTypesTags;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.core.HolderLookup;
@@ -57,7 +57,7 @@ public class AlienDamageTypeTagProvider extends FabricTagProvider<DamageType> {
                 AlienDamageTypeKeys.SMOTHERING
             );
 
-        getOrCreateTagBuilder(AVPDamageTypesTags.DOES_NOT_HURT_ALIENS)
+        getOrCreateTagBuilder(AlienDamageTypesTags.DOES_NOT_HURT_ALIENS)
             .add(
                 AlienDamageTypeKeys.ACID,
                 DamageTypes.DROWN,

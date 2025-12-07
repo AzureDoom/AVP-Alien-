@@ -7,7 +7,7 @@ import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.tag.AlienBlockTags;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.registry.tag.AlienItemTags;
-import com.avp.common.util.AVPPredicates;
+import com.blib.common.gameplay.util.BLibEntityPredicates;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -73,7 +73,7 @@ public class AlienPredicates {
             // AND can't attack what can't be attacked (duh).
             && potentialTarget.attackable()
             // AND can't attack immortal players.
-            && (!(potentialTarget instanceof Player) || !AVPPredicates.IS_IMMORTAL.test(potentialTarget))
+            && (!(potentialTarget instanceof Player) || !BLibEntityPredicates.isInvulnerable(potentialTarget))
             // AND *shouldn't* attack entities with an embryo inside them.
             && (!AlienPredicates.hasEmbryo(potentialTarget) || doesTargetHaveEnemyVariantEmbryo(selfVariant, potentialTarget))
             // AND *shouldn't* attack entities with a parasite attached.
@@ -119,7 +119,7 @@ public class AlienPredicates {
     }
 
     private static boolean isHated(@NotNull Alien alien, @NotNull LivingEntity potentialTarget) {
-        if (AVPPredicates.IS_IMMORTAL.test(potentialTarget)) {
+        if (BLibEntityPredicates.isInvulnerable(potentialTarget)) {
             // If the target is immortal, then alien can't "hate" them.
             return false;
         }
@@ -133,7 +133,7 @@ public class AlienPredicates {
     }
 
     public static boolean isFreeHost(Entity parasite, Entity hostTarget) {
-        return AVPPredicates.isLiving(hostTarget) &&
+        return BLibEntityPredicates.isAlive(hostTarget) &&
             isHost(hostTarget) &&
             !hasEmbryo(hostTarget) &&
             !isSelfOrOtherParasiteAttached(parasite, hostTarget)
@@ -142,9 +142,9 @@ public class AlienPredicates {
 
     public static boolean isHost(Entity target) {
         return target.getType().is(AlienEntityTypeTags.HOSTS) &&
-            AVPPredicates.isLiving(target) &&
-            !AVPPredicates.isBaby(target) &&
-            !AVPPredicates.IS_IMMORTAL.test((LivingEntity) target);
+            BLibEntityPredicates.isAlive(target) &&
+            !BLibEntityPredicates.isBaby(target) &&
+            !BLibEntityPredicates.isInvulnerable((LivingEntity) target);
     }
 
     public static boolean isParasiteAttached(Entity target) {

@@ -3,9 +3,8 @@ package com.alien.fabric.data.tag;
 import com.alien.Alien;
 import com.alien.common.registry.init.item.AlienArmorItems;
 import com.alien.common.registry.init.item.AlienItems;
-import com.alien.common.registry.init.item.block.AlienResinBlockItems;
 import com.alien.common.registry.tag.AlienItemTags;
-import com.avp.common.registry.tag.AVPItemTags;
+import com.blib.common.registry.tag.BLibItemTags;
 import com.compat.CommonItemTags;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
@@ -57,7 +56,7 @@ public class AlienItemTagProvider extends FabricTagProvider.ItemTagProvider {
                 AlienItems.PLATED_IRRADIATED_CHITIN.get()
             );
 
-        getOrCreateTagBuilder(AVPItemTags.DECORATIVE_POT_SHERDS)
+        getOrCreateTagBuilder(BLibItemTags.DECORATIVE_POT_SHERDS)
             .add(
                 AlienItems.OVOID_POTTERY_SHERD.get(),
                 AlienItems.PARASITE_POTTERY_SHERD.get(),
@@ -65,19 +64,20 @@ public class AlienItemTagProvider extends FabricTagProvider.ItemTagProvider {
                 AlienItems.VECTOR_POTTERY_SHERD.get()
             );
 
-        getOrCreateTagBuilder(AVPItemTags.RADIOACTIVE_ITEMS)
-            .add(
-                AlienItems.IRRADIATED_CHITIN.get(),
-                AlienItems.PLATED_IRRADIATED_CHITIN.get(),
-                AlienItems.IRRADIATED_RESIN_BALL.get(),
-                AlienResinBlockItems.IRRADIATED_RESIN.get(),
-                AlienResinBlockItems.IRRADIATED_RESIN_NODE.get(),
-                AlienResinBlockItems.IRRADIATED_RESIN_VEIN.get(),
-                AlienResinBlockItems.IRRADIATED_RESIN_WEB.get()
-            );
-
-        getOrCreateTagBuilder(AVPItemTags.URANIUM_NUGGET_LIKE)
-            .add(AlienItems.IRRADIATED_CHITIN.get());
+        // FIXME:
+        // getOrCreateTagBuilder(AVPItemTags.RADIOACTIVE_ITEMS)
+        // .add(
+        // AlienItems.IRRADIATED_CHITIN.get(),
+        // AlienItems.PLATED_IRRADIATED_CHITIN.get(),
+        // AlienItems.IRRADIATED_RESIN_BALL.get(),
+        // AlienResinBlockItems.IRRADIATED_RESIN.get(),
+        // AlienResinBlockItems.IRRADIATED_RESIN_NODE.get(),
+        // AlienResinBlockItems.IRRADIATED_RESIN_VEIN.get(),
+        // AlienResinBlockItems.IRRADIATED_RESIN_WEB.get()
+        // );
+        // FIXME:
+        // getOrCreateTagBuilder(AVPItemTags.URANIUM_NUGGET_LIKE)
+        // .add(AlienItems.IRRADIATED_CHITIN.get());
     }
 
     private void addAutomatedTagItems() {
@@ -261,7 +261,7 @@ public class AlienItemTagProvider extends FabricTagProvider.ItemTagProvider {
             .addTag(AlienItemTags.NETHER_CHITIN_ARMOR)
             .addTag(AlienItemTags.NORMAL_CHITIN_ARMOR);
 
-        getOrCreateTagBuilder(AVPItemTags.FIRE_RESISTANT_ARMORS)
+        getOrCreateTagBuilder(BLibItemTags.FIRE_RESISTANT_ARMORS)
             .addTag(AlienItemTags.NETHER_CHITIN_ARMOR)
             .addTag(AlienItemTags.PLATED_NETHER_CHITIN_ARMOR);
 

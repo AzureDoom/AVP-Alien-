@@ -2,8 +2,8 @@ package com.alien.fabric.data.recipe.impl;
 
 import com.alien.common.registry.init.block.AlienChitinBlocks;
 import com.alien.common.registry.init.item.AlienItems;
-import com.avp.fabric.data.recipe.builder.RecipeBuilder;
-import com.avp.fabric.data.recipe.util.RecipeUtil;
+import com.blib.fabric.data.recipe.builder.RecipeBuilder;
+import com.blib.fabric.data.recipe.util.RecipeUtil;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 

@@ -1,6 +1,5 @@
 package com.alien.client.render.entity.parasite;
 
-import com.human.common.registry.init.entity_type.HumanEntityTypes;
 import com.just.core.functional.function.Lazy;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -115,11 +114,13 @@ public record EntityHeadOffsetData(
                     new EntityHeadOffsetData(EntityHeadOffsetData::wolfVerticalOffset, EntityHeadOffsetData::wolfFaceOffset)
                 ),
                 Map.entry(EntityType.ZOGLIN, HOGLIN),
-                Map.entry(EntityType.ZOMBIE_VILLAGER, VILLAGER),
-                Map.entry(
-                    HumanEntityTypes.MARINE.get(),
-                    new EntityHeadOffsetData(EntityHeadOffsetData::marineVerticalOffset, EntityHeadOffsetData::marineFaceOffset)
-                )
+                Map.entry(EntityType.ZOMBIE_VILLAGER, VILLAGER)
+                // FIXME:
+                // Map.entry(
+                // HumanEntityTypes.MARINE.get(),
+                // new EntityHeadOffsetData(EntityHeadOffsetData::marineVerticalOffset,
+                // EntityHeadOffsetData::marineFaceOffset)
+                // )
             )
         )
     );

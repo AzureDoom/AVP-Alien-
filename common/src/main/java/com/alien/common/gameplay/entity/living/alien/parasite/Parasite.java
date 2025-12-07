@@ -4,7 +4,7 @@ import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.model.alien.FreeMob;
 import com.alien.common.registry.init.AlienDataKeys;
 import com.alien.common.util.AlienPredicates;
-import com.avp.common.util.AVPPredicates;
+import com.blib.common.gameplay.util.BLibEntityPredicates;
 import com.lib.common.network.DataAccessor;
 import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -33,7 +33,7 @@ public abstract class Parasite extends Alien {
     }
 
     public void restoreAllGoals() {
-        removeAllGoals(AVPPredicates.alwaysTrue());
+        removeAllGoals(BLibEntityPredicates.alwaysTrue());
         registerGoals();
     }
 
@@ -63,7 +63,7 @@ public abstract class Parasite extends Alien {
     protected boolean canAttachToHost(Entity entity) {
         return entity instanceof LivingEntity livingEntity &&
             isValidHost(livingEntity) &&
-            !AVPPredicates.hasShield(entity) && !(this.isPassenger() || this.isVehicle());
+            !BLibEntityPredicates.hasShield(entity) && !(this.isPassenger() || this.isVehicle());
     }
 
     protected boolean isValidHost(LivingEntity target) {
@@ -133,7 +133,7 @@ public abstract class Parasite extends Alien {
     private void handleFertilityChange(Boolean isFertile) {
         if (!isFertile) {
             ((FreeMob) this).removeFreedom();
-            this.removeAllGoals(AVPPredicates.alwaysTrue());
+            this.removeAllGoals(BLibEntityPredicates.alwaysTrue());
         } else {
             ((FreeMob) this).restoreFreedom();
             this.restoreAllGoals();

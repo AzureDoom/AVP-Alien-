@@ -1,7 +1,7 @@
 package com.alien.common.gameplay.entity.living.alien.ovipositor;
 
+import com.alien.common.registry.tag.AlienDamageTypesTags;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
-import com.avp.common.registry.tag.AVPDamageTypesTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -25,7 +25,7 @@ public class Ovipositor extends Mob {
 
     @Override
     public boolean hurt(@NotNull DamageSource damageSource, float amount) {
-        if (damageSource.is(AVPDamageTypesTags.DOES_NOT_HURT_ALIENS)) {
+        if (damageSource.is(AlienDamageTypesTags.DOES_NOT_HURT_ALIENS)) {
             return false;
         }
 

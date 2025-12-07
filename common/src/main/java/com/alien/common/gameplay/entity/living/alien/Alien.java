@@ -8,19 +8,15 @@ import com.alien.common.gameplay.level.saveddata.HiveLevelData;
 import com.alien.common.gameplay.level.saveddata.StrainLeakData;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienDataKeys;
+import com.alien.common.registry.tag.AlienDamageTypesTags;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.registry.tag.AlienMobEffectTags;
 import com.alien.common.util.AcidBleedUtil;
 import com.alien.common.util.AlienTransitionUtil;
 import com.avp.common.registry.init.AVPDataKeys;
-import com.avp.common.registry.key.AVPBiomeKeys;
-import com.avp.common.registry.tag.AVPDamageTypesTags;
 import com.avp.common.util.MovementAnalyzer;
 import com.just.core.functional.option.Option;
-import com.lib.common.gameplay.entity.manager.GeneManager;
 import com.lib.common.gameplay.entity.manager.VibrationSystemManager;
-import com.lib.common.gameplay.gene.Genes;
-import com.lib.common.model.GeneCarrier;
 import com.lib.common.network.DataAccessor;
 import com.lib.common.network.DataUser;
 import net.minecraft.ChatFormatting;
@@ -248,13 +244,14 @@ public abstract class Alien extends Monster implements DataUser {
                     // Decrease the reserve count for this entity's type.
                     hive.getReserveManager().add(getType(), -1);
                     // Apply genetics of hive leader to this alien.
-                    hive.getLeadershipManager()
-                        .getLeader()
-                        .map(leader -> ((GeneCarrier) leader).getOrCreateGeneManager().getGeneContainer())
-                        .ifSome(geneContainer -> {
-                            var alienGeneCarrier = ((GeneCarrier) this).getOrCreateGeneManager().getGeneContainer();
-                            geneContainer.transfer(alienGeneCarrier, true);
-                        });
+                    // FIXME:
+                    // hive.getLeadershipManager()
+                    // .getLeader()
+                    // .map(leader -> ((GeneCarrier) leader).getOrCreateGeneManager().getGeneContainer())
+                    // .ifSome(geneContainer -> {
+                    // var alienGeneCarrier = ((GeneCarrier) this).getOrCreateGeneManager().getGeneContainer();
+                    // geneContainer.transfer(alienGeneCarrier, true);
+                    // });
                 }
             });
 
@@ -305,9 +302,10 @@ public abstract class Alien extends Monster implements DataUser {
             return;
         }
 
-        if (!level().getBiome(blockPosition()).is(AVPBiomeKeys.NUKED_BIOME)) {
-            return;
-        }
+        // FIXME:
+        // if (!level().getBiome(blockPosition()).is(AVPBiomeKeys.NUKED_BIOME)) {
+        // return;
+        // }
 
         if (!isAlive()) {
             return;
@@ -333,7 +331,7 @@ public abstract class Alien extends Monster implements DataUser {
 
     @Override
     public boolean isInvulnerableTo(DamageSource damageSource) {
-        return damageSource.is(AVPDamageTypesTags.DOES_NOT_HURT_ALIENS) || super.isInvulnerableTo(damageSource);
+        return damageSource.is(AlienDamageTypesTags.DOES_NOT_HURT_ALIENS) || super.isInvulnerableTo(damageSource);
     }
 
     @Override
@@ -351,9 +349,12 @@ public abstract class Alien extends Monster implements DataUser {
         ) {
             hiveManager.hive().ifSome(hive -> {
                 var wasRunnerHostKilled = entity.getType().is(AlienEntityTypeTags.RUNNER_HOSTS);
-                var bonusCount = 1 + (int) getGeneManager().getGeneContainer()
-                    .getActiveGeneMap()
-                    .getValue(Genes.BONUS_EMBRYO_COUNT);
+                // FIXME:
+                var bonusCount = 1;
+                // FIXME:
+                // var bonusCount = 1 + (int) getGeneManager().getGeneContainer()
+                // .getActiveGeneMap()
+                // .getValue(Genes.BONUS_EMBRYO_COUNT);
                 var alienEntityType = wasRunnerHostKilled
                     ? Runner.getType(hive.getVariant())
                     : Drone.getType(hive.getVariant());
@@ -536,9 +537,10 @@ public abstract class Alien extends Monster implements DataUser {
         });
     }
 
-    public GeneManager getGeneManager() {
-        return ((GeneCarrier) this).getOrCreateGeneManager();
-    }
+    // FIXME:
+    // public GeneManager getGeneManager() {
+    // return ((GeneCarrier) this).getOrCreateGeneManager();
+    // }
 
     public HiveManager getHiveManager() {
         return hiveManager;

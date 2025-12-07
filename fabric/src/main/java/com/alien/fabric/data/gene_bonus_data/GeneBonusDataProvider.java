@@ -1,32 +1,32 @@
 package com.alien.fabric.data.gene_bonus_data;
 
-import com.lib.common.gameplay.gene.GeneBonusData;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public abstract class GeneBonusDataProvider implements DataProvider {
 
     private final FabricDataOutput output;
 
-    private final Map<String, GeneBonusData> geneBonusDataByName;
+    // FIXME:
+    // private final Map<String, GeneBonusData> geneBonusDataByName;
 
     protected GeneBonusDataProvider(FabricDataOutput output) {
         this.output = output;
-        this.geneBonusDataByName = new HashMap<>();
+        // FIXME:
+        // this.geneBonusDataByName = new HashMap<>();
     }
 
     protected abstract void generate();
 
     // TODO: Name shouldn't be provided by data generator.
-    public void add(String name, GeneBonusData geneBonusData) {
-        geneBonusDataByName.put(name, geneBonusData);
-    }
+    // FIXME:
+    // public void add(String name, GeneBonusData geneBonusData) {
+    // geneBonusDataByName.put(name, geneBonusData);
+    // }
 
     @Override
     public final @NotNull CompletableFuture<?> run(CachedOutput cached) {

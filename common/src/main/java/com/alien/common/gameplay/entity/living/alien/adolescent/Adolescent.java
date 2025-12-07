@@ -9,7 +9,7 @@ import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.util.AlienPredicates;
 import com.alien.common.util.XenomorphGrowthUtil;
-import com.avp.common.util.AVPPredicates;
+import com.blib.common.gameplay.util.BLibEntityPredicates;
 import com.lib.common.network.DataAccessor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
@@ -64,7 +64,7 @@ public class Adolescent extends Alien {
                 1.2,
                 entity -> entity instanceof Alien alien
                     ? AlienPredicates.areAliensEnemies(this, alien)
-                    : !AVPPredicates.IS_IMMORTAL.test(entity)
+                    : !BLibEntityPredicates.isInvulnerable(entity)
             )
         );
         goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 0.5));

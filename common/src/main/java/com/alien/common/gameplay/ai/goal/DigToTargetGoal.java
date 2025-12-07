@@ -2,7 +2,6 @@ package com.alien.common.gameplay.ai.goal;
 
 import com.alien.common.registry.tag.AlienBlockTags;
 import com.avp.server.BlockBreakProgressManager;
-import com.human.common.registry.init.block.HumanSteelBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -211,7 +210,9 @@ public class DigToTargetGoal extends Goal {
                         state.hasBlockEntity()
                             || state.getDestroySpeed(mob.level(), rayTraceResult.getBlockPos()) == -1
                             // TODO: Make this configurable
-                            || state.getBlock().defaultDestroyTime() >= HumanSteelBlocks.STEEL_BLOCK.get().defaultDestroyTime()
+                            // FIXME:
+                            // || state.getBlock().defaultDestroyTime() >=
+                            // HumanSteelBlocks.STEEL_BLOCK.get().defaultDestroyTime()
                             // TODO: Make this configurable
                             || state.is(AlienBlockTags.XENOMORPH_IMMUNE)
                     ) {

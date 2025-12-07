@@ -1,10 +1,11 @@
 package com.alien.fabric.data.recipe;
 
+import com.alien.Alien;
 import com.alien.fabric.data.recipe.impl.ArmorRecipeProvider;
 import com.alien.fabric.data.recipe.impl.ChitinRecipeProvider;
 import com.alien.fabric.data.recipe.impl.MiscellaneousRecipeProvider;
 import com.alien.fabric.data.recipe.impl.ResinRecipeProvider;
-import com.avp.fabric.data.recipe.builder.RecipeBuilder;
+import com.blib.fabric.data.recipe.builder.RecipeBuilder;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.core.HolderLookup;
@@ -20,7 +21,7 @@ public class RecipeProvider extends FabricRecipeProvider {
 
     @Override
     public void buildRecipes(RecipeOutput recipeOutput) {
-        var builder = RecipeBuilder.with(recipeOutput);
+        var builder = RecipeBuilder.with(Alien.MOD, recipeOutput);
         ArmorRecipeProvider.provide(builder);
         MiscellaneousRecipeProvider.provide(builder);
         ChitinRecipeProvider.provide(builder);

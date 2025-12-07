@@ -4,9 +4,6 @@ import com.alien.common.data.AlienAdvancements;
 import com.alien.common.model.alien.Host;
 import com.alien.common.util.AlienEmbryoUtil;
 import com.alien.common.util.AlienPredicates;
-import com.lib.common.gameplay.gene.GeneOperationType;
-import com.lib.common.gameplay.gene.Genes;
-import com.lib.common.model.GeneCarrier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -52,10 +49,11 @@ public class MixinItem_ChorusEmbryo {
                 // Attempt teleportation. We don't need a result from this since it wouldn't be useful anyway.
                 tryTeleportingEntity(livingEmbryo);
 
-                ((GeneCarrier) livingEmbryo).getOrCreateGeneManager()
-                    .getGeneContainer()
-                    .getActiveGeneMap()
-                    .add(Genes.WARP, GeneOperationType.ADDITIVE, 0.1);
+                // FIXME:
+                // ((GeneCarrier) livingEmbryo).getOrCreateGeneManager()
+                // .getGeneContainer()
+                // .getActiveGeneMap()
+                // .add(Genes.WARP, GeneOperationType.ADDITIVE, 0.1);
             }
         });
 

@@ -3,7 +3,7 @@ package com.alien.fabric.data.model;
 import com.alien.common.registry.init.block.AlienBlocks;
 import com.alien.common.registry.init.block.AlienChitinBlocks;
 import com.alien.common.registry.init.block.AlienResinBlocks;
-import com.avp.fabric.data.model.generator.MultiFaceGenerator;
+import com.blib.fabric.data.model.generator.MultiFaceGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
 import net.minecraft.core.registries.BuiltInRegistries;

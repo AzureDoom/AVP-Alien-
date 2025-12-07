@@ -10,6 +10,7 @@ import com.alien.common.registry.init.AlienArmorMaterials;
 import com.alien.common.registry.init.AlienBlockEntityTypes;
 import com.alien.common.registry.init.AlienCompostingChances;
 import com.alien.common.registry.init.AlienDataKeys;
+import com.alien.common.registry.init.AlienDecoratedPotPatterns;
 import com.alien.common.registry.init.AlienEntitySpawns;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienGameEvents;
@@ -25,12 +26,10 @@ import com.alien.common.registry.init.item.AlienSpawnEggItems;
 import com.alien.common.registry.init.item.block.AlienBlockItems;
 import com.alien.common.registry.init.item.block.AlienChitinBlockItems;
 import com.alien.common.registry.init.item.block.AlienResinBlockItems;
-import com.avp.common.registry.init.AVPDecoratedPotPatterns;
 import com.blib.BLib;
 import com.blib.BLibMod;
-import com.blib.event.BLibLevelTickEvent;
-import com.blib.event.key.BLibEventKeys;
 import com.blib.service.BLibServices;
+import net.minecraft.world.level.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,7 +73,7 @@ public class Alien {
         AlienParticleTypes.initialize();
 
         // Functionality
-        AVPDecoratedPotPatterns.initialize();
+        AlienDecoratedPotPatterns.initialize();
         AlienCompostingChances.initialize();
         AlienDataKeys.initialize();
         AlienEntitySpawns.initialize();
@@ -85,14 +84,12 @@ public class Alien {
         // Listeners/Events
         AlienReloadListeners.initialize();
 
-        MOD.addEventListener(BLibEventKeys.LEVEL_TICK_POST, Alien::tickHivesInLevel);
-        MOD.addEventListener(BLibEventKeys.LEVEL_TICK_POST, Alien::tickQueenSpawnCooldown);
-        MOD.addEventListener(BLibEventKeys.TAGS_UPDATED, $ -> AlienEvents.onTagsUpdated());
+        BLibServices.EVENT.afterLevelTick().register(Alien::tickHivesInLevel);
+        BLibServices.EVENT.afterLevelTick().register(Alien::tickQueenSpawnCooldown);
+        BLibServices.EVENT.onTagsUpdated().register(($1, $2) -> AlienEvents.onTagsUpdated());
     }
 
-    private static void tickHivesInLevel(BLibLevelTickEvent.Post event) {
-        var level = event.level();
-
+    private static void tickHivesInLevel(Level level) {
         if (level.isClientSide) {
             return;
         }
@@ -101,9 +98,7 @@ public class Alien {
             .ifSome(HiveLevelData::tick);
     }
 
-    private static void tickQueenSpawnCooldown(BLibLevelTickEvent.Post event) {
-        var level = event.level();
-
+    private static void tickQueenSpawnCooldown(Level level) {
         if (level.isClientSide) {
             return;
         }

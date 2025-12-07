@@ -1,6 +1,5 @@
 package com.alien.client.render.entity.parasite;
 
-import com.human.common.registry.init.entity_type.HumanEntityTypes;
 import com.just.core.functional.function.Lazy;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.Vec3;
@@ -64,8 +63,9 @@ public record EntityHeadData(
                 Map.entry(EntityType.WANDERING_TRADER, VILLAGER),
                 Map.entry(EntityType.WOLF, adjust(vec3(6, 6, 4), vec3(-3, 7.5, -9), vec3(1, 10.5, -7))),
                 Map.entry(EntityType.ZOGLIN, HOGLIN),
-                Map.entry(EntityType.ZOMBIE_VILLAGER, VILLAGER),
-                Map.entry(HumanEntityTypes.MARINE.get(), adjust(vec3(8, 8, 8), vec3(-4, 24, -4), vec3(0, 24, 0)))
+                Map.entry(EntityType.ZOMBIE_VILLAGER, VILLAGER)
+                // FIXME:
+                // Map.entry(HumanEntityTypes.MARINE.get(), adjust(vec3(8, 8, 8), vec3(-4, 24, -4), vec3(0, 24, 0)))
             )
         )
     );

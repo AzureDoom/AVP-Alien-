@@ -4,7 +4,7 @@ import com.alien.common.config.AlienConfig;
 import com.alien.common.registry.key.AlienDamageTypeKeys;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.registry.tag.AlienItemTags;
-import com.avp.common.util.AVPPredicates;
+import com.blib.common.gameplay.util.BLibEntityPredicates;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
@@ -29,7 +29,7 @@ public class AcidEntityDamageUtil {
         level.getEntities(
             acid,
             acid.getBoundingBox(),
-            entity -> AVPPredicates.isLiving(entity) || entity instanceof Acid
+            entity -> BLibEntityPredicates.isAlive(entity) || entity instanceof Acid
         )
             .stream()
             .filter(entity -> {
@@ -42,7 +42,7 @@ public class AcidEntityDamageUtil {
                     return false;
                 }
 
-                var isImmortalPlayer = entity instanceof Player player && AVPPredicates.IS_IMMORTAL.test(player);
+                var isImmortalPlayer = entity instanceof Player player && BLibEntityPredicates.isInvulnerable(player);
 
                 return entity.isAlive() && !isImmortalPlayer;
             })

@@ -18,7 +18,7 @@ import com.alien.fabric.data.tag.AlienBlockTagProvider;
 import com.alien.fabric.data.tag.AlienDamageTypeTagProvider;
 import com.alien.fabric.data.tag.AlienEntityTypeTagProvider;
 import com.alien.fabric.data.tag.AlienItemTagProvider;
-import com.avp.fabric.data.tag.AVPMobEffectTagProvider;
+import com.alien.fabric.data.tag.AlienMobEffectTagProvider;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.minecraft.core.RegistrySetBuilder;
@@ -51,7 +51,7 @@ public class AlienDataGenerator implements DataGeneratorEntrypoint {
         pack.addProvider(AlienDamageTypeTagProvider::new);
         pack.addProvider(AlienEntityTypeTagProvider::new);
         pack.addProvider(AlienItemTagProvider::new);
-        pack.addProvider(AVPMobEffectTagProvider::new);
+        pack.addProvider(AlienMobEffectTagProvider::new);
 
         // Loot providers
         pack.addProvider(BlockLootTableProvider::new);
