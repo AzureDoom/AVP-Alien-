@@ -1,5 +1,6 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.crusher;
 
+import com.alien.common.config.AlienConfig;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.model.alien.variant.AlienVariant;
@@ -17,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 public class Crusher extends Xenomorph {
 
     public static AttributeSupplier.Builder createCrusherAttributes() {
-        return applyFrom(AVP.config.statsConfigs.CRUSHER_STATS, Monster.createMonsterAttributes());
+        return applyFrom(AlienConfig.INSTANCE.statsConfigs.CRUSHER_STATS, Monster.createMonsterAttributes());
     }
 
     private final CrusherAnimationDispatcher animationDispatcher;
@@ -25,7 +26,7 @@ public class Crusher extends Xenomorph {
     public Crusher(EntityType<? extends Crusher> entityType, Level level) {
         super(entityType, level);
         this.animationDispatcher = new CrusherAnimationDispatcher(this);
-        this.config = AVP.config.statsConfigs.CRUSHER_STATS;
+        this.config = AlienConfig.INSTANCE.statsConfigs.CRUSHER_STATS;
     }
 
     @Override
@@ -35,7 +36,7 @@ public class Crusher extends Xenomorph {
 
     @Override
     protected @Nullable ResinData createResinData() {
-        return new ResinData(0, 16, 1, AVP.config.statsConfigs.CRUSHER_STATS.nestTickrate);
+        return new ResinData(0, 16, 1, AlienConfig.INSTANCE.statsConfigs.CRUSHER_STATS.nestTickrate);
     }
 
     @Override
@@ -73,7 +74,7 @@ public class Crusher extends Xenomorph {
 
     @Override
     protected float getHealthRegenPerSecond() {
-        return AVP.config.statsConfigs.CRUSHER_STATS.healthRegenPerSecond;
+        return AlienConfig.INSTANCE.statsConfigs.CRUSHER_STATS.healthRegenPerSecond;
     }
 
     @Override

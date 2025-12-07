@@ -1,5 +1,6 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.runner;
 
+import com.alien.common.config.AlienConfig;
 import com.alien.common.gameplay.ai.CreateVentGoal;
 import com.alien.common.gameplay.ai.DropOffEggGoal;
 import com.alien.common.gameplay.ai.PickUpEggGoal;
@@ -30,7 +31,7 @@ import java.util.function.BiConsumer;
 public class Runner extends Xenomorph implements EggCarrier {
 
     public static AttributeSupplier.Builder createRunnerAttributes() {
-        return applyFrom(AVP.config.statsConfigs.RUNNER_STATS, Monster.createMonsterAttributes());
+        return applyFrom(AlienConfig.INSTANCE.statsConfigs.RUNNER_STATS, Monster.createMonsterAttributes());
     }
 
     private final RunnerAnimationDispatcher animationDispatcher;
@@ -40,7 +41,7 @@ public class Runner extends Xenomorph implements EggCarrier {
     public Runner(EntityType<? extends Runner> entityType, Level level) {
         super(entityType, level);
         this.animationDispatcher = new RunnerAnimationDispatcher(this);
-        this.config = AVP.config.statsConfigs.RUNNER_STATS;
+        this.config = AlienConfig.INSTANCE.statsConfigs.RUNNER_STATS;
         this.eggPickupManager = new EggPickupManager(this);
     }
 
@@ -51,7 +52,7 @@ public class Runner extends Xenomorph implements EggCarrier {
 
     @Override
     protected @Nullable ResinData createResinData() {
-        return new ResinData(0, 16, 1, AVP.config.statsConfigs.RUNNER_STATS.nestTickrate);
+        return new ResinData(0, 16, 1, AlienConfig.INSTANCE.statsConfigs.RUNNER_STATS.nestTickrate);
     }
 
     @Override
@@ -116,7 +117,7 @@ public class Runner extends Xenomorph implements EggCarrier {
 
     @Override
     protected float getHealthRegenPerSecond() {
-        return AVP.config.statsConfigs.RUNNER_STATS.healthRegenPerSecond;
+        return AlienConfig.INSTANCE.statsConfigs.RUNNER_STATS.healthRegenPerSecond;
     }
 
     @Override

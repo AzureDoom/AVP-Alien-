@@ -1,0 +1,19 @@
+package com.alien.common.registry.key;
+
+import com.alien.AlienResources;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.damagesource.DamageType;
+
+public class AlienDamageTypeKeys {
+
+    public static final ResourceKey<DamageType> ACID = create("acid");
+
+    public static final ResourceKey<DamageType> CHESTBURSTING = create("chestbursting");
+
+    public static final ResourceKey<DamageType> SMOTHERING = create("smothering");
+
+    private static ResourceKey<DamageType> create(String id) {
+        return ResourceKey.create(Registries.DAMAGE_TYPE, AlienResources.location(id));
+    }
+}

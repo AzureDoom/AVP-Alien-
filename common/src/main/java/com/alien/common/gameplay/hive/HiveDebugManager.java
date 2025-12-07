@@ -1,5 +1,6 @@
 package com.alien.common.gameplay.hive;
 
+import com.alien.common.config.AlienConfig;
 import com.avp.AVP;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -50,14 +51,14 @@ public class HiveDebugManager {
     }
 
     public boolean isDebugEnabled() {
-        return AVP.config.hiveConfigs.HIVE_DEBUG_ENABLED;
+        return AlienConfig.INSTANCE.hiveConfigs.HIVE_DEBUG_ENABLED;
     }
 
     public boolean isDebugHiveMemberHighlightEnabled() {
-        return AVP.config.hiveConfigs.HIVE_DEBUG_HIGHLIGHT_ALL_MEMBERS;
+        return AlienConfig.INSTANCE.hiveConfigs.HIVE_DEBUG_HIGHLIGHT_ALL_MEMBERS;
     }
 
     public boolean isDebugLeaderHighlightEnabled() {
-        return AVP.config.hiveConfigs.HIVE_DEBUG_HIGHLIGHT_LEADER;
+        return AlienConfig.INSTANCE.hiveConfigs.HIVE_DEBUG_HIGHLIGHT_LEADER;
     }
 }

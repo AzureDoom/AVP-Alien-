@@ -1,5 +1,6 @@
 package com.alien.common.gameplay.entity.living.alien.parasite.facehugger;
 
+import com.alien.common.config.AlienConfig;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.parasite.Parasite;
 import com.alien.common.model.alien.variant.AlienVariant;
@@ -25,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 public class Facehugger extends Parasite {
 
     public static AttributeSupplier.Builder createFacehuggerAttributes() {
-        return applyFrom(AVP.config.statsConfigs.FACEHUGGER_STATS, Monster.createMonsterAttributes());
+        return applyFrom(AlienConfig.INSTANCE.statsConfigs.FACEHUGGER_STATS, Monster.createMonsterAttributes());
     }
 
     private final FacehuggerAnimationDispatcher animationDispatcher;
@@ -33,7 +34,7 @@ public class Facehugger extends Parasite {
     public Facehugger(EntityType<? extends Facehugger> entityType, Level level) {
         super(entityType, level);
         this.animationDispatcher = new FacehuggerAnimationDispatcher(this);
-        this.config = AVP.config.statsConfigs.FACEHUGGER_STATS;
+        this.config = AlienConfig.INSTANCE.statsConfigs.FACEHUGGER_STATS;
     }
 
     @Override

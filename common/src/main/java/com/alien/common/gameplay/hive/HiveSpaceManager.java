@@ -1,5 +1,6 @@
 package com.alien.common.gameplay.hive;
 
+import com.alien.common.config.AlienConfig;
 import com.avp.AVP;
 import com.lib.common.gameplay.util.spatial.Vec3Like;
 import com.lib.common.gameplay.util.spatial.block.BlockPosVec3;
@@ -41,8 +42,8 @@ public class HiveSpaceManager implements LayeredSphere {
     // Beyond resin layers
 
     private static final Supplier<Float> MAX_NORMALIZED_LEASH_RANGE_SUPPLIER = () -> {
-        var hiveRadiusBlocks = AVP.config.hiveConfigs.HIVE_RADIUS_IN_BLOCKS;
-        var hiveLeashRadiusInBlocks = AVP.config.hiveConfigs.HIVE_LEASH_RADIUS_IN_BLOCKS;
+        var hiveRadiusBlocks = AlienConfig.INSTANCE.hiveConfigs.HIVE_RADIUS_IN_BLOCKS;
+        var hiveLeashRadiusInBlocks = AlienConfig.INSTANCE.hiveConfigs.HIVE_LEASH_RADIUS_IN_BLOCKS;
 
         return 1F + (hiveLeashRadiusInBlocks / hiveRadiusBlocks);
     };
@@ -146,7 +147,7 @@ public class HiveSpaceManager implements LayeredSphere {
 
     @Override
     public float getRadius() {
-        return AVP.config.hiveConfigs.HIVE_RADIUS_IN_BLOCKS;
+        return AlienConfig.INSTANCE.hiveConfigs.HIVE_RADIUS_IN_BLOCKS;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.alien.common.gameplay.entity.living.alien.predalien_chestburster;
 
+import com.alien.common.config.AlienConfig;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.GrowthManager;
 import com.alien.common.model.alien.variant.AlienVariant;
@@ -22,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 public class PredalienChestburster extends Alien {
 
     public static AttributeSupplier.Builder createPredalienChestbursterAttributes() {
-        return applyFrom(AVP.config.statsConfigs.PREDALIEN_CHESTBURSTER_STATS, Monster.createMonsterAttributes());
+        return applyFrom(AlienConfig.INSTANCE.statsConfigs.PREDALIEN_CHESTBURSTER_STATS, Monster.createMonsterAttributes());
     }
 
     private final PredalienChestbursterAnimationDispatcher animationDispatcher;
@@ -34,7 +35,7 @@ public class PredalienChestburster extends Alien {
         this.animationDispatcher = new PredalienChestbursterAnimationDispatcher(this);
         this.growthManager = new GrowthManager(this, XenomorphGrowthUtil.GROW_UP_CALLBACK)
             .setGrowOverTime(true);
-        this.config = AVP.config.statsConfigs.PREDALIEN_CHESTBURSTER_STATS;
+        this.config = AlienConfig.INSTANCE.statsConfigs.PREDALIEN_CHESTBURSTER_STATS;
     }
 
     @Override
@@ -68,7 +69,7 @@ public class PredalienChestburster extends Alien {
 
     @Override
     protected float getHealthRegenPerSecond() {
-        return AVP.config.statsConfigs.PREDALIEN_CHESTBURSTER_STATS.healthRegenPerSecond;
+        return AlienConfig.INSTANCE.statsConfigs.PREDALIEN_CHESTBURSTER_STATS.healthRegenPerSecond;
     }
 
     @Override

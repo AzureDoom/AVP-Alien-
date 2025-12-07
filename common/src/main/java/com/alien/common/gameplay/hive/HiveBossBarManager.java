@@ -1,5 +1,6 @@
 package com.alien.common.gameplay.hive;
 
+import com.alien.common.config.AlienConfig;
 import com.alien.common.data.AlienAdvancements;
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.model.alien.variant.AlienVariant;
@@ -55,7 +56,7 @@ public class HiveBossBarManager {
             ALIEN_VARIANT_TO_COMPONENT_NAME_MAP.get(hive.getVariant()),
             BossEvent.BossBarColor.GREEN,
             BossEvent.BossBarOverlay.PROGRESS
-        ).setDarkenScreen(AVP.config.hiveConfigs.HIVE_DARKEN_SCREEN);
+        ).setDarkenScreen(AlienConfig.INSTANCE.hiveConfigs.HIVE_DARKEN_SCREEN);
         this.hive = hive;
     }
 

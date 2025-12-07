@@ -1,5 +1,6 @@
 package com.alien.common.gameplay.entity.living.alien.adolescent;
 
+import com.alien.common.config.AlienConfig;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.GrowthManager;
 import com.alien.common.model.alien.variant.AlienVariant;
@@ -25,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 public class Adolescent extends Alien {
 
     public static AttributeSupplier.Builder createAdolescentAttributes() {
-        return applyFrom(AVP.config.statsConfigs.ADOLESCENT_STATS, Monster.createMonsterAttributes());
+        return applyFrom(AlienConfig.INSTANCE.statsConfigs.ADOLESCENT_STATS, Monster.createMonsterAttributes());
     }
 
     private static final String NBT_HAS_DORSAL_TUBES = "hasDorsalTubes";
@@ -44,7 +45,7 @@ public class Adolescent extends Alien {
         this.animationDispatcher = new AdolescentAnimationDispatcher(this);
         this.growthManager = new GrowthManager(this, XenomorphGrowthUtil.GROW_UP_CALLBACK)
             .setGrowOverTime(true);
-        this.config = AVP.config.statsConfigs.ADOLESCENT_STATS;
+        this.config = AlienConfig.INSTANCE.statsConfigs.ADOLESCENT_STATS;
     }
 
     @Override
@@ -82,7 +83,7 @@ public class Adolescent extends Alien {
 
     @Override
     protected float getHealthRegenPerSecond() {
-        return AVP.config.statsConfigs.ADOLESCENT_STATS.healthRegenPerSecond;
+        return AlienConfig.INSTANCE.statsConfigs.ADOLESCENT_STATS.healthRegenPerSecond;
     }
 
     @Override

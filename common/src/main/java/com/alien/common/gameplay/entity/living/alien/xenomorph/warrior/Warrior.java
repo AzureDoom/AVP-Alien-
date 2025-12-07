@@ -1,5 +1,6 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.warrior;
 
+import com.alien.common.config.AlienConfig;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.model.alien.variant.AlienVariant;
@@ -17,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 public class Warrior extends Xenomorph {
 
     public static AttributeSupplier.Builder createWarriorAttributes() {
-        return applyFrom(AVP.config.statsConfigs.WARRIOR_STATS, Monster.createMonsterAttributes());
+        return applyFrom(AlienConfig.INSTANCE.statsConfigs.WARRIOR_STATS, Monster.createMonsterAttributes());
     }
 
     private final WarriorAnimationDispatcher animationDispatcher;
@@ -25,7 +26,7 @@ public class Warrior extends Xenomorph {
     public Warrior(EntityType<? extends Warrior> entityType, Level level) {
         super(entityType, level);
         this.animationDispatcher = new WarriorAnimationDispatcher(this);
-        this.config = AVP.config.statsConfigs.WARRIOR_STATS;
+        this.config = AlienConfig.INSTANCE.statsConfigs.WARRIOR_STATS;
     }
 
     @Override
@@ -35,12 +36,12 @@ public class Warrior extends Xenomorph {
 
     @Override
     protected float getHealthRegenPerSecond() {
-        return AVP.config.statsConfigs.WARRIOR_STATS.healthRegenPerSecond;
+        return AlienConfig.INSTANCE.statsConfigs.WARRIOR_STATS.healthRegenPerSecond;
     }
 
     @Override
     protected @Nullable ResinData createResinData() {
-        return new ResinData(0, 32, 1, AVP.config.statsConfigs.WARRIOR_STATS.nestTickrate);
+        return new ResinData(0, 32, 1, AlienConfig.INSTANCE.statsConfigs.WARRIOR_STATS.nestTickrate);
     }
 
     @Override

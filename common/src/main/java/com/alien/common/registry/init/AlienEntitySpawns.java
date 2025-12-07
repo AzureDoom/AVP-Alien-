@@ -1,12 +1,16 @@
 package com.alien.common.registry.init;
 
+import com.alien.common.config.AlienConfig;
+import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.AlienSpawning;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.QueenSpawning;
 import com.alien.common.registry.tag.AlienBiomeTags;
-import com.avp.AVP;
+import com.avp.common.config.AVPConfig;
 import com.avp.common.model.spawning.AVPEntitySpawnData;
 import com.avp.common.registry.tag.AVPBiomeTags;
 import com.avp.service.Services;
+import com.blib.BLibHolder;
+import net.minecraft.world.entity.EntityType;
 
 public class AlienEntitySpawns {
 
@@ -18,252 +22,92 @@ public class AlienEntitySpawns {
     }
 
     private static void registerNormalAlienSpawns() {
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.CHESTBURSTER)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.CHESTBURSTER_SPAWN)
-                .build()
-        );
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.CRUSHER)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.CRUSHER_SPAWN)
-                .build()
-        );
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.DRONE)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.DRONE_SPAWN)
-                .build()
-        );
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.WARRIOR)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.WARRIOR_SPAWN)
-                .build()
-        );
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.PRAETORIAN)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.PRAETORIAN_SPAWN)
-                .build()
-        );
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.PROWLER)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.PROWLER_SPAWN)
-                .build()
-        );
+        register(AlienEntityTypes.CHESTBURSTER, AlienConfig.INSTANCE.spawnConfigs.CHESTBURSTER_SPAWN);
+        register(AlienEntityTypes.CRUSHER, AlienConfig.INSTANCE.spawnConfigs.CRUSHER_SPAWN);
+        register(AlienEntityTypes.DRONE, AlienConfig.INSTANCE.spawnConfigs.DRONE_SPAWN);
+        register(AlienEntityTypes.WARRIOR, AlienConfig.INSTANCE.spawnConfigs.WARRIOR_SPAWN);
+        register(AlienEntityTypes.PRAETORIAN, AlienConfig.INSTANCE.spawnConfigs.PRAETORIAN_SPAWN);
+        register(AlienEntityTypes.PROWLER, AlienConfig.INSTANCE.spawnConfigs.PROWLER_SPAWN);
         Services.REGISTRY.registerEntitySpawnData(
             AVPEntitySpawnData.builder(AlienEntityTypes.QUEEN)
                 .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
                 .withSpawnPredicate(QueenSpawning.PREDICATE)
-                .withSpawnSettings(AVP.config.spawnConfigs.QUEEN_SPAWN)
+                .withSpawnSettings(convert(AlienConfig.INSTANCE.spawnConfigs.QUEEN_SPAWN))
                 .build()
         );
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.RUNNER)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.RUNNER_SPAWN)
-                .build()
-        );
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.SPITTER)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.SPITTER_SPAWN)
-                .build()
-        );
+        register(AlienEntityTypes.RUNNER, AlienConfig.INSTANCE.spawnConfigs.RUNNER_SPAWN);
+        register(AlienEntityTypes.SPITTER, AlienConfig.INSTANCE.spawnConfigs.SPITTER_SPAWN);
     }
 
     private static void registerAberrantAlienSpawns() {
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.ABERRANT_CHESTBURSTER)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.ABERRANT_CHESTBURSTER_SPAWN)
-                .build()
-        );
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.ABERRANT_CRUSHER)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.ABERRANT_CRUSHER_SPAWN)
-                .build()
-        );
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.ABERRANT_DRONE)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.ABERRANT_DRONE_SPAWN)
-                .build()
-        );
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.ABERRANT_WARRIOR)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.ABERRANT_WARRIOR_SPAWN)
-                .build()
-        );
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.ABERRANT_PRAETORIAN)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.ABERRANT_PRAETORIAN_SPAWN)
-                .build()
-        );
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.ABERRANT_PROWLER)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.ABERRANT_PROWLER_SPAWN)
-                .build()
-        );
+        register(AlienEntityTypes.ABERRANT_CHESTBURSTER, AlienConfig.INSTANCE.spawnConfigs.ABERRANT_CHESTBURSTER_SPAWN);
+        register(AlienEntityTypes.ABERRANT_CRUSHER, AlienConfig.INSTANCE.spawnConfigs.ABERRANT_CRUSHER_SPAWN);
+        register(AlienEntityTypes.ABERRANT_DRONE, AlienConfig.INSTANCE.spawnConfigs.ABERRANT_DRONE_SPAWN);
+        register(AlienEntityTypes.ABERRANT_WARRIOR, AlienConfig.INSTANCE.spawnConfigs.ABERRANT_WARRIOR_SPAWN);
+        register(AlienEntityTypes.ABERRANT_PRAETORIAN, AlienConfig.INSTANCE.spawnConfigs.ABERRANT_PRAETORIAN_SPAWN);
+        register(AlienEntityTypes.ABERRANT_PROWLER, AlienConfig.INSTANCE.spawnConfigs.ABERRANT_PROWLER_SPAWN);
+        register(AlienEntityTypes.ABERRANT_RUNNER, AlienConfig.INSTANCE.spawnConfigs.ABERRANT_RUNNER_SPAWN);
         Services.REGISTRY.registerEntitySpawnData(
             AVPEntitySpawnData.builder(AlienEntityTypes.ABERRANT_QUEEN)
                 .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
                 .withSpawnPredicate(QueenSpawning.PREDICATE)
-                .withSpawnSettings(AVP.config.spawnConfigs.ABERRANT_QUEEN_SPAWN)
+                .withSpawnSettings(convert(AlienConfig.INSTANCE.spawnConfigs.ABERRANT_QUEEN_SPAWN))
                 .build()
         );
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.ABERRANT_RUNNER)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.ABERRANT_RUNNER_SPAWN)
-                .build()
-        );
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.ABERRANT_SPITTER)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.ABERRANT_SPITTER_SPAWN)
-                .build()
-        );
+        register(AlienEntityTypes.ABERRANT_SPITTER, AlienConfig.INSTANCE.spawnConfigs.ABERRANT_SPITTER_SPAWN);
     }
 
     private static void registerIrradiatedAlienSpawns() {
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.IRRADIATED_CRUSHER)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.IRRADIATED_CRUSHER_SPAWN)
-                .build()
-        );
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.IRRADIATED_DRONE)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.IRRADIATED_DRONE_SPAWN)
-                .build()
-        );
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.IRRADIATED_WARRIOR)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.IRRADIATED_WARRIOR_SPAWN)
-                .build()
-        );
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.IRRADIATED_PRAETORIAN)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.IRRADIATED_PRAETORIAN_SPAWN)
-                .build()
-        );
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.IRRADIATED_PROWLER)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.IRRADIATED_PROWLER_SPAWN)
-                .build()
-        );
+        register(AlienEntityTypes.IRRADIATED_CRUSHER, AlienConfig.INSTANCE.spawnConfigs.IRRADIATED_CRUSHER_SPAWN);
+        register(AlienEntityTypes.IRRADIATED_DRONE, AlienConfig.INSTANCE.spawnConfigs.IRRADIATED_DRONE_SPAWN);
+        register(AlienEntityTypes.IRRADIATED_WARRIOR, AlienConfig.INSTANCE.spawnConfigs.IRRADIATED_WARRIOR_SPAWN);
+        register(AlienEntityTypes.IRRADIATED_PRAETORIAN, AlienConfig.INSTANCE.spawnConfigs.IRRADIATED_PRAETORIAN_SPAWN);
+        register(AlienEntityTypes.IRRADIATED_PROWLER, AlienConfig.INSTANCE.spawnConfigs.IRRADIATED_PROWLER_SPAWN);
+        register(AlienEntityTypes.IRRADIATED_RUNNER, AlienConfig.INSTANCE.spawnConfigs.IRRADIATED_RUNNER_SPAWN);
         Services.REGISTRY.registerEntitySpawnData(
             AVPEntitySpawnData.builder(AlienEntityTypes.IRRADIATED_QUEEN)
                 .withBiomeTagKey(AVPBiomeTags.IS_IRRADIATED)
                 .withSpawnPredicate(QueenSpawning.PREDICATE)
-                .withSpawnSettings(AVP.config.spawnConfigs.IRRADIATED_QUEEN_SPAWN)
-                .build()
-        );
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.IRRADIATED_RUNNER)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.IRRADIATED_RUNNER_SPAWN)
+                .withSpawnSettings(convert(AlienConfig.INSTANCE.spawnConfigs.IRRADIATED_QUEEN_SPAWN))
                 .build()
         );
     }
 
     private static void registerNetherAlienSpawns() {
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.NETHER_CHESTBURSTER)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.NETHER_CHESTBURSTER_SPAWN)
-                .build()
-        );
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.NETHER_CRUSHER)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.NETHER_CRUSHER_SPAWN)
-                .build()
-        );
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.NETHER_DRONE)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.NETHER_DRONE_SPAWN)
-                .build()
-        );
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.NETHER_WARRIOR)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.NETHER_WARRIOR_SPAWN)
-                .build()
-        );
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.NETHER_PRAETORIAN)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.NETHER_PRAETORIAN_SPAWN)
-                .build()
-        );
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.NETHER_PROWLER)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.NETHER_PROWLER_SPAWN)
-                .build()
-        );
+        register(AlienEntityTypes.NETHER_CHESTBURSTER, AlienConfig.INSTANCE.spawnConfigs.NETHER_CHESTBURSTER_SPAWN);
+        register(AlienEntityTypes.NETHER_CRUSHER, AlienConfig.INSTANCE.spawnConfigs.NETHER_CRUSHER_SPAWN);
+        register(AlienEntityTypes.NETHER_DRONE, AlienConfig.INSTANCE.spawnConfigs.NETHER_DRONE_SPAWN);
+        register(AlienEntityTypes.NETHER_WARRIOR, AlienConfig.INSTANCE.spawnConfigs.NETHER_WARRIOR_SPAWN);
+        register(AlienEntityTypes.NETHER_PRAETORIAN, AlienConfig.INSTANCE.spawnConfigs.NETHER_PRAETORIAN_SPAWN);
+        register(AlienEntityTypes.NETHER_PROWLER, AlienConfig.INSTANCE.spawnConfigs.NETHER_PROWLER_SPAWN);
+        register(AlienEntityTypes.NETHER_RUNNER, AlienConfig.INSTANCE.spawnConfigs.NETHER_RUNNER_SPAWN);
+        register(AlienEntityTypes.NETHER_SPITTER, AlienConfig.INSTANCE.spawnConfigs.NETHER_SPITTER_SPAWN);
+
         Services.REGISTRY.registerEntitySpawnData(
             AVPEntitySpawnData.builder(AlienEntityTypes.NETHER_QUEEN)
                 .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
                 .withSpawnPredicate(QueenSpawning.PREDICATE)
-                .withSpawnSettings(AVP.config.spawnConfigs.NETHER_QUEEN_SPAWN)
+                .withSpawnSettings(convert(AlienConfig.INSTANCE.spawnConfigs.NETHER_QUEEN_SPAWN))
                 .build()
         );
+    }
+
+    private static <T extends Alien> void register(BLibHolder<EntityType<T>> entityType, AlienConfig.SpawnConfigs.SpawnSettings spawn) {
         Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.NETHER_RUNNER)
+            AVPEntitySpawnData.builder(entityType)
                 .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
                 .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.NETHER_RUNNER_SPAWN)
+                .withSpawnSettings(convert(spawn))
                 .build()
         );
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.NETHER_SPITTER)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(AlienSpawning.getTypedPredicate())
-                .withSpawnSettings(AVP.config.spawnConfigs.NETHER_SPITTER_SPAWN)
-                .build()
+    }
+
+    private static AVPConfig.SpawnConfigs.SpawnSettings convert(AlienConfig.SpawnConfigs.SpawnSettings spawnSettings) {
+        return new AVPConfig.SpawnConfigs.SpawnSettings(
+            spawnSettings.enabled,
+            spawnSettings.minGroupSize,
+            spawnSettings.maxGroupSize,
+            spawnSettings.weight
         );
     }
 }

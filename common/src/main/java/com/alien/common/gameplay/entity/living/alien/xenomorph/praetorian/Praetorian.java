@@ -1,5 +1,6 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.praetorian;
 
+import com.alien.common.config.AlienConfig;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.model.alien.variant.AlienVariant;
@@ -16,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 public class Praetorian extends Xenomorph {
 
     public static AttributeSupplier.Builder createPraetorianAttributes() {
-        return applyFrom(AVP.config.statsConfigs.PRAETORIAN_STATS, Monster.createMonsterAttributes());
+        return applyFrom(AlienConfig.INSTANCE.statsConfigs.PRAETORIAN_STATS, Monster.createMonsterAttributes());
     }
 
     private final PraetorianAnimationDispatcher animationDispatcher;
@@ -24,7 +25,7 @@ public class Praetorian extends Xenomorph {
     public Praetorian(EntityType<? extends Praetorian> entityType, Level level) {
         super(entityType, level);
         this.animationDispatcher = new PraetorianAnimationDispatcher(this);
-        this.config = AVP.config.statsConfigs.PRAETORIAN_STATS;
+        this.config = AlienConfig.INSTANCE.statsConfigs.PRAETORIAN_STATS;
     }
 
     @Override
@@ -34,12 +35,12 @@ public class Praetorian extends Xenomorph {
 
     @Override
     protected @Nullable ResinData createResinData() {
-        return new ResinData(0, 64, 1, AVP.config.statsConfigs.PRAETORIAN_STATS.nestTickrate);
+        return new ResinData(0, 64, 1, AlienConfig.INSTANCE.statsConfigs.PRAETORIAN_STATS.nestTickrate);
     }
 
     @Override
     protected float getHealthRegenPerSecond() {
-        return AVP.config.statsConfigs.PRAETORIAN_STATS.healthRegenPerSecond;
+        return AlienConfig.INSTANCE.statsConfigs.PRAETORIAN_STATS.healthRegenPerSecond;
     }
 
     @Override

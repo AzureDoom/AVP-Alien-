@@ -1,5 +1,6 @@
 package com.alien.common.gameplay.hive;
 
+import com.alien.common.config.AlienConfig;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.Crusher;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
@@ -234,7 +235,7 @@ public class Hive implements NBTSerializable {
             QueenSpawnChunkData.getOrCreate(level)
                 .ifSome(queenSpawnChunkData -> {
                     // TODO: Use a precise circular area of chunks based on the hive's radius/size.
-                    var chunkRadiusToBlacklist = AVP.config.hiveConfigs.MINIMUM_DISTANCE_BETWEEN_NATURAL_QUEEN_SPAWNS_IN_CHUNKS;
+                    var chunkRadiusToBlacklist = AlienConfig.INSTANCE.hiveConfigs.MINIMUM_DISTANCE_BETWEEN_NATURAL_QUEEN_SPAWNS_IN_CHUNKS;
                     var nearbyChunkPositions = ChunkPosUtil.getChunksAround(centerPosition(), chunkRadiusToBlacklist);
 
                     nearbyChunkPositions.forEach(queenSpawnChunkData::addChunkToBlacklist);

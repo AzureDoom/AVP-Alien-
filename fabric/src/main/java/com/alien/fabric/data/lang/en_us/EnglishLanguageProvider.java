@@ -7,6 +7,7 @@ import com.alien.fabric.data.lang.en_us.provider.EnUsBlockProvider;
 import com.alien.fabric.data.lang.en_us.provider.EnUsBlockTagProvider;
 import com.alien.fabric.data.lang.en_us.provider.EnUsConfigProvider;
 import com.alien.fabric.data.lang.en_us.provider.EnUsCreativeModeTabProvider;
+import com.alien.fabric.data.lang.en_us.provider.EnUsDamageTypeTagProvider;
 import com.alien.fabric.data.lang.en_us.provider.EnUsEntityProvider;
 import com.alien.fabric.data.lang.en_us.provider.EnUsEntityTypeTagProvider;
 import com.alien.fabric.data.lang.en_us.provider.EnUsItemProvider;
@@ -32,6 +33,11 @@ public class EnglishLanguageProvider extends FabricLanguageProvider {
 
         // Creative Mode Tabs
         EnUsCreativeModeTabProvider.CONSUMER.accept(builder);
+
+        // Death messages
+        builder.add("death.attack.acid", "%1$s vaporized in acid");
+        builder.add("death.attack.chestbursting", "%1$s gave birth");
+        builder.add("death.attack.smothering", "%1$s was smothered to death");
 
         // Entities
         EnUsEntityProvider.CONSUMER.accept(builder);
@@ -64,10 +70,11 @@ public class EnglishLanguageProvider extends FabricLanguageProvider {
         EnUsConfigProvider.CONSUMER.accept(builder);
 
         // Tags
-        EnUsBlockTagProvider.CONSUMER.accept(builder);
-        EnUsItemTagProvider.CONSUMER.accept(builder);
-        EnUsEntityTypeTagProvider.CONSUMER.accept(builder);
-        EnUsMobEffectTagProvider.CONSUMER.accept(builder);
         EnUsBiomeTagProvider.CONSUMER.accept(builder);
+        EnUsBlockTagProvider.CONSUMER.accept(builder);
+        EnUsDamageTypeTagProvider.CONSUMER.accept(builder);
+        EnUsEntityTypeTagProvider.CONSUMER.accept(builder);
+        EnUsItemTagProvider.CONSUMER.accept(builder);
+        EnUsMobEffectTagProvider.CONSUMER.accept(builder);
     }
 }

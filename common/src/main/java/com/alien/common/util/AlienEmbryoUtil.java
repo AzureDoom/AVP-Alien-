@@ -3,6 +3,7 @@ package com.alien.common.util;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.model.alien.Host;
 import com.alien.common.registry.init.AlienSoundEvents;
+import com.alien.common.registry.key.AlienDamageTypeKeys;
 import com.avp.common.registry.key.AVPDamageTypeKeys;
 import com.lib.common.model.GeneCarrier;
 import com.lib.common.util.EmbryoUtil;
@@ -86,7 +87,7 @@ public class AlienEmbryoUtil {
                 if (hostEntity.tickCount % 10 == 0) {
                     hostEntity.level()
                         .playSound(null, hostEntity, AlienSoundEvents.EFFECT_BONE_CRUNCH.get(), SoundSource.HOSTILE, 0.2F, 1);
-                    hostEntity.hurt(hostEntity.damageSources().source(AVPDamageTypeKeys.CHESTBURSTING), 0.01F);
+                    hostEntity.hurt(hostEntity.damageSources().source(AlienDamageTypeKeys.CHESTBURSTING), 0.01F);
                 }
             }
 
@@ -99,7 +100,7 @@ public class AlienEmbryoUtil {
 
         hostEntity.level().playSound(null, hostEntity, AlienSoundEvents.ENTITY_CHESTBURSTER_BURST.get(), SoundSource.HOSTILE, 0.25F, 1);
 
-        hostEntity.hurt(hostEntity.damageSources().source(AVPDamageTypeKeys.CHESTBURSTING), Float.MAX_VALUE);
+        hostEntity.hurt(hostEntity.damageSources().source(AlienDamageTypeKeys.CHESTBURSTING), Float.MAX_VALUE);
 
         // Remove the embryo no matter what.
         host.removeEmbryo();

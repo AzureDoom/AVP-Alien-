@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinItem_GigeresqueSurgeryKit {
 
     @Inject(method = "interactLivingEntity", at = @At("HEAD"))
-    private void avp$removeParasiteOnEntity(
+    private void avp_alien$removeParasiteOnEntity(
         ItemStack stack,
         Player player,
         LivingEntity interactionTarget,
@@ -33,7 +33,7 @@ public class MixinItem_GigeresqueSurgeryKit {
     }
 
     @Inject(method = "use", at = @At("HEAD"))
-    private void avp$removeParasiteOnUse(
+    private void avp_alien$removeParasiteOnUse(
         Level level,
         Player player,
         InteractionHand usedHand,

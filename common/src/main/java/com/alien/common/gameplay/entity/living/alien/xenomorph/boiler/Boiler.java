@@ -1,5 +1,6 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.boiler;
 
+import com.alien.common.config.AlienConfig;
 import com.alien.common.gameplay.ai.InvestigateVibrationGoal;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
@@ -24,7 +25,7 @@ import java.util.List;
 public class Boiler extends Xenomorph {
 
     public static AttributeSupplier.Builder createBoilerAttributes() {
-        return applyFrom(AVP.config.statsConfigs.BOILER_STATS, Monster.createMonsterAttributes());
+        return applyFrom(AlienConfig.INSTANCE.statsConfigs.BOILER_STATS, Monster.createMonsterAttributes());
     }
 
     private final BoilerAnimationDispatcher animationDispatcher;
@@ -32,7 +33,7 @@ public class Boiler extends Xenomorph {
     public Boiler(EntityType<? extends Boiler> entityType, Level level) {
         super(entityType, level);
         this.animationDispatcher = new BoilerAnimationDispatcher(this);
-        this.config = AVP.config.statsConfigs.BOILER_STATS;
+        this.config = AlienConfig.INSTANCE.statsConfigs.BOILER_STATS;
     }
 
     @Override
@@ -101,7 +102,7 @@ public class Boiler extends Xenomorph {
 
     @Override
     protected float getHealthRegenPerSecond() {
-        return AVP.config.statsConfigs.BOILER_STATS.healthRegenPerSecond;
+        return AlienConfig.INSTANCE.statsConfigs.BOILER_STATS.healthRegenPerSecond;
     }
 
     @Override

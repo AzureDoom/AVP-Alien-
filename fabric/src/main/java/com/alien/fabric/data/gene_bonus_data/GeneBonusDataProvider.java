@@ -1,13 +1,9 @@
 package com.alien.fabric.data.gene_bonus_data;
 
-import com.alien.AlienResources;
-import com.alien.common.data.GeneBonusDataReloadListener;
 import com.lib.common.gameplay.gene.GeneBonusData;
-import com.mojang.serialization.JsonOps;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
-import net.minecraft.data.PackOutput;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -34,25 +30,27 @@ public abstract class GeneBonusDataProvider implements DataProvider {
 
     @Override
     public final @NotNull CompletableFuture<?> run(CachedOutput cached) {
-        generate();
-
-        var pathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, GeneBonusDataReloadListener.DIRECTORY_NAME);
-
-        var futures = geneBonusDataByName.entrySet()
-            .stream()
-            .map(entry -> {
-                var name = entry.getKey();
-                var geneBonusData = entry.getValue();
-                var id = AlienResources.location(name);
-
-                var filePath = pathProvider.json(id);
-                var jsonElement = GeneBonusData.CODEC.encodeStart(JsonOps.INSTANCE, geneBonusData)
-                    .getOrThrow();
-
-                return DataProvider.saveStable(cached, jsonElement, filePath);
-            });
-
-        return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
+        // FIXME:
+//        generate();
+//
+//        var pathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, GeneBonusDataReloadListener.DIRECTORY_NAME);
+//
+//        var futures = geneBonusDataByName.entrySet()
+//            .stream()
+//            .map(entry -> {
+//                var name = entry.getKey();
+//                var geneBonusData = entry.getValue();
+//                var id = AlienResources.location(name);
+//
+//                var filePath = pathProvider.json(id);
+//                var jsonElement = GeneBonusData.CODEC.encodeStart(JsonOps.INSTANCE, geneBonusData)
+//                    .getOrThrow();
+//
+//                return DataProvider.saveStable(cached, jsonElement, filePath);
+//            });
+//
+//        return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
+        return CompletableFuture.allOf();
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.prowler;
 
+import com.alien.common.config.AlienConfig;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.model.alien.variant.AlienVariant;
@@ -17,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 public class Prowler extends Xenomorph {
 
     public static AttributeSupplier.Builder createProwlerAttributes() {
-        return applyFrom(AVP.config.statsConfigs.PROWLER_STATS, Monster.createMonsterAttributes());
+        return applyFrom(AlienConfig.INSTANCE.statsConfigs.PROWLER_STATS, Monster.createMonsterAttributes());
     }
 
     private final ProwlerAnimationDispatcher animationDispatcher;
@@ -25,7 +26,7 @@ public class Prowler extends Xenomorph {
     public Prowler(EntityType<? extends Prowler> entityType, Level level) {
         super(entityType, level);
         this.animationDispatcher = new ProwlerAnimationDispatcher(this);
-        this.config = AVP.config.statsConfigs.PROWLER_STATS;
+        this.config = AlienConfig.INSTANCE.statsConfigs.PROWLER_STATS;
     }
 
     @Override
@@ -35,7 +36,7 @@ public class Prowler extends Xenomorph {
 
     @Override
     protected @Nullable ResinData createResinData() {
-        return new ResinData(0, 16, 1, AVP.config.statsConfigs.PROWLER_STATS.nestTickrate);
+        return new ResinData(0, 16, 1, AlienConfig.INSTANCE.statsConfigs.PROWLER_STATS.nestTickrate);
     }
 
     @Override
@@ -73,7 +74,7 @@ public class Prowler extends Xenomorph {
 
     @Override
     protected float getHealthRegenPerSecond() {
-        return AVP.config.statsConfigs.PROWLER_STATS.healthRegenPerSecond;
+        return AlienConfig.INSTANCE.statsConfigs.PROWLER_STATS.healthRegenPerSecond;
     }
 
     @Override

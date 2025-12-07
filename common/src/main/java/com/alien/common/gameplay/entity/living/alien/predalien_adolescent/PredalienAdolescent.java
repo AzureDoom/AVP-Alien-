@@ -1,5 +1,6 @@
 package com.alien.common.gameplay.entity.living.alien.predalien_adolescent;
 
+import com.alien.common.config.AlienConfig;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.GrowthManager;
 import com.alien.common.model.alien.variant.AlienVariant;
@@ -22,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 public class PredalienAdolescent extends Alien {
 
     public static AttributeSupplier.Builder createPredalienAdolescentAttributes() {
-        return applyFrom(AVP.config.statsConfigs.PREDALIEN_ADOLESCENT_STATS, Monster.createMonsterAttributes());
+        return applyFrom(AlienConfig.INSTANCE.statsConfigs.PREDALIEN_ADOLESCENT_STATS, Monster.createMonsterAttributes());
     }
 
     private final PredalienAdolescentAnimationDispatcher animationDispatcher;
@@ -35,7 +36,7 @@ public class PredalienAdolescent extends Alien {
         this.animationDispatcher = new PredalienAdolescentAnimationDispatcher(this);
         this.growthManager = new GrowthManager(this, XenomorphGrowthUtil.GROW_UP_CALLBACK)
             .setGrowOverTime(true);
-        this.config = AVP.config.statsConfigs.PREDALIEN_ADOLESCENT_STATS;
+        this.config = AlienConfig.INSTANCE.statsConfigs.PREDALIEN_ADOLESCENT_STATS;
     }
 
     @Override
@@ -69,7 +70,7 @@ public class PredalienAdolescent extends Alien {
 
     @Override
     protected float getHealthRegenPerSecond() {
-        return AVP.config.statsConfigs.PREDALIEN_ADOLESCENT_STATS.healthRegenPerSecond;
+        return AlienConfig.INSTANCE.statsConfigs.PREDALIEN_ADOLESCENT_STATS.healthRegenPerSecond;
     }
 
     @Override

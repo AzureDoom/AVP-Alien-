@@ -1,5 +1,6 @@
 package com.alien.common.gameplay.entity.living.alien.ovomorph;
 
+import com.alien.common.config.AlienConfig;
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.ovomorph.ai.OvomorphGOAP;
@@ -38,7 +39,7 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
     public static final HatchState DEFAULT_HATCH_STATE = HatchState.SLEEPING;
 
     public static AttributeSupplier.Builder createOvomorphAttributes() {
-        return applyFrom(AVP.config.statsConfigs.OVOMORPH_STATS, Monster.createMonsterAttributes());
+        return applyFrom(AlienConfig.INSTANCE.statsConfigs.OVOMORPH_STATS, Monster.createMonsterAttributes());
     }
 
     public final DataAccessor<Byte> hatchStateId;
@@ -65,7 +66,7 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
 
         this.animationDispatcher = new OvomorphAnimationDispatcher(this);
         this.hatchManager = new HatchManager(this, 3 * 20, 3 * 20);
-        this.config = AVP.config.statsConfigs.OVOMORPH_STATS;
+        this.config = AlienConfig.INSTANCE.statsConfigs.OVOMORPH_STATS;
         this.wantsPickup = false;
     }
 
@@ -254,7 +255,7 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
 
     @Override
     protected float getHealthRegenPerSecond() {
-        return AVP.config.statsConfigs.OVOMORPH_STATS.healthRegenPerSecond;
+        return AlienConfig.INSTANCE.statsConfigs.OVOMORPH_STATS.healthRegenPerSecond;
     }
 
     public HatchManager getHatchManager() {

@@ -1,6 +1,7 @@
 package com.alien;
 
 import com.alien.common.AlienEvents;
+import com.alien.common.config.AlienConfig;
 import com.alien.common.data.AlienReloadListeners;
 import com.alien.common.data.fixer.migration.AlienDataMigrations;
 import com.alien.common.gameplay.level.saveddata.HiveLevelData;
@@ -24,14 +25,18 @@ import com.alien.common.registry.init.item.AlienSpawnEggItems;
 import com.alien.common.registry.init.item.block.AlienBlockItems;
 import com.alien.common.registry.init.item.block.AlienChitinBlockItems;
 import com.alien.common.registry.init.item.block.AlienResinBlockItems;
-import com.avp.AVP;
-import com.avp.common.config.AVPConfig;
+import com.avp.common.registry.init.AVPDecoratedPotPatterns;
 import com.blib.BLib;
 import com.blib.BLibMod;
 import com.blib.event.BLibLevelTickEvent;
 import com.blib.event.key.BLibEventKeys;
 import com.blib.service.BLibServices;
+import mod.azure.azurelib.common.config.Config;
+import mod.azure.azurelib.common.config.ConfigHolder;
+import mod.azure.azurelib.common.config.ConfigHolderRegistry;
 import mod.azure.azurelib.common.config.format.ConfigFormats;
+import mod.azure.azurelib.common.config.format.IConfigFormatHandler;
+import mod.azure.azurelib.common.config.io.ConfigIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,15 +44,14 @@ public class Alien {
 
     public static final String MOD_ID = "avp_alien";
 
-    public static final BLibMod MOD = BLib.createMod(MOD_ID);
-
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    public static void initialize() {
-        // FIXME:
-        AVP.config = AVP.registerConfig(AVPConfig.class, ConfigFormats.json()).getConfigInstance();
+    public static final BLibMod MOD = BLib.createMod(MOD_ID);
 
+    public static void initialize() {
         LOGGER.info("Initializing AVP (Alien) for mod loader '{}'", BLibServices.MOD_LOADER.getModLoaderName());
+
+        AlienConfig.initialize();
 
         // No dependencies.
         AlienBlocks.initialize();
@@ -76,6 +80,7 @@ public class Alien {
         AlienParticleTypes.initialize();
 
         // Functionality
+        AVPDecoratedPotPatterns.initialize();
         AlienCompostingChances.initialize();
         AlienDataKeys.initialize();
         AlienEntitySpawns.initialize();

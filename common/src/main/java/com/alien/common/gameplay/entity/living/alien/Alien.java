@@ -1,5 +1,6 @@
 package com.alien.common.gameplay.entity.living.alien;
 
+import com.alien.common.config.AlienConfig;
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
@@ -12,7 +13,6 @@ import com.alien.common.registry.tag.AlienMobEffectTags;
 import com.alien.common.util.AcidBleedUtil;
 import com.alien.common.util.AlienTransitionUtil;
 import com.avp.AVP;
-import com.avp.common.config.AVPConfig;
 import com.avp.common.registry.init.AVPDataKeys;
 import com.avp.common.registry.key.AVPBiomeKeys;
 import com.avp.common.registry.tag.AVPDamageTypesTags;
@@ -82,7 +82,7 @@ public abstract class Alien extends Monster implements DataUser {
 
     private int lastHurtTimeInTicks;
 
-    protected AVPConfig.StatsConfigs.AdvancedStats config;
+    protected AlienConfig.StatsConfigs.AdvancedStats config;
 
     protected Alien(EntityType<? extends Alien> entityType, Level level) {
         super(entityType, level);
@@ -569,15 +569,15 @@ public abstract class Alien extends Monster implements DataUser {
         this.hostTypeOption = Option.some(hostType);
     }
 
-    public void applyDynamicAttributes(AVPConfig.StatsConfigs.AdvancedStats config) {
+    public void applyDynamicAttributes(AlienConfig.StatsConfigs.AdvancedStats config) {
         if (isAberrant()) {
-            applyAttributes(config, AVP.config.statsConfigs.ABERRANT_STATS_MULTIPLIER);
+            applyAttributes(config, AlienConfig.INSTANCE.statsConfigs.ABERRANT_STATS_MULTIPLIER);
         } else if (isIrradiated()) {
-            applyAttributes(config, AVP.config.statsConfigs.IRRADIATED_STATS_MULTIPLIER);
+            applyAttributes(config, AlienConfig.INSTANCE.statsConfigs.IRRADIATED_STATS_MULTIPLIER);
         }
     }
 
-    private void applyAttributes(AVPConfig.StatsConfigs.AdvancedStats config, float scaleFactor) {
+    private void applyAttributes(AlienConfig.StatsConfigs.AdvancedStats config, float scaleFactor) {
         setAttribute(Attributes.MAX_HEALTH, config.health * scaleFactor);
         setAttribute(Attributes.ATTACK_DAMAGE, config.attackDamage * scaleFactor);
         setAttribute(Attributes.ARMOR, config.armor * scaleFactor);
@@ -591,7 +591,7 @@ public abstract class Alien extends Monster implements DataUser {
         }
     }
 
-    public static AttributeSupplier.Builder applyFrom(AVPConfig.StatsConfigs.AdvancedStats config, AttributeSupplier.Builder builder) {
+    public static AttributeSupplier.Builder applyFrom(AlienConfig.StatsConfigs.AdvancedStats config, AttributeSupplier.Builder builder) {
         builder.add(Attributes.ARMOR, config.armor);
         builder.add(Attributes.ARMOR_TOUGHNESS, config.armorToughness);
         builder.add(Attributes.ATTACK_DAMAGE, config.attackDamage);

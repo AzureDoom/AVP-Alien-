@@ -1,5 +1,7 @@
 package com.alien.common.gameplay.entity.acid;
 
+import com.alien.common.config.AlienConfig;
+import com.alien.common.registry.key.AlienDamageTypeKeys;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.registry.tag.AlienItemTags;
 import com.avp.AVP;
@@ -67,9 +69,9 @@ public class AcidEntityDamageUtil {
             return;
         }
 
-        var damage = AVP.config.statsConfigs.ACID_ATTACK_DAMAGE;
+        var damage = AlienConfig.INSTANCE.statsConfigs.ACID_ATTACK_DAMAGE;
         var registry = acid.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
-        var damageSource = new DamageSource(registry.getHolderOrThrow(AVPDamageTypeKeys.ACID));
+        var damageSource = new DamageSource(registry.getHolderOrThrow(AlienDamageTypeKeys.ACID));
 
         if (acid.isNetherAfflicted()) {
             entity.igniteForTicks(5 * 20);
