@@ -2,7 +2,6 @@ package com.alien.common.data.fixer.migration.impl;
 
 import com.alien.Alien;
 import com.alien.AlienResources;
-import com.avp.AVPResources;
 import com.blib.common.data.fixer.BLibDataFixerRegistry;
 import com.blib.common.data.fixer.migration.BLibDataMigration;
 import com.blib.common.model.Version;
@@ -10,6 +9,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,16 +48,20 @@ public class AVP_0_3_0_To_Alien_0_1_0 implements BLibDataMigration {
         ResourceKey<Registry<StructureTemplatePool>> registry,
         String path
     ) {
-        return new BLibDataFixerRegistry.Entry.Resource(registry, AVPResources.location(path), AlienResources.location(path));
+        return new BLibDataFixerRegistry.Entry.Resource(registry, createAvpResourceLocation(path), AlienResources.location(path));
     }
 
     private static void registerMigrationsForRegistry(Registry<?> registry) {
         Alien.MOD.getAllHolders(registry)
             .forEach(
                 holder -> register(
-                    new BLibDataFixerRegistry.Entry.Direct(registry, AVPResources.location(holder.getPath()), holder.getResourceLocation())
+                    new BLibDataFixerRegistry.Entry.Direct(registry, createAvpResourceLocation(holder.getPath()), holder.getResourceLocation())
                 )
             );
+    }
+
+    private static ResourceLocation createAvpResourceLocation(String path) {
+        return ResourceLocation.fromNamespaceAndPath("avp", path);
     }
 
     public static void register(BLibDataFixerRegistry.Entry entry) {

@@ -1,23 +1,19 @@
 package com.alien.common.data;
 
-import com.avp.service.Services;
+import com.alien.Alien;
+import com.blib.common.registry.impl.BLibReloadListenerRegistry;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 
 public class AlienReloadListeners {
 
-    public static final PreparableReloadListener GROWTH_STAGES_RELOAD_LISTENER = register(
-        GrowthStageReloadListener.DIRECTORY_NAME,
-        new GrowthStageReloadListener()
-    );
+    private static final BLibReloadListenerRegistry REGISTRY = Alien.MOD.createReloadListenerRegistry();
 
-    public static final PreparableReloadListener INFECTIONS_RELOAD_LISTENER = register(
-        InfectionReloadListener.DIRECTORY_NAME,
-        new InfectionReloadListener()
-    );
+    public static final PreparableReloadListener GROWTH_STAGES_RELOAD_LISTENER = new GrowthStageReloadListener();
 
-    private static PreparableReloadListener register(String id, PreparableReloadListener listener) {
-        return Services.REGISTRY.registerReloadListener(id, listener);
+    public static final PreparableReloadListener INFECTIONS_RELOAD_LISTENER = new InfectionReloadListener();
+
+    public static void initialize() {
+        REGISTRY.register(GrowthStageReloadListener.DIRECTORY_NAME, GROWTH_STAGES_RELOAD_LISTENER);
+        REGISTRY.register(InfectionReloadListener.DIRECTORY_NAME, INFECTIONS_RELOAD_LISTENER);
     }
-
-    public static void initialize() {}
 }
