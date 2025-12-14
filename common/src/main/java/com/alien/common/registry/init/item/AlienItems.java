@@ -6,6 +6,7 @@ import com.alien.common.gameplay.item.RoyalJellyItem;
 import com.alien.common.registry.key.AlienJukeboxSongKeys;
 import com.blib.BLibHolder;
 import com.blib.BLibRegistry;
+import com.blib.common.registry.impl.BLibDecoratedPotPatternRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.DiscFragmentItem;
 import net.minecraft.world.item.Item;
@@ -16,6 +17,8 @@ import java.util.function.Supplier;
 public class AlienItems {
 
     public static final BLibRegistry<Item> REGISTRY = Alien.MOD.createRegistry(BuiltInRegistries.ITEM);
+
+    private static final BLibDecoratedPotPatternRegistry DECORATED_POT_PATTERN_REGISTRY = Alien.MOD.createDecoratedPotPatternRegistry();
 
     public static final BLibHolder<Item> ABERRANT_CHITIN = create(
         "aberrant_chitin",
@@ -92,5 +95,9 @@ public class AlienItems {
 
     public static void initialize() {
         REGISTRY.registerAll();
+        DECORATED_POT_PATTERN_REGISTRY.register("ovoid_pottery_pattern", OVOID_POTTERY_SHERD);
+        DECORATED_POT_PATTERN_REGISTRY.register("parasite_pottery_pattern", PARASITE_POTTERY_SHERD);
+        DECORATED_POT_PATTERN_REGISTRY.register("royalty_pottery_pattern", ROYALTY_POTTERY_SHERD);
+        DECORATED_POT_PATTERN_REGISTRY.register("vector_pottery_pattern", VECTOR_POTTERY_SHERD);
     }
 }
