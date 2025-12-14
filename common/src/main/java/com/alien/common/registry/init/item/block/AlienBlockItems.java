@@ -3,15 +3,14 @@ package com.alien.common.registry.init.item.block;
 import com.alien.Alien;
 import com.alien.common.gameplay.item.RoyalJellyBlockItem;
 import com.blib.BLibHolder;
-import com.blib.BLibRegistry;
-import net.minecraft.core.registries.BuiltInRegistries;
+import com.blib.common.registry.impl.BLibItemRegistry;
 import net.minecraft.world.item.BlockItem;
 
 import java.util.function.Supplier;
 
 public class AlienBlockItems {
 
-    private static final BLibRegistry<BlockItem> REGISTRY = Alien.MOD.createRegistry(BuiltInRegistries.ITEM);
+    private static final BLibItemRegistry REGISTRY = Alien.MOD.createItemRegistry();
 
     public static final BLibHolder<BlockItem> ROYAL_JELLY_BLOCK = createWithSupplier(
         "royal_jelly_block",

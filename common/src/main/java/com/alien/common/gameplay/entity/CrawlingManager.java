@@ -1,8 +1,8 @@
 package com.alien.common.gameplay.entity;
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
-import com.lib.common.gameplay.NBTSerializable;
-import com.lib.common.network.DataAccessor;
+import com.blib.common.gameplay.model.NBTSerializable;
+import com.blib.common.network.data.DataAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.PathfinderMob;

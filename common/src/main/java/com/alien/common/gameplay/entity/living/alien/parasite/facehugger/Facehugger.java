@@ -6,7 +6,7 @@ import com.alien.common.gameplay.entity.living.alien.parasite.Parasite;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
-import com.avp.common.gameplay.ai.goal.combat.LungeAtTargetGoal;
+import com.blib.common.gameplay.entity.ai.goal.combat.LungeAtTargetGoal;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;

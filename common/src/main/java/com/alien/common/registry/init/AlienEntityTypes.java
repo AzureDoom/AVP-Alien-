@@ -19,18 +19,16 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.spitter.Spitter;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.warrior.Warrior;
-import com.avp.common.registry.init.entity_type.SilencedEntityTypeBuilder;
 import com.blib.BLibHolder;
-import com.blib.BLibRegistry;
-import com.blib.service.BLibServices;
-import net.minecraft.core.registries.BuiltInRegistries;
+import com.blib.common.registry.SilencedEntityTypeBuilder;
+import com.blib.common.registry.impl.BLibEntityTypeRegistry;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 
 public class AlienEntityTypes {
 
-    public static final BLibRegistry<EntityType<?>> REGISTRY = Alien.MOD.createRegistry(BuiltInRegistries.ENTITY_TYPE);
+    public static final BLibEntityTypeRegistry REGISTRY = Alien.MOD.createEntityTypeRegistry();
 
     public static final BLibHolder<EntityType<Adolescent>> ABERRANT_ADOLESCENT = create(
         "aberrant_adolescent",
@@ -455,95 +453,95 @@ public class AlienEntityTypes {
     public static <T extends Entity> BLibHolder<EntityType<T>> create(String path, EntityType.Builder<T> builder) {
         return REGISTRY.createHolder(
             path,
-            () -> ((SilencedEntityTypeBuilder) builder).avp$buildWithoutDataFixerCheck()
+            () -> ((SilencedEntityTypeBuilder) builder).blib$buildWithoutDataFixerCheck()
         );
     }
 
     public static void initialize() {
         REGISTRY.registerAll();
-        BLibServices.REGISTRY.registerEntityAttributes(ABERRANT_ADOLESCENT, Adolescent::createAdolescentAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(ABERRANT_BOILER, Boiler::createBoilerAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(ABERRANT_CHESTBURSTER, Chestburster::createChestbursterAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(ABERRANT_CRUSHER, Crusher::createCrusherAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(ABERRANT_DRONE, Drone::createDroneAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(ABERRANT_FACEHUGGER, Facehugger::createFacehuggerAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(ABERRANT_OVOMORPH, Ovomorph::createOvomorphAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(ABERRANT_PRAETORIAN, Praetorian::createPraetorianAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(ABERRANT_PREDALIEN, Predalien::createPredalienAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(
+        REGISTRY.registerAttributes(ABERRANT_ADOLESCENT, Adolescent::createAdolescentAttributes);
+        REGISTRY.registerAttributes(ABERRANT_BOILER, Boiler::createBoilerAttributes);
+        REGISTRY.registerAttributes(ABERRANT_CHESTBURSTER, Chestburster::createChestbursterAttributes);
+        REGISTRY.registerAttributes(ABERRANT_CRUSHER, Crusher::createCrusherAttributes);
+        REGISTRY.registerAttributes(ABERRANT_DRONE, Drone::createDroneAttributes);
+        REGISTRY.registerAttributes(ABERRANT_FACEHUGGER, Facehugger::createFacehuggerAttributes);
+        REGISTRY.registerAttributes(ABERRANT_OVOMORPH, Ovomorph::createOvomorphAttributes);
+        REGISTRY.registerAttributes(ABERRANT_PRAETORIAN, Praetorian::createPraetorianAttributes);
+        REGISTRY.registerAttributes(ABERRANT_PREDALIEN, Predalien::createPredalienAttributes);
+        REGISTRY.registerAttributes(
             ABERRANT_PREDALIEN_ADOLESCENT,
             PredalienAdolescent::createPredalienAdolescentAttributes
         );
-        BLibServices.REGISTRY.registerEntityAttributes(
+        REGISTRY.registerAttributes(
             ABERRANT_PREDALIEN_CHESTBURSTER,
             PredalienChestburster::createPredalienChestbursterAttributes
         );
-        BLibServices.REGISTRY.registerEntityAttributes(ABERRANT_PROWLER, Prowler::createProwlerAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(ABERRANT_QUEEN, Queen::createQueenAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(ABERRANT_RUNNER, Runner::createRunnerAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(ABERRANT_SPITTER, Spitter::createSpitterAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(ABERRANT_WARRIOR, Warrior::createWarriorAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(CHESTBURSTER, Chestburster::createChestbursterAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(ADOLESCENT, Adolescent::createAdolescentAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(BOILER, Boiler::createBoilerAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(CRUSHER, Crusher::createCrusherAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(DRONE, Drone::createDroneAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(FACEHUGGER, Facehugger::createFacehuggerAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(IRRADIATED_CRUSHER, Crusher::createCrusherAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(IRRADIATED_DRONE, Drone::createDroneAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(IRRADIATED_PRAETORIAN, Praetorian::createPraetorianAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(IRRADIATED_PREDALIEN, Predalien::createPredalienAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(IRRADIATED_PROWLER, Prowler::createProwlerAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(IRRADIATED_QUEEN, Queen::createQueenAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(IRRADIATED_RUNNER, Runner::createRunnerAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(IRRADIATED_WARRIOR, Warrior::createWarriorAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(NETHER_ADOLESCENT, Adolescent::createAdolescentAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(NETHER_BOILER, Boiler::createBoilerAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(NETHER_CHESTBURSTER, Chestburster::createChestbursterAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(NETHER_CRUSHER, Crusher::createCrusherAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(NETHER_DRONE, Drone::createDroneAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(NETHER_FACEHUGGER, Facehugger::createFacehuggerAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(NETHER_OVOMORPH, Ovomorph::createOvomorphAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(NETHER_PRAETORIAN, Praetorian::createPraetorianAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(NETHER_PREDALIEN, Predalien::createPredalienAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(
+        REGISTRY.registerAttributes(ABERRANT_PROWLER, Prowler::createProwlerAttributes);
+        REGISTRY.registerAttributes(ABERRANT_QUEEN, Queen::createQueenAttributes);
+        REGISTRY.registerAttributes(ABERRANT_RUNNER, Runner::createRunnerAttributes);
+        REGISTRY.registerAttributes(ABERRANT_SPITTER, Spitter::createSpitterAttributes);
+        REGISTRY.registerAttributes(ABERRANT_WARRIOR, Warrior::createWarriorAttributes);
+        REGISTRY.registerAttributes(CHESTBURSTER, Chestburster::createChestbursterAttributes);
+        REGISTRY.registerAttributes(ADOLESCENT, Adolescent::createAdolescentAttributes);
+        REGISTRY.registerAttributes(BOILER, Boiler::createBoilerAttributes);
+        REGISTRY.registerAttributes(CRUSHER, Crusher::createCrusherAttributes);
+        REGISTRY.registerAttributes(DRONE, Drone::createDroneAttributes);
+        REGISTRY.registerAttributes(FACEHUGGER, Facehugger::createFacehuggerAttributes);
+        REGISTRY.registerAttributes(IRRADIATED_CRUSHER, Crusher::createCrusherAttributes);
+        REGISTRY.registerAttributes(IRRADIATED_DRONE, Drone::createDroneAttributes);
+        REGISTRY.registerAttributes(IRRADIATED_PRAETORIAN, Praetorian::createPraetorianAttributes);
+        REGISTRY.registerAttributes(IRRADIATED_PREDALIEN, Predalien::createPredalienAttributes);
+        REGISTRY.registerAttributes(IRRADIATED_PROWLER, Prowler::createProwlerAttributes);
+        REGISTRY.registerAttributes(IRRADIATED_QUEEN, Queen::createQueenAttributes);
+        REGISTRY.registerAttributes(IRRADIATED_RUNNER, Runner::createRunnerAttributes);
+        REGISTRY.registerAttributes(IRRADIATED_WARRIOR, Warrior::createWarriorAttributes);
+        REGISTRY.registerAttributes(NETHER_ADOLESCENT, Adolescent::createAdolescentAttributes);
+        REGISTRY.registerAttributes(NETHER_BOILER, Boiler::createBoilerAttributes);
+        REGISTRY.registerAttributes(NETHER_CHESTBURSTER, Chestburster::createChestbursterAttributes);
+        REGISTRY.registerAttributes(NETHER_CRUSHER, Crusher::createCrusherAttributes);
+        REGISTRY.registerAttributes(NETHER_DRONE, Drone::createDroneAttributes);
+        REGISTRY.registerAttributes(NETHER_FACEHUGGER, Facehugger::createFacehuggerAttributes);
+        REGISTRY.registerAttributes(NETHER_OVOMORPH, Ovomorph::createOvomorphAttributes);
+        REGISTRY.registerAttributes(NETHER_PRAETORIAN, Praetorian::createPraetorianAttributes);
+        REGISTRY.registerAttributes(NETHER_PREDALIEN, Predalien::createPredalienAttributes);
+        REGISTRY.registerAttributes(
             NETHER_PREDALIEN_ADOLESCENT,
             PredalienAdolescent::createPredalienAdolescentAttributes
         );
-        BLibServices.REGISTRY.registerEntityAttributes(
+        REGISTRY.registerAttributes(
             NETHER_PREDALIEN_CHESTBURSTER,
             PredalienChestburster::createPredalienChestbursterAttributes
         );
-        BLibServices.REGISTRY.registerEntityAttributes(NETHER_PROWLER, Prowler::createProwlerAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(NETHER_QUEEN, Queen::createQueenAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(NETHER_RUNNER, Runner::createRunnerAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(NETHER_SPITTER, Spitter::createSpitterAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(NETHER_WARRIOR, Warrior::createWarriorAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(OVIPOSITOR, Ovipositor::createOvipositorAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(OVOMORPH, Ovomorph::createOvomorphAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(PRAETORIAN, Praetorian::createPraetorianAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(PREDALIEN, Predalien::createPredalienAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(PREDALIEN_ADOLESCENT, PredalienAdolescent::createPredalienAdolescentAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(
+        REGISTRY.registerAttributes(NETHER_PROWLER, Prowler::createProwlerAttributes);
+        REGISTRY.registerAttributes(NETHER_QUEEN, Queen::createQueenAttributes);
+        REGISTRY.registerAttributes(NETHER_RUNNER, Runner::createRunnerAttributes);
+        REGISTRY.registerAttributes(NETHER_SPITTER, Spitter::createSpitterAttributes);
+        REGISTRY.registerAttributes(NETHER_WARRIOR, Warrior::createWarriorAttributes);
+        REGISTRY.registerAttributes(OVIPOSITOR, Ovipositor::createOvipositorAttributes);
+        REGISTRY.registerAttributes(OVOMORPH, Ovomorph::createOvomorphAttributes);
+        REGISTRY.registerAttributes(PRAETORIAN, Praetorian::createPraetorianAttributes);
+        REGISTRY.registerAttributes(PREDALIEN, Predalien::createPredalienAttributes);
+        REGISTRY.registerAttributes(PREDALIEN_ADOLESCENT, PredalienAdolescent::createPredalienAdolescentAttributes);
+        REGISTRY.registerAttributes(
             PREDALIEN_CHESTBURSTER,
             PredalienChestburster::createPredalienChestbursterAttributes
         );
-        BLibServices.REGISTRY.registerEntityAttributes(PROWLER, Prowler::createProwlerAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(QUEEN, Queen::createQueenAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(ROYAL_ABERRANT_ADOLESCENT, Adolescent::createAdolescentAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(ROYAL_ABERRANT_CHESTBURSTER, Chestburster::createChestbursterAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(ROYAL_ABERRANT_FACEHUGGER, Facehugger::createFacehuggerAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(ROYAL_ABERRANT_OVOMORPH, Ovomorph::createOvomorphAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(ROYAL_ADOLESCENT, Adolescent::createAdolescentAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(ROYAL_CHESTBURSTER, Chestburster::createChestbursterAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(ROYAL_FACEHUGGER, Facehugger::createFacehuggerAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(ROYAL_NETHER_ADOLESCENT, Adolescent::createAdolescentAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(ROYAL_NETHER_CHESTBURSTER, Chestburster::createChestbursterAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(ROYAL_NETHER_FACEHUGGER, Facehugger::createFacehuggerAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(ROYAL_NETHER_OVOMORPH, Ovomorph::createOvomorphAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(ROYAL_OVOMORPH, Ovomorph::createOvomorphAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(RUNNER, Runner::createRunnerAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(SPITTER, Spitter::createSpitterAttributes);
-        BLibServices.REGISTRY.registerEntityAttributes(WARRIOR, Warrior::createWarriorAttributes);
+        REGISTRY.registerAttributes(PROWLER, Prowler::createProwlerAttributes);
+        REGISTRY.registerAttributes(QUEEN, Queen::createQueenAttributes);
+        REGISTRY.registerAttributes(ROYAL_ABERRANT_ADOLESCENT, Adolescent::createAdolescentAttributes);
+        REGISTRY.registerAttributes(ROYAL_ABERRANT_CHESTBURSTER, Chestburster::createChestbursterAttributes);
+        REGISTRY.registerAttributes(ROYAL_ABERRANT_FACEHUGGER, Facehugger::createFacehuggerAttributes);
+        REGISTRY.registerAttributes(ROYAL_ABERRANT_OVOMORPH, Ovomorph::createOvomorphAttributes);
+        REGISTRY.registerAttributes(ROYAL_ADOLESCENT, Adolescent::createAdolescentAttributes);
+        REGISTRY.registerAttributes(ROYAL_CHESTBURSTER, Chestburster::createChestbursterAttributes);
+        REGISTRY.registerAttributes(ROYAL_FACEHUGGER, Facehugger::createFacehuggerAttributes);
+        REGISTRY.registerAttributes(ROYAL_NETHER_ADOLESCENT, Adolescent::createAdolescentAttributes);
+        REGISTRY.registerAttributes(ROYAL_NETHER_CHESTBURSTER, Chestburster::createChestbursterAttributes);
+        REGISTRY.registerAttributes(ROYAL_NETHER_FACEHUGGER, Facehugger::createFacehuggerAttributes);
+        REGISTRY.registerAttributes(ROYAL_NETHER_OVOMORPH, Ovomorph::createOvomorphAttributes);
+        REGISTRY.registerAttributes(ROYAL_OVOMORPH, Ovomorph::createOvomorphAttributes);
+        REGISTRY.registerAttributes(RUNNER, Runner::createRunnerAttributes);
+        REGISTRY.registerAttributes(SPITTER, Spitter::createSpitterAttributes);
+        REGISTRY.registerAttributes(WARRIOR, Warrior::createWarriorAttributes);
     }
 }

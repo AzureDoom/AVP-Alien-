@@ -5,13 +5,15 @@ import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.AlienSpawning;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.QueenSpawning;
 import com.alien.common.registry.tag.AlienBiomeTags;
-import com.avp.common.model.spawning.AVPEntitySpawnData;
-import com.avp.common.model.spawning.SpawnSettings;
-import com.avp.service.Services;
 import com.blib.BLibHolder;
+import com.blib.common.gameplay.model.spawning.BLibEntitySpawnData;
+import com.blib.common.gameplay.model.spawning.SpawnSettings;
+import com.blib.common.registry.impl.BLibEntityTypeRegistry;
 import net.minecraft.world.entity.EntityType;
 
 public class AlienEntitySpawns {
+
+    private static final BLibEntityTypeRegistry REGISTRY = com.alien.Alien.MOD.createEntityTypeRegistry();;
 
     public static void initialize() {
         registerAberrantAlienSpawns();
@@ -27,8 +29,8 @@ public class AlienEntitySpawns {
         register(AlienEntityTypes.WARRIOR, AlienConfig.INSTANCE.spawnConfigs.WARRIOR_SPAWN);
         register(AlienEntityTypes.PRAETORIAN, AlienConfig.INSTANCE.spawnConfigs.PRAETORIAN_SPAWN);
         register(AlienEntityTypes.PROWLER, AlienConfig.INSTANCE.spawnConfigs.PROWLER_SPAWN);
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.QUEEN)
+        REGISTRY.registerSpawnData(
+            BLibEntitySpawnData.builder(AlienEntityTypes.QUEEN)
                 .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
                 .withSpawnPredicate(QueenSpawning.PREDICATE)
                 .withSpawnSettings(convert(AlienConfig.INSTANCE.spawnConfigs.QUEEN_SPAWN))
@@ -46,8 +48,8 @@ public class AlienEntitySpawns {
         register(AlienEntityTypes.ABERRANT_PRAETORIAN, AlienConfig.INSTANCE.spawnConfigs.ABERRANT_PRAETORIAN_SPAWN);
         register(AlienEntityTypes.ABERRANT_PROWLER, AlienConfig.INSTANCE.spawnConfigs.ABERRANT_PROWLER_SPAWN);
         register(AlienEntityTypes.ABERRANT_RUNNER, AlienConfig.INSTANCE.spawnConfigs.ABERRANT_RUNNER_SPAWN);
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.ABERRANT_QUEEN)
+        REGISTRY.registerSpawnData(
+            BLibEntitySpawnData.builder(AlienEntityTypes.ABERRANT_QUEEN)
                 .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
                 .withSpawnPredicate(QueenSpawning.PREDICATE)
                 .withSpawnSettings(convert(AlienConfig.INSTANCE.spawnConfigs.ABERRANT_QUEEN_SPAWN))
@@ -63,8 +65,8 @@ public class AlienEntitySpawns {
         register(AlienEntityTypes.IRRADIATED_PRAETORIAN, AlienConfig.INSTANCE.spawnConfigs.IRRADIATED_PRAETORIAN_SPAWN);
         register(AlienEntityTypes.IRRADIATED_PROWLER, AlienConfig.INSTANCE.spawnConfigs.IRRADIATED_PROWLER_SPAWN);
         register(AlienEntityTypes.IRRADIATED_RUNNER, AlienConfig.INSTANCE.spawnConfigs.IRRADIATED_RUNNER_SPAWN);
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.IRRADIATED_QUEEN)
+        REGISTRY.registerSpawnData(
+            BLibEntitySpawnData.builder(AlienEntityTypes.IRRADIATED_QUEEN)
                 // FIXME:
                 // .withBiomeTagKey(AVPBiomeTags.IS_IRRADIATED)
                 .withSpawnPredicate(QueenSpawning.PREDICATE)
@@ -83,8 +85,8 @@ public class AlienEntitySpawns {
         register(AlienEntityTypes.NETHER_RUNNER, AlienConfig.INSTANCE.spawnConfigs.NETHER_RUNNER_SPAWN);
         register(AlienEntityTypes.NETHER_SPITTER, AlienConfig.INSTANCE.spawnConfigs.NETHER_SPITTER_SPAWN);
 
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(AlienEntityTypes.NETHER_QUEEN)
+        REGISTRY.registerSpawnData(
+            BLibEntitySpawnData.builder(AlienEntityTypes.NETHER_QUEEN)
                 .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
                 .withSpawnPredicate(QueenSpawning.PREDICATE)
                 .withSpawnSettings(convert(AlienConfig.INSTANCE.spawnConfigs.NETHER_QUEEN_SPAWN))
@@ -93,8 +95,8 @@ public class AlienEntitySpawns {
     }
 
     private static <T extends Alien> void register(BLibHolder<EntityType<T>> entityType, AlienConfig.SpawnConfigs.SpawnSettings spawn) {
-        Services.REGISTRY.registerEntitySpawnData(
-            AVPEntitySpawnData.builder(entityType)
+        REGISTRY.registerSpawnData(
+            BLibEntitySpawnData.builder(entityType)
                 .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
                 .withSpawnPredicate(AlienSpawning.getTypedPredicate())
                 .withSpawnSettings(convert(spawn))

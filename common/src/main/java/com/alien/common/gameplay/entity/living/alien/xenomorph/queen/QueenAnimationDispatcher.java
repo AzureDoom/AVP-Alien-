@@ -1,7 +1,7 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.queen;
 
 import com.alien.common.util.AzAlienAnimationUtil;
-import com.lib.common.util.AzAnimationUtil;
+import com.blib.common.util.AzAnimationUtil;
 import mod.azure.azurelib.common.animation.dispatch.command.AzCommand;
 import mod.azure.azurelib.common.animation.play_behavior.AzPlayBehaviors;
 

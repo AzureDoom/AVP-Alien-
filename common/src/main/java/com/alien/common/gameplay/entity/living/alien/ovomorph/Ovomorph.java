@@ -11,11 +11,11 @@ import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.util.AlienPredicates;
+import com.blib.common.gameplay.entity.manager.VibrationSystemManager;
+import com.blib.common.gameplay.goap.GOAPUser;
+import com.blib.common.network.data.DataAccessor;
 import com.just.core.functional.option.Option;
 import com.just.goap.graph.Graph;
-import com.lib.common.gameplay.entity.manager.VibrationSystemManager;
-import com.lib.common.gameplay.goap.GOAPUser;
-import com.lib.common.network.DataAccessor;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -97,7 +97,7 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
                 var deferredHolder = alienVariantType.eggPickupRequestEvent();
 
                 if (deferredHolder != null) {
-                    gameEvent(deferredHolder.getHolder());
+                    gameEvent(deferredHolder);
                 }
             }
 

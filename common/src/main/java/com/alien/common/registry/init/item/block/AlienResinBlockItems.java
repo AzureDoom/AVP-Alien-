@@ -3,8 +3,7 @@ package com.alien.common.registry.init.item.block;
 import com.alien.Alien;
 import com.alien.common.registry.init.block.AlienResinBlocks;
 import com.blib.BLibHolder;
-import com.blib.BLibRegistry;
-import net.minecraft.core.registries.BuiltInRegistries;
+import com.blib.common.registry.impl.BLibItemRegistry;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -13,7 +12,7 @@ import java.util.function.Supplier;
 
 public class AlienResinBlockItems {
 
-    private static final BLibRegistry<BlockItem> REGISTRY = Alien.MOD.createRegistry(BuiltInRegistries.ITEM);
+    private static final BLibItemRegistry REGISTRY = Alien.MOD.createItemRegistry();
 
     public static final BLibHolder<BlockItem> ABERRANT_RESIN = create(
         "aberrant_resin",

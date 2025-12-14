@@ -1,13 +1,13 @@
 package com.alien.common.gameplay.hive;
 
 import com.alien.common.config.AlienConfig;
-import com.lib.common.gameplay.util.spatial.Vec3Like;
-import com.lib.common.gameplay.util.spatial.block.BlockPosVec3;
-import com.lib.common.gameplay.util.spatial.sphere.layer.LayeredSphere;
-import com.lib.common.gameplay.util.spatial.sphere.layer.SphereLayer;
-import com.lib.common.gameplay.util.spatial.sphere.layer.SphereLayerDistanceTarget;
-import com.lib.common.gameplay.util.spatial.sphere.layer.impl.PercentileSphereLayer;
-import com.lib.common.gameplay.util.spatial.sphere.layer.impl.SupplyingPercentileSphereLayer;
+import com.blib.common.gameplay.util.spatial.Vec3Like;
+import com.blib.common.gameplay.util.spatial.block.BlockPosVec3;
+import com.blib.common.gameplay.util.spatial.sphere.layer.LayeredSphere;
+import com.blib.common.gameplay.util.spatial.sphere.layer.SphereLayer;
+import com.blib.common.gameplay.util.spatial.sphere.layer.SphereLayerDistanceTarget;
+import com.blib.common.gameplay.util.spatial.sphere.layer.impl.PercentileSphereLayer;
+import com.blib.common.gameplay.util.spatial.sphere.layer.impl.SupplyingPercentileSphereLayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;

@@ -1,7 +1,7 @@
 package com.alien.common.gameplay.ai.goal;
 
 import com.alien.common.registry.tag.AlienBlockTags;
-import com.avp.server.BlockBreakProgressManager;
+import com.blib.server.BlockBreakProgressManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;

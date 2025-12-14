@@ -5,7 +5,7 @@ import com.alien.common.model.alien.FreeMob;
 import com.alien.common.registry.init.AlienDataKeys;
 import com.alien.common.util.AlienPredicates;
 import com.blib.common.gameplay.util.BLibEntityPredicates;
-import com.lib.common.network.DataAccessor;
+import com.blib.common.network.data.DataAccessor;
 import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;

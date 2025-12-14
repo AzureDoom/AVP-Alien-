@@ -42,47 +42,49 @@ public class Alien {
     public static final BLibMod MOD = BLib.createMod(MOD_ID);
 
     public static void initialize() {
-        LOGGER.info("Initializing AVP (Alien) for mod loader '{}'", BLibServices.MOD_LOADER.getModLoaderName());
+        LOGGER.info("Initializing AVP (Alien) for mod loader '{}'", BLib.getModLoaderType());
 
         AlienConfig.initialize();
 
-        // No dependencies.
-        AlienBlocks.initialize();
-        AlienChitinBlocks.initialize();
-        AlienResinBlocks.initialize();
-        AlienItems.initialize();
-        AlienEntityTypes.initialize();
-        AlienSoundEvents.initialize();
+        MOD.initialize(() -> {
+            // No dependencies.
+            AlienBlocks.initialize();
+            AlienChitinBlocks.initialize();
+            AlienResinBlocks.initialize();
+            AlienItems.initialize();
+            AlienEntityTypes.initialize();
+            AlienSoundEvents.initialize();
 
-        // Depends on blocks.
-        AlienBlockItems.initialize();
-        AlienChitinBlockItems.initialize();
-        AlienResinBlockItems.initialize();
-        // Depends on sound events.
-        AlienArmorMaterials.initialize();
-        // Depends on armor materials.
-        AlienArmorItems.initialize();
-        // Depends on entity types.
-        AlienSpawnEggItems.initialize();
-        // Depends on blocks.
-        AlienBlockEntityTypes.initialize();
-        // Depends on blocks, items, block items, etc.
-        AlienCreativeModeTabs.initialize();
+            // Depends on blocks.
+            AlienBlockItems.initialize();
+            AlienChitinBlockItems.initialize();
+            AlienResinBlockItems.initialize();
+            // Depends on sound events.
+            AlienArmorMaterials.initialize();
+            // Depends on armor materials.
+            AlienArmorItems.initialize();
+            // Depends on entity types.
+            AlienSpawnEggItems.initialize();
+            // Depends on blocks.
+            AlienBlockEntityTypes.initialize();
+            // Depends on blocks, items, block items, etc.
+            AlienCreativeModeTabs.initialize();
 
-        AlienGameEvents.initialize();
-        AlienParticleTypes.initialize();
+            AlienGameEvents.initialize();
+            AlienParticleTypes.initialize();
 
-        // Functionality
-        AlienDecoratedPotPatterns.initialize();
-        AlienCompostingChances.initialize();
-        AlienDataKeys.initialize();
-        AlienEntitySpawns.initialize();
+            // Functionality
+            AlienDecoratedPotPatterns.initialize();
+            AlienCompostingChances.initialize();
+            AlienDataKeys.initialize();
+            AlienEntitySpawns.initialize();
 
-        // Data Migration
-        AlienDataMigrations.initialize();
+            // Data Migration
+            AlienDataMigrations.initialize();
 
-        // Listeners/Events
-        AlienReloadListeners.initialize();
+            // Listeners/Events
+            AlienReloadListeners.initialize();
+        });
 
         BLibServices.EVENT.afterLevelTick().register(Alien::tickHivesInLevel);
         BLibServices.EVENT.afterLevelTick().register(Alien::tickQueenSpawnCooldown);

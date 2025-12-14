@@ -68,7 +68,7 @@ public class ResinSpreadListener implements GameEventListener {
             // If there is no alien variant type for given source entity
             // OR if there is a resin spread event type mismatch...
             AlienVariantTypes.getFor(serverLevel.getBlockState(blockPos))
-                .isNoneOr(alienVariantType -> !holder.is(alienVariantType.resinSpreadEvent().getHolder()))
+                .isNoneOr(alienVariantType -> !holder.is(alienVariantType.resinSpreadEvent()))
         ) {
             // Then ignore the event.
             return false;

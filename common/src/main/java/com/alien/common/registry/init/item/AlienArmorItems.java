@@ -5,9 +5,7 @@ import com.alien.common.gameplay.item.NetherChitinArmorItem;
 import com.alien.common.gameplay.item.PlatedNetherChitinArmorItem;
 import com.alien.common.registry.init.AlienArmorMaterials;
 import com.blib.BLibHolder;
-import com.blib.BLibRegistry;
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
+import com.blib.common.registry.impl.BLibItemRegistry;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
@@ -16,7 +14,7 @@ import java.util.function.Supplier;
 
 public class AlienArmorItems {
 
-    private static final BLibRegistry<ArmorItem> REGISTRY = Alien.MOD.createRegistry(BuiltInRegistries.ITEM);
+    private static final BLibItemRegistry REGISTRY = Alien.MOD.createItemRegistry();
 
     public static final int CHITIN_DURABILITY_MULTIPLIER = 21;
 
@@ -24,84 +22,84 @@ public class AlienArmorItems {
 
     public static final BLibHolder<ArmorItem> ABERRANT_CHITIN_BOOTS = create(
         "aberrant_chitin_boots",
-        AlienArmorMaterials.ABERRANT_CHITIN::getHolder,
+        AlienArmorMaterials.ABERRANT_CHITIN,
         ArmorItem.Type.BOOTS,
         CHITIN_DURABILITY_MULTIPLIER
     );
 
     public static final BLibHolder<ArmorItem> ABERRANT_CHITIN_CHESTPLATE = create(
         "aberrant_chitin_chestplate",
-        AlienArmorMaterials.ABERRANT_CHITIN::getHolder,
+        AlienArmorMaterials.ABERRANT_CHITIN,
         ArmorItem.Type.CHESTPLATE,
         CHITIN_DURABILITY_MULTIPLIER
     );
 
     public static final BLibHolder<ArmorItem> ABERRANT_CHITIN_HELMET = create(
         "aberrant_chitin_helmet",
-        AlienArmorMaterials.ABERRANT_CHITIN::getHolder,
+        AlienArmorMaterials.ABERRANT_CHITIN,
         ArmorItem.Type.HELMET,
         CHITIN_DURABILITY_MULTIPLIER
     );
 
     public static final BLibHolder<ArmorItem> ABERRANT_CHITIN_LEGGINGS = create(
         "aberrant_chitin_leggings",
-        AlienArmorMaterials.ABERRANT_CHITIN::getHolder,
+        AlienArmorMaterials.ABERRANT_CHITIN,
         ArmorItem.Type.LEGGINGS,
         CHITIN_DURABILITY_MULTIPLIER
     );
 
     public static final BLibHolder<ArmorItem> CHITIN_BOOTS = create(
         "chitin_boots",
-        AlienArmorMaterials.CHITIN::getHolder,
+        AlienArmorMaterials.CHITIN,
         ArmorItem.Type.BOOTS,
         CHITIN_DURABILITY_MULTIPLIER
     );
 
     public static final BLibHolder<ArmorItem> CHITIN_CHESTPLATE = create(
         "chitin_chestplate",
-        AlienArmorMaterials.CHITIN::getHolder,
+        AlienArmorMaterials.CHITIN,
         ArmorItem.Type.CHESTPLATE,
         CHITIN_DURABILITY_MULTIPLIER
     );
 
     public static final BLibHolder<ArmorItem> CHITIN_HELMET = create(
         "chitin_helmet",
-        AlienArmorMaterials.CHITIN::getHolder,
+        AlienArmorMaterials.CHITIN,
         ArmorItem.Type.HELMET,
         CHITIN_DURABILITY_MULTIPLIER
     );
 
     public static final BLibHolder<ArmorItem> CHITIN_LEGGINGS = create(
         "chitin_leggings",
-        AlienArmorMaterials.CHITIN::getHolder,
+        AlienArmorMaterials.CHITIN,
         ArmorItem.Type.LEGGINGS,
         CHITIN_DURABILITY_MULTIPLIER
     );
 
     public static final BLibHolder<ArmorItem> IRRADIATED_CHITIN_BOOTS = create(
         "irradiated_chitin_boots",
-        AlienArmorMaterials.IRRADIATED_CHITIN::getHolder,
+        AlienArmorMaterials.IRRADIATED_CHITIN,
         ArmorItem.Type.BOOTS,
         CHITIN_DURABILITY_MULTIPLIER
     );
 
     public static final BLibHolder<ArmorItem> IRRADIATED_CHITIN_CHESTPLATE = create(
         "irradiated_chitin_chestplate",
-        AlienArmorMaterials.IRRADIATED_CHITIN::getHolder,
+        AlienArmorMaterials.IRRADIATED_CHITIN,
         ArmorItem.Type.CHESTPLATE,
         CHITIN_DURABILITY_MULTIPLIER
     );
 
     public static final BLibHolder<ArmorItem> IRRADIATED_CHITIN_HELMET = create(
         "irradiated_chitin_helmet",
-        AlienArmorMaterials.IRRADIATED_CHITIN::getHolder,
+        AlienArmorMaterials.IRRADIATED_CHITIN,
         ArmorItem.Type.HELMET,
         CHITIN_DURABILITY_MULTIPLIER
     );
 
     public static final BLibHolder<ArmorItem> IRRADIATED_CHITIN_LEGGINGS = create(
         "irradiated_chitin_leggings",
-        AlienArmorMaterials.IRRADIATED_CHITIN::getHolder,
+        AlienArmorMaterials.IRRADIATED_CHITIN,
         ArmorItem.Type.LEGGINGS,
         CHITIN_DURABILITY_MULTIPLIER
     );
@@ -128,84 +126,84 @@ public class AlienArmorItems {
 
     public static final BLibHolder<ArmorItem> PLATED_ABERRANT_CHITIN_BOOTS = create(
         "plated_aberrant_chitin_boots",
-        AlienArmorMaterials.PLATED_ABERRANT_CHITIN::getHolder,
+        AlienArmorMaterials.PLATED_ABERRANT_CHITIN,
         ArmorItem.Type.BOOTS,
         PLATED_CHITIN_DURABILITY_MULTIPLIER
     );
 
     public static final BLibHolder<ArmorItem> PLATED_ABERRANT_CHITIN_CHESTPLATE = create(
         "plated_aberrant_chitin_chestplate",
-        AlienArmorMaterials.PLATED_ABERRANT_CHITIN::getHolder,
+        AlienArmorMaterials.PLATED_ABERRANT_CHITIN,
         ArmorItem.Type.CHESTPLATE,
         PLATED_CHITIN_DURABILITY_MULTIPLIER
     );
 
     public static final BLibHolder<ArmorItem> PLATED_ABERRANT_CHITIN_HELMET = create(
         "plated_aberrant_chitin_helmet",
-        AlienArmorMaterials.PLATED_ABERRANT_CHITIN::getHolder,
+        AlienArmorMaterials.PLATED_ABERRANT_CHITIN,
         ArmorItem.Type.HELMET,
         PLATED_CHITIN_DURABILITY_MULTIPLIER
     );
 
     public static final BLibHolder<ArmorItem> PLATED_ABERRANT_CHITIN_LEGGINGS = create(
         "plated_aberrant_chitin_leggings",
-        AlienArmorMaterials.PLATED_ABERRANT_CHITIN::getHolder,
+        AlienArmorMaterials.PLATED_ABERRANT_CHITIN,
         ArmorItem.Type.LEGGINGS,
         PLATED_CHITIN_DURABILITY_MULTIPLIER
     );
 
     public static final BLibHolder<ArmorItem> PLATED_CHITIN_BOOTS = create(
         "plated_chitin_boots",
-        AlienArmorMaterials.PLATED_CHITIN::getHolder,
+        AlienArmorMaterials.PLATED_CHITIN,
         ArmorItem.Type.BOOTS,
         PLATED_CHITIN_DURABILITY_MULTIPLIER
     );
 
     public static final BLibHolder<ArmorItem> PLATED_CHITIN_CHESTPLATE = create(
         "plated_chitin_chestplate",
-        AlienArmorMaterials.PLATED_CHITIN::getHolder,
+        AlienArmorMaterials.PLATED_CHITIN,
         ArmorItem.Type.CHESTPLATE,
         PLATED_CHITIN_DURABILITY_MULTIPLIER
     );
 
     public static final BLibHolder<ArmorItem> PLATED_CHITIN_HELMET = create(
         "plated_chitin_helmet",
-        AlienArmorMaterials.PLATED_CHITIN::getHolder,
+        AlienArmorMaterials.PLATED_CHITIN,
         ArmorItem.Type.HELMET,
         PLATED_CHITIN_DURABILITY_MULTIPLIER
     );
 
     public static final BLibHolder<ArmorItem> PLATED_CHITIN_LEGGINGS = create(
         "plated_chitin_leggings",
-        AlienArmorMaterials.PLATED_CHITIN::getHolder,
+        AlienArmorMaterials.PLATED_CHITIN,
         ArmorItem.Type.LEGGINGS,
         PLATED_CHITIN_DURABILITY_MULTIPLIER
     );
 
     public static final BLibHolder<ArmorItem> PLATED_IRRADIATED_CHITIN_BOOTS = create(
         "plated_irradiated_chitin_boots",
-        AlienArmorMaterials.PLATED_IRRADIATED_CHITIN::getHolder,
+        AlienArmorMaterials.PLATED_IRRADIATED_CHITIN,
         ArmorItem.Type.BOOTS,
         PLATED_CHITIN_DURABILITY_MULTIPLIER
     );
 
     public static final BLibHolder<ArmorItem> PLATED_IRRADIATED_CHITIN_CHESTPLATE = create(
         "plated_irradiated_chitin_chestplate",
-        AlienArmorMaterials.PLATED_IRRADIATED_CHITIN::getHolder,
+        AlienArmorMaterials.PLATED_IRRADIATED_CHITIN,
         ArmorItem.Type.CHESTPLATE,
         PLATED_CHITIN_DURABILITY_MULTIPLIER
     );
 
     public static final BLibHolder<ArmorItem> PLATED_IRRADIATED_CHITIN_HELMET = create(
         "plated_irradiated_chitin_helmet",
-        AlienArmorMaterials.PLATED_IRRADIATED_CHITIN::getHolder,
+        AlienArmorMaterials.PLATED_IRRADIATED_CHITIN,
         ArmorItem.Type.HELMET,
         PLATED_CHITIN_DURABILITY_MULTIPLIER
     );
 
     public static final BLibHolder<ArmorItem> PLATED_IRRADIATED_CHITIN_LEGGINGS = create(
         "plated_irradiated_chitin_leggings",
-        AlienArmorMaterials.PLATED_IRRADIATED_CHITIN::getHolder,
+        AlienArmorMaterials.PLATED_IRRADIATED_CHITIN,
         ArmorItem.Type.LEGGINGS,
         PLATED_CHITIN_DURABILITY_MULTIPLIER
     );
@@ -232,21 +230,21 @@ public class AlienArmorItems {
 
     private static BLibHolder<ArmorItem> create(
         String path,
-        Supplier<Holder<ArmorMaterial>> holderSupplier,
+        BLibHolder<ArmorMaterial> holder,
         ArmorItem.Type type,
         int durabilityMultiplier
     ) {
-        return create(path, holderSupplier, type, durabilityMultiplier, new Item.Properties());
+        return create(path, holder, type, durabilityMultiplier, new Item.Properties());
     }
 
     private static BLibHolder<ArmorItem> create(
         String path,
-        Supplier<Holder<ArmorMaterial>> holderSupplier,
+        BLibHolder<ArmorMaterial> holder,
         ArmorItem.Type type,
         int durabilityMultiplier,
         Item.Properties properties
     ) {
-        return create(path, () -> createArmorItem(holderSupplier.get(), type, durabilityMultiplier, properties));
+        return create(path, () -> createArmorItem(holder, type, durabilityMultiplier, properties));
     }
 
     private static <T extends ArmorItem> BLibHolder<T> create(String path, Supplier<T> itemSupplier) {
@@ -254,7 +252,7 @@ public class AlienArmorItems {
     }
 
     private static ArmorItem createArmorItem(
-        Holder<ArmorMaterial> holder,
+        BLibHolder<ArmorMaterial> holder,
         ArmorItem.Type type,
         int durabilityMultiplier,
         Item.Properties properties

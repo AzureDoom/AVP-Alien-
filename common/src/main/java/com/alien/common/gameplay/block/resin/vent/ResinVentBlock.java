@@ -2,7 +2,7 @@ package com.alien.common.gameplay.block.resin.vent;
 
 import com.alien.common.gameplay.block.entity.resin.vent.ResinVentBlockEntity;
 import com.alien.common.registry.init.AlienBlockEntityTypes;
-import com.lib.common.gameplay.util.spatial.block.BlockPosUtil;
+import com.blib.common.gameplay.util.spatial.block.BlockPosUtil;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;

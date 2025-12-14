@@ -2,9 +2,9 @@ package com.alien.common.registry.init.block;
 
 import com.alien.Alien;
 import com.alien.common.registry.init.block.property.AlienBlockProperties;
-import com.avp.common.gameplay.block.property.BlockPropertyBuilder;
 import com.blib.BLibHolder;
 import com.blib.BLibRegistry;
+import com.blib.common.gameplay.block.property.BlockPropertyBuilder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SlabBlock;

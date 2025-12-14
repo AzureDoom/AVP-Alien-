@@ -13,12 +13,12 @@ import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.registry.tag.AlienMobEffectTags;
 import com.alien.common.util.AcidBleedUtil;
 import com.alien.common.util.AlienTransitionUtil;
-import com.avp.common.registry.init.AVPDataKeys;
-import com.avp.common.util.MovementAnalyzer;
+import com.blib.common.gameplay.entity.manager.VibrationSystemManager;
+import com.blib.common.network.data.DataAccessor;
+import com.blib.common.network.data.DataUser;
+import com.blib.common.registry.init.BLibDataKeys;
+import com.blib.common.util.MovementAnalyzer;
 import com.just.core.functional.option.Option;
-import com.lib.common.gameplay.entity.manager.VibrationSystemManager;
-import com.lib.common.network.DataAccessor;
-import com.lib.common.network.DataUser;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -82,9 +82,9 @@ public abstract class Alien extends Monster implements DataUser {
     protected Alien(EntityType<? extends Alien> entityType, Level level) {
         super(entityType, level);
 
-        this.hasTarget = new DataAccessor<>(this, AVPDataKeys.ENTITY_HAS_TARGET);
+        this.hasTarget = new DataAccessor<>(this, BLibDataKeys.ENTITY_HAS_TARGET);
         this.isPoisoned = new DataAccessor<>(this, AlienDataKeys.ALIEN_IS_POISONED);
-        this.isMovingHorizontally = new DataAccessor<>(this, AVPDataKeys.ENTITY_IS_MOVING_HORIZONTALLY);
+        this.isMovingHorizontally = new DataAccessor<>(this, BLibDataKeys.ENTITY_IS_MOVING_HORIZONTALLY);
 
         this.hiveManager = new HiveManager(this);
         this.movementAnalyzer = new MovementAnalyzer(this);
@@ -385,7 +385,7 @@ public abstract class Alien extends Monster implements DataUser {
 
             if (damageSource.getEntity() != null) {
                 // Cry for help so that nearby vents may try and summon help.
-                gameEvent(alienVariantType.cryForHelpEvent().getHolder());
+                gameEvent(alienVariantType.cryForHelpEvent());
             }
 
             if (canBleedAcid() && damageSource != damageSources().genericKill()) {

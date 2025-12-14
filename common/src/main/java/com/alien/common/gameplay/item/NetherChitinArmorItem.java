@@ -2,9 +2,9 @@ package com.alien.common.gameplay.item;
 
 import com.alien.common.registry.init.AlienArmorMaterials;
 import com.alien.common.registry.init.item.AlienArmorItems;
-import com.avp.common.data.TooltipTranslationKeys;
-import com.lib.common.data.TooltipHintBuilder;
-import com.lib.common.model.TooltipCategoryType;
+import com.blib.common.data.TooltipHintBuilder;
+import com.blib.common.data.TooltipTranslationKeys;
+import com.blib.common.gameplay.model.TooltipCategoryType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
@@ -22,7 +22,7 @@ public class NetherChitinArmorItem extends ArmorItem {
 
     public NetherChitinArmorItem(Type type) {
         super(
-            AlienArmorMaterials.NETHER_CHITIN.getHolder(),
+            AlienArmorMaterials.NETHER_CHITIN,
             type,
             new Properties().durability(type.getDurability(AlienArmorItems.CHITIN_DURABILITY_MULTIPLIER)).fireResistant()
         );

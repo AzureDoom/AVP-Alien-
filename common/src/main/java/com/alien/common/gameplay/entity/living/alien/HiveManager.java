@@ -3,10 +3,10 @@ package com.alien.common.gameplay.entity.living.alien;
 import com.alien.common.gameplay.hive.Hive;
 import com.alien.common.gameplay.level.saveddata.HiveLevelData;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
+import com.blib.common.gameplay.model.NBTSerializable;
+import com.blib.common.gameplay.util.CompoundTagUtil;
 import com.just.core.functional.option.Option;
 import com.just.core.functional.tuple.Tuple2;
-import com.lib.common.gameplay.NBTSerializable;
-import com.lib.common.gameplay.util.CompoundTagUtil;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.Nullable;
 

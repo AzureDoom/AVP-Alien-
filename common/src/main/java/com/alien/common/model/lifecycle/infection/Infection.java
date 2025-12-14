@@ -1,6 +1,6 @@
 package com.alien.common.model.lifecycle.infection;
 
-import com.lib.common.data.EntityTypePredicate;
+import com.blib.common.data.EntityTypePredicate;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.registries.BuiltInRegistries;

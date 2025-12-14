@@ -4,8 +4,8 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.boiler.Boiler;
 import com.alien.common.model.lifecycle.growth.GrowthStage;
 import com.alien.common.registry.GrowthStageRegistry;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
-import com.avp.common.util.AVPEntityTransitionUtil;
-import com.lib.common.gameplay.NBTSerializable;
+import com.blib.common.gameplay.model.NBTSerializable;
+import com.blib.common.util.EntityTransitionUtil;
 import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
@@ -21,7 +21,7 @@ public class GrowthManager implements NBTSerializable {
     private static final String GROWTH_TIME_IN_TICKS_TAG_KEY = "growthTimeInTicks";
 
     private static final Set<String> TRANSITION_NBT_KEY_BLACKLIST = Util.make(() -> {
-        var set = new HashSet<>(AVPEntityTransitionUtil.DEFAULT_NBT_KEY_BLACKLIST);
+        var set = new HashSet<>(EntityTransitionUtil.DEFAULT_NBT_KEY_BLACKLIST);
         set.add(GROWTH_TIME_IN_TICKS_TAG_KEY);
         return set;
     });
@@ -91,14 +91,14 @@ public class GrowthManager implements NBTSerializable {
             case GrowthResult.Success $ -> {/* NO-OP */}
             case GrowthResult.FailedTransitionResult failedTransitionResult -> {
                 switch (failedTransitionResult.result) {
-                    case AVPEntityTransitionUtil.EntityTransitionResult.ClientSide $1 -> {/* NO-OP */}
-                    case AVPEntityTransitionUtil.EntityTransitionResult.EntityCreation $1 -> {/* NO-OP */}
-                    case AVPEntityTransitionUtil.EntityTransitionResult.Obstructed $1 ->
+                    case EntityTransitionUtil.EntityTransitionResult.ClientSide $1 -> {/* NO-OP */}
+                    case EntityTransitionUtil.EntityTransitionResult.EntityCreation $1 -> {/* NO-OP */}
+                    case EntityTransitionUtil.EntityTransitionResult.Obstructed $1 ->
                         // If the entity failed to grow, then retry in 10 seconds.
                         // TODO: Add particles here maybe if the alien can't grow up, to indicate "frustration"?
                         // Apply a buffer time period before we retry growing.
                         this.growthRetryTimeInTicks = 20 * 10;
-                    case AVPEntityTransitionUtil.EntityTransitionResult.Success<?> $1 -> {/* NO-OP */ }
+                    case EntityTransitionUtil.EntityTransitionResult.Success<?> $1 -> {/* NO-OP */ }
                 }
             }
         }
@@ -149,13 +149,13 @@ public class GrowthManager implements NBTSerializable {
             nextFormType = Boiler.getType(entity.getVariant());
         }
 
-        var transitionResult = AVPEntityTransitionUtil.transitionInto(entity, nextFormType, TRANSITION_NBT_KEY_BLACKLIST);
+        var transitionResult = EntityTransitionUtil.transitionInto(entity, nextFormType, TRANSITION_NBT_KEY_BLACKLIST);
 
         nextForm = switch (transitionResult) {
-            case AVPEntityTransitionUtil.EntityTransitionResult.ClientSide ignored -> null;
-            case AVPEntityTransitionUtil.EntityTransitionResult.EntityCreation ignored -> null;
-            case AVPEntityTransitionUtil.EntityTransitionResult.Obstructed ignored -> null;
-            case AVPEntityTransitionUtil.EntityTransitionResult.Success<?> success -> success.newEntity();
+            case EntityTransitionUtil.EntityTransitionResult.ClientSide ignored -> null;
+            case EntityTransitionUtil.EntityTransitionResult.EntityCreation ignored -> null;
+            case EntityTransitionUtil.EntityTransitionResult.Obstructed ignored -> null;
+            case EntityTransitionUtil.EntityTransitionResult.Success<?> success -> success.newEntity();
         };
 
         if (nextForm == null) {
@@ -259,7 +259,7 @@ public class GrowthManager implements NBTSerializable {
             INSTANCE
         }
 
-        record FailedTransitionResult(AVPEntityTransitionUtil.EntityTransitionResult result) implements GrowthResult {}
+        record FailedTransitionResult(EntityTransitionUtil.EntityTransitionResult result) implements GrowthResult {}
 
         record Success(Entity newEntity) implements GrowthResult {}
     }

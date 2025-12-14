@@ -2,9 +2,9 @@ package com.alien.common.registry.init;
 
 import com.alien.AlienResources;
 import com.alien.common.gameplay.entity.living.alien.ovomorph.Ovomorph;
+import com.blib.common.network.data.DataKey;
+import com.blib.common.registry.DataKeyRegistry;
 import com.just.codec.stream.impl.StreamCodecs;
-import com.lib.common.network.DataKey;
-import com.lib.common.registry.DataKeyRegistry;
 import com.mojang.serialization.Codec;
 
 import java.util.function.Function;

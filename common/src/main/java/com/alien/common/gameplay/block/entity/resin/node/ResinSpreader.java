@@ -1,6 +1,6 @@
 package com.alien.common.gameplay.block.entity.resin.node;
 
-import com.lib.common.gameplay.NBTSerializable;
+import com.blib.common.gameplay.model.NBTSerializable;
 import com.mojang.serialization.Dynamic;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;

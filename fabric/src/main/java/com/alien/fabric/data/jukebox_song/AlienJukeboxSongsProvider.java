@@ -24,7 +24,7 @@ public class AlienJukeboxSongsProvider extends FabricDynamicRegistryProvider {
 
     private JukeboxSong createAlienMusic1Song() {
         return new JukeboxSong(
-            AlienSoundEvents.JUKEBOX_SOUNDS_ALIEN_MUSIC_1.getHolder(),
+            AlienSoundEvents.JUKEBOX_SOUNDS_ALIEN_MUSIC_1,
             Component.translatable("jukebox_song.avp_alien.alien_music_1"),
             180,
             12

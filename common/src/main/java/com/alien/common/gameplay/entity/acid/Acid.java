@@ -2,9 +2,9 @@ package com.alien.common.gameplay.entity.acid;
 
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.registry.init.AlienDataKeys;
-import com.lib.common.gameplay.util.GravityUtil;
-import com.lib.common.network.DataAccessor;
-import com.lib.common.network.DataUser;
+import com.blib.common.gameplay.util.GravityUtil;
+import com.blib.common.network.data.DataAccessor;
+import com.blib.common.network.data.DataUser;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;

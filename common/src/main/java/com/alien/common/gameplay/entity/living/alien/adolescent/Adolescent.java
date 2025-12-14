@@ -10,7 +10,7 @@ import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.util.AlienPredicates;
 import com.alien.common.util.XenomorphGrowthUtil;
 import com.blib.common.gameplay.util.BLibEntityPredicates;
-import com.lib.common.network.DataAccessor;
+import com.blib.common.network.data.DataAccessor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;

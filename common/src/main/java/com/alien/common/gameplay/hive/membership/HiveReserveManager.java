@@ -6,10 +6,10 @@ import com.alien.common.gameplay.hive.Hive;
 import com.alien.common.gameplay.hive.HiveSpaceManager;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.avp.AVP;
-import com.lib.common.gameplay.NBTSerializable;
-import com.lib.common.gameplay.entity.EntityReserves;
-import com.lib.common.gameplay.util.spatial.block.BlockPosVec3;
-import com.lib.common.util.codec.schema.CodecSchemas;
+import com.blib.common.gameplay.entity.EntityReserves;
+import com.blib.common.gameplay.model.NBTSerializable;
+import com.blib.common.gameplay.util.spatial.block.BlockPosVec3;
+import com.blib.common.util.codec.schema.CodecSchemas;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
 

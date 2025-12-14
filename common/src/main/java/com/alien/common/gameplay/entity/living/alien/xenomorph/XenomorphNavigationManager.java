@@ -1,8 +1,8 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph;
 
 import com.alien.common.gameplay.ai.path.CrawlPathNodeEvaluator;
-import com.avp.common.gameplay.ai.goal.WaterMoveControl;
-import com.avp.common.gameplay.ai.goal.combat.DelayedAttackGoal;
+import com.blib.common.gameplay.entity.ai.goal.WaterMoveControl;
+import com.blib.common.gameplay.entity.ai.goal.combat.DelayedAttackGoal;
 import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.GoalSelector;

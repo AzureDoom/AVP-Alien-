@@ -2,7 +2,7 @@ package com.alien.common.util;
 
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.model.alien.variant.AlienVariant;
-import com.avp.common.util.AVPEntityTransitionUtil;
+import com.blib.common.util.EntityTransitionUtil;
 import net.minecraft.world.entity.EntityType;
 
 public class AlienTransitionUtil {
@@ -28,7 +28,7 @@ public class AlienTransitionUtil {
             return AlienTransitionResult.NoTypeForVariant.INSTANCE;
         }
 
-        return new AlienTransitionResult.Result(AVPEntityTransitionUtil.transitionInto(alien, variantType));
+        return new AlienTransitionResult.Result(EntityTransitionUtil.transitionInto(alien, variantType));
     }
 
     public sealed interface AlienTransitionResult {
@@ -45,6 +45,6 @@ public class AlienTransitionUtil {
             INSTANCE
         }
 
-        record Result(AVPEntityTransitionUtil.EntityTransitionResult result) implements AlienTransitionResult {}
+        record Result(EntityTransitionUtil.EntityTransitionResult result) implements AlienTransitionResult {}
     }
 }

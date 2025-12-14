@@ -4,7 +4,7 @@ import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.block.entity.resin.vent.ResinVentBlockEntity;
 import com.alien.common.registry.tag.AlienBlockTags;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
-import com.lib.common.gameplay.util.spatial.block.BlockPosUtil;
+import com.blib.common.gameplay.util.spatial.block.BlockPosUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
@@ -55,7 +55,7 @@ public class CryForHelpListener implements GameEventListener {
                 // If there is no alien variant type for given source entity
                 // OR if there is a cry for help event type mismatch...
                 || AlienVariantTypes.getFor(sourceEntity)
-                    .isNoneOr(alienVariantType -> !holder.is(alienVariantType.cryForHelpEvent().getHolder()))
+                    .isNoneOr(alienVariantType -> !holder.is(alienVariantType.cryForHelpEvent()))
         ) {
             // Then ignore the event.
             return false;

@@ -5,8 +5,8 @@ import com.alien.common.gameplay.level.gameevent.listener.ResinSpreadListener;
 import com.alien.common.model.resin.ReadableResinData;
 import com.alien.common.model.resin.ResinData;
 import com.avp.AVP;
+import com.blib.common.gameplay.model.NBTSerializable;
 import com.just.core.functional.option.Option;
-import com.lib.common.gameplay.NBTSerializable;
 import com.mojang.serialization.Dynamic;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -98,7 +98,7 @@ public class ResinManager implements GameEventListener.Provider<ResinSpreadListe
         var alienVariantType = AlienVariantTypes.getFor(alien);
 
         // Signal to the nearest resin node that we want to spread resin.
-        alien.gameEvent(alienVariantType.resinSpreadEvent().getHolder());
+        alien.gameEvent(alienVariantType.resinSpreadEvent());
 
         // If the alien still has resin even after signalling a resin spread event, that means there was no resin node
         // to intercept the event. So we try to place a resin node down here.

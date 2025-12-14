@@ -1,8 +1,8 @@
 package com.alien.common.gameplay.level.saveddata;
 
+import com.blib.common.data.Cooldown;
+import com.blib.common.gameplay.util.spatial.region.RegionPos;
 import com.just.core.functional.option.Option;
-import com.lib.common.data.Cooldown;
-import com.lib.common.gameplay.util.spatial.region.RegionPos;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;

@@ -5,7 +5,7 @@ import com.alien.AlienResources;
 import com.avp.AVPResources;
 import com.blib.common.data.fixer.BLibDataFixerRegistry;
 import com.blib.common.data.fixer.migration.BLibDataMigration;
-import com.lib.common.util.Version;
+import com.blib.common.model.Version;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
