@@ -312,7 +312,8 @@ public abstract class Alien extends Monster implements DataUser {
         }
 
         if (getRandom().nextIntBetweenInclusive(1, 100) >= 90) {
-            AlienTransitionUtil.transitionIntoVariant(this, AlienVariant.IRRADIATED);
+            // FIXME:
+//            AlienTransitionUtil.transitionIntoVariant(this, AlienVariant.IRRADIATED);
         }
     }
 
