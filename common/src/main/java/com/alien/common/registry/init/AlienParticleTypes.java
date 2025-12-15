@@ -1,15 +1,15 @@
 package com.alien.common.registry.init;
 
 import com.alien.Alien;
-import com.blib.BLibHolder;
-import com.blib.BLibRegistry;
+import com.blib.common.registry.BLibHolder;
+import com.blib.common.registry.BLibRegistry;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
 
 public class AlienParticleTypes {
 
-    private static final BLibRegistry<ParticleType<?>> REGISTRY = Alien.MOD.createRegistry(BuiltInRegistries.PARTICLE_TYPE);
+    private static final BLibRegistry<ParticleType<?>> REGISTRY = Alien.MOD.registries().create(BuiltInRegistries.PARTICLE_TYPE);
 
     public static final BLibHolder<SimpleParticleType> ACID = create("acid");
 

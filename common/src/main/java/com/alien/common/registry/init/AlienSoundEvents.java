@@ -2,14 +2,14 @@ package com.alien.common.registry.init;
 
 import com.alien.Alien;
 import com.alien.AlienResources;
-import com.blib.BLibHolder;
-import com.blib.BLibRegistry;
+import com.blib.common.registry.BLibHolder;
+import com.blib.common.registry.BLibRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.sounds.SoundEvent;
 
 public class AlienSoundEvents {
 
-    private static final BLibRegistry<SoundEvent> REGISTRY = Alien.MOD.createRegistry(BuiltInRegistries.SOUND_EVENT);
+    private static final BLibRegistry<SoundEvent> REGISTRY = Alien.MOD.registries().create(BuiltInRegistries.SOUND_EVENT);
 
     public static final BLibHolder<SoundEvent> BLOCK_ACID_BURN = create("block.acid.burn");
 

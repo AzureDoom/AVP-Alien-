@@ -35,7 +35,7 @@
 		"minecraft": "~${minecraft_version}",
 		"java": ">=${java_version}",
 		"fabric-api": "*",
-		"avp": ">=${avp_version}",
+		"blib": ">=${blib_version}",
 		"azurelib": ">=${azurelib_version}"
 	}
 }

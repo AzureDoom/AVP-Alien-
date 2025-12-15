@@ -68,7 +68,7 @@ dependencies {
     implementation "com.just:just-goap:${project.just_goap_version}"
     include "com.just:just-goap:${project.just_goap_version}"
 
-    modImplementation ("com.avp:avp-fabric-${project.minecraft_version}:${project.avp_version}") {
+    modImplementation ("com.blib:blib-fabric-${project.minecraft_version}:${project.blib_version}") {
         exclude group: "com.just", module: "just-codec"
         exclude group: "com.just", module: "just-core"
         exclude group: "com.just", module: "just-goap"

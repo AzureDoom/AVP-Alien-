@@ -3,8 +3,8 @@ package com.alien.common.registry.init;
 import com.alien.Alien;
 import com.alien.AlienResources;
 import com.alien.common.registry.init.item.AlienItems;
-import com.blib.BLibHolder;
-import com.blib.BLibRegistry;
+import com.blib.common.registry.BLibHolder;
+import com.blib.common.registry.BLibRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.sounds.SoundEvent;
@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 
 public class AlienArmorMaterials {
 
-    private static final BLibRegistry<ArmorMaterial> REGISTRY = Alien.MOD.createRegistry(BuiltInRegistries.ARMOR_MATERIAL);
+    private static final BLibRegistry<ArmorMaterial> REGISTRY = Alien.MOD.registries().create(BuiltInRegistries.ARMOR_MATERIAL);
 
     // Should be slightly stronger than iron.
     public static final BLibHolder<ArmorMaterial> ABERRANT_CHITIN = create(

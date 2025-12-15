@@ -1,8 +1,8 @@
 package com.alien.common.gameplay.hive.membership;
 
+import com.alien.Alien;
 import com.alien.common.gameplay.hive.Hive;
 import com.alien.common.model.hive.HiveMemberData;
-import com.avp.AVP;
 import com.blib.common.gameplay.model.NBTSerializable;
 import com.just.core.functional.option.Option;
 import com.mojang.serialization.Dynamic;
@@ -153,7 +153,7 @@ public class HiveMembershipManager implements NBTSerializable {
                 new Dynamic<>(NbtOps.INSTANCE, hiveMemberDataTag)
             )
                 .resultOrPartial(
-                    AVP.LOGGER::error
+                    Alien.LOGGER::error
                 )
                 .ifPresent(hiveMemberData -> hiveMembershipCache.add(entityUUID, hiveMemberData));
         }
@@ -167,7 +167,7 @@ public class HiveMembershipManager implements NBTSerializable {
             .forEach(
                 entry -> HiveMemberData.CODEC.encodeStart(NbtOps.INSTANCE, entry.getValue())
                     .resultOrPartial(
-                        AVP.LOGGER::error
+                        Alien.LOGGER::error
                     )
                     .ifPresent(tag -> hiveMemberDataTag.put(entry.getKey().toString(), tag))
             );

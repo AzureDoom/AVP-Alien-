@@ -10,6 +10,6 @@ public class AlienDamageTypesTags {
     public static final TagKey<DamageType> DOES_NOT_HURT_ALIENS = create("does_not_hurt_aliens");
 
     private static TagKey<DamageType> create(String path) {
-        return Alien.MOD.createTagKey(Registries.DAMAGE_TYPE, path);
+        return Alien.MOD.resources().createTagKey(Registries.DAMAGE_TYPE, path);
     }
 }

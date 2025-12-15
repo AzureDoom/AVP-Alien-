@@ -11,8 +11,8 @@ import com.alien.common.registry.init.item.AlienArmorItems;
 import com.alien.common.registry.init.item.AlienItems;
 import com.alien.common.registry.init.item.AlienSpawnEggItems;
 import com.alien.common.registry.key.AlienCreativeModeTabKeys;
-import com.blib.BLibHolder;
-import com.blib.BLibRegistry;
+import com.blib.common.registry.BLibHolder;
+import com.blib.common.registry.BLibRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 
 public class AlienCreativeModeTabs {
 
-    private static final BLibRegistry<CreativeModeTab> REGISTRY = Alien.MOD.createRegistry(BuiltInRegistries.CREATIVE_MODE_TAB);
+    private static final BLibRegistry<CreativeModeTab> REGISTRY = Alien.MOD.registries().create(BuiltInRegistries.CREATIVE_MODE_TAB);
 
     private static final String BASE_PATH = "creativeModeTab";
 

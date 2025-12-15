@@ -52,10 +52,15 @@ public class AVP_0_3_0_To_Alien_0_1_0 implements BLibDataMigration {
     }
 
     private static void registerMigrationsForRegistry(Registry<?> registry) {
-        Alien.MOD.getAllHolders(registry)
+        Alien.MOD.registries()
+            .getAllHolders(registry)
             .forEach(
                 holder -> register(
-                    new BLibDataFixerRegistry.Entry.Direct(registry, createAvpResourceLocation(holder.getPath()), holder.getResourceLocation())
+                    new BLibDataFixerRegistry.Entry.Direct(
+                        registry,
+                        createAvpResourceLocation(holder.getPath()),
+                        holder.getResourceLocation()
+                    )
                 )
             );
     }

@@ -4,8 +4,9 @@ import com.alien.Alien;
 import com.alien.common.gameplay.item.NetherChitinArmorItem;
 import com.alien.common.gameplay.item.PlatedNetherChitinArmorItem;
 import com.alien.common.registry.init.AlienArmorMaterials;
-import com.blib.BLibHolder;
-import com.blib.common.registry.impl.BLibItemRegistry;
+import com.blib.common.registry.BLibHolder;
+import com.blib.common.registry.BLibRegistry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
@@ -14,7 +15,7 @@ import java.util.function.Supplier;
 
 public class AlienArmorItems {
 
-    private static final BLibItemRegistry REGISTRY = Alien.MOD.createItemRegistry();
+    private static final BLibRegistry<Item> REGISTRY = Alien.MOD.registries().create(BuiltInRegistries.ITEM);
 
     public static final int CHITIN_DURABILITY_MULTIPLIER = 21;
 

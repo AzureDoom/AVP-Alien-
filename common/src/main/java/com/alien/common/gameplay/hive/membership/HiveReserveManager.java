@@ -1,11 +1,11 @@
 package com.alien.common.gameplay.hive.membership;
 
+import com.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
 import com.alien.common.gameplay.hive.Hive;
 import com.alien.common.gameplay.hive.HiveSpaceManager;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
-import com.avp.AVP;
 import com.blib.common.gameplay.entity.EntityReserves;
 import com.blib.common.gameplay.model.NBTSerializable;
 import com.blib.common.gameplay.util.spatial.block.BlockPosVec3;
@@ -91,7 +91,7 @@ public class HiveReserveManager implements NBTSerializable {
     @Override
     public void load(CompoundTag compoundTag) {
         EntityReserves.CODEC.decode(CodecSchemas.NBT, compoundTag.getCompound(NBT_HIVE_MEMBER_RESERVES))
-            .inspectErr(tag -> AVP.LOGGER.error("Failed to load tag '{}'. Tag: {}", NBT_HIVE_MEMBER_RESERVES, tag))
+            .inspectErr(tag -> Alien.LOGGER.error("Failed to load tag '{}'. Tag: {}", NBT_HIVE_MEMBER_RESERVES, tag))
             .ifOk(loadedEntityReserves -> hiveMemberReserves.putAll(loadedEntityReserves.getBackingMap()));
     }
 

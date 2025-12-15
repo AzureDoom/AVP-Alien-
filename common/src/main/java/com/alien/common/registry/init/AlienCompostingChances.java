@@ -7,7 +7,7 @@ import com.blib.common.registry.impl.BLibCompostableRegistry;
 
 public class AlienCompostingChances {
 
-    private static final BLibCompostableRegistry REGISTRY = Alien.MOD.createCompostableRegistry();
+    private static final BLibCompostableRegistry REGISTRY = Alien.MOD.registries().createCompostableRegistry();
 
     public static void initialize() {
         REGISTRY.register(AlienItems.IRRADIATED_RESIN_BALL, 0.3F, false, false);

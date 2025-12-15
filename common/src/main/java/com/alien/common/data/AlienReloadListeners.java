@@ -6,7 +6,7 @@ import net.minecraft.server.packs.resources.PreparableReloadListener;
 
 public class AlienReloadListeners {
 
-    private static final BLibReloadListenerRegistry REGISTRY = Alien.MOD.createReloadListenerRegistry();
+    private static final BLibReloadListenerRegistry REGISTRY = Alien.MOD.registries().createReloadListenerRegistry();
 
     public static final PreparableReloadListener GROWTH_STAGES_RELOAD_LISTENER = new GrowthStageReloadListener();
 

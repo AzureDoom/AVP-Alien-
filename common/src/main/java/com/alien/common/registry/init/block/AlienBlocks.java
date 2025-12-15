@@ -2,9 +2,9 @@ package com.alien.common.registry.init.block;
 
 import com.alien.Alien;
 import com.alien.common.registry.init.block.property.AlienBlockProperties;
-import com.blib.BLibHolder;
-import com.blib.BLibRegistry;
 import com.blib.common.gameplay.block.property.BlockPropertyBuilder;
+import com.blib.common.registry.BLibHolder;
+import com.blib.common.registry.BLibRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Block;
 
@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 
 public class AlienBlocks {
 
-    public static final BLibRegistry<Block> REGISTRY = Alien.MOD.createRegistry(BuiltInRegistries.BLOCK);
+    public static final BLibRegistry<Block> REGISTRY = Alien.MOD.registries().create(BuiltInRegistries.BLOCK);
 
     public static final BLibHolder<Block> ROYAL_JELLY_BLOCK = create("royal_jelly_block", AlienBlockProperties.JELLY);
 

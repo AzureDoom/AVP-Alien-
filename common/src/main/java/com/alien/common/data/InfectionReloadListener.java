@@ -1,8 +1,8 @@
 package com.alien.common.data;
 
+import com.alien.Alien;
 import com.alien.common.model.lifecycle.infection.Infection;
 import com.alien.common.registry.InfectionRegistry;
-import com.avp.AVP;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -41,7 +41,7 @@ public class InfectionReloadListener extends SimpleJsonResourceReloadListener {
             var jsonElement = entry.getValue();
 
             Infection.CODEC.parse(JsonOps.INSTANCE, jsonElement)
-                .resultOrPartial(err -> AVP.LOGGER.error("Failed to parse Infection {}: {}", id, err))
+                .resultOrPartial(err -> Alien.LOGGER.error("Failed to parse Infection {}: {}", id, err))
                 .ifPresent(InfectionRegistry::register);
         }
     }

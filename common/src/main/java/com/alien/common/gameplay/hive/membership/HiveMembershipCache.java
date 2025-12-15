@@ -1,7 +1,7 @@
 package com.alien.common.gameplay.hive.membership;
 
+import com.alien.Alien;
 import com.alien.common.model.hive.HiveMemberData;
-import com.avp.AVP;
 import com.just.core.cache.Cache;
 import net.minecraft.world.entity.EntityType;
 import org.jetbrains.annotations.Nullable;
@@ -34,7 +34,7 @@ public class HiveMembershipCache extends Cache<UUID, HiveMemberData> {
         var entityType = newValue.getEntityType().unwrapOr(null);
 
         if (entityType == null) {
-            AVP.LOGGER.warn("onAddToCache - Invalid entity type. Resource Location: {}", newValue.entityTypeResourceLocation());
+            Alien.LOGGER.warn("onAddToCache - Invalid entity type. Resource Location: {}", newValue.entityTypeResourceLocation());
             return;
         }
 
@@ -54,7 +54,7 @@ public class HiveMembershipCache extends Cache<UUID, HiveMemberData> {
         var entityType = value.getEntityType().unwrapOr(null);
 
         if (entityType == null) {
-            AVP.LOGGER.warn("onRemoveFromCache - Invalid entity type. Resource Location: {}", value.entityTypeResourceLocation());
+            Alien.LOGGER.warn("onRemoveFromCache - Invalid entity type. Resource Location: {}", value.entityTypeResourceLocation());
             return;
         }
 

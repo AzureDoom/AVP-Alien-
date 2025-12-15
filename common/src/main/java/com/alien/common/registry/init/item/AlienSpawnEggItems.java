@@ -2,9 +2,10 @@ package com.alien.common.registry.init.item;
 
 import com.alien.Alien;
 import com.alien.common.registry.init.AlienEntityTypes;
-import com.blib.BLibHolder;
-import com.blib.common.registry.impl.BLibItemRegistry;
+import com.blib.common.registry.BLibHolder;
+import com.blib.common.registry.BLibRegistry;
 import com.blib.service.BLibServices;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
@@ -14,7 +15,7 @@ import java.util.function.Supplier;
 
 public class AlienSpawnEggItems {
 
-    public static final BLibItemRegistry REGISTRY = Alien.MOD.createItemRegistry();
+    public static final BLibRegistry<Item> REGISTRY = Alien.MOD.registries().create(BuiltInRegistries.ITEM);
 
     public static final BLibHolder<SpawnEggItem> ABERRANT_ADOLESCENT_SPAWN_EGG = register(
         "aberrant_adolescent",

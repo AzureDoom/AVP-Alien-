@@ -1,10 +1,10 @@
 package com.alien.common.gameplay.entity.living.alien.ovomorph;
 
+import com.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.Facehugger;
 import com.alien.common.model.alien.HatchState;
 import com.alien.common.registry.init.AlienDataKeys;
 import com.alien.common.registry.init.AlienSoundEvents;
-import com.avp.AVP;
 import com.blib.common.network.data.DataAccessor;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -117,7 +117,7 @@ public class HatchManager {
         var facehuggerType = Facehugger.getType(ovomorph.getVariant(), ovomorph.isRoyal());
 
         if (facehuggerType == null) {
-            AVP.LOGGER.warn(
+            Alien.LOGGER.warn(
                 "Failed to get a facehugger type for an ovomorph entity Ovomorph Variant: {}, IsRoyal: {}.",
                 ovomorph.getVariant(),
                 ovomorph.isRoyal()
@@ -128,7 +128,7 @@ public class HatchManager {
         var facehugger = facehuggerType.create(level);
 
         if (facehugger == null) {
-            AVP.LOGGER.warn("Failed to create facehugger entity.");
+            Alien.LOGGER.warn("Failed to create facehugger entity.");
             return;
         }
 

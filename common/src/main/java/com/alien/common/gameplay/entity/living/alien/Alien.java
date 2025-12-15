@@ -12,7 +12,6 @@ import com.alien.common.registry.tag.AlienDamageTypesTags;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.registry.tag.AlienMobEffectTags;
 import com.alien.common.util.AcidBleedUtil;
-import com.alien.common.util.AlienTransitionUtil;
 import com.blib.common.gameplay.entity.manager.VibrationSystemManager;
 import com.blib.common.network.data.DataAccessor;
 import com.blib.common.network.data.DataUser;
@@ -313,7 +312,7 @@ public abstract class Alien extends Monster implements DataUser {
 
         if (getRandom().nextIntBetweenInclusive(1, 100) >= 90) {
             // FIXME:
-//            AlienTransitionUtil.transitionIntoVariant(this, AlienVariant.IRRADIATED);
+            // AlienTransitionUtil.transitionIntoVariant(this, AlienVariant.IRRADIATED);
         }
     }
 

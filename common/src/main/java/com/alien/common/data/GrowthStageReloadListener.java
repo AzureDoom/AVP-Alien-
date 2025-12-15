@@ -1,8 +1,8 @@
 package com.alien.common.data;
 
+import com.alien.Alien;
 import com.alien.common.model.lifecycle.growth.GrowthStage;
 import com.alien.common.registry.GrowthStageRegistry;
-import com.avp.AVP;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -41,7 +41,7 @@ public class GrowthStageReloadListener extends SimpleJsonResourceReloadListener 
             var jsonElement = entry.getValue();
 
             GrowthStage.CODEC.parse(JsonOps.INSTANCE, jsonElement)
-                .resultOrPartial(err -> AVP.LOGGER.error("Failed to parse GrowthStage {}: {}", id, err))
+                .resultOrPartial(err -> Alien.LOGGER.error("Failed to parse GrowthStage {}: {}", id, err))
                 .ifPresent(GrowthStageRegistry::register);
         }
     }

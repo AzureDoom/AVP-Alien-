@@ -4,8 +4,8 @@ import com.alien.Alien;
 import com.alien.common.gameplay.item.PoisonJellyItem;
 import com.alien.common.gameplay.item.RoyalJellyItem;
 import com.alien.common.registry.key.AlienJukeboxSongKeys;
-import com.blib.BLibHolder;
-import com.blib.BLibRegistry;
+import com.blib.common.registry.BLibHolder;
+import com.blib.common.registry.BLibRegistry;
 import com.blib.common.registry.impl.BLibDecoratedPotPatternRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.DiscFragmentItem;
@@ -16,9 +16,10 @@ import java.util.function.Supplier;
 
 public class AlienItems {
 
-    public static final BLibRegistry<Item> REGISTRY = Alien.MOD.createRegistry(BuiltInRegistries.ITEM);
+    public static final BLibRegistry<Item> REGISTRY = Alien.MOD.registries().create(BuiltInRegistries.ITEM);
 
-    private static final BLibDecoratedPotPatternRegistry DECORATED_POT_PATTERN_REGISTRY = Alien.MOD.createDecoratedPotPatternRegistry();
+    private static final BLibDecoratedPotPatternRegistry DECORATED_POT_PATTERN_REGISTRY = Alien.MOD.registries()
+        .createDecoratedPotPatternRegistry();
 
     public static final BLibHolder<Item> ABERRANT_CHITIN = create(
         "aberrant_chitin",

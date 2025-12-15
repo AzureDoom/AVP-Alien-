@@ -9,7 +9,7 @@ import com.alien.common.constant.HealthConstants;
 import com.alien.common.constant.HealthRegenConstants;
 import com.alien.common.constant.KnockbackResistanceConstants;
 import com.alien.common.constant.MoveSpeedConstants;
-import com.avp.AVP;
+import com.blib.config.BLibConfigs;
 import mod.azure.azurelib.common.config.Config;
 import mod.azure.azurelib.common.config.Configurable;
 import mod.azure.azurelib.common.config.format.ConfigFormats;
@@ -20,7 +20,7 @@ public class AlienConfig {
     public static AlienConfig INSTANCE;
 
     public static void initialize() {
-        INSTANCE = AVP.registerConfig(AlienConfig.class, ConfigFormats.json()).getConfigInstance();
+        INSTANCE = BLibConfigs.register(AlienConfig.class, ConfigFormats.json()).getConfigInstance();
     }
 
     @Configurable

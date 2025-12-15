@@ -4,8 +4,8 @@ import com.alien.Alien;
 import com.alien.common.gameplay.block.entity.resin.node.ResinNodeBlockEntity;
 import com.alien.common.gameplay.block.entity.resin.vent.ResinVentBlockEntity;
 import com.alien.common.registry.init.block.AlienResinBlocks;
-import com.blib.BLibHolder;
-import com.blib.BLibRegistry;
+import com.blib.common.registry.BLibHolder;
+import com.blib.common.registry.BLibRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 
 public class AlienBlockEntityTypes {
 
-    private static final BLibRegistry<BlockEntityType<?>> REGISTRY = Alien.MOD.createRegistry(BuiltInRegistries.BLOCK_ENTITY_TYPE);
+    private static final BLibRegistry<BlockEntityType<?>> REGISTRY = Alien.MOD.registries().create(BuiltInRegistries.BLOCK_ENTITY_TYPE);
 
     public static final BLibHolder<BlockEntityType<ResinNodeBlockEntity>> RESIN_NODE = create(
         "resin_node",

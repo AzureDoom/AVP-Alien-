@@ -2,7 +2,6 @@ package com.alien.common.gameplay.level.saveddata;
 
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.hive.Hive;
-import com.avp.AVP;
 import com.blib.common.gameplay.util.BLibEntityPredicates;
 import com.just.core.functional.option.Option;
 import net.minecraft.core.BlockPos;
@@ -94,7 +93,7 @@ public class HiveLevelData extends SavedData {
         // Move the hive center to the provided block position.
         hive.moveCenter(blockPos);
         hiveByIdMap.put(id, hive);
-        AVP.LOGGER.debug("Created hive: {}", id);
+        com.alien.Alien.LOGGER.debug("Created hive: {}", id);
         return hive;
     }
 

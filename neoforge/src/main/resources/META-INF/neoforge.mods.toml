@@ -35,9 +35,9 @@ versionRange  = "${azurelib_version}"
 ordering      = "NONE"
 side          = "BOTH"
 [[dependencies.${mod_id}]]
-modId         = "avp"
+modId         = "blib"
 type          = "required"
-versionRange  = "${avp_version}"
+versionRange  = "${blib_version}"
 ordering      = "NONE"
 side          = "BOTH"
 

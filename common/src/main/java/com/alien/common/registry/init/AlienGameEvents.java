@@ -1,14 +1,14 @@
 package com.alien.common.registry.init;
 
 import com.alien.Alien;
-import com.blib.BLibHolder;
-import com.blib.BLibRegistry;
+import com.blib.common.registry.BLibHolder;
+import com.blib.common.registry.BLibRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.gameevent.GameEvent;
 
 public class AlienGameEvents {
 
-    private static final BLibRegistry<GameEvent> REGISTRY = Alien.MOD.createRegistry(BuiltInRegistries.GAME_EVENT);
+    private static final BLibRegistry<GameEvent> REGISTRY = Alien.MOD.registries().create(BuiltInRegistries.GAME_EVENT);
 
     public static final BLibHolder<GameEvent> EGG_ABERRANT_PICKUP_REQUEST = register("egg_aberrant_pickup_request");
 

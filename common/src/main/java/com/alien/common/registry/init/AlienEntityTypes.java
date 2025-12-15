@@ -19,16 +19,20 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.spitter.Spitter;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.warrior.Warrior;
-import com.blib.BLibHolder;
+import com.blib.common.registry.BLibHolder;
+import com.blib.common.registry.BLibRegistry;
 import com.blib.common.registry.SilencedEntityTypeBuilder;
-import com.blib.common.registry.impl.BLibEntityTypeRegistry;
+import com.blib.common.registry.impl.BLibEntityAttributeRegistry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 
 public class AlienEntityTypes {
 
-    public static final BLibEntityTypeRegistry REGISTRY = Alien.MOD.createEntityTypeRegistry();
+    private static final BLibEntityAttributeRegistry ATTRIBUTE_REGISTRY = Alien.MOD.registries().createEntityAttributeRegistry();
+
+    private static final BLibRegistry<EntityType<?>> TYPE_REGISTRY = Alien.MOD.registries().create(BuiltInRegistries.ENTITY_TYPE);
 
     public static final BLibHolder<EntityType<Adolescent>> ABERRANT_ADOLESCENT = create(
         "aberrant_adolescent",
@@ -451,97 +455,97 @@ public class AlienEntityTypes {
     );
 
     public static <T extends Entity> BLibHolder<EntityType<T>> create(String path, EntityType.Builder<T> builder) {
-        return REGISTRY.createHolder(
+        return TYPE_REGISTRY.createHolder(
             path,
             () -> ((SilencedEntityTypeBuilder) builder).blib$buildWithoutDataFixerCheck()
         );
     }
 
     public static void initialize() {
-        REGISTRY.registerAll();
-        REGISTRY.registerAttributes(ABERRANT_ADOLESCENT, Adolescent::createAdolescentAttributes);
-        REGISTRY.registerAttributes(ABERRANT_BOILER, Boiler::createBoilerAttributes);
-        REGISTRY.registerAttributes(ABERRANT_CHESTBURSTER, Chestburster::createChestbursterAttributes);
-        REGISTRY.registerAttributes(ABERRANT_CRUSHER, Crusher::createCrusherAttributes);
-        REGISTRY.registerAttributes(ABERRANT_DRONE, Drone::createDroneAttributes);
-        REGISTRY.registerAttributes(ABERRANT_FACEHUGGER, Facehugger::createFacehuggerAttributes);
-        REGISTRY.registerAttributes(ABERRANT_OVOMORPH, Ovomorph::createOvomorphAttributes);
-        REGISTRY.registerAttributes(ABERRANT_PRAETORIAN, Praetorian::createPraetorianAttributes);
-        REGISTRY.registerAttributes(ABERRANT_PREDALIEN, Predalien::createPredalienAttributes);
-        REGISTRY.registerAttributes(
+        TYPE_REGISTRY.registerAll();
+        ATTRIBUTE_REGISTRY.register(ABERRANT_ADOLESCENT, Adolescent::createAdolescentAttributes);
+        ATTRIBUTE_REGISTRY.register(ABERRANT_BOILER, Boiler::createBoilerAttributes);
+        ATTRIBUTE_REGISTRY.register(ABERRANT_CHESTBURSTER, Chestburster::createChestbursterAttributes);
+        ATTRIBUTE_REGISTRY.register(ABERRANT_CRUSHER, Crusher::createCrusherAttributes);
+        ATTRIBUTE_REGISTRY.register(ABERRANT_DRONE, Drone::createDroneAttributes);
+        ATTRIBUTE_REGISTRY.register(ABERRANT_FACEHUGGER, Facehugger::createFacehuggerAttributes);
+        ATTRIBUTE_REGISTRY.register(ABERRANT_OVOMORPH, Ovomorph::createOvomorphAttributes);
+        ATTRIBUTE_REGISTRY.register(ABERRANT_PRAETORIAN, Praetorian::createPraetorianAttributes);
+        ATTRIBUTE_REGISTRY.register(ABERRANT_PREDALIEN, Predalien::createPredalienAttributes);
+        ATTRIBUTE_REGISTRY.register(
             ABERRANT_PREDALIEN_ADOLESCENT,
             PredalienAdolescent::createPredalienAdolescentAttributes
         );
-        REGISTRY.registerAttributes(
+        ATTRIBUTE_REGISTRY.register(
             ABERRANT_PREDALIEN_CHESTBURSTER,
             PredalienChestburster::createPredalienChestbursterAttributes
         );
-        REGISTRY.registerAttributes(ABERRANT_PROWLER, Prowler::createProwlerAttributes);
-        REGISTRY.registerAttributes(ABERRANT_QUEEN, Queen::createQueenAttributes);
-        REGISTRY.registerAttributes(ABERRANT_RUNNER, Runner::createRunnerAttributes);
-        REGISTRY.registerAttributes(ABERRANT_SPITTER, Spitter::createSpitterAttributes);
-        REGISTRY.registerAttributes(ABERRANT_WARRIOR, Warrior::createWarriorAttributes);
-        REGISTRY.registerAttributes(CHESTBURSTER, Chestburster::createChestbursterAttributes);
-        REGISTRY.registerAttributes(ADOLESCENT, Adolescent::createAdolescentAttributes);
-        REGISTRY.registerAttributes(BOILER, Boiler::createBoilerAttributes);
-        REGISTRY.registerAttributes(CRUSHER, Crusher::createCrusherAttributes);
-        REGISTRY.registerAttributes(DRONE, Drone::createDroneAttributes);
-        REGISTRY.registerAttributes(FACEHUGGER, Facehugger::createFacehuggerAttributes);
-        REGISTRY.registerAttributes(IRRADIATED_CRUSHER, Crusher::createCrusherAttributes);
-        REGISTRY.registerAttributes(IRRADIATED_DRONE, Drone::createDroneAttributes);
-        REGISTRY.registerAttributes(IRRADIATED_PRAETORIAN, Praetorian::createPraetorianAttributes);
-        REGISTRY.registerAttributes(IRRADIATED_PREDALIEN, Predalien::createPredalienAttributes);
-        REGISTRY.registerAttributes(IRRADIATED_PROWLER, Prowler::createProwlerAttributes);
-        REGISTRY.registerAttributes(IRRADIATED_QUEEN, Queen::createQueenAttributes);
-        REGISTRY.registerAttributes(IRRADIATED_RUNNER, Runner::createRunnerAttributes);
-        REGISTRY.registerAttributes(IRRADIATED_WARRIOR, Warrior::createWarriorAttributes);
-        REGISTRY.registerAttributes(NETHER_ADOLESCENT, Adolescent::createAdolescentAttributes);
-        REGISTRY.registerAttributes(NETHER_BOILER, Boiler::createBoilerAttributes);
-        REGISTRY.registerAttributes(NETHER_CHESTBURSTER, Chestburster::createChestbursterAttributes);
-        REGISTRY.registerAttributes(NETHER_CRUSHER, Crusher::createCrusherAttributes);
-        REGISTRY.registerAttributes(NETHER_DRONE, Drone::createDroneAttributes);
-        REGISTRY.registerAttributes(NETHER_FACEHUGGER, Facehugger::createFacehuggerAttributes);
-        REGISTRY.registerAttributes(NETHER_OVOMORPH, Ovomorph::createOvomorphAttributes);
-        REGISTRY.registerAttributes(NETHER_PRAETORIAN, Praetorian::createPraetorianAttributes);
-        REGISTRY.registerAttributes(NETHER_PREDALIEN, Predalien::createPredalienAttributes);
-        REGISTRY.registerAttributes(
+        ATTRIBUTE_REGISTRY.register(ABERRANT_PROWLER, Prowler::createProwlerAttributes);
+        ATTRIBUTE_REGISTRY.register(ABERRANT_QUEEN, Queen::createQueenAttributes);
+        ATTRIBUTE_REGISTRY.register(ABERRANT_RUNNER, Runner::createRunnerAttributes);
+        ATTRIBUTE_REGISTRY.register(ABERRANT_SPITTER, Spitter::createSpitterAttributes);
+        ATTRIBUTE_REGISTRY.register(ABERRANT_WARRIOR, Warrior::createWarriorAttributes);
+        ATTRIBUTE_REGISTRY.register(CHESTBURSTER, Chestburster::createChestbursterAttributes);
+        ATTRIBUTE_REGISTRY.register(ADOLESCENT, Adolescent::createAdolescentAttributes);
+        ATTRIBUTE_REGISTRY.register(BOILER, Boiler::createBoilerAttributes);
+        ATTRIBUTE_REGISTRY.register(CRUSHER, Crusher::createCrusherAttributes);
+        ATTRIBUTE_REGISTRY.register(DRONE, Drone::createDroneAttributes);
+        ATTRIBUTE_REGISTRY.register(FACEHUGGER, Facehugger::createFacehuggerAttributes);
+        ATTRIBUTE_REGISTRY.register(IRRADIATED_CRUSHER, Crusher::createCrusherAttributes);
+        ATTRIBUTE_REGISTRY.register(IRRADIATED_DRONE, Drone::createDroneAttributes);
+        ATTRIBUTE_REGISTRY.register(IRRADIATED_PRAETORIAN, Praetorian::createPraetorianAttributes);
+        ATTRIBUTE_REGISTRY.register(IRRADIATED_PREDALIEN, Predalien::createPredalienAttributes);
+        ATTRIBUTE_REGISTRY.register(IRRADIATED_PROWLER, Prowler::createProwlerAttributes);
+        ATTRIBUTE_REGISTRY.register(IRRADIATED_QUEEN, Queen::createQueenAttributes);
+        ATTRIBUTE_REGISTRY.register(IRRADIATED_RUNNER, Runner::createRunnerAttributes);
+        ATTRIBUTE_REGISTRY.register(IRRADIATED_WARRIOR, Warrior::createWarriorAttributes);
+        ATTRIBUTE_REGISTRY.register(NETHER_ADOLESCENT, Adolescent::createAdolescentAttributes);
+        ATTRIBUTE_REGISTRY.register(NETHER_BOILER, Boiler::createBoilerAttributes);
+        ATTRIBUTE_REGISTRY.register(NETHER_CHESTBURSTER, Chestburster::createChestbursterAttributes);
+        ATTRIBUTE_REGISTRY.register(NETHER_CRUSHER, Crusher::createCrusherAttributes);
+        ATTRIBUTE_REGISTRY.register(NETHER_DRONE, Drone::createDroneAttributes);
+        ATTRIBUTE_REGISTRY.register(NETHER_FACEHUGGER, Facehugger::createFacehuggerAttributes);
+        ATTRIBUTE_REGISTRY.register(NETHER_OVOMORPH, Ovomorph::createOvomorphAttributes);
+        ATTRIBUTE_REGISTRY.register(NETHER_PRAETORIAN, Praetorian::createPraetorianAttributes);
+        ATTRIBUTE_REGISTRY.register(NETHER_PREDALIEN, Predalien::createPredalienAttributes);
+        ATTRIBUTE_REGISTRY.register(
             NETHER_PREDALIEN_ADOLESCENT,
             PredalienAdolescent::createPredalienAdolescentAttributes
         );
-        REGISTRY.registerAttributes(
+        ATTRIBUTE_REGISTRY.register(
             NETHER_PREDALIEN_CHESTBURSTER,
             PredalienChestburster::createPredalienChestbursterAttributes
         );
-        REGISTRY.registerAttributes(NETHER_PROWLER, Prowler::createProwlerAttributes);
-        REGISTRY.registerAttributes(NETHER_QUEEN, Queen::createQueenAttributes);
-        REGISTRY.registerAttributes(NETHER_RUNNER, Runner::createRunnerAttributes);
-        REGISTRY.registerAttributes(NETHER_SPITTER, Spitter::createSpitterAttributes);
-        REGISTRY.registerAttributes(NETHER_WARRIOR, Warrior::createWarriorAttributes);
-        REGISTRY.registerAttributes(OVIPOSITOR, Ovipositor::createOvipositorAttributes);
-        REGISTRY.registerAttributes(OVOMORPH, Ovomorph::createOvomorphAttributes);
-        REGISTRY.registerAttributes(PRAETORIAN, Praetorian::createPraetorianAttributes);
-        REGISTRY.registerAttributes(PREDALIEN, Predalien::createPredalienAttributes);
-        REGISTRY.registerAttributes(PREDALIEN_ADOLESCENT, PredalienAdolescent::createPredalienAdolescentAttributes);
-        REGISTRY.registerAttributes(
+        ATTRIBUTE_REGISTRY.register(NETHER_PROWLER, Prowler::createProwlerAttributes);
+        ATTRIBUTE_REGISTRY.register(NETHER_QUEEN, Queen::createQueenAttributes);
+        ATTRIBUTE_REGISTRY.register(NETHER_RUNNER, Runner::createRunnerAttributes);
+        ATTRIBUTE_REGISTRY.register(NETHER_SPITTER, Spitter::createSpitterAttributes);
+        ATTRIBUTE_REGISTRY.register(NETHER_WARRIOR, Warrior::createWarriorAttributes);
+        ATTRIBUTE_REGISTRY.register(OVIPOSITOR, Ovipositor::createOvipositorAttributes);
+        ATTRIBUTE_REGISTRY.register(OVOMORPH, Ovomorph::createOvomorphAttributes);
+        ATTRIBUTE_REGISTRY.register(PRAETORIAN, Praetorian::createPraetorianAttributes);
+        ATTRIBUTE_REGISTRY.register(PREDALIEN, Predalien::createPredalienAttributes);
+        ATTRIBUTE_REGISTRY.register(PREDALIEN_ADOLESCENT, PredalienAdolescent::createPredalienAdolescentAttributes);
+        ATTRIBUTE_REGISTRY.register(
             PREDALIEN_CHESTBURSTER,
             PredalienChestburster::createPredalienChestbursterAttributes
         );
-        REGISTRY.registerAttributes(PROWLER, Prowler::createProwlerAttributes);
-        REGISTRY.registerAttributes(QUEEN, Queen::createQueenAttributes);
-        REGISTRY.registerAttributes(ROYAL_ABERRANT_ADOLESCENT, Adolescent::createAdolescentAttributes);
-        REGISTRY.registerAttributes(ROYAL_ABERRANT_CHESTBURSTER, Chestburster::createChestbursterAttributes);
-        REGISTRY.registerAttributes(ROYAL_ABERRANT_FACEHUGGER, Facehugger::createFacehuggerAttributes);
-        REGISTRY.registerAttributes(ROYAL_ABERRANT_OVOMORPH, Ovomorph::createOvomorphAttributes);
-        REGISTRY.registerAttributes(ROYAL_ADOLESCENT, Adolescent::createAdolescentAttributes);
-        REGISTRY.registerAttributes(ROYAL_CHESTBURSTER, Chestburster::createChestbursterAttributes);
-        REGISTRY.registerAttributes(ROYAL_FACEHUGGER, Facehugger::createFacehuggerAttributes);
-        REGISTRY.registerAttributes(ROYAL_NETHER_ADOLESCENT, Adolescent::createAdolescentAttributes);
-        REGISTRY.registerAttributes(ROYAL_NETHER_CHESTBURSTER, Chestburster::createChestbursterAttributes);
-        REGISTRY.registerAttributes(ROYAL_NETHER_FACEHUGGER, Facehugger::createFacehuggerAttributes);
-        REGISTRY.registerAttributes(ROYAL_NETHER_OVOMORPH, Ovomorph::createOvomorphAttributes);
-        REGISTRY.registerAttributes(ROYAL_OVOMORPH, Ovomorph::createOvomorphAttributes);
-        REGISTRY.registerAttributes(RUNNER, Runner::createRunnerAttributes);
-        REGISTRY.registerAttributes(SPITTER, Spitter::createSpitterAttributes);
-        REGISTRY.registerAttributes(WARRIOR, Warrior::createWarriorAttributes);
+        ATTRIBUTE_REGISTRY.register(PROWLER, Prowler::createProwlerAttributes);
+        ATTRIBUTE_REGISTRY.register(QUEEN, Queen::createQueenAttributes);
+        ATTRIBUTE_REGISTRY.register(ROYAL_ABERRANT_ADOLESCENT, Adolescent::createAdolescentAttributes);
+        ATTRIBUTE_REGISTRY.register(ROYAL_ABERRANT_CHESTBURSTER, Chestburster::createChestbursterAttributes);
+        ATTRIBUTE_REGISTRY.register(ROYAL_ABERRANT_FACEHUGGER, Facehugger::createFacehuggerAttributes);
+        ATTRIBUTE_REGISTRY.register(ROYAL_ABERRANT_OVOMORPH, Ovomorph::createOvomorphAttributes);
+        ATTRIBUTE_REGISTRY.register(ROYAL_ADOLESCENT, Adolescent::createAdolescentAttributes);
+        ATTRIBUTE_REGISTRY.register(ROYAL_CHESTBURSTER, Chestburster::createChestbursterAttributes);
+        ATTRIBUTE_REGISTRY.register(ROYAL_FACEHUGGER, Facehugger::createFacehuggerAttributes);
+        ATTRIBUTE_REGISTRY.register(ROYAL_NETHER_ADOLESCENT, Adolescent::createAdolescentAttributes);
+        ATTRIBUTE_REGISTRY.register(ROYAL_NETHER_CHESTBURSTER, Chestburster::createChestbursterAttributes);
+        ATTRIBUTE_REGISTRY.register(ROYAL_NETHER_FACEHUGGER, Facehugger::createFacehuggerAttributes);
+        ATTRIBUTE_REGISTRY.register(ROYAL_NETHER_OVOMORPH, Ovomorph::createOvomorphAttributes);
+        ATTRIBUTE_REGISTRY.register(ROYAL_OVOMORPH, Ovomorph::createOvomorphAttributes);
+        ATTRIBUTE_REGISTRY.register(RUNNER, Runner::createRunnerAttributes);
+        ATTRIBUTE_REGISTRY.register(SPITTER, Spitter::createSpitterAttributes);
+        ATTRIBUTE_REGISTRY.register(WARRIOR, Warrior::createWarriorAttributes);
     }
 }

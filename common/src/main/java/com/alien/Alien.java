@@ -28,7 +28,6 @@ import com.alien.common.registry.init.item.block.AlienChitinBlockItems;
 import com.alien.common.registry.init.item.block.AlienResinBlockItems;
 import com.blib.BLib;
 import com.blib.BLibMod;
-import com.blib.service.BLibServices;
 import net.minecraft.world.level.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,11 +83,11 @@ public class Alien {
 
             // Listeners/Events
             AlienReloadListeners.initialize();
-        });
 
-        BLibServices.EVENT.afterLevelTick().register(Alien::tickHivesInLevel);
-        BLibServices.EVENT.afterLevelTick().register(Alien::tickQueenSpawnCooldown);
-        BLibServices.EVENT.onTagsUpdated().register(($1, $2) -> AlienEvents.onTagsUpdated());
+            MOD.events().afterLevelTick().register(Alien::tickHivesInLevel);
+            MOD.events().afterLevelTick().register(Alien::tickQueenSpawnCooldown);
+            MOD.events().onTagsUpdated().register(($1, $2) -> AlienEvents.onTagsUpdated());
+        });
     }
 
     private static void tickHivesInLevel(Level level) {

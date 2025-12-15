@@ -4,7 +4,6 @@ import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.level.gameevent.listener.ResinSpreadListener;
 import com.alien.common.model.resin.ReadableResinData;
 import com.alien.common.model.resin.ResinData;
-import com.avp.AVP;
 import com.blib.common.gameplay.model.NBTSerializable;
 import com.just.core.functional.option.Option;
 import com.mojang.serialization.Dynamic;
@@ -203,7 +202,7 @@ public class ResinManager implements GameEventListener.Provider<ResinSpreadListe
                 new Dynamic<>(NbtOps.INSTANCE, compoundTag.getCompound(NBT_RESIN_DATA))
             )
                 .resultOrPartial(
-                    AVP.LOGGER::error
+                    com.alien.Alien.LOGGER::error
                 )
                 .ifPresent(resinData -> this.resinData = resinData);
         }
@@ -214,7 +213,7 @@ public class ResinManager implements GameEventListener.Provider<ResinSpreadListe
         if (resinData != null) {
             ResinData.CODEC.encodeStart(NbtOps.INSTANCE, resinData)
                 .resultOrPartial(
-                    AVP.LOGGER::error
+                    com.alien.Alien.LOGGER::error
                 )
                 .ifPresent(tag -> compoundTag.put(NBT_RESIN_DATA, tag));
 

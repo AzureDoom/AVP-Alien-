@@ -5,15 +5,15 @@ import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.AlienSpawning;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.QueenSpawning;
 import com.alien.common.registry.tag.AlienBiomeTags;
-import com.blib.BLibHolder;
 import com.blib.common.gameplay.model.spawning.BLibEntitySpawnData;
 import com.blib.common.gameplay.model.spawning.SpawnSettings;
-import com.blib.common.registry.impl.BLibEntityTypeRegistry;
+import com.blib.common.registry.BLibHolder;
+import com.blib.common.registry.impl.BLibEntitySpawnRegistry;
 import net.minecraft.world.entity.EntityType;
 
 public class AlienEntitySpawns {
 
-    private static final BLibEntityTypeRegistry REGISTRY = com.alien.Alien.MOD.createEntityTypeRegistry();;
+    private static final BLibEntitySpawnRegistry REGISTRY = com.alien.Alien.MOD.registries().createEntitySpawnRegistry();;
 
     public static void initialize() {
         registerAberrantAlienSpawns();
@@ -29,7 +29,7 @@ public class AlienEntitySpawns {
         register(AlienEntityTypes.WARRIOR, AlienConfig.INSTANCE.spawnConfigs.WARRIOR_SPAWN);
         register(AlienEntityTypes.PRAETORIAN, AlienConfig.INSTANCE.spawnConfigs.PRAETORIAN_SPAWN);
         register(AlienEntityTypes.PROWLER, AlienConfig.INSTANCE.spawnConfigs.PROWLER_SPAWN);
-        REGISTRY.registerSpawnData(
+        REGISTRY.register(
             BLibEntitySpawnData.builder(AlienEntityTypes.QUEEN)
                 .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
                 .withSpawnPredicate(QueenSpawning.PREDICATE)
@@ -48,7 +48,7 @@ public class AlienEntitySpawns {
         register(AlienEntityTypes.ABERRANT_PRAETORIAN, AlienConfig.INSTANCE.spawnConfigs.ABERRANT_PRAETORIAN_SPAWN);
         register(AlienEntityTypes.ABERRANT_PROWLER, AlienConfig.INSTANCE.spawnConfigs.ABERRANT_PROWLER_SPAWN);
         register(AlienEntityTypes.ABERRANT_RUNNER, AlienConfig.INSTANCE.spawnConfigs.ABERRANT_RUNNER_SPAWN);
-        REGISTRY.registerSpawnData(
+        REGISTRY.register(
             BLibEntitySpawnData.builder(AlienEntityTypes.ABERRANT_QUEEN)
                 .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
                 .withSpawnPredicate(QueenSpawning.PREDICATE)
@@ -65,7 +65,7 @@ public class AlienEntitySpawns {
         register(AlienEntityTypes.IRRADIATED_PRAETORIAN, AlienConfig.INSTANCE.spawnConfigs.IRRADIATED_PRAETORIAN_SPAWN);
         register(AlienEntityTypes.IRRADIATED_PROWLER, AlienConfig.INSTANCE.spawnConfigs.IRRADIATED_PROWLER_SPAWN);
         register(AlienEntityTypes.IRRADIATED_RUNNER, AlienConfig.INSTANCE.spawnConfigs.IRRADIATED_RUNNER_SPAWN);
-        REGISTRY.registerSpawnData(
+        REGISTRY.register(
             BLibEntitySpawnData.builder(AlienEntityTypes.IRRADIATED_QUEEN)
                 // FIXME:
                 // .withBiomeTagKey(AVPBiomeTags.IS_IRRADIATED)
@@ -85,7 +85,7 @@ public class AlienEntitySpawns {
         register(AlienEntityTypes.NETHER_RUNNER, AlienConfig.INSTANCE.spawnConfigs.NETHER_RUNNER_SPAWN);
         register(AlienEntityTypes.NETHER_SPITTER, AlienConfig.INSTANCE.spawnConfigs.NETHER_SPITTER_SPAWN);
 
-        REGISTRY.registerSpawnData(
+        REGISTRY.register(
             BLibEntitySpawnData.builder(AlienEntityTypes.NETHER_QUEEN)
                 .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
                 .withSpawnPredicate(QueenSpawning.PREDICATE)
@@ -95,7 +95,7 @@ public class AlienEntitySpawns {
     }
 
     private static <T extends Alien> void register(BLibHolder<EntityType<T>> entityType, AlienConfig.SpawnConfigs.SpawnSettings spawn) {
-        REGISTRY.registerSpawnData(
+        REGISTRY.register(
             BLibEntitySpawnData.builder(entityType)
                 .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
                 .withSpawnPredicate(AlienSpawning.getTypedPredicate())

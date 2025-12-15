@@ -13,7 +13,7 @@ public class AlienDataMigrations {
     );
 
     public static void initialize() {
-        var version = Alien.MOD.getVersion();
+        var version = Alien.MOD.version();
 
         if (version != null) {
             MIGRATIONS.forEach(BLibDataMigration::apply);

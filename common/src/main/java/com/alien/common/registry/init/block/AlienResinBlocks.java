@@ -11,9 +11,9 @@ import com.alien.common.gameplay.block.resin.vent.ResinVentBlock;
 import com.alien.common.gameplay.block.resin.web.IrradiatedResinWebBlock;
 import com.alien.common.gameplay.block.resin.web.ResinWebBlock;
 import com.alien.common.registry.init.block.property.AlienBlockProperties;
-import com.blib.BLibHolder;
-import com.blib.BLibRegistry;
 import com.blib.common.gameplay.block.property.BlockPropertyBuilder;
+import com.blib.common.registry.BLibHolder;
+import com.blib.common.registry.BLibRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RotatedPillarBlock;
@@ -25,7 +25,7 @@ import java.util.function.Supplier;
 
 public class AlienResinBlocks {
 
-    private static final BLibRegistry<Block> REGISTRY = Alien.MOD.createRegistry(BuiltInRegistries.BLOCK);
+    private static final BLibRegistry<Block> REGISTRY = Alien.MOD.registries().create(BuiltInRegistries.BLOCK);
 
     public static final BLibHolder<Block> ABERRANT_RESIN = create(
         "aberrant_resin",

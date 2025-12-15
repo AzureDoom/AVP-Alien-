@@ -47,7 +47,7 @@ repositories {
         name = 'BlameJared'
         url = 'https://maven.blamejared.com'
     }
-    maven { url = "https://maven.bvanseghi.dev/avp" }
+    maven { url = "https://maven.bvanseghi.dev/blib" }
     maven { url = "https://maven.bvanseghi.dev/just" }
     maven { url = "https://maven.azuredoom.com/mods" }
     maven { url = "https://maven.terraformersmc.com/releases" }
@@ -107,7 +107,7 @@ processResources {
             'neoforge_loader_version_range': neoforge_loader_version_range,
             'credits'                      : credits,
             'java_version'                 : java_version,
-            'avp_version'                  : avp_version,
+            'blib_version'                  : blib_version,
             'azurelib_version'             : azurelib_version
     ]
 

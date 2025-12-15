@@ -29,7 +29,7 @@ dependencies {
     compileOnly "com.just:just-codec:${project.just_codec_version}"
     compileOnly "com.just:just-core:${project.just_core_version}"
     compileOnly "com.just:just-goap:${project.just_goap_version}"
-    compileOnly ("com.avp:avp-common-${project.minecraft_version}:${project.avp_version}") {
+    compileOnly ("com.blib:blib-common-${project.minecraft_version}:${project.blib_version}") {
         exclude group: "com.just", module: "just-codec"
         exclude group: "com.just", module: "just-core"
         exclude group: "com.just", module: "just-goap"
