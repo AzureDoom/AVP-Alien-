@@ -1,8 +1,7 @@
 package com.alien.mixin;
 
-import com.alien.compat.gigeresque.Gigeresque;
-import com.alien.compat.gigeresque.common.patch.GigeresqueSurgeryKitPatch;
-import com.blib.BLib;
+import com.alien.compatibility.gigeresque.Gigeresque;
+import com.alien.compatibility.gigeresque.common.patch.GigeresqueSurgeryKitPatch;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -27,7 +26,7 @@ public class MixinItem_GigeresqueSurgeryKit {
         InteractionHand usedHand,
         CallbackInfoReturnable<InteractionResult> cir
     ) {
-        if (BLib.isModLoaded(Gigeresque.MOD_ID)) {
+        if (Gigeresque.MOD.isLoaded()) {
             GigeresqueSurgeryKitPatch.removeParasite(player, interactionTarget, stack);
         }
     }
@@ -39,7 +38,7 @@ public class MixinItem_GigeresqueSurgeryKit {
         InteractionHand usedHand,
         CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir
     ) {
-        if (BLib.isModLoaded(Gigeresque.MOD_ID)) {
+        if (Gigeresque.MOD.isLoaded()) {
             GigeresqueSurgeryKitPatch.removeParasite(player, player, player.getItemInHand(usedHand));
         }
     }

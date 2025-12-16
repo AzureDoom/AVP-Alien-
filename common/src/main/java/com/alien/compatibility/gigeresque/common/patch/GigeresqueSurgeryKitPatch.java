@@ -1,9 +1,9 @@
-package com.alien.compat.gigeresque.common.patch;
+package com.alien.compatibility.gigeresque.common.patch;
 
 import com.alien.common.model.alien.Host;
 import com.alien.common.util.AlienEmbryoUtil;
 import com.alien.common.util.AlienPredicates;
-import com.alien.compat.gigeresque.GigeresqueResources;
+import com.alien.compatibility.gigeresque.Gigeresque;
 import mods.cybercat.gigeresque.CommonMod;
 import mods.cybercat.gigeresque.common.item.GigItems;
 import net.minecraft.server.level.ServerPlayer;
@@ -46,7 +46,7 @@ public class GigeresqueSurgeryKitPatch {
         }
 
         if (player instanceof ServerPlayer serverPlayer) {
-            var advancement = serverPlayer.server.getAdvancements().get(GigeresqueResources.location("surgery_kit"));
+            var advancement = serverPlayer.server.getAdvancements().get(Gigeresque.MOD.resources().createLocation("surgery_kit"));
 
             if (advancement != null && !serverPlayer.getAdvancements().getOrStartProgress(advancement).isDone()) {
                 for (var s : serverPlayer.getAdvancements().getOrStartProgress(advancement).getRemainingCriteria()) {
