@@ -56,10 +56,10 @@ public class OvomorphRenderer extends AzEntityRenderer<Ovomorph> {
             ovomorph.getHatchManager().isHatching()
                 || ovomorph.getHatchManager().isHatched()
         ) {
-            return TRANSPARENT_RESOURCE_CACHE.getOrCreateRenderTypeForVariant(ovomorph.getVariant());
+            return TRANSPARENT_RESOURCE_CACHE.getOrCreateRenderTypeForVariant(ovomorph.getVariant(), ovomorph.isRoyal());
         }
 
-        return RESOURCE_CACHE.getOrCreateRenderTypeForVariant(ovomorph.getVariant());
+        return RESOURCE_CACHE.getOrCreateRenderTypeForVariant(ovomorph.getVariant(), ovomorph.isRoyal());
     }
 
     private static ResourceLocation modelLocation(Ovomorph ovomorph) {

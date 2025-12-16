@@ -14,7 +14,7 @@
 - Alien spawn eggs in the Alien Spawn Eggs creative mode tab are now sorted based on their lifecycle.
 
 ## 🐞 Fixes
-- N/A
+- Fixed royal ovomorphs using incorrect textures.
 
 ## 🧪 Experimental
 - N/A
