@@ -3,7 +3,10 @@ package com.alien.common.registry.init;
 import com.alien.Alien;
 import com.alien.common.gameplay.block.entity.resin.node.ResinNodeBlockEntity;
 import com.alien.common.gameplay.block.entity.resin.vent.ResinVentBlockEntity;
+import com.alien.common.registry.init.block.AberrantAlienResinBlocks;
 import com.alien.common.registry.init.block.AlienResinBlocks;
+import com.alien.common.registry.init.block.IrradiatedAlienResinBlocks;
+import com.alien.common.registry.init.block.NetherAlienResinBlocks;
 import com.blib.common.registry.BLibHolder;
 import com.blib.common.registry.BLibRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -20,9 +23,9 @@ public class AlienBlockEntityTypes {
         "resin_node",
         () -> BlockEntityType.Builder.of(
             ResinNodeBlockEntity::new,
-            AlienResinBlocks.IRRADIATED_RESIN_NODE.get(),
-            AlienResinBlocks.ABERRANT_RESIN_NODE.get(),
-            AlienResinBlocks.NETHER_RESIN_NODE.get(),
+            IrradiatedAlienResinBlocks.IRRADIATED_RESIN_NODE.get(),
+            AberrantAlienResinBlocks.ABERRANT_RESIN_NODE.get(),
+            NetherAlienResinBlocks.NETHER_RESIN_NODE.get(),
             AlienResinBlocks.RESIN_NODE.get()
         )
     );
@@ -31,9 +34,9 @@ public class AlienBlockEntityTypes {
         "resin_vent",
         () -> BlockEntityType.Builder.of(
             ResinVentBlockEntity::new,
-            AlienResinBlocks.IRRADIATED_RESIN_VENT.get(),
-            AlienResinBlocks.ABERRANT_RESIN_VENT.get(),
-            AlienResinBlocks.NETHER_RESIN_VENT.get(),
+            IrradiatedAlienResinBlocks.IRRADIATED_RESIN_VENT.get(),
+            AberrantAlienResinBlocks.ABERRANT_RESIN_VENT.get(),
+            NetherAlienResinBlocks.NETHER_RESIN_VENT.get(),
             AlienResinBlocks.RESIN_VENT.get()
         )
     );

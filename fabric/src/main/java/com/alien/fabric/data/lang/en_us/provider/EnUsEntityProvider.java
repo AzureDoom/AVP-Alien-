@@ -83,15 +83,6 @@ public class EnUsEntityProvider {
         addEntity(builder, AlienEntityTypes.RUNNER, "Runner");
         addEntity(builder, AlienEntityTypes.SPITTER, "Spitter");
         addEntity(builder, AlienEntityTypes.WARRIOR, "Warrior");
-
-        // FIXME:
-        // AVPRegistryValidation.throwIfMissingEntries(
-        // Alien.MOD.getAllHolders(BuiltInRegistries.ENTITY_TYPE),
-        // TOUCHED_ENTRIES::contains,
-        // EntityType::getDescriptionId,
-        // "Entity type translation did not complete successfully - there are unhandled entity types that need to be
-        // handled."
-        // );
     };
 
     private static void addEntity(

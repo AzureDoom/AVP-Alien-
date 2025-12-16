@@ -58,7 +58,6 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
     public Ovomorph(EntityType<? extends Ovomorph> entityType, Level level) {
         super(entityType, level);
 
-        // FIXME:
         this.hatchStateId = new DataAccessor<>(this, AlienDataKeys.OVOMORPH_HATCH_STATE);
         this.maxSpawnCount = new DataAccessor<>(this, AlienDataKeys.OVOMORPH_MAXIMUM_SPAWN_COUNT);
         this.isRooted = new DataAccessor<>(this, AlienDataKeys.OVOMORPH_IS_ROOTED);

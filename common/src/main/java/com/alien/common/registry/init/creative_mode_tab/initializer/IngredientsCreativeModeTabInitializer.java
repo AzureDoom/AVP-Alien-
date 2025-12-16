@@ -9,18 +9,11 @@ public class IngredientsCreativeModeTabInitializer {
 
     public static final Consumer<CreativeModeTab.Output> OUTPUT_CONSUMER = output -> {
         // Alien materials
-        CreativeModeTabUtil.accept(output, AlienItems.RESIN_BALL);
-        CreativeModeTabUtil.accept(output, AlienItems.CHITIN);
-        CreativeModeTabUtil.accept(output, AlienItems.PLATED_CHITIN);
-        CreativeModeTabUtil.accept(output, AlienItems.NETHER_RESIN_BALL);
-        CreativeModeTabUtil.accept(output, AlienItems.NETHER_CHITIN);
-        CreativeModeTabUtil.accept(output, AlienItems.PLATED_NETHER_CHITIN);
-        CreativeModeTabUtil.accept(output, AlienItems.ABERRANT_RESIN_BALL);
-        CreativeModeTabUtil.accept(output, AlienItems.ABERRANT_CHITIN);
-        CreativeModeTabUtil.accept(output, AlienItems.PLATED_ABERRANT_CHITIN);
-        CreativeModeTabUtil.accept(output, AlienItems.IRRADIATED_RESIN_BALL);
-        CreativeModeTabUtil.accept(output, AlienItems.IRRADIATED_CHITIN);
-        CreativeModeTabUtil.accept(output, AlienItems.PLATED_IRRADIATED_CHITIN);
+        addBaseXenomorphIngredients(output);
+        addNetherXenomorphIngredients(output);
+        addAberrantXenomorphIngredients(output);
+        addIrradiatedXenomorphIngredients(output);
+
         CreativeModeTabUtil.accept(output, AlienItems.RAW_ROYAL_JELLY);
         CreativeModeTabUtil.accept(output, AlienItems.POISON_JELLY);
 
@@ -31,4 +24,28 @@ public class IngredientsCreativeModeTabInitializer {
         CreativeModeTabUtil.accept(output, AlienItems.VECTOR_POTTERY_SHERD);
         CreativeModeTabUtil.accept(output, AlienItems.ALIEN_MUSIC_DISC_1_FRAGMENT);
     };
+
+    private static void addBaseXenomorphIngredients(CreativeModeTab.Output output) {
+        CreativeModeTabUtil.accept(output, AlienItems.RESIN_BALL);
+        CreativeModeTabUtil.accept(output, AlienItems.CHITIN);
+        CreativeModeTabUtil.accept(output, AlienItems.PLATED_CHITIN);
+    }
+
+    private static void addNetherXenomorphIngredients(CreativeModeTab.Output output) {
+        CreativeModeTabUtil.accept(output, AlienItems.NETHER_RESIN_BALL);
+        CreativeModeTabUtil.accept(output, AlienItems.NETHER_CHITIN);
+        CreativeModeTabUtil.accept(output, AlienItems.PLATED_NETHER_CHITIN);
+    }
+
+    private static void addAberrantXenomorphIngredients(CreativeModeTab.Output output) {
+        CreativeModeTabUtil.accept(output, AlienItems.ABERRANT_RESIN_BALL);
+        CreativeModeTabUtil.accept(output, AlienItems.ABERRANT_CHITIN);
+        CreativeModeTabUtil.accept(output, AlienItems.PLATED_ABERRANT_CHITIN);
+    }
+
+    private static void addIrradiatedXenomorphIngredients(CreativeModeTab.Output output) {
+        CreativeModeTabUtil.accept(output, AlienItems.IRRADIATED_RESIN_BALL);
+        CreativeModeTabUtil.accept(output, AlienItems.IRRADIATED_CHITIN);
+        CreativeModeTabUtil.accept(output, AlienItems.PLATED_IRRADIATED_CHITIN);
+    }
 }

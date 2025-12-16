@@ -32,8 +32,11 @@ import com.alien.client.render.entity.WarriorRenderer;
 import com.alien.client.render.entity.parasite.facehugger.FacehuggerRenderer;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienParticleTypes;
+import com.alien.common.registry.init.block.AberrantAlienResinBlocks;
 import com.alien.common.registry.init.block.AlienBlocks;
 import com.alien.common.registry.init.block.AlienResinBlocks;
+import com.alien.common.registry.init.block.IrradiatedAlienResinBlocks;
+import com.alien.common.registry.init.block.NetherAlienResinBlocks;
 import com.alien.common.registry.init.item.AlienArmorItems;
 import com.blib.client.BLibClientMod;
 import net.minecraft.client.renderer.RenderType;
@@ -137,14 +140,18 @@ public class AlienClient {
     }
 
     private static void registerBlockRenderLayers() {
-        MOD.registries().registerBlockRenderLayer(AlienResinBlocks.IRRADIATED_RESIN_VEIN, RenderType.cutout());
-        MOD.registries().registerBlockRenderLayer(AlienResinBlocks.IRRADIATED_RESIN_WEB, RenderType.cutout());
-        MOD.registries().registerBlockRenderLayer(AlienResinBlocks.ABERRANT_RESIN_VEIN, RenderType.cutout());
-        MOD.registries().registerBlockRenderLayer(AlienResinBlocks.ABERRANT_RESIN_WEB, RenderType.cutout());
-        MOD.registries().registerBlockRenderLayer(AlienResinBlocks.NETHER_RESIN_VEIN, RenderType.cutout());
-        MOD.registries().registerBlockRenderLayer(AlienResinBlocks.NETHER_RESIN_WEB, RenderType.cutout());
         MOD.registries().registerBlockRenderLayer(AlienResinBlocks.RESIN_VEIN, RenderType.cutout());
         MOD.registries().registerBlockRenderLayer(AlienResinBlocks.RESIN_WEB, RenderType.cutout());
+
+        MOD.registries().registerBlockRenderLayer(NetherAlienResinBlocks.NETHER_RESIN_VEIN, RenderType.cutout());
+        MOD.registries().registerBlockRenderLayer(NetherAlienResinBlocks.NETHER_RESIN_WEB, RenderType.cutout());
+
+        MOD.registries().registerBlockRenderLayer(AberrantAlienResinBlocks.ABERRANT_RESIN_VEIN, RenderType.cutout());
+        MOD.registries().registerBlockRenderLayer(AberrantAlienResinBlocks.ABERRANT_RESIN_WEB, RenderType.cutout());
+
+        MOD.registries().registerBlockRenderLayer(IrradiatedAlienResinBlocks.IRRADIATED_RESIN_VEIN, RenderType.cutout());
+        MOD.registries().registerBlockRenderLayer(IrradiatedAlienResinBlocks.IRRADIATED_RESIN_WEB, RenderType.cutout());
+
         MOD.registries().registerBlockRenderLayer(AlienBlocks.ROYAL_JELLY_BLOCK, RenderType.translucent());
     }
 

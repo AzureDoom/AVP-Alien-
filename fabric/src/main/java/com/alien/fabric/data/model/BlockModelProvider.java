@@ -1,8 +1,13 @@
 package com.alien.fabric.data.model;
 
+import com.alien.common.registry.init.block.AberrantAlienChitinBlocks;
+import com.alien.common.registry.init.block.AberrantAlienResinBlocks;
 import com.alien.common.registry.init.block.AlienBlocks;
 import com.alien.common.registry.init.block.AlienChitinBlocks;
 import com.alien.common.registry.init.block.AlienResinBlocks;
+import com.alien.common.registry.init.block.IrradiatedAlienResinBlocks;
+import com.alien.common.registry.init.block.NetherAlienChitinBlocks;
+import com.alien.common.registry.init.block.NetherAlienResinBlocks;
 import com.blib.fabric.data.model.generator.MultiFaceGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
@@ -25,72 +30,76 @@ public class BlockModelProvider extends FabricModelProvider {
 
     @Override
     public void generateBlockStateModels(BlockModelGenerators generators) {
-        generators.createRotatedVariantBlock(AlienResinBlocks.IRRADIATED_RESIN.get());
-        createSlab(generators, AlienResinBlocks.IRRADIATED_RESIN.get(), AlienResinBlocks.IRRADIATED_RESIN_SLAB.get());
-        createStairs(generators, AlienResinBlocks.IRRADIATED_RESIN.get(), AlienResinBlocks.IRRADIATED_RESIN_STAIRS.get());
-        generators.createRotatedVariantBlock(AlienResinBlocks.IRRADIATED_RESIN_NODE.get());
-        MultiFaceGenerator.generate(generators, AlienResinBlocks.IRRADIATED_RESIN_VEIN.get());
-        generators.createCrossBlock(AlienResinBlocks.IRRADIATED_RESIN_WEB.get(), BlockModelGenerators.TintState.NOT_TINTED);
+        generators.createRotatedVariantBlock(IrradiatedAlienResinBlocks.IRRADIATED_RESIN.get());
+        createSlab(generators, IrradiatedAlienResinBlocks.IRRADIATED_RESIN.get(), IrradiatedAlienResinBlocks.IRRADIATED_RESIN_SLAB.get());
+        createStairs(
+            generators,
+            IrradiatedAlienResinBlocks.IRRADIATED_RESIN.get(),
+            IrradiatedAlienResinBlocks.IRRADIATED_RESIN_STAIRS.get()
+        );
+        generators.createRotatedVariantBlock(IrradiatedAlienResinBlocks.IRRADIATED_RESIN_NODE.get());
+        MultiFaceGenerator.generate(generators, IrradiatedAlienResinBlocks.IRRADIATED_RESIN_VEIN.get());
+        generators.createCrossBlock(IrradiatedAlienResinBlocks.IRRADIATED_RESIN_WEB.get(), BlockModelGenerators.TintState.NOT_TINTED);
 
-        generators.createRotatedVariantBlock(AlienResinBlocks.ABERRANT_RESIN.get());
-        createSlab(generators, AlienResinBlocks.ABERRANT_RESIN.get(), AlienResinBlocks.ABERRANT_RESIN_SLAB.get());
-        createStairs(generators, AlienResinBlocks.ABERRANT_RESIN.get(), AlienResinBlocks.ABERRANT_RESIN_STAIRS.get());
-        generators.createRotatedVariantBlock(AlienResinBlocks.ABERRANT_RESIN_NODE.get());
-        MultiFaceGenerator.generate(generators, AlienResinBlocks.ABERRANT_RESIN_VEIN.get());
-        generators.createCrossBlock(AlienResinBlocks.ABERRANT_RESIN_WEB.get(), BlockModelGenerators.TintState.NOT_TINTED);
+        generators.createRotatedVariantBlock(AberrantAlienResinBlocks.ABERRANT_RESIN.get());
+        createSlab(generators, AberrantAlienResinBlocks.ABERRANT_RESIN.get(), AberrantAlienResinBlocks.ABERRANT_RESIN_SLAB.get());
+        createStairs(generators, AberrantAlienResinBlocks.ABERRANT_RESIN.get(), AberrantAlienResinBlocks.ABERRANT_RESIN_STAIRS.get());
+        generators.createRotatedVariantBlock(AberrantAlienResinBlocks.ABERRANT_RESIN_NODE.get());
+        MultiFaceGenerator.generate(generators, AberrantAlienResinBlocks.ABERRANT_RESIN_VEIN.get());
+        generators.createCrossBlock(AberrantAlienResinBlocks.ABERRANT_RESIN_WEB.get(), BlockModelGenerators.TintState.NOT_TINTED);
 
-        generators.family(AlienChitinBlocks.ABERRANT_CHITIN_BLOCK.get())
-            .slab(AlienChitinBlocks.ABERRANT_CHITIN_BLOCK_SLAB.get())
-            .stairs(AlienChitinBlocks.ABERRANT_CHITIN_BLOCK_STAIRS.get())
-            .wall(AlienChitinBlocks.ABERRANT_CHITIN_BLOCK_WALL.get());
-        generators.family(AlienChitinBlocks.ABERRANT_CHITIN_BRICKS.get())
-            .slab(AlienChitinBlocks.ABERRANT_CHITIN_BRICK_SLAB.get())
-            .stairs(AlienChitinBlocks.ABERRANT_CHITIN_BRICK_STAIRS.get())
-            .wall(AlienChitinBlocks.ABERRANT_CHITIN_BRICK_WALL.get());
+        generators.family(AberrantAlienChitinBlocks.ABERRANT_CHITIN_BLOCK.get())
+            .slab(AberrantAlienChitinBlocks.ABERRANT_CHITIN_BLOCK_SLAB.get())
+            .stairs(AberrantAlienChitinBlocks.ABERRANT_CHITIN_BLOCK_STAIRS.get())
+            .wall(AberrantAlienChitinBlocks.ABERRANT_CHITIN_BLOCK_WALL.get());
+        generators.family(AberrantAlienChitinBlocks.ABERRANT_CHITIN_BRICKS.get())
+            .slab(AberrantAlienChitinBlocks.ABERRANT_CHITIN_BRICK_SLAB.get())
+            .stairs(AberrantAlienChitinBlocks.ABERRANT_CHITIN_BRICK_STAIRS.get())
+            .wall(AberrantAlienChitinBlocks.ABERRANT_CHITIN_BRICK_WALL.get());
         createBottomTopBlock(
             generators,
-            AlienChitinBlocks.CHISELED_ABERRANT_CHITIN_BRICKS.get(),
-            AlienChitinBlocks.POLISHED_ABERRANT_CHITIN.get()
+            AberrantAlienChitinBlocks.CHISELED_ABERRANT_CHITIN_BRICKS.get(),
+            AberrantAlienChitinBlocks.POLISHED_ABERRANT_CHITIN.get()
         );
         createBottomTopBlock(
             generators,
-            AlienChitinBlocks.CHISELED_ABERRANT_CHITIN_BRICKS_EMBRYO.get(),
-            AlienChitinBlocks.POLISHED_ABERRANT_CHITIN.get()
+            AberrantAlienChitinBlocks.CHISELED_ABERRANT_CHITIN_BRICKS_EMBRYO.get(),
+            AberrantAlienChitinBlocks.POLISHED_ABERRANT_CHITIN.get()
         );
-        generators.family(AlienChitinBlocks.POLISHED_ABERRANT_CHITIN.get())
-            .slab(AlienChitinBlocks.POLISHED_ABERRANT_CHITIN_SLAB.get())
-            .stairs(AlienChitinBlocks.POLISHED_ABERRANT_CHITIN_STAIRS.get())
-            .wall(AlienChitinBlocks.POLISHED_ABERRANT_CHITIN_WALL.get());
+        generators.family(AberrantAlienChitinBlocks.POLISHED_ABERRANT_CHITIN.get())
+            .slab(AberrantAlienChitinBlocks.POLISHED_ABERRANT_CHITIN_SLAB.get())
+            .stairs(AberrantAlienChitinBlocks.POLISHED_ABERRANT_CHITIN_STAIRS.get())
+            .wall(AberrantAlienChitinBlocks.POLISHED_ABERRANT_CHITIN_WALL.get());
 
-        generators.createRotatedVariantBlock(AlienResinBlocks.NETHER_RESIN.get());
-        createSlab(generators, AlienResinBlocks.NETHER_RESIN.get(), AlienResinBlocks.NETHER_RESIN_SLAB.get());
-        createStairs(generators, AlienResinBlocks.NETHER_RESIN.get(), AlienResinBlocks.NETHER_RESIN_STAIRS.get());
-        generators.createRotatedVariantBlock(AlienResinBlocks.NETHER_RESIN_NODE.get());
-        MultiFaceGenerator.generate(generators, AlienResinBlocks.NETHER_RESIN_VEIN.get());
-        generators.createCrossBlock(AlienResinBlocks.NETHER_RESIN_WEB.get(), BlockModelGenerators.TintState.NOT_TINTED);
+        generators.createRotatedVariantBlock(NetherAlienResinBlocks.NETHER_RESIN.get());
+        createSlab(generators, NetherAlienResinBlocks.NETHER_RESIN.get(), NetherAlienResinBlocks.NETHER_RESIN_SLAB.get());
+        createStairs(generators, NetherAlienResinBlocks.NETHER_RESIN.get(), NetherAlienResinBlocks.NETHER_RESIN_STAIRS.get());
+        generators.createRotatedVariantBlock(NetherAlienResinBlocks.NETHER_RESIN_NODE.get());
+        MultiFaceGenerator.generate(generators, NetherAlienResinBlocks.NETHER_RESIN_VEIN.get());
+        generators.createCrossBlock(NetherAlienResinBlocks.NETHER_RESIN_WEB.get(), BlockModelGenerators.TintState.NOT_TINTED);
 
-        generators.family(AlienChitinBlocks.NETHER_CHITIN_BLOCK.get())
-            .slab(AlienChitinBlocks.NETHER_CHITIN_BLOCK_SLAB.get())
-            .stairs(AlienChitinBlocks.NETHER_CHITIN_BLOCK_STAIRS.get())
-            .wall(AlienChitinBlocks.NETHER_CHITIN_BLOCK_WALL.get());
-        generators.family(AlienChitinBlocks.NETHER_CHITIN_BRICKS.get())
-            .slab(AlienChitinBlocks.NETHER_CHITIN_BRICK_SLAB.get())
-            .stairs(AlienChitinBlocks.NETHER_CHITIN_BRICK_STAIRS.get())
-            .wall(AlienChitinBlocks.NETHER_CHITIN_BRICK_WALL.get());
+        generators.family(NetherAlienChitinBlocks.NETHER_CHITIN_BLOCK.get())
+            .slab(NetherAlienChitinBlocks.NETHER_CHITIN_BLOCK_SLAB.get())
+            .stairs(NetherAlienChitinBlocks.NETHER_CHITIN_BLOCK_STAIRS.get())
+            .wall(NetherAlienChitinBlocks.NETHER_CHITIN_BLOCK_WALL.get());
+        generators.family(NetherAlienChitinBlocks.NETHER_CHITIN_BRICKS.get())
+            .slab(NetherAlienChitinBlocks.NETHER_CHITIN_BRICK_SLAB.get())
+            .stairs(NetherAlienChitinBlocks.NETHER_CHITIN_BRICK_STAIRS.get())
+            .wall(NetherAlienChitinBlocks.NETHER_CHITIN_BRICK_WALL.get());
         createBottomTopBlock(
             generators,
-            AlienChitinBlocks.CHISELED_NETHER_CHITIN_BRICKS.get(),
-            AlienChitinBlocks.POLISHED_NETHER_CHITIN.get()
+            NetherAlienChitinBlocks.CHISELED_NETHER_CHITIN_BRICKS.get(),
+            NetherAlienChitinBlocks.POLISHED_NETHER_CHITIN.get()
         );
         createBottomTopBlock(
             generators,
-            AlienChitinBlocks.CHISELED_NETHER_CHITIN_BRICKS_EMBRYO.get(),
-            AlienChitinBlocks.POLISHED_NETHER_CHITIN.get()
+            NetherAlienChitinBlocks.CHISELED_NETHER_CHITIN_BRICKS_EMBRYO.get(),
+            NetherAlienChitinBlocks.POLISHED_NETHER_CHITIN.get()
         );
-        generators.family(AlienChitinBlocks.POLISHED_NETHER_CHITIN.get())
-            .slab(AlienChitinBlocks.POLISHED_NETHER_CHITIN_SLAB.get())
-            .stairs(AlienChitinBlocks.POLISHED_NETHER_CHITIN_STAIRS.get())
-            .wall(AlienChitinBlocks.POLISHED_NETHER_CHITIN_WALL.get());
+        generators.family(NetherAlienChitinBlocks.POLISHED_NETHER_CHITIN.get())
+            .slab(NetherAlienChitinBlocks.POLISHED_NETHER_CHITIN_SLAB.get())
+            .stairs(NetherAlienChitinBlocks.POLISHED_NETHER_CHITIN_STAIRS.get())
+            .wall(NetherAlienChitinBlocks.POLISHED_NETHER_CHITIN_WALL.get());
 
         generators.createRotatedVariantBlock(AlienResinBlocks.RESIN.get());
         createSlab(generators, AlienResinBlocks.RESIN.get(), AlienResinBlocks.RESIN_SLAB.get());
@@ -116,23 +125,23 @@ public class BlockModelProvider extends FabricModelProvider {
 
         generators.createTrivialCube(AlienBlocks.ROYAL_JELLY_BLOCK.get());
 
-        generators.family(AlienResinBlocks.ABERRANT_RESIN_BRICKS.get())
-            .slab(AlienResinBlocks.ABERRANT_RESIN_BRICK_SLAB.get())
-            .stairs(AlienResinBlocks.ABERRANT_RESIN_BRICK_STAIRS.get())
-            .wall(AlienResinBlocks.ABERRANT_RESIN_BRICK_WALL.get());
-        generators.createTrivialCube(AlienResinBlocks.ABERRANT_RESIN_VENT.get());
+        generators.family(AberrantAlienResinBlocks.ABERRANT_RESIN_BRICKS.get())
+            .slab(AberrantAlienResinBlocks.ABERRANT_RESIN_BRICK_SLAB.get())
+            .stairs(AberrantAlienResinBlocks.ABERRANT_RESIN_BRICK_STAIRS.get())
+            .wall(AberrantAlienResinBlocks.ABERRANT_RESIN_BRICK_WALL.get());
+        generators.createTrivialCube(AberrantAlienResinBlocks.ABERRANT_RESIN_VENT.get());
 
-        generators.family(AlienResinBlocks.IRRADIATED_RESIN_BRICKS.get())
-            .slab(AlienResinBlocks.IRRADIATED_RESIN_BRICK_SLAB.get())
-            .stairs(AlienResinBlocks.IRRADIATED_RESIN_BRICK_STAIRS.get())
-            .wall(AlienResinBlocks.IRRADIATED_RESIN_BRICK_WALL.get());
-        generators.createTrivialCube(AlienResinBlocks.IRRADIATED_RESIN_VENT.get());
+        generators.family(IrradiatedAlienResinBlocks.IRRADIATED_RESIN_BRICKS.get())
+            .slab(IrradiatedAlienResinBlocks.IRRADIATED_RESIN_BRICK_SLAB.get())
+            .stairs(IrradiatedAlienResinBlocks.IRRADIATED_RESIN_BRICK_STAIRS.get())
+            .wall(IrradiatedAlienResinBlocks.IRRADIATED_RESIN_BRICK_WALL.get());
+        generators.createTrivialCube(IrradiatedAlienResinBlocks.IRRADIATED_RESIN_VENT.get());
 
-        generators.family(AlienResinBlocks.NETHER_RESIN_BRICKS.get())
-            .slab(AlienResinBlocks.NETHER_RESIN_BRICK_SLAB.get())
-            .stairs(AlienResinBlocks.NETHER_RESIN_BRICK_STAIRS.get())
-            .wall(AlienResinBlocks.NETHER_RESIN_BRICK_WALL.get());
-        generators.createTrivialCube(AlienResinBlocks.NETHER_RESIN_VENT.get());
+        generators.family(NetherAlienResinBlocks.NETHER_RESIN_BRICKS.get())
+            .slab(NetherAlienResinBlocks.NETHER_RESIN_BRICK_SLAB.get())
+            .stairs(NetherAlienResinBlocks.NETHER_RESIN_BRICK_STAIRS.get())
+            .wall(NetherAlienResinBlocks.NETHER_RESIN_BRICK_WALL.get());
+        generators.createTrivialCube(NetherAlienResinBlocks.NETHER_RESIN_VENT.get());
 
         generators.family(AlienResinBlocks.RESIN_BRICKS.get())
             .slab(AlienResinBlocks.RESIN_BRICK_SLAB.get())
@@ -140,25 +149,25 @@ public class BlockModelProvider extends FabricModelProvider {
             .wall(AlienResinBlocks.RESIN_BRICK_WALL.get());
         generators.createTrivialCube(AlienResinBlocks.RESIN_VENT.get());
 
-        createRotatedPillar(generators, AlienResinBlocks.RIBBED_ABERRANT_RESIN.get(), TexturedModel.CUBE);
-        createRotatedPillar(generators, AlienResinBlocks.RIBBED_IRRADIATED_RESIN.get(), TexturedModel.CUBE);
-        createRotatedPillar(generators, AlienResinBlocks.RIBBED_NETHER_RESIN.get(), TexturedModel.CUBE);
+        createRotatedPillar(generators, AberrantAlienResinBlocks.RIBBED_ABERRANT_RESIN.get(), TexturedModel.CUBE);
+        createRotatedPillar(generators, IrradiatedAlienResinBlocks.RIBBED_IRRADIATED_RESIN.get(), TexturedModel.CUBE);
+        createRotatedPillar(generators, NetherAlienResinBlocks.RIBBED_NETHER_RESIN.get(), TexturedModel.CUBE);
         createRotatedPillar(generators, AlienResinBlocks.RIBBED_RESIN.get(), TexturedModel.CUBE);
 
-        generators.family(AlienResinBlocks.SMOOTH_ABERRANT_RESIN.get())
-            .slab(AlienResinBlocks.SMOOTH_ABERRANT_RESIN_SLAB.get())
-            .stairs(AlienResinBlocks.SMOOTH_ABERRANT_RESIN_STAIRS.get())
-            .wall(AlienResinBlocks.SMOOTH_ABERRANT_RESIN_WALL.get());
+        generators.family(AberrantAlienResinBlocks.SMOOTH_ABERRANT_RESIN.get())
+            .slab(AberrantAlienResinBlocks.SMOOTH_ABERRANT_RESIN_SLAB.get())
+            .stairs(AberrantAlienResinBlocks.SMOOTH_ABERRANT_RESIN_STAIRS.get())
+            .wall(AberrantAlienResinBlocks.SMOOTH_ABERRANT_RESIN_WALL.get());
 
-        generators.family(AlienResinBlocks.SMOOTH_IRRADIATED_RESIN.get())
-            .slab(AlienResinBlocks.SMOOTH_IRRADIATED_RESIN_SLAB.get())
-            .stairs(AlienResinBlocks.SMOOTH_IRRADIATED_RESIN_STAIRS.get())
-            .wall(AlienResinBlocks.SMOOTH_IRRADIATED_RESIN_WALL.get());
+        generators.family(IrradiatedAlienResinBlocks.SMOOTH_IRRADIATED_RESIN.get())
+            .slab(IrradiatedAlienResinBlocks.SMOOTH_IRRADIATED_RESIN_SLAB.get())
+            .stairs(IrradiatedAlienResinBlocks.SMOOTH_IRRADIATED_RESIN_STAIRS.get())
+            .wall(IrradiatedAlienResinBlocks.SMOOTH_IRRADIATED_RESIN_WALL.get());
 
-        generators.family(AlienResinBlocks.SMOOTH_NETHER_RESIN.get())
-            .slab(AlienResinBlocks.SMOOTH_NETHER_RESIN_SLAB.get())
-            .stairs(AlienResinBlocks.SMOOTH_NETHER_RESIN_STAIRS.get())
-            .wall(AlienResinBlocks.SMOOTH_NETHER_RESIN_WALL.get());
+        generators.family(NetherAlienResinBlocks.SMOOTH_NETHER_RESIN.get())
+            .slab(NetherAlienResinBlocks.SMOOTH_NETHER_RESIN_SLAB.get())
+            .stairs(NetherAlienResinBlocks.SMOOTH_NETHER_RESIN_STAIRS.get())
+            .wall(NetherAlienResinBlocks.SMOOTH_NETHER_RESIN_WALL.get());
 
         generators.family(AlienResinBlocks.SMOOTH_RESIN.get())
             .slab(AlienResinBlocks.SMOOTH_RESIN_SLAB.get())

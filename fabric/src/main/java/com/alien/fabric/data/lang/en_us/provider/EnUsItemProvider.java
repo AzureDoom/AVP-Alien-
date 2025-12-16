@@ -140,17 +140,6 @@ public class EnUsItemProvider {
         addItem(builder, AlienSpawnEggItems.ROYAL_ABERRANT_OVOMORPH_SPAWN_EGG, "Royal Aberrant Ovomorph Spawn Egg");
         addItem(builder, AlienSpawnEggItems.ROYAL_ABERRANT_FACEHUGGER_SPAWN_EGG, "Royal Aberrant Facehugger Spawn Egg");
         addItem(builder, AlienSpawnEggItems.ROYAL_ABERRANT_CHESTBURSTER_SPAWN_EGG, "Royal Aberrant Chestburster Spawn Egg");
-
-        // FIXME:
-        // AVPRegistryValidation.throwIfMissingEntries(
-        // Alien.MOD.getAllHolders(BuiltInRegistries.ITEM)
-        // .stream()
-        // .filter(deferredHolder -> !(deferredHolder.get() instanceof BlockItem))
-        // .toList(),
-        // TOUCHED_ENTRIES::contains,
-        // Item::getDescriptionId,
-        // "Item translation did not complete successfully - there are unhandled items that need to be handled."
-        // );
     };
 
     private static void addItem(

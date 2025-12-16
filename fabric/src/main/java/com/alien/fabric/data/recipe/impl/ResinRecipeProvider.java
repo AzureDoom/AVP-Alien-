@@ -1,7 +1,10 @@
 package com.alien.fabric.data.recipe.impl;
 
 import com.alien.common.gameplay.block.resin.vein.ResinVeinBlock;
+import com.alien.common.registry.init.block.AberrantAlienResinBlocks;
 import com.alien.common.registry.init.block.AlienResinBlocks;
+import com.alien.common.registry.init.block.IrradiatedAlienResinBlocks;
+import com.alien.common.registry.init.block.NetherAlienResinBlocks;
 import com.alien.common.registry.init.item.AlienItems;
 import com.blib.fabric.data.recipe.RecipeTemplates;
 import com.blib.fabric.data.recipe.builder.RecipeBuilder;
@@ -16,53 +19,53 @@ public class ResinRecipeProvider {
 
     private static final ResinSet ABERRANT_SET = new ResinSet(
         AlienItems.ABERRANT_RESIN_BALL,
-        AlienResinBlocks.ABERRANT_RESIN,
-        AlienResinBlocks.ABERRANT_RESIN_SLAB,
-        AlienResinBlocks.ABERRANT_RESIN_STAIRS,
-        AlienResinBlocks.ABERRANT_RESIN_BRICKS,
-        AlienResinBlocks.ABERRANT_RESIN_BRICK_SLAB,
-        AlienResinBlocks.ABERRANT_RESIN_BRICK_STAIRS,
-        AlienResinBlocks.ABERRANT_RESIN_BRICK_WALL,
-        AlienResinBlocks.SMOOTH_ABERRANT_RESIN,
-        AlienResinBlocks.SMOOTH_ABERRANT_RESIN_SLAB,
-        AlienResinBlocks.SMOOTH_ABERRANT_RESIN_STAIRS,
-        AlienResinBlocks.SMOOTH_ABERRANT_RESIN_WALL,
-        AlienResinBlocks.ABERRANT_RESIN_VEIN,
-        AlienResinBlocks.ABERRANT_RESIN_WEB
+        AberrantAlienResinBlocks.ABERRANT_RESIN,
+        AberrantAlienResinBlocks.ABERRANT_RESIN_SLAB,
+        AberrantAlienResinBlocks.ABERRANT_RESIN_STAIRS,
+        AberrantAlienResinBlocks.ABERRANT_RESIN_BRICKS,
+        AberrantAlienResinBlocks.ABERRANT_RESIN_BRICK_SLAB,
+        AberrantAlienResinBlocks.ABERRANT_RESIN_BRICK_STAIRS,
+        AberrantAlienResinBlocks.ABERRANT_RESIN_BRICK_WALL,
+        AberrantAlienResinBlocks.SMOOTH_ABERRANT_RESIN,
+        AberrantAlienResinBlocks.SMOOTH_ABERRANT_RESIN_SLAB,
+        AberrantAlienResinBlocks.SMOOTH_ABERRANT_RESIN_STAIRS,
+        AberrantAlienResinBlocks.SMOOTH_ABERRANT_RESIN_WALL,
+        AberrantAlienResinBlocks.ABERRANT_RESIN_VEIN,
+        AberrantAlienResinBlocks.ABERRANT_RESIN_WEB
     );
 
     private static final ResinSet IRRADIATED_SET = new ResinSet(
         AlienItems.IRRADIATED_RESIN_BALL,
-        AlienResinBlocks.IRRADIATED_RESIN,
-        AlienResinBlocks.IRRADIATED_RESIN_SLAB,
-        AlienResinBlocks.IRRADIATED_RESIN_STAIRS,
-        AlienResinBlocks.IRRADIATED_RESIN_BRICKS,
-        AlienResinBlocks.IRRADIATED_RESIN_BRICK_SLAB,
-        AlienResinBlocks.IRRADIATED_RESIN_BRICK_STAIRS,
-        AlienResinBlocks.IRRADIATED_RESIN_BRICK_WALL,
-        AlienResinBlocks.SMOOTH_IRRADIATED_RESIN,
-        AlienResinBlocks.SMOOTH_IRRADIATED_RESIN_SLAB,
-        AlienResinBlocks.SMOOTH_IRRADIATED_RESIN_STAIRS,
-        AlienResinBlocks.SMOOTH_IRRADIATED_RESIN_WALL,
-        AlienResinBlocks.IRRADIATED_RESIN_VEIN,
-        AlienResinBlocks.IRRADIATED_RESIN_WEB
+        IrradiatedAlienResinBlocks.IRRADIATED_RESIN,
+        IrradiatedAlienResinBlocks.IRRADIATED_RESIN_SLAB,
+        IrradiatedAlienResinBlocks.IRRADIATED_RESIN_STAIRS,
+        IrradiatedAlienResinBlocks.IRRADIATED_RESIN_BRICKS,
+        IrradiatedAlienResinBlocks.IRRADIATED_RESIN_BRICK_SLAB,
+        IrradiatedAlienResinBlocks.IRRADIATED_RESIN_BRICK_STAIRS,
+        IrradiatedAlienResinBlocks.IRRADIATED_RESIN_BRICK_WALL,
+        IrradiatedAlienResinBlocks.SMOOTH_IRRADIATED_RESIN,
+        IrradiatedAlienResinBlocks.SMOOTH_IRRADIATED_RESIN_SLAB,
+        IrradiatedAlienResinBlocks.SMOOTH_IRRADIATED_RESIN_STAIRS,
+        IrradiatedAlienResinBlocks.SMOOTH_IRRADIATED_RESIN_WALL,
+        IrradiatedAlienResinBlocks.IRRADIATED_RESIN_VEIN,
+        IrradiatedAlienResinBlocks.IRRADIATED_RESIN_WEB
     );
 
     private static final ResinSet NETHER_SET = new ResinSet(
         AlienItems.NETHER_RESIN_BALL,
-        AlienResinBlocks.NETHER_RESIN,
-        AlienResinBlocks.NETHER_RESIN_SLAB,
-        AlienResinBlocks.NETHER_RESIN_STAIRS,
-        AlienResinBlocks.NETHER_RESIN_BRICKS,
-        AlienResinBlocks.NETHER_RESIN_BRICK_SLAB,
-        AlienResinBlocks.NETHER_RESIN_BRICK_STAIRS,
-        AlienResinBlocks.NETHER_RESIN_BRICK_WALL,
-        AlienResinBlocks.SMOOTH_NETHER_RESIN,
-        AlienResinBlocks.SMOOTH_NETHER_RESIN_SLAB,
-        AlienResinBlocks.SMOOTH_NETHER_RESIN_STAIRS,
-        AlienResinBlocks.SMOOTH_NETHER_RESIN_WALL,
-        AlienResinBlocks.NETHER_RESIN_VEIN,
-        AlienResinBlocks.NETHER_RESIN_WEB
+        NetherAlienResinBlocks.NETHER_RESIN,
+        NetherAlienResinBlocks.NETHER_RESIN_SLAB,
+        NetherAlienResinBlocks.NETHER_RESIN_STAIRS,
+        NetherAlienResinBlocks.NETHER_RESIN_BRICKS,
+        NetherAlienResinBlocks.NETHER_RESIN_BRICK_SLAB,
+        NetherAlienResinBlocks.NETHER_RESIN_BRICK_STAIRS,
+        NetherAlienResinBlocks.NETHER_RESIN_BRICK_WALL,
+        NetherAlienResinBlocks.SMOOTH_NETHER_RESIN,
+        NetherAlienResinBlocks.SMOOTH_NETHER_RESIN_SLAB,
+        NetherAlienResinBlocks.SMOOTH_NETHER_RESIN_STAIRS,
+        NetherAlienResinBlocks.SMOOTH_NETHER_RESIN_WALL,
+        NetherAlienResinBlocks.NETHER_RESIN_VEIN,
+        NetherAlienResinBlocks.NETHER_RESIN_WEB
     );
 
     private static final ResinSet NORMAL_SET = new ResinSet(

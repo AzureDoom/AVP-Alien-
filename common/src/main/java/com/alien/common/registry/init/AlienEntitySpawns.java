@@ -9,6 +9,7 @@ import com.blib.common.gameplay.model.spawning.BLibEntitySpawnData;
 import com.blib.common.gameplay.model.spawning.SpawnSettings;
 import com.blib.common.registry.BLibHolder;
 import com.blib.common.registry.impl.BLibEntitySpawnRegistry;
+import com.human.common.registry.tag.HumanBiomeTags;
 import net.minecraft.world.entity.EntityType;
 
 public class AlienEntitySpawns {
@@ -16,10 +17,10 @@ public class AlienEntitySpawns {
     private static final BLibEntitySpawnRegistry REGISTRY = com.alien.Alien.MOD.registries().createEntitySpawnRegistry();;
 
     public static void initialize() {
-        registerAberrantAlienSpawns();
-        registerIrradiatedAlienSpawns();
         registerNetherAlienSpawns();
         registerNormalAlienSpawns();
+        registerAberrantAlienSpawns();
+        registerIrradiatedAlienSpawns();
     }
 
     private static void registerNormalAlienSpawns() {
@@ -67,8 +68,7 @@ public class AlienEntitySpawns {
         register(AlienEntityTypes.IRRADIATED_RUNNER, AlienConfig.INSTANCE.spawnConfigs.IRRADIATED_RUNNER_SPAWN);
         REGISTRY.register(
             BLibEntitySpawnData.builder(AlienEntityTypes.IRRADIATED_QUEEN)
-                // FIXME:
-                // .withBiomeTagKey(AVPBiomeTags.IS_IRRADIATED)
+                .withBiomeTagKey(HumanBiomeTags.IS_IRRADIATED)
                 .withSpawnPredicate(QueenSpawning.PREDICATE)
                 .withSpawnSettings(convert(AlienConfig.INSTANCE.spawnConfigs.IRRADIATED_QUEEN_SPAWN))
                 .build()

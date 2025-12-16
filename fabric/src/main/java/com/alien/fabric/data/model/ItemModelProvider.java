@@ -1,6 +1,7 @@
 package com.alien.fabric.data.model;
 
 import com.alien.common.registry.init.block.AlienResinBlocks;
+import com.alien.common.registry.init.block.NetherAlienResinBlocks;
 import com.alien.common.registry.init.item.AlienArmorItems;
 import com.alien.common.registry.init.item.AlienItems;
 import com.alien.common.registry.init.item.AlienSpawnEggItems;
@@ -23,7 +24,7 @@ public class ItemModelProvider extends FabricModelProvider {
 
     @Override
     public void generateBlockStateModels(BlockModelGenerators generators) {
-        generators.createSimpleFlatItemModel(AlienResinBlocks.NETHER_RESIN_WEB.get());
+        generators.createSimpleFlatItemModel(NetherAlienResinBlocks.NETHER_RESIN_WEB.get());
         generators.createSimpleFlatItemModel(AlienResinBlocks.RESIN_WEB.get());
     }
 

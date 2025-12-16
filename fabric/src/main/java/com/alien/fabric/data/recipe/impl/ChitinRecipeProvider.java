@@ -1,6 +1,8 @@
 package com.alien.fabric.data.recipe.impl;
 
+import com.alien.common.registry.init.block.AberrantAlienChitinBlocks;
 import com.alien.common.registry.init.block.AlienChitinBlocks;
+import com.alien.common.registry.init.block.NetherAlienChitinBlocks;
 import com.alien.common.registry.init.item.AlienItems;
 import com.blib.fabric.data.recipe.builder.RecipeBuilder;
 import com.blib.fabric.data.recipe.util.RecipeUtil;
@@ -14,39 +16,39 @@ public class ChitinRecipeProvider {
     private static final ChitinSet ABERRANT_SET = new ChitinSet(
         AlienItems.ABERRANT_CHITIN,
         AlienItems.PLATED_ABERRANT_CHITIN,
-        AlienChitinBlocks.ABERRANT_CHITIN_BLOCK,
-        AlienChitinBlocks.ABERRANT_CHITIN_BLOCK_SLAB,
-        AlienChitinBlocks.ABERRANT_CHITIN_BLOCK_STAIRS,
-        AlienChitinBlocks.ABERRANT_CHITIN_BLOCK_WALL,
-        AlienChitinBlocks.ABERRANT_CHITIN_BRICKS,
-        AlienChitinBlocks.ABERRANT_CHITIN_BRICK_SLAB,
-        AlienChitinBlocks.ABERRANT_CHITIN_BRICK_STAIRS,
-        AlienChitinBlocks.ABERRANT_CHITIN_BRICK_WALL,
-        AlienChitinBlocks.CHISELED_ABERRANT_CHITIN_BRICKS,
-        AlienChitinBlocks.CHISELED_ABERRANT_CHITIN_BRICKS_EMBRYO,
-        AlienChitinBlocks.POLISHED_ABERRANT_CHITIN,
-        AlienChitinBlocks.POLISHED_ABERRANT_CHITIN_SLAB,
-        AlienChitinBlocks.POLISHED_ABERRANT_CHITIN_STAIRS,
-        AlienChitinBlocks.POLISHED_ABERRANT_CHITIN_WALL
+        AberrantAlienChitinBlocks.ABERRANT_CHITIN_BLOCK,
+        AberrantAlienChitinBlocks.ABERRANT_CHITIN_BLOCK_SLAB,
+        AberrantAlienChitinBlocks.ABERRANT_CHITIN_BLOCK_STAIRS,
+        AberrantAlienChitinBlocks.ABERRANT_CHITIN_BLOCK_WALL,
+        AberrantAlienChitinBlocks.ABERRANT_CHITIN_BRICKS,
+        AberrantAlienChitinBlocks.ABERRANT_CHITIN_BRICK_SLAB,
+        AberrantAlienChitinBlocks.ABERRANT_CHITIN_BRICK_STAIRS,
+        AberrantAlienChitinBlocks.ABERRANT_CHITIN_BRICK_WALL,
+        AberrantAlienChitinBlocks.CHISELED_ABERRANT_CHITIN_BRICKS,
+        AberrantAlienChitinBlocks.CHISELED_ABERRANT_CHITIN_BRICKS_EMBRYO,
+        AberrantAlienChitinBlocks.POLISHED_ABERRANT_CHITIN,
+        AberrantAlienChitinBlocks.POLISHED_ABERRANT_CHITIN_SLAB,
+        AberrantAlienChitinBlocks.POLISHED_ABERRANT_CHITIN_STAIRS,
+        AberrantAlienChitinBlocks.POLISHED_ABERRANT_CHITIN_WALL
     );
 
     private static final ChitinSet NETHER_SET = new ChitinSet(
         AlienItems.NETHER_CHITIN,
         AlienItems.PLATED_NETHER_CHITIN,
-        AlienChitinBlocks.NETHER_CHITIN_BLOCK,
-        AlienChitinBlocks.NETHER_CHITIN_BLOCK_SLAB,
-        AlienChitinBlocks.NETHER_CHITIN_BLOCK_STAIRS,
-        AlienChitinBlocks.NETHER_CHITIN_BLOCK_WALL,
-        AlienChitinBlocks.NETHER_CHITIN_BRICKS,
-        AlienChitinBlocks.NETHER_CHITIN_BRICK_SLAB,
-        AlienChitinBlocks.NETHER_CHITIN_BRICK_STAIRS,
-        AlienChitinBlocks.NETHER_CHITIN_BRICK_WALL,
-        AlienChitinBlocks.CHISELED_NETHER_CHITIN_BRICKS,
-        AlienChitinBlocks.CHISELED_NETHER_CHITIN_BRICKS_EMBRYO,
-        AlienChitinBlocks.POLISHED_NETHER_CHITIN,
-        AlienChitinBlocks.POLISHED_NETHER_CHITIN_SLAB,
-        AlienChitinBlocks.POLISHED_NETHER_CHITIN_STAIRS,
-        AlienChitinBlocks.POLISHED_NETHER_CHITIN_WALL
+        NetherAlienChitinBlocks.NETHER_CHITIN_BLOCK,
+        NetherAlienChitinBlocks.NETHER_CHITIN_BLOCK_SLAB,
+        NetherAlienChitinBlocks.NETHER_CHITIN_BLOCK_STAIRS,
+        NetherAlienChitinBlocks.NETHER_CHITIN_BLOCK_WALL,
+        NetherAlienChitinBlocks.NETHER_CHITIN_BRICKS,
+        NetherAlienChitinBlocks.NETHER_CHITIN_BRICK_SLAB,
+        NetherAlienChitinBlocks.NETHER_CHITIN_BRICK_STAIRS,
+        NetherAlienChitinBlocks.NETHER_CHITIN_BRICK_WALL,
+        NetherAlienChitinBlocks.CHISELED_NETHER_CHITIN_BRICKS,
+        NetherAlienChitinBlocks.CHISELED_NETHER_CHITIN_BRICKS_EMBRYO,
+        NetherAlienChitinBlocks.POLISHED_NETHER_CHITIN,
+        NetherAlienChitinBlocks.POLISHED_NETHER_CHITIN_SLAB,
+        NetherAlienChitinBlocks.POLISHED_NETHER_CHITIN_STAIRS,
+        NetherAlienChitinBlocks.POLISHED_NETHER_CHITIN_WALL
     );
 
     private static final ChitinSet NORMAL_SET = new ChitinSet(

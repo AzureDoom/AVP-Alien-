@@ -17,62 +17,6 @@ public class AlienChitinBlocks {
 
     private static final BLibRegistry<Block> REGISTRY = Alien.MOD.registries().create(BuiltInRegistries.BLOCK);
 
-    public static final BLibHolder<Block> ABERRANT_CHITIN_BLOCK = create(
-        "aberrant_chitin_block",
-        AlienBlockProperties.ABERRANT_CHITIN
-    );
-
-    public static final BLibHolder<Block> ABERRANT_CHITIN_BLOCK_SLAB = create(
-        "aberrant_chitin_block_slab",
-        () -> new SlabBlock(AlienBlockProperties.ABERRANT_CHITIN.build())
-    );
-
-    public static final BLibHolder<Block> ABERRANT_CHITIN_BLOCK_STAIRS = create(
-        "aberrant_chitin_block_stairs",
-        () -> new StairBlock(
-            ABERRANT_CHITIN_BLOCK.get().defaultBlockState(),
-            AlienBlockProperties.ABERRANT_CHITIN.build()
-        )
-    );
-
-    public static final BLibHolder<Block> ABERRANT_CHITIN_BLOCK_WALL = create(
-        "aberrant_chitin_block_wall",
-        () -> new WallBlock(AlienBlockProperties.ABERRANT_CHITIN.build())
-    );
-
-    public static final BLibHolder<Block> ABERRANT_CHITIN_BRICKS = create(
-        "aberrant_chitin_bricks",
-        AlienBlockProperties.ABERRANT_CHITIN
-    );
-
-    public static final BLibHolder<Block> ABERRANT_CHITIN_BRICK_SLAB = create(
-        "aberrant_chitin_brick_slab",
-        () -> new SlabBlock(AlienBlockProperties.ABERRANT_CHITIN.build())
-    );
-
-    public static final BLibHolder<Block> ABERRANT_CHITIN_BRICK_STAIRS = create(
-        "aberrant_chitin_brick_stairs",
-        () -> new StairBlock(
-            ABERRANT_CHITIN_BRICKS.get().defaultBlockState(),
-            AlienBlockProperties.ABERRANT_CHITIN.build()
-        )
-    );
-
-    public static final BLibHolder<Block> ABERRANT_CHITIN_BRICK_WALL = create(
-        "aberrant_chitin_brick_wall",
-        () -> new WallBlock(AlienBlockProperties.ABERRANT_CHITIN.build())
-    );
-
-    public static final BLibHolder<Block> CHISELED_ABERRANT_CHITIN_BRICKS = create(
-        "chiseled_aberrant_chitin_bricks",
-        AlienBlockProperties.ABERRANT_CHITIN
-    );
-
-    public static final BLibHolder<Block> CHISELED_ABERRANT_CHITIN_BRICKS_EMBRYO = create(
-        "chiseled_aberrant_chitin_bricks_embryo",
-        AlienBlockProperties.ABERRANT_CHITIN
-    );
-
     public static final BLibHolder<Block> CHISELED_CHITIN_BRICKS = create(
         "chiseled_chitin_bricks",
         AlienBlockProperties.CHITIN
@@ -81,16 +25,6 @@ public class AlienChitinBlocks {
     public static final BLibHolder<Block> CHISELED_CHITIN_BRICKS_EMBRYO = create(
         "chiseled_chitin_bricks_embryo",
         AlienBlockProperties.CHITIN
-    );
-
-    public static final BLibHolder<Block> CHISELED_NETHER_CHITIN_BRICKS = create(
-        "chiseled_nether_chitin_bricks",
-        AlienBlockProperties.NETHER_CHITIN
-    );
-
-    public static final BLibHolder<Block> CHISELED_NETHER_CHITIN_BRICKS_EMBRYO = create(
-        "chiseled_nether_chitin_bricks_embryo",
-        AlienBlockProperties.NETHER_CHITIN
     );
 
     public static final BLibHolder<Block> CHITIN_BLOCK = create(
@@ -139,75 +73,6 @@ public class AlienChitinBlocks {
         () -> new WallBlock(AlienBlockProperties.CHITIN.build())
     );
 
-    public static final BLibHolder<Block> NETHER_CHITIN_BLOCK = create(
-        "nether_chitin_block",
-        AlienBlockProperties.NETHER_CHITIN
-    );
-
-    public static final BLibHolder<Block> NETHER_CHITIN_BLOCK_SLAB = create(
-        "nether_chitin_block_slab",
-        () -> new SlabBlock(AlienBlockProperties.NETHER_CHITIN.build())
-    );
-
-    public static final BLibHolder<Block> NETHER_CHITIN_BLOCK_STAIRS = create(
-        "nether_chitin_block_stairs",
-        () -> new StairBlock(
-            NETHER_CHITIN_BLOCK.get().defaultBlockState(),
-            AlienBlockProperties.NETHER_CHITIN.build()
-        )
-    );
-
-    public static final BLibHolder<Block> NETHER_CHITIN_BLOCK_WALL = create(
-        "nether_chitin_block_wall",
-        () -> new WallBlock(AlienBlockProperties.NETHER_CHITIN.build())
-    );
-
-    public static final BLibHolder<Block> NETHER_CHITIN_BRICKS = create(
-        "nether_chitin_bricks",
-        AlienBlockProperties.NETHER_CHITIN
-    );
-
-    public static final BLibHolder<Block> NETHER_CHITIN_BRICK_SLAB = create(
-        "nether_chitin_brick_slab",
-        () -> new SlabBlock(AlienBlockProperties.NETHER_CHITIN.build())
-    );
-
-    public static final BLibHolder<Block> NETHER_CHITIN_BRICK_STAIRS = create(
-        "nether_chitin_brick_stairs",
-        () -> new StairBlock(
-            NETHER_CHITIN_BRICKS.get().defaultBlockState(),
-            AlienBlockProperties.NETHER_CHITIN.build()
-        )
-    );
-
-    public static final BLibHolder<Block> NETHER_CHITIN_BRICK_WALL = create(
-        "nether_chitin_brick_wall",
-        () -> new WallBlock(AlienBlockProperties.NETHER_CHITIN.build())
-    );
-
-    public static final BLibHolder<Block> POLISHED_ABERRANT_CHITIN = create(
-        "polished_aberrant_chitin",
-        AlienBlockProperties.ABERRANT_CHITIN
-    );
-
-    public static final BLibHolder<Block> POLISHED_ABERRANT_CHITIN_SLAB = create(
-        "polished_aberrant_chitin_slab",
-        () -> new SlabBlock(AlienBlockProperties.ABERRANT_CHITIN.build())
-    );
-
-    public static final BLibHolder<Block> POLISHED_ABERRANT_CHITIN_STAIRS = create(
-        "polished_aberrant_chitin_stairs",
-        () -> new StairBlock(
-            POLISHED_ABERRANT_CHITIN.get().defaultBlockState(),
-            AlienBlockProperties.ABERRANT_CHITIN.build()
-        )
-    );
-
-    public static final BLibHolder<Block> POLISHED_ABERRANT_CHITIN_WALL = create(
-        "polished_aberrant_chitin_wall",
-        () -> new WallBlock(AlienBlockProperties.ABERRANT_CHITIN.build())
-    );
-
     public static final BLibHolder<Block> POLISHED_CHITIN = create(
         "polished_chitin",
         AlienBlockProperties.CHITIN
@@ -229,29 +94,6 @@ public class AlienChitinBlocks {
     public static final BLibHolder<Block> POLISHED_CHITIN_WALL = create(
         "polished_chitin_wall",
         () -> new WallBlock(AlienBlockProperties.CHITIN.build())
-    );
-
-    public static final BLibHolder<Block> POLISHED_NETHER_CHITIN = create(
-        "polished_nether_chitin",
-        AlienBlockProperties.NETHER_CHITIN
-    );
-
-    public static final BLibHolder<Block> POLISHED_NETHER_CHITIN_SLAB = create(
-        "polished_nether_chitin_slab",
-        () -> new SlabBlock(AlienBlockProperties.NETHER_CHITIN.build())
-    );
-
-    public static final BLibHolder<Block> POLISHED_NETHER_CHITIN_STAIRS = create(
-        "polished_nether_chitin_stairs",
-        () -> new StairBlock(
-            POLISHED_NETHER_CHITIN.get().defaultBlockState(),
-            AlienBlockProperties.NETHER_CHITIN.build()
-        )
-    );
-
-    public static final BLibHolder<Block> POLISHED_NETHER_CHITIN_WALL = create(
-        "polished_nether_chitin_wall",
-        () -> new WallBlock(AlienBlockProperties.NETHER_CHITIN.build())
     );
 
     private static BLibHolder<Block> create(String path, BlockPropertyBuilder blockPropertyBuilder) {
