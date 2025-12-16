@@ -4,6 +4,10 @@ import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.model.alien.Host;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.key.AlienDamageTypeKeys;
+import com.alien.compatibility.avp_human.AVPHuman;
+import com.alien.compatibility.avp_human.GeneContainerProxy;
+import com.human.common.model.GeneCarrier;
+import com.human.common.util.EmbryoUtil;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -104,14 +108,22 @@ public class AlienEmbryoUtil {
     }
 
     public static List<Entity> birthEmbryos(LivingEntity parentEntity) {
-        // FIXME:
-        return List.of();
-        // return EmbryoUtil.birthEmbryos(
-        // parentEntity,
-        // ((Host) parentEntity).getOrCreateParasiteGeneContainer(),
-        // AlienEmbryoUtil::alienEmbryoFactory,
-        // 1
-        // );
+        if (AVPHuman.MOD.isLoaded()) {
+            if (((Host) parentEntity).getOrCreateParasiteGeneContainer() instanceof GeneContainerProxy.Wrapper(var geneContainer)) {
+                return EmbryoUtil.birthEmbryos(
+                    parentEntity,
+                    geneContainer,
+                    AlienEmbryoUtil::alienEmbryoFactory,
+                    1
+                );
+            }
+        }
+
+        var alienEmbryo = AlienEmbryoUtil.alienEmbryoFactory(parentEntity);
+
+        return alienEmbryo == null
+            ? List.of()
+            : List.of(alienEmbryo);
     }
 
     public static @Nullable Entity alienEmbryoFactory(@NotNull LivingEntity hostEntity) {
@@ -134,13 +146,17 @@ public class AlienEmbryoUtil {
         }
 
         if (embryo instanceof Alien alien) {
-            // FIXME:
-            // EmbryoUtil.applyGenesToEmbryo(
-            // hostEntity.getType(),
-            // host.getOrCreateParasiteGeneContainer(),
-            // (GeneCarrier) alien,
-            // true
-            // );
+            if (AVPHuman.MOD.isLoaded()) {
+                if (host.getOrCreateParasiteGeneContainer() instanceof GeneContainerProxy.Wrapper(var geneContainer)) {
+                    EmbryoUtil.applyGenesToEmbryo(
+                        hostEntity.getType(),
+                        geneContainer,
+                        (GeneCarrier) alien,
+                        true
+                    );
+                }
+            }
+
             alien.setHostType(hostEntity.getType());
         }
 

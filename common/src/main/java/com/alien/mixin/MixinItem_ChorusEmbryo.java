@@ -49,11 +49,7 @@ public class MixinItem_ChorusEmbryo {
                 // Attempt teleportation. We don't need a result from this since it wouldn't be useful anyway.
                 tryTeleportingEntity(livingEmbryo);
 
-                // FIXME:
-                // ((GeneCarrier) livingEmbryo).getOrCreateGeneManager()
-                // .getGeneContainer()
-                // .getActiveGeneMap()
-                // .add(Genes.WARP, GeneOperationType.ADDITIVE, 0.1);
+                MixinItem_ChorusEmbryo$Compatibility.addWarpGene(livingEmbryo);
             }
         });
 

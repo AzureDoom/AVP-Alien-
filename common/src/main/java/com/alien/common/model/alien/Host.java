@@ -1,6 +1,7 @@
 package com.alien.common.model.alien;
 
 import com.alien.common.gameplay.entity.living.alien.parasite.Parasite;
+import com.alien.compatibility.avp_human.GeneContainerProxy;
 import com.just.core.functional.option.Option;
 import net.minecraft.world.entity.EntityType;
 import org.jetbrains.annotations.Nullable;
@@ -13,8 +14,7 @@ public interface Host {
 
     void implantEmbryo(Parasite parasite);
 
-    // FIXME:
-    // GeneContainer getOrCreateParasiteGeneContainer();
+    GeneContainerProxy getOrCreateParasiteGeneContainer();
 
     int getEmbryoGrowthTimeInTicks();
 
@@ -27,7 +27,6 @@ public interface Host {
     default void removeEmbryo() {
         setEmbryoType(null);
         setEmbryoGrowthTimeInTicks(0);
-        // FIXME:
-        // getOrCreateParasiteGeneContainer().clear();
+        getOrCreateParasiteGeneContainer().clear();
     }
 }

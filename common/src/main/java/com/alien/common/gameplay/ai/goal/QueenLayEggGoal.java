@@ -6,6 +6,10 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
+import com.alien.compatibility.avp_human.AVPHuman;
+import com.alien.compatibility.avp_human.GeneManagerProxy;
+import com.human.common.model.GeneCarrier;
+import com.human.common.util.GeneIntegrityUtil;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.phys.AABB;
@@ -82,34 +86,37 @@ public class QueenLayEggGoal extends Goal {
         ovomorph.setPos(queen.getOvipositorManager().getEggLayingPosition());
         ovomorph.setPersistenceRequired();
         ovomorph.isRooted.set(false);
-        // Transfer genes.
-        // FIXME:
-        // queen.getGeneManager()
-        // .getGeneContainer()
-        // .transfer(ovomorph.getGeneManager().getGeneContainer(), false);
+
+        switch (queen.getGeneManager()) {
+            case GeneManagerProxy.EMPTY ignored -> {/* NO-OP */}
+            // Transfer genes.
+            case GeneManagerProxy.Wrapper wrapper -> wrapper.transfer(ovomorph.getGeneManager(), false);
+        }
 
         level.playSound(null, queen, AlienSoundEvents.ENTITY_OVOMORPH_LAID.get(), SoundSource.HOSTILE, 1.0F, 1.0F);
         level.addFreshEntity(ovomorph);
     }
 
     private boolean shouldBeAberrant() {
-        return false;
-        // FIXME:
-        // var geneCarrier = (GeneCarrier) queen;
-        // var geneDecayLevel = GeneIntegrityUtil.getGeneDecayLevel(geneCarrier);
-        //
-        // return switch (geneDecayLevel) {
-        // case FATAL, VOLATILE -> true;
-        // case STABLE -> false;
-        // case UNSTABLE -> {
-        // // Ex. -1.75 -> 1.75
-        // var totalGeneIntegrity = Math.abs(GeneIntegrityUtil.getTotalGeneticIntegrity(geneCarrier));
-        // // Ex. 1.75 - 1 = 0.75
-        // var chance = totalGeneIntegrity - Math.floor(totalGeneIntegrity);
-        // // Ex. 0.75 means 75% chance to be aberrant.
-        // yield queen.getRandom().nextDouble() < chance;
-        // }
-        // };
+        if (!AVPHuman.MOD.isLoaded()) {
+            return false;
+        }
+
+        var geneCarrier = (GeneCarrier) queen;
+        var geneDecayLevel = GeneIntegrityUtil.getGeneDecayLevel(geneCarrier);
+
+        return switch (geneDecayLevel) {
+            case FATAL, VOLATILE -> true;
+            case STABLE -> false;
+            case UNSTABLE -> {
+                // Ex. -1.75 -> 1.75
+                var totalGeneIntegrity = Math.abs(GeneIntegrityUtil.getTotalGeneticIntegrity(geneCarrier));
+                // Ex. 1.75 - 1 = 0.75
+                var chance = totalGeneIntegrity - Math.floor(totalGeneIntegrity);
+                // Ex. 0.75 means 75% chance to be aberrant.
+                yield queen.getRandom().nextDouble() < chance;
+            }
+        };
     }
 
     private boolean noEggsNearby() {

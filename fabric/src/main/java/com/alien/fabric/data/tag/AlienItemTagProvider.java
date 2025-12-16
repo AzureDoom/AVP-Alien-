@@ -3,9 +3,11 @@ package com.alien.fabric.data.tag;
 import com.alien.Alien;
 import com.alien.common.registry.init.item.AlienArmorItems;
 import com.alien.common.registry.init.item.AlienItems;
+import com.alien.common.registry.init.item.block.IrradiatedAlienResinBlockItems;
 import com.alien.common.registry.tag.AlienItemTags;
 import com.blib.common.data.tag.BLibItemTags;
 import com.compatibility.CommonItemTags;
+import com.human.common.registry.tag.HumanItemTags;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.core.HolderLookup;
@@ -64,20 +66,18 @@ public class AlienItemTagProvider extends FabricTagProvider.ItemTagProvider {
                 AlienItems.VECTOR_POTTERY_SHERD.get()
             );
 
-        // FIXME:
-        // getOrCreateTagBuilder(AVPItemTags.RADIOACTIVE_ITEMS)
-        // .add(
-        // AlienItems.IRRADIATED_CHITIN.get(),
-        // AlienItems.PLATED_IRRADIATED_CHITIN.get(),
-        // AlienItems.IRRADIATED_RESIN_BALL.get(),
-        // AlienResinBlockItems.IRRADIATED_RESIN.get(),
-        // AlienResinBlockItems.IRRADIATED_RESIN_NODE.get(),
-        // AlienResinBlockItems.IRRADIATED_RESIN_VEIN.get(),
-        // AlienResinBlockItems.IRRADIATED_RESIN_WEB.get()
-        // );
-        // FIXME:
-        // getOrCreateTagBuilder(AVPItemTags.URANIUM_NUGGET_LIKE)
-        // .add(AlienItems.IRRADIATED_CHITIN.get());
+        getOrCreateTagBuilder(HumanItemTags.RADIOACTIVE_ITEMS)
+            .add(
+                AlienItems.IRRADIATED_CHITIN.get(),
+                AlienItems.PLATED_IRRADIATED_CHITIN.get(),
+                AlienItems.IRRADIATED_RESIN_BALL.get(),
+                IrradiatedAlienResinBlockItems.IRRADIATED_RESIN.get(),
+                IrradiatedAlienResinBlockItems.IRRADIATED_RESIN_NODE.get(),
+                IrradiatedAlienResinBlockItems.IRRADIATED_RESIN_VEIN.get(),
+                IrradiatedAlienResinBlockItems.IRRADIATED_RESIN_WEB.get()
+            );
+        getOrCreateTagBuilder(HumanItemTags.URANIUM_NUGGET_LIKE)
+            .add(AlienItems.IRRADIATED_CHITIN.get());
     }
 
     private void addAutomatedTagItems() {

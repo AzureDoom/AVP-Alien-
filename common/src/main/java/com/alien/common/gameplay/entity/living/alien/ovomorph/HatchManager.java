@@ -5,6 +5,7 @@ import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.Facehug
 import com.alien.common.model.alien.HatchState;
 import com.alien.common.registry.init.AlienDataKeys;
 import com.alien.common.registry.init.AlienSoundEvents;
+import com.alien.compatibility.avp_human.GeneManagerProxy;
 import com.blib.common.network.data.DataAccessor;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -132,10 +133,10 @@ public class HatchManager {
             return;
         }
 
-        // FIXME:
-        // ovomorph.getGeneManager()
-        // .getGeneContainer()
-        // .transfer(facehugger.getGeneManager().getGeneContainer(), false);
+        switch (ovomorph.getGeneManager()) {
+            case GeneManagerProxy.EMPTY ignored -> {/* NO-OP */}
+            case GeneManagerProxy.Wrapper wrapper -> wrapper.transfer(facehugger.getGeneManager(), false);
+        }
 
         var ovomorphAbovePos = ovomorph.blockPosition().above();
         var ovomorphSuffocatingAboveCheck = ovomorph.level()

@@ -2,8 +2,10 @@ package com.alien.fabric.data.tag;
 
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
-import com.alien.compat.gigeresque.common.registry.tag.GigeresqueEntityTypeTags;
+import com.alien.compatibility.gigeresque.common.registry.tag.GigeresqueEntityTypeTags;
 import com.alien.fabric.data.compatibility.stellaris.StellarisConstants;
+import com.human.common.registry.init.HumanEntityTypes;
+import com.human.common.registry.tag.HumanEntityTypeTags;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.core.HolderLookup;
@@ -165,10 +167,8 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
 
     private void addHatedByXenomorphs() {
         getOrCreateTagBuilder(AlienEntityTypeTags.HATED_BY_XENOMORPHS)
-            .add(EntityType.PLAYER);
-        // TODO: Add a "humans" tag here that includes the marine.
-        // FIXME:
-        // .add(HumanEntityTypes.MARINE.get());
+            .add(EntityType.PLAYER)
+            .add(HumanEntityTypes.MARINE.get());
     }
 
     private void addHiveAliens() {
@@ -213,9 +213,8 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
                 EntityType.TRADER_LLAMA,
                 EntityType.VILLAGER,
                 EntityType.WANDERING_TRADER,
-                EntityType.WITCH
-                // FIXME:
-                // HumanEntityTypes.MARINE.get()
+                EntityType.WITCH,
+                HumanEntityTypes.MARINE.get()
             );
     }
 
@@ -361,9 +360,8 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
     }
 
     private void addRadiationResistant() {
-        // FIXME:
-        // getOrCreateTagBuilder(AVPEntityTypeTags.RADIATION_RESISTANT)
-        // .addTag(AlienEntityTypeTags.XENOMORPHS);
+        getOrCreateTagBuilder(HumanEntityTypeTags.RADIATION_RESISTANT)
+            .addTag(AlienEntityTypeTags.XENOMORPHS);
     }
 
     private void addRoyalAliens() {

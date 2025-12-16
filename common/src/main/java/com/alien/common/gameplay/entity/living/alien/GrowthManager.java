@@ -4,8 +4,14 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.boiler.Boiler;
 import com.alien.common.model.lifecycle.growth.GrowthStage;
 import com.alien.common.registry.GrowthStageRegistry;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
+import com.alien.compatibility.avp_human.AVPHuman;
+import com.alien.compatibility.avp_human.GeneManagerProxy;
 import com.blib.common.gameplay.model.NBTSerializable;
 import com.blib.common.util.EntityTransitionUtil;
+import com.human.common.gameplay.gene.GeneOperationType;
+import com.human.common.gameplay.gene.Genes;
+import com.human.common.model.GeneCarrier;
+import com.human.common.util.GeneIntegrityUtil;
 import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
@@ -199,37 +205,42 @@ public class GrowthManager implements NBTSerializable {
     }
 
     private boolean shouldBecomeBoilerFromAcidVolatility() {
-        return false;
-        // FIXME:
-        // var geneContainer = entity.getGeneManager().getGeneContainer();
-        // var additiveAcidVolatility = geneContainer.getActiveGeneMap()
-        // .getValue(Genes.ACID_VOLATILITY, GeneOperationType.ADDITIVE);
-        // var multiplicativeAcidVolatility = geneContainer.getActiveGeneMap()
-        // .getValue(Genes.ACID_VOLATILITY, GeneOperationType.MULTIPLICATIVE);
-        //
-        // var totalAcidVolatility = additiveAcidVolatility + multiplicativeAcidVolatility;
-        //
-        // return entity.getRandom().nextDouble() < totalAcidVolatility;
+        return switch (entity.getGeneManager()) {
+            case GeneManagerProxy.EMPTY ignored -> false;
+            case GeneManagerProxy.Wrapper wrapper -> {
+                var geneContainer = wrapper.geneManager().getGeneContainer();
+                var additiveAcidVolatility = geneContainer.getActiveGeneMap()
+                    .getValue(Genes.ACID_VOLATILITY, GeneOperationType.ADDITIVE);
+                var multiplicativeAcidVolatility = geneContainer.getActiveGeneMap()
+                    .getValue(Genes.ACID_VOLATILITY, GeneOperationType.MULTIPLICATIVE);
+
+                var totalAcidVolatility = additiveAcidVolatility + multiplicativeAcidVolatility;
+
+                yield entity.getRandom().nextDouble() < totalAcidVolatility;
+            }
+        };
     }
 
     private boolean shouldBecomeBoilerFromGeneDecay() {
-        return false;
-        // FIXME:
-        // var geneCarrier = (GeneCarrier) entity;
-        // var geneDecayLevel = GeneIntegrityUtil.getGeneDecayLevel(geneCarrier);
-        //
-        // return switch (geneDecayLevel) {
-        // case FATAL -> true;
-        // case STABLE, UNSTABLE -> false;
-        // case VOLATILE -> {
-        // // Ex. -2.75 -> 2.75
-        // var totalGeneIntegrity = Math.abs(GeneIntegrityUtil.getTotalGeneticIntegrity(geneCarrier));
-        // // Ex. 2.75 - 2 = 0.75
-        // var chance = totalGeneIntegrity - Math.floor(totalGeneIntegrity);
-        // // Ex. 0.75 means 75% chance to be a boiler.
-        // yield entity.getRandom().nextDouble() < chance;
-        // }
-        // };
+        if (!AVPHuman.MOD.isLoaded()) {
+            return false;
+        }
+
+        var geneCarrier = (GeneCarrier) entity;
+        var geneDecayLevel = GeneIntegrityUtil.getGeneDecayLevel(geneCarrier);
+
+        return switch (geneDecayLevel) {
+            case FATAL -> true;
+            case STABLE, UNSTABLE -> false;
+            case VOLATILE -> {
+                // Ex. -2.75 -> 2.75
+                var totalGeneIntegrity = Math.abs(GeneIntegrityUtil.getTotalGeneticIntegrity(geneCarrier));
+                // Ex. 2.75 - 2 = 0.75
+                var chance = totalGeneIntegrity - Math.floor(totalGeneIntegrity);
+                // Ex. 0.75 means 75% chance to be a boiler.
+                yield entity.getRandom().nextDouble() < chance;
+            }
+        };
     }
 
     @Override
