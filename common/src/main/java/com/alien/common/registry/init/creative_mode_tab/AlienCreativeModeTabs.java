@@ -48,7 +48,7 @@ public class AlienCreativeModeTabs {
 
     public static final BLibHolder<CreativeModeTab> SPAWN_EGGS = create(
         AlienCreativeModeTabKeys.SPAWN_EGGS_KEY,
-        () -> new ItemStack(AlienSpawnEggItems.DRONE_SPAWN_EGG.get()),
+        () -> new ItemStack(AlienSpawnEggItems.QUEEN_SPAWN_EGG.get()),
         SpawnEggsCreativeModeTabInitializer.OUTPUT_CONSUMER
     );
 

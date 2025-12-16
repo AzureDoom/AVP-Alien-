@@ -1,4 +1,4 @@
-# vMAJOR.MINOR.PATCH-DIST
+# v0.1.0
 
 ## ✍️ Developer Notes
 - For help or other questions, concerns, etc. check out our Discord server: https://discord.gg/wp7mvmbkVb
@@ -7,10 +7,11 @@
 - N/A
 
 ## ✨ What's New
-- N/A
+- Added new textures for all alien spawn egg items.
+  - Thanks to Danlogo for contributing the textures!
 
 ## ♻️ Changes
-- N/A
+- Alien spawn eggs in the Alien Spawn Eggs creative mode tab are now sorted based on their lifecycle.
 
 ## 🐞 Fixes
 - N/A

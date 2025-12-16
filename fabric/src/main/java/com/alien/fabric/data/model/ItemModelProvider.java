@@ -8,7 +8,6 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
 import net.minecraft.data.models.BlockModelGenerators;
 import net.minecraft.data.models.ItemModelGenerators;
-import net.minecraft.data.models.model.ModelLocationUtils;
 import net.minecraft.data.models.model.ModelTemplate;
 import net.minecraft.data.models.model.ModelTemplates;
 import net.minecraft.world.item.Item;
@@ -26,11 +25,6 @@ public class ItemModelProvider extends FabricModelProvider {
     public void generateBlockStateModels(BlockModelGenerators generators) {
         generators.createSimpleFlatItemModel(AlienResinBlocks.NETHER_RESIN_WEB.get());
         generators.createSimpleFlatItemModel(AlienResinBlocks.RESIN_WEB.get());
-
-        var spawnEggLocation = ModelLocationUtils.decorateItemModelLocation("template_spawn_egg");
-
-        AlienSpawnEggItems.REGISTRY.getAll()
-            .forEach(spawnEggItem -> generators.delegateItemModel(spawnEggItem.get(), spawnEggLocation));
     }
 
     @Override
@@ -87,6 +81,9 @@ public class ItemModelProvider extends FabricModelProvider {
         generateStandardItem(generators, AlienItems.ROYALTY_POTTERY_SHERD);
         generateStandardItem(generators, AlienItems.VECTOR_POTTERY_SHERD);
         generateStandardItem(generators, AlienItems.POISON_JELLY);
+
+        AlienSpawnEggItems.REGISTRY.getAll()
+            .forEach(holder -> generateStandardItem(generators, holder));
     }
 
     private void generateHandheldItem(ItemModelGenerators generators, Supplier<? extends Item> itemSupplier) {

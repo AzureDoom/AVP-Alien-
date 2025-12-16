@@ -16,492 +16,242 @@ public class AlienSpawnEggItems {
 
     public static final BLibRegistry<Item> REGISTRY = Alien.MOD.registries().create(BuiltInRegistries.ITEM);
 
-    public static final BLibHolder<SpawnEggItem> ABERRANT_ADOLESCENT_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> ABERRANT_ADOLESCENT_SPAWN_EGG = create(
         "aberrant_adolescent",
-        AlienEntityTypes.ABERRANT_ADOLESCENT,
-        0xD9D9B8,
-        0xBFBF88
+        AlienEntityTypes.ABERRANT_ADOLESCENT
     );
 
-    public static final BLibHolder<SpawnEggItem> ABERRANT_BOILER_SPAWN_EGG = register(
-        "aberrant_boiler",
-        AlienEntityTypes.ABERRANT_BOILER,
-        0xE5BF05,
-        0xD7D7DF
-    );
+    public static final BLibHolder<SpawnEggItem> ABERRANT_BOILER_SPAWN_EGG = create("aberrant_boiler", AlienEntityTypes.ABERRANT_BOILER);
 
-    public static final BLibHolder<SpawnEggItem> ABERRANT_CHESTBURSTER_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> ABERRANT_CHESTBURSTER_SPAWN_EGG = create(
         "aberrant_chestburster",
-        AlienEntityTypes.ABERRANT_CHESTBURSTER,
-        0xD9D9B8,
-        0xBFBF88
+        AlienEntityTypes.ABERRANT_CHESTBURSTER
     );
 
-    public static final BLibHolder<SpawnEggItem> ABERRANT_CRUSHER_SPAWN_EGG = register(
-        "aberrant_crusher",
-        AlienEntityTypes.ABERRANT_CRUSHER,
-        0xF1C810,
-        0xD7D7DF
-    );
+    public static final BLibHolder<SpawnEggItem> ABERRANT_CRUSHER_SPAWN_EGG = create("aberrant_crusher", AlienEntityTypes.ABERRANT_CRUSHER);
 
-    public static final BLibHolder<SpawnEggItem> ABERRANT_DRONE_SPAWN_EGG = register(
-        "aberrant_drone",
-        AlienEntityTypes.ABERRANT_DRONE,
-        0xE5BF05,
-        0xD7D7DF
-    );
+    public static final BLibHolder<SpawnEggItem> ABERRANT_DRONE_SPAWN_EGG = create("aberrant_drone", AlienEntityTypes.ABERRANT_DRONE);
 
-    public static final BLibHolder<SpawnEggItem> ABERRANT_FACEHUGGER_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> ABERRANT_FACEHUGGER_SPAWN_EGG = create(
         "aberrant_facehugger",
-        AlienEntityTypes.ABERRANT_FACEHUGGER,
-        0xCDCCA3,
-        0xC9CE3B
+        AlienEntityTypes.ABERRANT_FACEHUGGER
     );
 
-    public static final BLibHolder<SpawnEggItem> ABERRANT_OVOMORPH_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> ABERRANT_OVOMORPH_SPAWN_EGG = create(
         "aberrant_ovomorph",
-        AlienEntityTypes.ABERRANT_OVOMORPH,
-        0x767139,
-        0xC9C432
+        AlienEntityTypes.ABERRANT_OVOMORPH
     );
 
-    public static final BLibHolder<SpawnEggItem> ABERRANT_PRAETORIAN_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> ABERRANT_PRAETORIAN_SPAWN_EGG = create(
         "aberrant_praetorian",
-        AlienEntityTypes.ABERRANT_PRAETORIAN,
-        0xF1C810,
-        0xD7D7DF
+        AlienEntityTypes.ABERRANT_PRAETORIAN
     );
 
-    public static final BLibHolder<SpawnEggItem> ABERRANT_PREDALIEN_ADOLESCENT_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> ABERRANT_PREDALIEN_ADOLESCENT_SPAWN_EGG = create(
         "aberrant_predalien_adolescent",
-        AlienEntityTypes.ABERRANT_PREDALIEN_ADOLESCENT,
-        0xD9D9B8,
-        0xBFBF88
+        AlienEntityTypes.ABERRANT_PREDALIEN_ADOLESCENT
     );
 
-    public static final BLibHolder<SpawnEggItem> ABERRANT_PREDALIEN_CHESTBURSTER_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> ABERRANT_PREDALIEN_CHESTBURSTER_SPAWN_EGG = create(
         "aberrant_predalien_chestburster",
-        AlienEntityTypes.ABERRANT_PREDALIEN_CHESTBURSTER,
-        0xD9D9B8,
-        0xBFBF88
+        AlienEntityTypes.ABERRANT_PREDALIEN_CHESTBURSTER
     );
 
-    public static final BLibHolder<SpawnEggItem> ABERRANT_PREDALIEN_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> ABERRANT_PREDALIEN_SPAWN_EGG = create(
         "aberrant_predalien",
-        AlienEntityTypes.ABERRANT_PREDALIEN,
-        0xF1C810,
-        0xD7D7DF
+        AlienEntityTypes.ABERRANT_PREDALIEN
     );
 
-    public static final BLibHolder<SpawnEggItem> ABERRANT_PROWLER_SPAWN_EGG = register(
-        "aberrant_prowler",
-        AlienEntityTypes.ABERRANT_PROWLER,
-        0xE5BF05,
-        0xD7D7DF
-    );
+    public static final BLibHolder<SpawnEggItem> ABERRANT_PROWLER_SPAWN_EGG = create("aberrant_prowler", AlienEntityTypes.ABERRANT_PROWLER);
 
-    public static final BLibHolder<SpawnEggItem> ABERRANT_RUNNER_SPAWN_EGG = register(
-        "aberrant_runner",
-        AlienEntityTypes.ABERRANT_RUNNER,
-        0xE5BF05,
-        0xD7D7DF
-    );
+    public static final BLibHolder<SpawnEggItem> ABERRANT_RUNNER_SPAWN_EGG = create("aberrant_runner", AlienEntityTypes.ABERRANT_RUNNER);
 
-    public static final BLibHolder<SpawnEggItem> ABERRANT_SPITTER_SPAWN_EGG = register(
-        "aberrant_spitter",
-        AlienEntityTypes.ABERRANT_SPITTER,
-        0xE5BF05,
-        0xD7D7DF
-    );
+    public static final BLibHolder<SpawnEggItem> ABERRANT_SPITTER_SPAWN_EGG = create("aberrant_spitter", AlienEntityTypes.ABERRANT_SPITTER);
 
-    public static final BLibHolder<SpawnEggItem> ABERRANT_WARRIOR_SPAWN_EGG = register(
-        "aberrant_warrior",
-        AlienEntityTypes.ABERRANT_WARRIOR,
-        0xF3CE07,
-        0xD7D7DF
-    );
+    public static final BLibHolder<SpawnEggItem> ABERRANT_WARRIOR_SPAWN_EGG = create("aberrant_warrior", AlienEntityTypes.ABERRANT_WARRIOR);
 
-    public static final BLibHolder<SpawnEggItem> ABERRANT_QUEEN_SPAWN_EGG = register(
-        "aberrant_queen",
-        AlienEntityTypes.ABERRANT_QUEEN,
-        0xF3CE07,
-        0xD7D7DF
-    );
+    public static final BLibHolder<SpawnEggItem> ABERRANT_QUEEN_SPAWN_EGG = create("aberrant_queen", AlienEntityTypes.ABERRANT_QUEEN);
 
-    public static final BLibHolder<SpawnEggItem> ADOLESCENT_SPAWN_EGG = register(
-        "adolescent",
-        AlienEntityTypes.ADOLESCENT,
-        0xD8B877,
-        0xF7E2B4
-    );
+    public static final BLibHolder<SpawnEggItem> ADOLESCENT_SPAWN_EGG = create("adolescent", AlienEntityTypes.ADOLESCENT);
 
-    public static final BLibHolder<SpawnEggItem> BOILER_SPAWN_EGG = register(
-        "boiler",
-        AlienEntityTypes.BOILER,
-        0x010202,
-        0xDFE2E4
-    );
+    public static final BLibHolder<SpawnEggItem> BOILER_SPAWN_EGG = create("boiler", AlienEntityTypes.BOILER);
 
-    public static final BLibHolder<SpawnEggItem> CHESTBURSTER_SPAWN_EGG = register(
-        "chestburster",
-        AlienEntityTypes.CHESTBURSTER,
-        0xD8B877,
-        0xF7E2B4
-    );
+    public static final BLibHolder<SpawnEggItem> CHESTBURSTER_SPAWN_EGG = create("chestburster", AlienEntityTypes.CHESTBURSTER);
 
-    public static final BLibHolder<SpawnEggItem> CRUSHER_SPAWN_EGG = register(
-        "crusher",
-        AlienEntityTypes.CRUSHER,
-        0x010202,
-        0x363534
-    );
+    public static final BLibHolder<SpawnEggItem> CRUSHER_SPAWN_EGG = create("crusher", AlienEntityTypes.CRUSHER);
 
-    public static final BLibHolder<SpawnEggItem> DRONE_SPAWN_EGG = register(
-        "drone",
-        AlienEntityTypes.DRONE,
-        0x010202,
-        0xDFE2E4
-    );
+    public static final BLibHolder<SpawnEggItem> DRONE_SPAWN_EGG = create("drone", AlienEntityTypes.DRONE);
 
-    public static final BLibHolder<SpawnEggItem> FACEHUGGER_SPAWN_EGG = register(
-        "facehugger",
-        AlienEntityTypes.FACEHUGGER,
-        0xE4D597,
-        0xA55863
-    );
+    public static final BLibHolder<SpawnEggItem> FACEHUGGER_SPAWN_EGG = create("facehugger", AlienEntityTypes.FACEHUGGER);
 
-    public static final BLibHolder<SpawnEggItem> IRRADIATED_CRUSHER_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> IRRADIATED_CRUSHER_SPAWN_EGG = create(
         "irradiated_crusher",
-        AlienEntityTypes.IRRADIATED_CRUSHER,
-        0xD5F2ED,
-        0x73D9CF
+        AlienEntityTypes.IRRADIATED_CRUSHER
     );
 
-    public static final BLibHolder<SpawnEggItem> IRRADIATED_DRONE_SPAWN_EGG = register(
-        "irradiated_drone",
-        AlienEntityTypes.IRRADIATED_DRONE,
-        0xD5F2ED,
-        0x73D9CF
-    );
+    public static final BLibHolder<SpawnEggItem> IRRADIATED_DRONE_SPAWN_EGG = create("irradiated_drone", AlienEntityTypes.IRRADIATED_DRONE);
 
-    public static final BLibHolder<SpawnEggItem> IRRADIATED_PRAETORIAN_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> IRRADIATED_PRAETORIAN_SPAWN_EGG = create(
         "irradiated_praetorian",
-        AlienEntityTypes.IRRADIATED_PRAETORIAN,
-        0xD5F2ED,
-        0x73D9CF
+        AlienEntityTypes.IRRADIATED_PRAETORIAN
     );
 
-    public static final BLibHolder<SpawnEggItem> IRRADIATED_PREDALIEN_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> IRRADIATED_PREDALIEN_SPAWN_EGG = create(
         "irradiated_predalien",
-        AlienEntityTypes.IRRADIATED_PREDALIEN,
-        0xD5F2ED,
-        0x73D9CF
+        AlienEntityTypes.IRRADIATED_PREDALIEN
     );
 
-    public static final BLibHolder<SpawnEggItem> IRRADIATED_PROWLER_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> IRRADIATED_PROWLER_SPAWN_EGG = create(
         "irradiated_prowler",
-        AlienEntityTypes.IRRADIATED_PROWLER,
-        0xD5F2ED,
-        0x73D9CF
+        AlienEntityTypes.IRRADIATED_PROWLER
     );
 
-    public static final BLibHolder<SpawnEggItem> IRRADIATED_QUEEN_SPAWN_EGG = register(
-        "irradiated_queen",
-        AlienEntityTypes.IRRADIATED_QUEEN,
-        0xD5F2ED,
-        0x73D9CF
-    );
+    public static final BLibHolder<SpawnEggItem> IRRADIATED_QUEEN_SPAWN_EGG = create("irradiated_queen", AlienEntityTypes.IRRADIATED_QUEEN);
 
-    public static final BLibHolder<SpawnEggItem> IRRADIATED_RUNNER_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> IRRADIATED_RUNNER_SPAWN_EGG = create(
         "irradiated_runner",
-        AlienEntityTypes.IRRADIATED_RUNNER,
-        0xD5F2ED,
-        0x73D9CF
+        AlienEntityTypes.IRRADIATED_RUNNER
     );
 
-    public static final BLibHolder<SpawnEggItem> IRRADIATED_WARRIOR_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> IRRADIATED_WARRIOR_SPAWN_EGG = create(
         "irradiated_warrior",
-        AlienEntityTypes.IRRADIATED_WARRIOR,
-        0xD5F2ED,
-        0x73D9CF
+        AlienEntityTypes.IRRADIATED_WARRIOR
     );
 
-    public static final BLibHolder<SpawnEggItem> NETHER_ADOLESCENT_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> NETHER_ADOLESCENT_SPAWN_EGG = create(
         "nether_adolescent",
-        AlienEntityTypes.NETHER_ADOLESCENT,
-        0x360101,
-        0x803232
+        AlienEntityTypes.NETHER_ADOLESCENT
     );
 
-    public static final BLibHolder<SpawnEggItem> NETHER_BOILER_SPAWN_EGG = register(
-        "nether_boiler",
-        AlienEntityTypes.NETHER_BOILER,
-        0x360101,
-        0x803232
-    );
+    public static final BLibHolder<SpawnEggItem> NETHER_BOILER_SPAWN_EGG = create("nether_boiler", AlienEntityTypes.NETHER_BOILER);
 
-    public static final BLibHolder<SpawnEggItem> NETHER_CHESTBURSTER_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> NETHER_CHESTBURSTER_SPAWN_EGG = create(
         "nether_chestburster",
-        AlienEntityTypes.NETHER_CHESTBURSTER,
-        0x360101,
-        0x803232
+        AlienEntityTypes.NETHER_CHESTBURSTER
     );
 
-    public static final BLibHolder<SpawnEggItem> NETHER_CRUSHER_SPAWN_EGG = register(
-        "nether_crusher",
-        AlienEntityTypes.NETHER_CRUSHER,
-        0x310808,
-        0x5d1f1f
-    );
+    public static final BLibHolder<SpawnEggItem> NETHER_CRUSHER_SPAWN_EGG = create("nether_crusher", AlienEntityTypes.NETHER_CRUSHER);
 
-    public static final BLibHolder<SpawnEggItem> NETHER_DRONE_SPAWN_EGG = register(
-        "nether_drone",
-        AlienEntityTypes.NETHER_DRONE,
-        0x360101,
-        0x803232
-    );
+    public static final BLibHolder<SpawnEggItem> NETHER_DRONE_SPAWN_EGG = create("nether_drone", AlienEntityTypes.NETHER_DRONE);
 
-    public static final BLibHolder<SpawnEggItem> NETHER_FACEHUGGER_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> NETHER_FACEHUGGER_SPAWN_EGG = create(
         "nether_facehugger",
-        AlienEntityTypes.NETHER_FACEHUGGER,
-        0x27221C,
-        0xFAD855
+        AlienEntityTypes.NETHER_FACEHUGGER
     );
 
-    public static final BLibHolder<SpawnEggItem> NETHER_OVOMORPH_SPAWN_EGG = register(
-        "nether_ovomorph",
-        AlienEntityTypes.NETHER_OVOMORPH,
-        0x20131C,
-        0xFCEE4B
-    );
+    public static final BLibHolder<SpawnEggItem> NETHER_OVOMORPH_SPAWN_EGG = create("nether_ovomorph", AlienEntityTypes.NETHER_OVOMORPH);
 
-    public static final BLibHolder<SpawnEggItem> NETHER_PRAETORIAN_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> NETHER_PRAETORIAN_SPAWN_EGG = create(
         "nether_praetorian",
-        AlienEntityTypes.NETHER_PRAETORIAN,
-        0x310808,
-        0x5d1f1f
+        AlienEntityTypes.NETHER_PRAETORIAN
     );
 
-    public static final BLibHolder<SpawnEggItem> NETHER_PREDALIEN_ADOLESCENT_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> NETHER_PREDALIEN_ADOLESCENT_SPAWN_EGG = create(
         "nether_predalien_adolescent",
-        AlienEntityTypes.NETHER_PREDALIEN_ADOLESCENT,
-        0x360101,
-        0x803232
+        AlienEntityTypes.NETHER_PREDALIEN_ADOLESCENT
     );
 
-    public static final BLibHolder<SpawnEggItem> NETHER_PREDALIEN_CHESTBURSTER_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> NETHER_PREDALIEN_CHESTBURSTER_SPAWN_EGG = create(
         "nether_predalien_chestburster",
-        AlienEntityTypes.NETHER_PREDALIEN_CHESTBURSTER,
-        0x360101,
-        0x803232
+        AlienEntityTypes.NETHER_PREDALIEN_CHESTBURSTER
     );
 
-    public static final BLibHolder<SpawnEggItem> NETHER_PREDALIEN_SPAWN_EGG = register(
-        "nether_predalien",
-        AlienEntityTypes.NETHER_PREDALIEN,
-        0x310808,
-        0x5d1f1f
-    );
+    public static final BLibHolder<SpawnEggItem> NETHER_PREDALIEN_SPAWN_EGG = create("nether_predalien", AlienEntityTypes.NETHER_PREDALIEN);
 
-    public static final BLibHolder<SpawnEggItem> NETHER_PROWLER_SPAWN_EGG = register(
-        "nether_prowler",
-        AlienEntityTypes.NETHER_PROWLER,
-        0x360101,
-        0x803232
-    );
+    public static final BLibHolder<SpawnEggItem> NETHER_PROWLER_SPAWN_EGG = create("nether_prowler", AlienEntityTypes.NETHER_PROWLER);
 
-    public static final BLibHolder<SpawnEggItem> NETHER_RUNNER_SPAWN_EGG = register(
-        "nether_runner",
-        AlienEntityTypes.NETHER_RUNNER,
-        0x360101,
-        0x803232
-    );
+    public static final BLibHolder<SpawnEggItem> NETHER_RUNNER_SPAWN_EGG = create("nether_runner", AlienEntityTypes.NETHER_RUNNER);
 
-    public static final BLibHolder<SpawnEggItem> NETHER_SPITTER_SPAWN_EGG = register(
-        "nether_spitter",
-        AlienEntityTypes.NETHER_SPITTER,
-        0x360101,
-        0x803232
-    );
+    public static final BLibHolder<SpawnEggItem> NETHER_SPITTER_SPAWN_EGG = create("nether_spitter", AlienEntityTypes.NETHER_SPITTER);
 
-    public static final BLibHolder<SpawnEggItem> NETHER_WARRIOR_SPAWN_EGG = register(
-        "nether_warrior",
-        AlienEntityTypes.NETHER_WARRIOR,
-        0x2b0000,
-        0x67261f
-    );
+    public static final BLibHolder<SpawnEggItem> NETHER_WARRIOR_SPAWN_EGG = create("nether_warrior", AlienEntityTypes.NETHER_WARRIOR);
 
-    public static final BLibHolder<SpawnEggItem> NETHER_QUEEN_SPAWN_EGG = register(
-        "nether_queen",
-        AlienEntityTypes.NETHER_QUEEN,
-        0x2b0000,
-        0x67261f
-    );
+    public static final BLibHolder<SpawnEggItem> NETHER_QUEEN_SPAWN_EGG = create("nether_queen", AlienEntityTypes.NETHER_QUEEN);
 
-    public static final BLibHolder<SpawnEggItem> OVOMORPH_SPAWN_EGG = register(
-        "ovomorph",
-        AlienEntityTypes.OVOMORPH,
-        0x615B45,
-        0xBF7872
-    );
+    public static final BLibHolder<SpawnEggItem> OVOMORPH_SPAWN_EGG = create("ovomorph", AlienEntityTypes.OVOMORPH);
 
-    public static final BLibHolder<SpawnEggItem> PRAETORIAN_SPAWN_EGG = register(
-        "praetorian",
-        AlienEntityTypes.PRAETORIAN,
-        0x010202,
-        0x363534
-    );
+    public static final BLibHolder<SpawnEggItem> PRAETORIAN_SPAWN_EGG = create("praetorian", AlienEntityTypes.PRAETORIAN);
 
-    public static final BLibHolder<SpawnEggItem> PREDALIEN_ADOLESCENT_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> PREDALIEN_ADOLESCENT_SPAWN_EGG = create(
         "predalien_adolescent",
-        AlienEntityTypes.PREDALIEN_ADOLESCENT,
-        0xD8B877,
-        0xF7E2B4
+        AlienEntityTypes.PREDALIEN_ADOLESCENT
     );
 
-    public static final BLibHolder<SpawnEggItem> PREDALIEN_CHESTBURSTER_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> PREDALIEN_CHESTBURSTER_SPAWN_EGG = create(
         "predalien_chestburster",
-        AlienEntityTypes.PREDALIEN_CHESTBURSTER,
-        0xD8B877,
-        0xF7E2B4
+        AlienEntityTypes.PREDALIEN_CHESTBURSTER
     );
 
-    public static final BLibHolder<SpawnEggItem> PREDALIEN_SPAWN_EGG = register(
-        "predalien",
-        AlienEntityTypes.PREDALIEN,
-        // FIXME:
-        0x010202,
-        0x363534
-    );
+    public static final BLibHolder<SpawnEggItem> PREDALIEN_SPAWN_EGG = create("predalien", AlienEntityTypes.PREDALIEN);
 
-    public static final BLibHolder<SpawnEggItem> PROWLER_SPAWN_EGG = register(
-        "prowler",
-        AlienEntityTypes.PROWLER,
-        0x010202,
-        0xDFE2E4
-    );
+    public static final BLibHolder<SpawnEggItem> PROWLER_SPAWN_EGG = create("prowler", AlienEntityTypes.PROWLER);
 
-    public static final BLibHolder<SpawnEggItem> QUEEN_SPAWN_EGG = register(
-        "queen",
-        AlienEntityTypes.QUEEN,
-        0x010202,
-        0x363534
-    );
+    public static final BLibHolder<SpawnEggItem> QUEEN_SPAWN_EGG = create("queen", AlienEntityTypes.QUEEN);
 
-    public static final BLibHolder<SpawnEggItem> ROYAL_ABERRANT_ADOLESCENT_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> ROYAL_ABERRANT_ADOLESCENT_SPAWN_EGG = create(
         "royal_aberrant_adolescent",
-        AlienEntityTypes.ROYAL_ABERRANT_ADOLESCENT,
-        0x706c36,
-        0xd3cf51
+        AlienEntityTypes.ROYAL_ABERRANT_ADOLESCENT
     );
 
-    public static final BLibHolder<SpawnEggItem> ROYAL_ABERRANT_CHESTBURSTER_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> ROYAL_ABERRANT_CHESTBURSTER_SPAWN_EGG = create(
         "royal_aberrant_chestburster",
-        AlienEntityTypes.ROYAL_ABERRANT_CHESTBURSTER,
-        0x706c36,
-        0xd3cf51
+        AlienEntityTypes.ROYAL_ABERRANT_CHESTBURSTER
     );
 
-    public static final BLibHolder<SpawnEggItem> ROYAL_ABERRANT_FACEHUGGER_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> ROYAL_ABERRANT_FACEHUGGER_SPAWN_EGG = create(
         "royal_aberrant_facehugger",
-        AlienEntityTypes.ROYAL_ABERRANT_FACEHUGGER,
-        0x706c36,
-        0xd3cf51
+        AlienEntityTypes.ROYAL_ABERRANT_FACEHUGGER
     );
 
-    public static final BLibHolder<SpawnEggItem> ROYAL_ABERRANT_OVOMORPH_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> ROYAL_ABERRANT_OVOMORPH_SPAWN_EGG = create(
         "royal_aberrant_ovomorph",
-        AlienEntityTypes.ROYAL_ABERRANT_OVOMORPH,
-        0x706c36,
-        0xd3cf51
+        AlienEntityTypes.ROYAL_ABERRANT_OVOMORPH
     );
 
-    public static final BLibHolder<SpawnEggItem> ROYAL_ADOLESCENT_SPAWN_EGG = register(
-        "royal_adolescent",
-        AlienEntityTypes.ROYAL_ADOLESCENT,
-        0x29140a,
-        0xe6b57b
-    );
+    public static final BLibHolder<SpawnEggItem> ROYAL_ADOLESCENT_SPAWN_EGG = create("royal_adolescent", AlienEntityTypes.ROYAL_ADOLESCENT);
 
-    public static final BLibHolder<SpawnEggItem> ROYAL_CHESTBURSTER_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> ROYAL_CHESTBURSTER_SPAWN_EGG = create(
         "royal_chestburster",
-        AlienEntityTypes.ROYAL_CHESTBURSTER,
-        0x29140a,
-        0xe6b57b
+        AlienEntityTypes.ROYAL_CHESTBURSTER
     );
 
-    public static final BLibHolder<SpawnEggItem> ROYAL_NETHER_ADOLESCENT_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> ROYAL_NETHER_ADOLESCENT_SPAWN_EGG = create(
         "royal_nether_adolescent",
-        AlienEntityTypes.ROYAL_NETHER_ADOLESCENT,
-        0x331715,
-        0xfcee4b
+        AlienEntityTypes.ROYAL_NETHER_ADOLESCENT
     );
 
-    public static final BLibHolder<SpawnEggItem> ROYAL_NETHER_CHESTBURSTER_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> ROYAL_NETHER_CHESTBURSTER_SPAWN_EGG = create(
         "royal_nether_chestburster",
-        AlienEntityTypes.ROYAL_NETHER_CHESTBURSTER,
-        0x331715,
-        0xfcee4b
+        AlienEntityTypes.ROYAL_NETHER_CHESTBURSTER
     );
 
-    public static final BLibHolder<SpawnEggItem> ROYAL_FACEHUGGER_SPAWN_EGG = register(
-        "royal_facehugger",
-        AlienEntityTypes.ROYAL_FACEHUGGER,
-        0x4b4946,
-        0x292729
-    );
+    public static final BLibHolder<SpawnEggItem> ROYAL_FACEHUGGER_SPAWN_EGG = create("royal_facehugger", AlienEntityTypes.ROYAL_FACEHUGGER);
 
-    public static final BLibHolder<SpawnEggItem> ROYAL_NETHER_FACEHUGGER_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> ROYAL_NETHER_FACEHUGGER_SPAWN_EGG = create(
         "royal_nether_facehugger",
-        AlienEntityTypes.ROYAL_NETHER_FACEHUGGER,
-        0x331715,
-        0xfcee4b
+        AlienEntityTypes.ROYAL_NETHER_FACEHUGGER
     );
 
-    public static final BLibHolder<SpawnEggItem> ROYAL_NETHER_OVOMORPH_SPAWN_EGG = register(
+    public static final BLibHolder<SpawnEggItem> ROYAL_NETHER_OVOMORPH_SPAWN_EGG = create(
         "royal_nether_ovomorph",
-        AlienEntityTypes.ROYAL_NETHER_OVOMORPH,
-        0x331715,
-        0xfcee4b
+        AlienEntityTypes.ROYAL_NETHER_OVOMORPH
     );
 
-    public static final BLibHolder<SpawnEggItem> ROYAL_OVOMORPH_SPAWN_EGG = register(
-        "royal_ovomorph",
-        AlienEntityTypes.ROYAL_OVOMORPH,
-        0x2a2918,
-        0x34341f
-    );
+    public static final BLibHolder<SpawnEggItem> ROYAL_OVOMORPH_SPAWN_EGG = create("royal_ovomorph", AlienEntityTypes.ROYAL_OVOMORPH);
 
-    public static final BLibHolder<SpawnEggItem> RUNNER_SPAWN_EGG = register(
-        "runner",
-        AlienEntityTypes.RUNNER,
-        0x010202,
-        0xDFE2E4
-    );
+    public static final BLibHolder<SpawnEggItem> RUNNER_SPAWN_EGG = create("runner", AlienEntityTypes.RUNNER);
 
-    public static final BLibHolder<SpawnEggItem> SPITTER_SPAWN_EGG = register(
-        "spitter",
-        AlienEntityTypes.SPITTER,
-        0x010202,
-        0xDFE2E4
-    );
+    public static final BLibHolder<SpawnEggItem> SPITTER_SPAWN_EGG = create("spitter", AlienEntityTypes.SPITTER);
 
-    public static final BLibHolder<SpawnEggItem> WARRIOR_SPAWN_EGG = register(
-        "warrior",
-        AlienEntityTypes.WARRIOR,
-        0x010202,
-        0x4A4E55
-    );
+    public static final BLibHolder<SpawnEggItem> WARRIOR_SPAWN_EGG = create("warrior", AlienEntityTypes.WARRIOR);
 
-    private static <E extends Mob> BLibHolder<SpawnEggItem> register(
-        String baseId,
-        Supplier<EntityType<E>> entityTypeSupplier,
-        int primaryColor,
-        int secondaryColor
+    private static <E extends Mob> BLibHolder<SpawnEggItem> create(
+        String path,
+        Supplier<EntityType<E>> entityTypeSupplier
     ) {
         return REGISTRY.createHolder(
-            baseId + "_spawn_egg",
-            Alien.MOD.factories().createSpawnEggSupplier(entityTypeSupplier, primaryColor, secondaryColor, new Item.Properties())
+            path + "_spawn_egg",
+            Alien.MOD.factories().createSpawnEggSupplier(entityTypeSupplier, 0xFFFFFF, 0xFFFFFF, new Item.Properties())
         );
     }
 
