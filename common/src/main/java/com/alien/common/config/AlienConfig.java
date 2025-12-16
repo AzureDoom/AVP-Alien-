@@ -9,7 +9,7 @@ import com.alien.common.constant.HealthConstants;
 import com.alien.common.constant.HealthRegenConstants;
 import com.alien.common.constant.KnockbackResistanceConstants;
 import com.alien.common.constant.MoveSpeedConstants;
-import com.blib.config.BLibConfigs;
+import com.blib.common.config.BLibConfigs;
 import mod.azure.azurelib.common.config.Config;
 import mod.azure.azurelib.common.config.Configurable;
 import mod.azure.azurelib.common.config.format.ConfigFormats;

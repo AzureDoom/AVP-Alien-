@@ -1,5 +1,6 @@
 package com.alien.client;
 
+import com.alien.Alien;
 import com.alien.client.particle.AcidParticleProvider;
 import com.alien.client.particle.BlueAcidParticleProvider;
 import com.alien.client.particle.IrradiatedAcidParticleProvider;
@@ -34,195 +35,211 @@ import com.alien.common.registry.init.AlienParticleTypes;
 import com.alien.common.registry.init.block.AlienBlocks;
 import com.alien.common.registry.init.block.AlienResinBlocks;
 import com.alien.common.registry.init.item.AlienArmorItems;
-import com.blib.service.BLibServices;
+import com.blib.client.BLibClientMod;
 import net.minecraft.client.renderer.RenderType;
 
 import java.util.List;
 
 public class AlienClient {
 
+    private static final BLibClientMod MOD = BLibClientMod.createFor(Alien.MOD);
+
     public static void initialize() {
         registerArmorRenderers();
         registerBlockRenderLayers();
         registerEntityRenderers();
         registerParticleProviderFactories();
+
+        MOD.initialize();
     }
 
     private static void registerArmorRenderers() {
-        BLibServices.CLIENT_REGISTRY.registerArmorRenderer(
-            AberrantChitinArmorRenderer::new,
-            List.of(
-                AlienArmorItems.ABERRANT_CHITIN_HELMET,
-                AlienArmorItems.ABERRANT_CHITIN_CHESTPLATE,
-                AlienArmorItems.ABERRANT_CHITIN_LEGGINGS,
-                AlienArmorItems.ABERRANT_CHITIN_BOOTS
-            )
-        );
-        BLibServices.CLIENT_REGISTRY.registerArmorRenderer(
-            ChitinArmorRenderer::new,
-            List.of(
-                AlienArmorItems.CHITIN_HELMET,
-                AlienArmorItems.CHITIN_CHESTPLATE,
-                AlienArmorItems.CHITIN_LEGGINGS,
-                AlienArmorItems.CHITIN_BOOTS
-            )
-        );
-        BLibServices.CLIENT_REGISTRY.registerArmorRenderer(
-            IrradiatedChitinArmorRenderer::new,
-            List.of(
-                AlienArmorItems.IRRADIATED_CHITIN_HELMET,
-                AlienArmorItems.IRRADIATED_CHITIN_CHESTPLATE,
-                AlienArmorItems.IRRADIATED_CHITIN_LEGGINGS,
-                AlienArmorItems.IRRADIATED_CHITIN_BOOTS
-            )
-        );
-        BLibServices.CLIENT_REGISTRY.registerArmorRenderer(
-            NetherChitinArmorRenderer::new,
-            List.of(
-                AlienArmorItems.NETHER_CHITIN_HELMET,
-                AlienArmorItems.NETHER_CHITIN_CHESTPLATE,
-                AlienArmorItems.NETHER_CHITIN_LEGGINGS,
-                AlienArmorItems.NETHER_CHITIN_BOOTS
-            )
-        );
-        BLibServices.CLIENT_REGISTRY.registerArmorRenderer(
-            PlatedAberrantChitinArmorRenderer::new,
-            List.of(
-                AlienArmorItems.PLATED_ABERRANT_CHITIN_HELMET,
-                AlienArmorItems.PLATED_ABERRANT_CHITIN_CHESTPLATE,
-                AlienArmorItems.PLATED_ABERRANT_CHITIN_LEGGINGS,
-                AlienArmorItems.PLATED_ABERRANT_CHITIN_BOOTS
-            )
-        );
-        BLibServices.CLIENT_REGISTRY.registerArmorRenderer(
-            PlatedChitinArmorRenderer::new,
-            List.of(
-                AlienArmorItems.PLATED_CHITIN_HELMET,
-                AlienArmorItems.PLATED_CHITIN_CHESTPLATE,
-                AlienArmorItems.PLATED_CHITIN_LEGGINGS,
-                AlienArmorItems.PLATED_CHITIN_BOOTS
-            )
-        );
-        BLibServices.CLIENT_REGISTRY.registerArmorRenderer(
-            PlatedIrradiatedChitinArmorRenderer::new,
-            List.of(
-                AlienArmorItems.PLATED_IRRADIATED_CHITIN_HELMET,
-                AlienArmorItems.PLATED_IRRADIATED_CHITIN_CHESTPLATE,
-                AlienArmorItems.PLATED_IRRADIATED_CHITIN_LEGGINGS,
-                AlienArmorItems.PLATED_IRRADIATED_CHITIN_BOOTS
-            )
-        );
-        BLibServices.CLIENT_REGISTRY.registerArmorRenderer(
-            PlatedNetherChitinArmorRenderer::new,
-            List.of(
-                AlienArmorItems.PLATED_NETHER_CHITIN_HELMET,
-                AlienArmorItems.PLATED_NETHER_CHITIN_CHESTPLATE,
-                AlienArmorItems.PLATED_NETHER_CHITIN_LEGGINGS,
-                AlienArmorItems.PLATED_NETHER_CHITIN_BOOTS
-            )
-        );
+        MOD.registries()
+            .registerArmorRenderer(
+                AberrantChitinArmorRenderer::new,
+                List.of(
+                    AlienArmorItems.ABERRANT_CHITIN_HELMET,
+                    AlienArmorItems.ABERRANT_CHITIN_CHESTPLATE,
+                    AlienArmorItems.ABERRANT_CHITIN_LEGGINGS,
+                    AlienArmorItems.ABERRANT_CHITIN_BOOTS
+                )
+            );
+        MOD.registries()
+            .registerArmorRenderer(
+                ChitinArmorRenderer::new,
+                List.of(
+                    AlienArmorItems.CHITIN_HELMET,
+                    AlienArmorItems.CHITIN_CHESTPLATE,
+                    AlienArmorItems.CHITIN_LEGGINGS,
+                    AlienArmorItems.CHITIN_BOOTS
+                )
+            );
+        MOD.registries()
+            .registerArmorRenderer(
+                IrradiatedChitinArmorRenderer::new,
+                List.of(
+                    AlienArmorItems.IRRADIATED_CHITIN_HELMET,
+                    AlienArmorItems.IRRADIATED_CHITIN_CHESTPLATE,
+                    AlienArmorItems.IRRADIATED_CHITIN_LEGGINGS,
+                    AlienArmorItems.IRRADIATED_CHITIN_BOOTS
+                )
+            );
+        MOD.registries()
+            .registerArmorRenderer(
+                NetherChitinArmorRenderer::new,
+                List.of(
+                    AlienArmorItems.NETHER_CHITIN_HELMET,
+                    AlienArmorItems.NETHER_CHITIN_CHESTPLATE,
+                    AlienArmorItems.NETHER_CHITIN_LEGGINGS,
+                    AlienArmorItems.NETHER_CHITIN_BOOTS
+                )
+            );
+        MOD.registries()
+            .registerArmorRenderer(
+                PlatedAberrantChitinArmorRenderer::new,
+                List.of(
+                    AlienArmorItems.PLATED_ABERRANT_CHITIN_HELMET,
+                    AlienArmorItems.PLATED_ABERRANT_CHITIN_CHESTPLATE,
+                    AlienArmorItems.PLATED_ABERRANT_CHITIN_LEGGINGS,
+                    AlienArmorItems.PLATED_ABERRANT_CHITIN_BOOTS
+                )
+            );
+        MOD.registries()
+            .registerArmorRenderer(
+                PlatedChitinArmorRenderer::new,
+                List.of(
+                    AlienArmorItems.PLATED_CHITIN_HELMET,
+                    AlienArmorItems.PLATED_CHITIN_CHESTPLATE,
+                    AlienArmorItems.PLATED_CHITIN_LEGGINGS,
+                    AlienArmorItems.PLATED_CHITIN_BOOTS
+                )
+            );
+        MOD.registries()
+            .registerArmorRenderer(
+                PlatedIrradiatedChitinArmorRenderer::new,
+                List.of(
+                    AlienArmorItems.PLATED_IRRADIATED_CHITIN_HELMET,
+                    AlienArmorItems.PLATED_IRRADIATED_CHITIN_CHESTPLATE,
+                    AlienArmorItems.PLATED_IRRADIATED_CHITIN_LEGGINGS,
+                    AlienArmorItems.PLATED_IRRADIATED_CHITIN_BOOTS
+                )
+            );
+        MOD.registries()
+            .registerArmorRenderer(
+                PlatedNetherChitinArmorRenderer::new,
+                List.of(
+                    AlienArmorItems.PLATED_NETHER_CHITIN_HELMET,
+                    AlienArmorItems.PLATED_NETHER_CHITIN_CHESTPLATE,
+                    AlienArmorItems.PLATED_NETHER_CHITIN_LEGGINGS,
+                    AlienArmorItems.PLATED_NETHER_CHITIN_BOOTS
+                )
+            );
     }
 
     private static void registerBlockRenderLayers() {
-        BLibServices.CLIENT_REGISTRY.registerBlockRenderLayer(AlienResinBlocks.IRRADIATED_RESIN_VEIN, RenderType.cutout());
-        BLibServices.CLIENT_REGISTRY.registerBlockRenderLayer(AlienResinBlocks.IRRADIATED_RESIN_WEB, RenderType.cutout());
-        BLibServices.CLIENT_REGISTRY.registerBlockRenderLayer(AlienResinBlocks.ABERRANT_RESIN_VEIN, RenderType.cutout());
-        BLibServices.CLIENT_REGISTRY.registerBlockRenderLayer(AlienResinBlocks.ABERRANT_RESIN_WEB, RenderType.cutout());
-        BLibServices.CLIENT_REGISTRY.registerBlockRenderLayer(AlienResinBlocks.NETHER_RESIN_VEIN, RenderType.cutout());
-        BLibServices.CLIENT_REGISTRY.registerBlockRenderLayer(AlienResinBlocks.NETHER_RESIN_WEB, RenderType.cutout());
-        BLibServices.CLIENT_REGISTRY.registerBlockRenderLayer(AlienResinBlocks.RESIN_VEIN, RenderType.cutout());
-        BLibServices.CLIENT_REGISTRY.registerBlockRenderLayer(AlienResinBlocks.RESIN_WEB, RenderType.cutout());
-        BLibServices.CLIENT_REGISTRY.registerBlockRenderLayer(AlienBlocks.ROYAL_JELLY_BLOCK, RenderType.translucent());
+        MOD.registries().registerBlockRenderLayer(AlienResinBlocks.IRRADIATED_RESIN_VEIN, RenderType.cutout());
+        MOD.registries().registerBlockRenderLayer(AlienResinBlocks.IRRADIATED_RESIN_WEB, RenderType.cutout());
+        MOD.registries().registerBlockRenderLayer(AlienResinBlocks.ABERRANT_RESIN_VEIN, RenderType.cutout());
+        MOD.registries().registerBlockRenderLayer(AlienResinBlocks.ABERRANT_RESIN_WEB, RenderType.cutout());
+        MOD.registries().registerBlockRenderLayer(AlienResinBlocks.NETHER_RESIN_VEIN, RenderType.cutout());
+        MOD.registries().registerBlockRenderLayer(AlienResinBlocks.NETHER_RESIN_WEB, RenderType.cutout());
+        MOD.registries().registerBlockRenderLayer(AlienResinBlocks.RESIN_VEIN, RenderType.cutout());
+        MOD.registries().registerBlockRenderLayer(AlienResinBlocks.RESIN_WEB, RenderType.cutout());
+        MOD.registries().registerBlockRenderLayer(AlienBlocks.ROYAL_JELLY_BLOCK, RenderType.translucent());
     }
 
     private static void registerEntityRenderers() {
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ABERRANT_ADOLESCENT, AdolescentRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ABERRANT_BOILER, BoilerRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ABERRANT_CHESTBURSTER, ChestbursterRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ABERRANT_CRUSHER, CrusherRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ABERRANT_DRONE, DroneRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ABERRANT_FACEHUGGER, FacehuggerRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ABERRANT_OVOMORPH, OvomorphRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ABERRANT_PRAETORIAN, PraetorianRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ABERRANT_PREDALIEN, PredalienRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(
-            AlienEntityTypes.ABERRANT_PREDALIEN_ADOLESCENT,
-            PredalienAdolescentRenderer::new
-        );
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(
-            AlienEntityTypes.ABERRANT_PREDALIEN_CHESTBURSTER,
-            PredalienChestbursterRenderer::new
-        );
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ABERRANT_PROWLER, ProwlerRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ABERRANT_QUEEN, QueenRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ABERRANT_RUNNER, RunnerRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ABERRANT_SPITTER, SpitterRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ABERRANT_WARRIOR, WarriorRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ACID, AcidRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ADOLESCENT, AdolescentRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.BOILER, BoilerRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.CHESTBURSTER, ChestbursterRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.CRUSHER, CrusherRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.DRONE, DroneRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.FACEHUGGER, FacehuggerRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.IRRADIATED_CRUSHER, CrusherRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.IRRADIATED_DRONE, DroneRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.IRRADIATED_PRAETORIAN, PraetorianRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.IRRADIATED_PREDALIEN, PredalienRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.IRRADIATED_PROWLER, ProwlerRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.IRRADIATED_QUEEN, QueenRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.IRRADIATED_RUNNER, RunnerRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.IRRADIATED_WARRIOR, WarriorRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.NETHER_ADOLESCENT, AdolescentRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.NETHER_BOILER, BoilerRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.NETHER_CHESTBURSTER, ChestbursterRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.NETHER_CRUSHER, CrusherRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.NETHER_DRONE, DroneRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.NETHER_FACEHUGGER, FacehuggerRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.NETHER_OVOMORPH, OvomorphRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.NETHER_PRAETORIAN, PraetorianRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.NETHER_PREDALIEN, PredalienRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.NETHER_PREDALIEN_ADOLESCENT, PredalienAdolescentRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(
-            AlienEntityTypes.NETHER_PREDALIEN_CHESTBURSTER,
-            PredalienChestbursterRenderer::new
-        );
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.NETHER_PROWLER, ProwlerRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.NETHER_QUEEN, QueenRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.NETHER_RUNNER, RunnerRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.NETHER_SPITTER, SpitterRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.NETHER_WARRIOR, WarriorRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.OVIPOSITOR, OvipositorRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.OVOMORPH, OvomorphRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.PRAETORIAN, PraetorianRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.PREDALIEN, PredalienRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.PREDALIEN_ADOLESCENT, PredalienAdolescentRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.PREDALIEN_CHESTBURSTER, PredalienChestbursterRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.PROWLER, ProwlerRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.QUEEN, QueenRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ROYAL_ABERRANT_ADOLESCENT, AdolescentRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ROYAL_ABERRANT_CHESTBURSTER, ChestbursterRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ROYAL_ABERRANT_FACEHUGGER, FacehuggerRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ROYAL_ABERRANT_OVOMORPH, OvomorphRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ROYAL_ADOLESCENT, AdolescentRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ROYAL_CHESTBURSTER, ChestbursterRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ROYAL_FACEHUGGER, FacehuggerRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ROYAL_NETHER_ADOLESCENT, AdolescentRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ROYAL_NETHER_CHESTBURSTER, ChestbursterRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ROYAL_NETHER_FACEHUGGER, FacehuggerRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ROYAL_NETHER_OVOMORPH, OvomorphRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.ROYAL_OVOMORPH, OvomorphRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.RUNNER, RunnerRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.SPITTER, SpitterRenderer::new);
-        BLibServices.CLIENT_REGISTRY.registerEntityRenderer(AlienEntityTypes.WARRIOR, WarriorRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_ADOLESCENT, AdolescentRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_BOILER, BoilerRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_CHESTBURSTER, ChestbursterRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_CRUSHER, CrusherRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_DRONE, DroneRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_FACEHUGGER, FacehuggerRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_OVOMORPH, OvomorphRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_PRAETORIAN, PraetorianRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_PREDALIEN, PredalienRenderer::new);
+        MOD.registries()
+            .registerEntityRenderer(
+                AlienEntityTypes.ABERRANT_PREDALIEN_ADOLESCENT,
+                PredalienAdolescentRenderer::new
+            );
+        MOD.registries()
+            .registerEntityRenderer(
+                AlienEntityTypes.ABERRANT_PREDALIEN_CHESTBURSTER,
+                PredalienChestbursterRenderer::new
+            );
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_PROWLER, ProwlerRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_QUEEN, QueenRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_RUNNER, RunnerRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_SPITTER, SpitterRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_WARRIOR, WarriorRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ACID, AcidRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ADOLESCENT, AdolescentRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.BOILER, BoilerRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.CHESTBURSTER, ChestbursterRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.CRUSHER, CrusherRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.DRONE, DroneRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.FACEHUGGER, FacehuggerRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_CRUSHER, CrusherRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_DRONE, DroneRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_PRAETORIAN, PraetorianRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_PREDALIEN, PredalienRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_PROWLER, ProwlerRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_QUEEN, QueenRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_RUNNER, RunnerRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_WARRIOR, WarriorRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_ADOLESCENT, AdolescentRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_BOILER, BoilerRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_CHESTBURSTER, ChestbursterRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_CRUSHER, CrusherRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_DRONE, DroneRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_FACEHUGGER, FacehuggerRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_OVOMORPH, OvomorphRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_PRAETORIAN, PraetorianRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_PREDALIEN, PredalienRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_PREDALIEN_ADOLESCENT, PredalienAdolescentRenderer::new);
+        MOD.registries()
+            .registerEntityRenderer(
+                AlienEntityTypes.NETHER_PREDALIEN_CHESTBURSTER,
+                PredalienChestbursterRenderer::new
+            );
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_PROWLER, ProwlerRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_QUEEN, QueenRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_RUNNER, RunnerRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_SPITTER, SpitterRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_WARRIOR, WarriorRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.OVIPOSITOR, OvipositorRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.OVOMORPH, OvomorphRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.PRAETORIAN, PraetorianRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.PREDALIEN, PredalienRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.PREDALIEN_ADOLESCENT, PredalienAdolescentRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.PREDALIEN_CHESTBURSTER, PredalienChestbursterRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.PROWLER, ProwlerRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.QUEEN, QueenRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ROYAL_ABERRANT_ADOLESCENT, AdolescentRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ROYAL_ABERRANT_CHESTBURSTER, ChestbursterRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ROYAL_ABERRANT_FACEHUGGER, FacehuggerRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ROYAL_ABERRANT_OVOMORPH, OvomorphRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ROYAL_ADOLESCENT, AdolescentRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ROYAL_CHESTBURSTER, ChestbursterRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ROYAL_FACEHUGGER, FacehuggerRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ROYAL_NETHER_ADOLESCENT, AdolescentRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ROYAL_NETHER_CHESTBURSTER, ChestbursterRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ROYAL_NETHER_FACEHUGGER, FacehuggerRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ROYAL_NETHER_OVOMORPH, OvomorphRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ROYAL_OVOMORPH, OvomorphRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.RUNNER, RunnerRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.SPITTER, SpitterRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.WARRIOR, WarriorRenderer::new);
     }
 
     private static void registerParticleProviderFactories() {
-        BLibServices.CLIENT_REGISTRY.registerParticleProviderFactory(AlienParticleTypes.ACID, AcidParticleProvider::new);
-        BLibServices.CLIENT_REGISTRY.registerParticleProviderFactory(AlienParticleTypes.BLUE_ACID, BlueAcidParticleProvider::new);
-        BLibServices.CLIENT_REGISTRY.registerParticleProviderFactory(
-            AlienParticleTypes.IRRADIATED_ACID,
-            IrradiatedAcidParticleProvider::new
-        );
+        MOD.registries().registerParticleProviderFactory(AlienParticleTypes.ACID, AcidParticleProvider::new);
+        MOD.registries().registerParticleProviderFactory(AlienParticleTypes.BLUE_ACID, BlueAcidParticleProvider::new);
+        MOD.registries()
+            .registerParticleProviderFactory(
+                AlienParticleTypes.IRRADIATED_ACID,
+                IrradiatedAcidParticleProvider::new
+            );
     }
 }

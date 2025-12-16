@@ -4,7 +4,6 @@ import com.alien.Alien;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.blib.common.registry.BLibHolder;
 import com.blib.common.registry.BLibRegistry;
-import com.blib.service.BLibServices;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -502,7 +501,7 @@ public class AlienSpawnEggItems {
     ) {
         return REGISTRY.createHolder(
             baseId + "_spawn_egg",
-            BLibServices.FACTORY.createSpawnEggSupplier(entityTypeSupplier, primaryColor, secondaryColor, new Item.Properties())
+            Alien.MOD.factories().createSpawnEggSupplier(entityTypeSupplier, primaryColor, secondaryColor, new Item.Properties())
         );
     }
 
