@@ -47,6 +47,7 @@ repositories {
         name = 'BlameJared'
         url = 'https://maven.blamejared.com'
     }
+    maven { url = "https://maven.bvanseghi.dev/avp_human" }
     maven { url = "https://maven.bvanseghi.dev/blib" }
     maven { url = "https://maven.bvanseghi.dev/just" }
     maven { url = "https://maven.azuredoom.com/mods" }
@@ -108,7 +109,8 @@ processResources {
             'credits'                      : credits,
             'java_version'                 : java_version,
             'blib_version'                  : blib_version,
-            'azurelib_version'             : azurelib_version
+            'azurelib_version'             : azurelib_version,
+            'avp_human_version'            : avp_human_version,
     ]
 
     filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml', '*.mixins.json']) {

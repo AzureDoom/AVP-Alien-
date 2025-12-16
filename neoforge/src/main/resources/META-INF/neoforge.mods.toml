@@ -37,8 +37,12 @@ side          = "BOTH"
 [[dependencies.${mod_id}]]
 modId         = "blib"
 type          = "required"
-versionRange  = "${blib_version}"
-ordering      = "NONE"
+versionRange  = "[${blib_version},0.2.0)"
+side          = "BOTH"
+[[dependencies.${mod_id}]]
+modId         = "avp_human"
+type          = "optional"
+versionRange  = "[${avp_human_version},0.2.0)"
 side          = "BOTH"
 
 # Features are specific properties of the game environment, that you may want to declare you require. This example declares

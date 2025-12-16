@@ -70,8 +70,11 @@ dependencies {
     implementation("com.just:just-core:${project.just_core_version}")
     implementation("com.just:just-goap:${project.just_goap_version}")
 
-    // Compats
+    // Compatibility
     implementation "maven.modrinth:gigeresque:${project.gigeresque_version}"
+
+    compileOnly "com.avp.human:avp_human-neoforge-1.21.1:${project.avp_human_version}"
+    runtimeOnly "com.avp.human:avp_human-neoforge-1.21.1:${project.avp_human_version}"
 }
 
 configurations.configureEach {

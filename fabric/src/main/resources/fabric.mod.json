@@ -35,7 +35,10 @@
 		"minecraft": "~${minecraft_version}",
 		"java": ">=${java_version}",
 		"fabric-api": "*",
-		"blib": ">=${blib_version}",
+		"blib": "~${blib_version}",
 		"azurelib": ">=${azurelib_version}"
+	},
+	"suggests": {
+		"avp_human": "~${avp_human_version}"
 	}
 }
