@@ -10,7 +10,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 import org.jetbrains.annotations.NotNull;
 
 public class AVP_0_3_0_To_Alien_0_1_0 implements BLibDataMigration {
@@ -27,8 +26,26 @@ public class AVP_0_3_0_To_Alien_0_1_0 implements BLibDataMigration {
 
     @Override
     public void apply() {
+        registerStructureDataFixes();
+        registerStructureSetDataFixes();
         registerTemplatePoolDataFixes();
         BuiltInRegistries.REGISTRY.forEach(AVP_0_3_0_To_Alien_0_1_0::registerMigrationsForRegistry);
+    }
+
+    private static void registerStructureDataFixes() {
+        register(createResourceKeyEntry(Registries.STRUCTURE, "badlands_royal_altar"));
+        register(createResourceKeyEntry(Registries.STRUCTURE, "deepslate_royal_altar"));
+        register(createResourceKeyEntry(Registries.STRUCTURE, "desert_royal_altar"));
+        register(createResourceKeyEntry(Registries.STRUCTURE, "jungle_royal_altar"));
+        register(createResourceKeyEntry(Registries.STRUCTURE, "nether_royal_altar"));
+    }
+
+    private static void registerStructureSetDataFixes() {
+        register(createResourceKeyEntry(Registries.STRUCTURE_SET, "badlands_royal_altar"));
+        register(createResourceKeyEntry(Registries.STRUCTURE_SET, "deepslate_royal_altar"));
+        register(createResourceKeyEntry(Registries.STRUCTURE_SET, "desert_royal_altar"));
+        register(createResourceKeyEntry(Registries.STRUCTURE_SET, "jungle_royal_altar"));
+        register(createResourceKeyEntry(Registries.STRUCTURE_SET, "nether_royal_altar"));
     }
 
     private static void registerTemplatePoolDataFixes() {
@@ -44,8 +61,8 @@ public class AVP_0_3_0_To_Alien_0_1_0 implements BLibDataMigration {
         register(createResourceKeyEntry(Registries.TEMPLATE_POOL, "nether_royal_altar_egg"));
     }
 
-    private static BLibDataFixerRegistry.Entry.@NotNull Resource createResourceKeyEntry(
-        ResourceKey<Registry<StructureTemplatePool>> registry,
+    private static <T> BLibDataFixerRegistry.Entry.@NotNull Resource createResourceKeyEntry(
+        ResourceKey<Registry<T>> registry,
         String path
     ) {
         return new BLibDataFixerRegistry.Entry.Resource(registry, createAvpResourceLocation(path), AlienResources.location(path));
