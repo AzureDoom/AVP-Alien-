@@ -10,7 +10,7 @@ import com.alien.common.registry.InfectionRegistry;
 import com.alien.common.registry.init.AlienArmorMaterials;
 import com.alien.common.registry.init.AlienBlockEntityTypes;
 import com.alien.common.registry.init.AlienCompostingChances;
-import com.alien.common.registry.init.AlienDataKeys;
+import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienDecoratedPotPatterns;
 import com.alien.common.registry.init.AlienEntitySpawns;
 import com.alien.common.registry.init.AlienEntityTypes;
@@ -97,7 +97,7 @@ public class Alien {
             // Functionality
             AlienDecoratedPotPatterns.initialize();
             AlienCompostingChances.initialize();
-            AlienDataKeys.initialize();
+            AlienDataSyncKeys.initialize();
             AlienEntitySpawns.initialize();
 
             // Data Migration

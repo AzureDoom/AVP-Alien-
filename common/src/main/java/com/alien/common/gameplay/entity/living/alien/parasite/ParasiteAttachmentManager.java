@@ -2,7 +2,7 @@ package com.alien.common.gameplay.entity.living.alien.parasite;
 
 import com.alien.common.model.alien.FreeMob;
 import com.alien.common.model.alien.Host;
-import com.alien.common.registry.init.AlienDataKeys;
+import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.key.AlienDamageTypeKeys;
 import com.alien.common.util.AlienPredicates;
 import com.blib.common.network.data.DataAccessor;
@@ -24,7 +24,7 @@ public class ParasiteAttachmentManager {
 
     public ParasiteAttachmentManager(Parasite parasite) {
         this.parasite = parasite;
-        this.ticksAttachedToHost = new DataAccessor<>(parasite, AlienDataKeys.PARASITE_TICKS_ATTACHED_TO_HOST);
+        this.ticksAttachedToHost = new DataAccessor<>(parasite, AlienDataSyncKeys.PARASITE_TICKS_ATTACHED_TO_HOST.get());
     }
 
     public void tick() {

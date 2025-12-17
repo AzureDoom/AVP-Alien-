@@ -3,7 +3,7 @@ package com.alien.common.gameplay.entity.living.alien.ovomorph;
 import com.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.Facehugger;
 import com.alien.common.model.alien.HatchState;
-import com.alien.common.registry.init.AlienDataKeys;
+import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.compatibility.avp_human.GeneManagerProxy;
 import com.blib.common.network.data.DataAccessor;
@@ -27,13 +27,13 @@ public class HatchManager {
         this.hatchDesireManager = new HatchDesireManager(ovomorph);
         this.ovomorph = ovomorph;
 
-        this.remainingHatchDurationInTicks = new DataAccessor<>(ovomorph, AlienDataKeys.OVOMORPH_HATCH_DURATION_IN_TICKS);
+        this.remainingHatchDurationInTicks = new DataAccessor<>(ovomorph, AlienDataSyncKeys.OVOMORPH_HATCH_DURATION_IN_TICKS.get());
         remainingHatchDurationInTicks.set(hatchDurationInTicks);
 
-        this.remainingSpawnDelayInTicks = new DataAccessor<>(ovomorph, AlienDataKeys.OVOMORPH_REMAINING_SPAWN_DELAY_IN_TICKS);
+        this.remainingSpawnDelayInTicks = new DataAccessor<>(ovomorph, AlienDataSyncKeys.OVOMORPH_REMAINING_SPAWN_DELAY_IN_TICKS.get());
         remainingSpawnDelayInTicks.set(spawnDelayInTicks);
 
-        this.spawnCount = new DataAccessor<>(ovomorph, AlienDataKeys.OVOMORPH_SPAWN_COUNT);
+        this.spawnCount = new DataAccessor<>(ovomorph, AlienDataSyncKeys.OVOMORPH_SPAWN_COUNT.get());
     }
 
     public void tick() {

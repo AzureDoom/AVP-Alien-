@@ -8,7 +8,7 @@ import com.alien.common.gameplay.entity.living.alien.GrowthManager;
 import com.alien.common.gameplay.entity.living.alien.ResinManager;
 import com.alien.common.model.resin.ResinData;
 import com.alien.common.model.resin.ResinProducer;
-import com.alien.common.registry.init.AlienDataKeys;
+import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.util.AlienPredicates;
@@ -63,7 +63,7 @@ public abstract class Xenomorph extends Alien implements ResinProducer {
     public Xenomorph(EntityType<? extends Xenomorph> entityType, Level level) {
         super(entityType, level);
 
-        this.isCrawling = new DataAccessor<>(this, AlienDataKeys.XENOMORPH_IS_CRAWLING);
+        this.isCrawling = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_IS_CRAWLING.get());
 
         this.crawlingManager = new CrawlingManager(this, isCrawling);
         this.growthManager = new GrowthManager(this, XenomorphGrowthUtil.GROW_UP_CALLBACK)

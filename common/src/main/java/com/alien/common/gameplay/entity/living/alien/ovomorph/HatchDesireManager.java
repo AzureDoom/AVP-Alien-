@@ -1,6 +1,6 @@
 package com.alien.common.gameplay.entity.living.alien.ovomorph;
 
-import com.alien.common.registry.init.AlienDataKeys;
+import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.util.AlienPredicates;
 import com.blib.common.network.data.DataAccessor;
 import net.minecraft.world.level.gameevent.vibrations.VibrationInfo;
@@ -19,7 +19,7 @@ public class HatchDesireManager {
 
     public HatchDesireManager(Ovomorph ovomorph) {
         this.ovomorph = ovomorph;
-        this.desireToHatch = new DataAccessor<>(ovomorph, AlienDataKeys.OVOMORPH_DESIRE_TO_HATCH);
+        this.desireToHatch = new DataAccessor<>(ovomorph, AlienDataSyncKeys.OVOMORPH_DESIRE_TO_HATCH.get());
     }
 
     public void tick() {

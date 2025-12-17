@@ -2,7 +2,7 @@ package com.alien.common.gameplay.entity.living.alien.parasite;
 
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.model.alien.FreeMob;
-import com.alien.common.registry.init.AlienDataKeys;
+import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.util.AlienPredicates;
 import com.blib.common.gameplay.util.BLibEntityPredicates;
 import com.blib.common.network.data.DataAccessor;
@@ -24,7 +24,7 @@ public abstract class Parasite extends Alien {
     protected Parasite(EntityType<? extends Parasite> entityType, Level level) {
         super(entityType, level);
 
-        this.isFertile = new DataAccessor<>(this, AlienDataKeys.PARASITE_IS_FERTILE);
+        this.isFertile = new DataAccessor<>(this, AlienDataSyncKeys.PARASITE_IS_FERTILE.get());
 
         this.attachmentManager = new ParasiteAttachmentManager(this);
 

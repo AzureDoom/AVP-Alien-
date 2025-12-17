@@ -7,7 +7,7 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
 import com.alien.common.gameplay.level.saveddata.HiveLevelData;
 import com.alien.common.gameplay.level.saveddata.StrainLeakData;
 import com.alien.common.model.alien.variant.AlienVariant;
-import com.alien.common.registry.init.AlienDataKeys;
+import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.tag.AlienDamageTypesTags;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.registry.tag.AlienMobEffectTags;
@@ -19,7 +19,7 @@ import com.alien.compatibility.avp_predator.AVPPredator;
 import com.blib.common.gameplay.entity.manager.VibrationSystemManager;
 import com.blib.common.network.data.DataAccessor;
 import com.blib.common.network.data.DataUser;
-import com.blib.common.registry.init.BLibDataKeys;
+import com.blib.common.registry.init.BLibDataSyncKeys;
 import com.blib.common.util.MovementAnalyzer;
 import com.human.common.gameplay.gene.Genes;
 import com.human.common.registry.key.HumanBiomeKeys;
@@ -88,9 +88,9 @@ public abstract class Alien extends Monster implements DataUser {
     protected Alien(EntityType<? extends Alien> entityType, Level level) {
         super(entityType, level);
 
-        this.hasTarget = new DataAccessor<>(this, BLibDataKeys.ENTITY_HAS_TARGET);
-        this.isPoisoned = new DataAccessor<>(this, AlienDataKeys.ALIEN_IS_POISONED);
-        this.isMovingHorizontally = new DataAccessor<>(this, BLibDataKeys.ENTITY_IS_MOVING_HORIZONTALLY);
+        this.hasTarget = new DataAccessor<>(this, BLibDataSyncKeys.ENTITY_HAS_TARGET.get());
+        this.isPoisoned = new DataAccessor<>(this, AlienDataSyncKeys.ALIEN_IS_POISONED.get());
+        this.isMovingHorizontally = new DataAccessor<>(this, BLibDataSyncKeys.ENTITY_IS_MOVING_HORIZONTALLY.get());
 
         this.hiveManager = new HiveManager(this);
         this.movementAnalyzer = new MovementAnalyzer(this);

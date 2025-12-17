@@ -4,7 +4,7 @@ import com.alien.common.config.AlienConfig;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.GrowthManager;
 import com.alien.common.model.alien.variant.AlienVariant;
-import com.alien.common.registry.init.AlienDataKeys;
+import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.util.AlienPredicates;
@@ -39,7 +39,7 @@ public class Adolescent extends Alien {
     public Adolescent(EntityType<? extends Adolescent> entityType, Level level) {
         super(entityType, level);
 
-        this.hasDorsalTubes = new DataAccessor<>(this, AlienDataKeys.ADOLESCENT_HAS_DORSAL_TUBES);
+        this.hasDorsalTubes = new DataAccessor<>(this, AlienDataSyncKeys.ADOLESCENT_HAS_DORSAL_TUBES.get());
 
         this.animationDispatcher = new AdolescentAnimationDispatcher(this);
         this.growthManager = new GrowthManager(this, XenomorphGrowthUtil.GROW_UP_CALLBACK)
