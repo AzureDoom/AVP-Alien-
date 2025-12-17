@@ -8,10 +8,10 @@ import java.util.function.Consumer;
 public class EnUsCreativeModeTabProvider {
 
     public static final Consumer<FabricLanguageProvider.TranslationBuilder> CONSUMER = builder -> {
-        builder.add(AlienCreativeModeTabKeys.BLOCKS_KEY, "Alien Blocks");
-        builder.add(AlienCreativeModeTabKeys.COMBAT_KEY, "Alien Combat");
-        builder.add(AlienCreativeModeTabKeys.INGREDIENTS_KEY, "Alien Ingredients");
-        builder.add(AlienCreativeModeTabKeys.SPAWN_EGGS_KEY, "Alien Spawn Eggs");
-        builder.add(AlienCreativeModeTabKeys.TOOLS_AND_UTILITIES_KEY, "Alien Tools & Utilities");
+        builder.add(AlienCreativeModeTabKeys.BLOCKS_KEY, "Blocks (AVP: Alien)");
+        builder.add(AlienCreativeModeTabKeys.COMBAT_KEY, "Combat (AVP: Alien)");
+        builder.add(AlienCreativeModeTabKeys.INGREDIENTS_KEY, "Ingredients (AVP: Alien)");
+        builder.add(AlienCreativeModeTabKeys.SPAWN_EGGS_KEY, "Spawn Eggs (AVP: Alien)");
+        builder.add(AlienCreativeModeTabKeys.TOOLS_AND_UTILITIES_KEY, "Tools & Utilities (AVP: Alien)");
     };
 }

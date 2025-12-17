@@ -8,6 +8,7 @@ import com.alien.common.registry.init.block.AlienResinBlocks;
 import com.alien.common.registry.init.block.IrradiatedAlienResinBlocks;
 import com.alien.common.registry.init.block.NetherAlienChitinBlocks;
 import com.alien.common.registry.init.block.NetherAlienResinBlocks;
+import com.alien.compatibility.avp_human.AVPHuman;
 import net.minecraft.world.item.CreativeModeTab;
 
 import java.util.function.Consumer;
@@ -18,8 +19,11 @@ public class BlocksCreativeModeTabInitializer {
         // Alien blocks
         addBaseXenomorphBlocks(output);
         addNetherXenomorphBlocks(output);
-        addAberrantXenomorphBlocks(output);
-        addIrradiatedXenomorphBlocks(output);
+
+        if (AVPHuman.MOD.isLoaded()) {
+            addAberrantXenomorphBlocks(output);
+            addIrradiatedXenomorphBlocks(output);
+        }
 
         CreativeModeTabUtil.accept(output, AlienBlocks.ROYAL_JELLY_BLOCK);
     };

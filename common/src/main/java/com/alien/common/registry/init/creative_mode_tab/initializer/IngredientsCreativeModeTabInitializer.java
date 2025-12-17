@@ -1,6 +1,7 @@
 package com.alien.common.registry.init.creative_mode_tab.initializer;
 
 import com.alien.common.registry.init.item.AlienItems;
+import com.alien.compatibility.avp_human.AVPHuman;
 import net.minecraft.world.item.CreativeModeTab;
 
 import java.util.function.Consumer;
@@ -11,8 +12,11 @@ public class IngredientsCreativeModeTabInitializer {
         // Alien materials
         addBaseXenomorphIngredients(output);
         addNetherXenomorphIngredients(output);
-        addAberrantXenomorphIngredients(output);
-        addIrradiatedXenomorphIngredients(output);
+
+        if (AVPHuman.MOD.isLoaded()) {
+            addAberrantXenomorphIngredients(output);
+            addIrradiatedXenomorphIngredients(output);
+        }
 
         CreativeModeTabUtil.accept(output, AlienItems.RAW_ROYAL_JELLY);
         CreativeModeTabUtil.accept(output, AlienItems.POISON_JELLY);

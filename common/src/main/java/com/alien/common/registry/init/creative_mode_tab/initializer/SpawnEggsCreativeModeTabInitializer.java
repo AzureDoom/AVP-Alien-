@@ -1,6 +1,7 @@
 package com.alien.common.registry.init.creative_mode_tab.initializer;
 
 import com.alien.common.registry.init.item.AlienSpawnEggItems;
+import com.alien.compatibility.avp_human.AVPHuman;
 import net.minecraft.world.item.CreativeModeTab;
 
 import java.util.function.Consumer;
@@ -10,8 +11,11 @@ public class SpawnEggsCreativeModeTabInitializer {
     public static final Consumer<CreativeModeTab.Output> OUTPUT_CONSUMER = output -> {
         addBaseXenomorphSpawnEggs(output);
         addNetherXenomorphSpawnEggs(output);
-        addAberrantXenomorphSpawnEggs(output);
-        addIrradiatedXenomorphSpawnEggs(output);
+
+        if (AVPHuman.MOD.isLoaded()) {
+            addAberrantXenomorphSpawnEggs(output);
+            addIrradiatedXenomorphSpawnEggs(output);
+        }
     };
 
     private static void addBaseXenomorphSpawnEggs(CreativeModeTab.Output output) {

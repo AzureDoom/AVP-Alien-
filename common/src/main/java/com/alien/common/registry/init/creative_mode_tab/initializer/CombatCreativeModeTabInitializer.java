@@ -1,6 +1,7 @@
 package com.alien.common.registry.init.creative_mode_tab.initializer;
 
 import com.alien.common.registry.init.item.AlienArmorItems;
+import com.alien.compatibility.avp_human.AVPHuman;
 import net.minecraft.world.item.CreativeModeTab;
 
 import java.util.function.Consumer;
@@ -10,8 +11,11 @@ public class CombatCreativeModeTabInitializer {
     public static final Consumer<CreativeModeTab.Output> OUTPUT_CONSUMER = output -> {
         addBaseXenomorphArmors(output);
         addNetherXenomorphArmors(output);
-        addAberrantXenomorphArmors(output);
-        addIrradiatedXenomorphArmors(output);
+
+        if (AVPHuman.MOD.isLoaded()) {
+            addAberrantXenomorphArmors(output);
+            addIrradiatedXenomorphArmors(output);
+        }
     };
 
     private static void addBaseXenomorphArmors(CreativeModeTab.Output output) {
