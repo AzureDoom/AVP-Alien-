@@ -13,7 +13,11 @@ public sealed interface GeneContainerProxy {
             : EMPTY.INSTANCE;
     }
 
-    default void ifPresent(Consumer<Wrapper> consumer) {}
+    default void ifPresent(Consumer<Wrapper> consumer) {
+        if (this instanceof Wrapper wrapper) {
+            consumer.accept(wrapper);
+        }
+    }
 
     default void clear() {
         if (this instanceof Wrapper(var geneContainer)) {
