@@ -2,6 +2,7 @@ package com.alien.common.registry.init.creative_mode_tab.initializer;
 
 import com.alien.common.registry.init.item.AlienSpawnEggItems;
 import com.alien.compatibility.avp_human.AVPHuman;
+import com.alien.compatibility.avp_predator.AVPPredator;
 import net.minecraft.world.item.CreativeModeTab;
 
 import java.util.function.Consumer;
@@ -36,9 +37,11 @@ public class SpawnEggsCreativeModeTabInitializer {
         CreativeModeTabUtil.accept(output, AlienSpawnEggItems.PROWLER_SPAWN_EGG);
         CreativeModeTabUtil.accept(output, AlienSpawnEggItems.CRUSHER_SPAWN_EGG);
 
-        CreativeModeTabUtil.accept(output, AlienSpawnEggItems.PREDALIEN_CHESTBURSTER_SPAWN_EGG);
-        CreativeModeTabUtil.accept(output, AlienSpawnEggItems.PREDALIEN_ADOLESCENT_SPAWN_EGG);
-        CreativeModeTabUtil.accept(output, AlienSpawnEggItems.PREDALIEN_SPAWN_EGG);
+        if (AVPPredator.MOD.isLoaded()) {
+            CreativeModeTabUtil.accept(output, AlienSpawnEggItems.PREDALIEN_CHESTBURSTER_SPAWN_EGG);
+            CreativeModeTabUtil.accept(output, AlienSpawnEggItems.PREDALIEN_ADOLESCENT_SPAWN_EGG);
+            CreativeModeTabUtil.accept(output, AlienSpawnEggItems.PREDALIEN_SPAWN_EGG);
+        }
 
         CreativeModeTabUtil.accept(output, AlienSpawnEggItems.BOILER_SPAWN_EGG);
         CreativeModeTabUtil.accept(output, AlienSpawnEggItems.SPITTER_SPAWN_EGG);
@@ -62,9 +65,11 @@ public class SpawnEggsCreativeModeTabInitializer {
         CreativeModeTabUtil.accept(output, AlienSpawnEggItems.NETHER_PROWLER_SPAWN_EGG);
         CreativeModeTabUtil.accept(output, AlienSpawnEggItems.NETHER_CRUSHER_SPAWN_EGG);
 
-        CreativeModeTabUtil.accept(output, AlienSpawnEggItems.NETHER_PREDALIEN_CHESTBURSTER_SPAWN_EGG);
-        CreativeModeTabUtil.accept(output, AlienSpawnEggItems.NETHER_PREDALIEN_ADOLESCENT_SPAWN_EGG);
-        CreativeModeTabUtil.accept(output, AlienSpawnEggItems.NETHER_PREDALIEN_SPAWN_EGG);
+        if (AVPPredator.MOD.isLoaded()) {
+            CreativeModeTabUtil.accept(output, AlienSpawnEggItems.NETHER_PREDALIEN_CHESTBURSTER_SPAWN_EGG);
+            CreativeModeTabUtil.accept(output, AlienSpawnEggItems.NETHER_PREDALIEN_ADOLESCENT_SPAWN_EGG);
+            CreativeModeTabUtil.accept(output, AlienSpawnEggItems.NETHER_PREDALIEN_SPAWN_EGG);
+        }
 
         CreativeModeTabUtil.accept(output, AlienSpawnEggItems.NETHER_BOILER_SPAWN_EGG);
         CreativeModeTabUtil.accept(output, AlienSpawnEggItems.NETHER_SPITTER_SPAWN_EGG);
@@ -88,9 +93,11 @@ public class SpawnEggsCreativeModeTabInitializer {
         CreativeModeTabUtil.accept(output, AlienSpawnEggItems.ABERRANT_PROWLER_SPAWN_EGG);
         CreativeModeTabUtil.accept(output, AlienSpawnEggItems.ABERRANT_CRUSHER_SPAWN_EGG);
 
-        CreativeModeTabUtil.accept(output, AlienSpawnEggItems.ABERRANT_PREDALIEN_CHESTBURSTER_SPAWN_EGG);
-        CreativeModeTabUtil.accept(output, AlienSpawnEggItems.ABERRANT_PREDALIEN_ADOLESCENT_SPAWN_EGG);
-        CreativeModeTabUtil.accept(output, AlienSpawnEggItems.ABERRANT_PREDALIEN_SPAWN_EGG);
+        if (AVPPredator.MOD.isLoaded()) {
+            CreativeModeTabUtil.accept(output, AlienSpawnEggItems.ABERRANT_PREDALIEN_CHESTBURSTER_SPAWN_EGG);
+            CreativeModeTabUtil.accept(output, AlienSpawnEggItems.ABERRANT_PREDALIEN_ADOLESCENT_SPAWN_EGG);
+            CreativeModeTabUtil.accept(output, AlienSpawnEggItems.ABERRANT_PREDALIEN_SPAWN_EGG);
+        }
 
         CreativeModeTabUtil.accept(output, AlienSpawnEggItems.ABERRANT_BOILER_SPAWN_EGG);
         CreativeModeTabUtil.accept(output, AlienSpawnEggItems.ABERRANT_SPITTER_SPAWN_EGG);
@@ -106,6 +113,8 @@ public class SpawnEggsCreativeModeTabInitializer {
         CreativeModeTabUtil.accept(output, AlienSpawnEggItems.IRRADIATED_PROWLER_SPAWN_EGG);
         CreativeModeTabUtil.accept(output, AlienSpawnEggItems.IRRADIATED_CRUSHER_SPAWN_EGG);
 
-        CreativeModeTabUtil.accept(output, AlienSpawnEggItems.IRRADIATED_PREDALIEN_SPAWN_EGG);
+        if (AVPPredator.MOD.isLoaded()) {
+            CreativeModeTabUtil.accept(output, AlienSpawnEggItems.IRRADIATED_PREDALIEN_SPAWN_EGG);
+        }
     }
 }
