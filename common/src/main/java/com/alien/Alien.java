@@ -1,11 +1,12 @@
 package com.alien;
 
-import com.alien.common.AlienEvents;
 import com.alien.common.config.AlienConfig;
 import com.alien.common.data.AlienReloadListeners;
 import com.alien.common.data.fixer.migration.AlienDataMigrations;
 import com.alien.common.gameplay.level.saveddata.HiveLevelData;
 import com.alien.common.gameplay.level.saveddata.QueenSpawnChunkData;
+import com.alien.common.registry.GrowthStageRegistry;
+import com.alien.common.registry.InfectionRegistry;
 import com.alien.common.registry.init.AlienArmorMaterials;
 import com.alien.common.registry.init.AlienBlockEntityTypes;
 import com.alien.common.registry.init.AlienCompostingChances;
@@ -38,6 +39,7 @@ import com.alien.common.registry.init.item.block.NetherAlienChitinBlockItems;
 import com.alien.common.registry.init.item.block.NetherAlienResinBlockItems;
 import com.blib.BLib;
 import com.blib.BLibMod;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.level.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,7 +108,7 @@ public class Alien {
 
             MOD.events().afterLevelTick().register(Alien::tickHivesInLevel);
             MOD.events().afterLevelTick().register(Alien::tickQueenSpawnCooldown);
-            MOD.events().onTagsUpdated().register(($1, $2) -> AlienEvents.onTagsUpdated());
+            MOD.events().onTagsUpdated().register(Alien::onTagsUpdated);
         });
     }
 
@@ -126,5 +128,10 @@ public class Alien {
 
         QueenSpawnChunkData.getOrCreate(level)
             .ifSome(QueenSpawnChunkData::tick);
+    }
+
+    private static void onTagsUpdated(RegistryAccess registryAccess, boolean flag) {
+        GrowthStageRegistry.rebuildLookupMappings();
+        InfectionRegistry.rebuildLookupMappings();
     }
 }
