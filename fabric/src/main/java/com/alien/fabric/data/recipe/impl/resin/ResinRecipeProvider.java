@@ -1,19 +1,15 @@
-package com.alien.fabric.data.recipe.impl;
+package com.alien.fabric.data.recipe.impl.resin;
 
-import com.alien.common.gameplay.block.resin.vein.ResinVeinBlock;
 import com.alien.common.registry.init.block.AberrantAlienResinBlocks;
 import com.alien.common.registry.init.block.AlienResinBlocks;
 import com.alien.common.registry.init.block.IrradiatedAlienResinBlocks;
 import com.alien.common.registry.init.block.NetherAlienResinBlocks;
 import com.alien.common.registry.init.item.AlienItems;
+import com.alien.fabric.compatibility.AVPHumanFabric;
 import com.blib.fabric.data.recipe.RecipeTemplates;
 import com.blib.fabric.data.recipe.builder.RecipeBuilder;
 import com.blib.fabric.data.recipe.util.RecipeUtil;
 import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-
-import java.util.function.Supplier;
 
 public class ResinRecipeProvider {
 
@@ -68,7 +64,7 @@ public class ResinRecipeProvider {
         NetherAlienResinBlocks.NETHER_RESIN_WEB
     );
 
-    private static final ResinSet NORMAL_SET = new ResinSet(
+    private static final ResinSet BASE_SET = new ResinSet(
         AlienItems.RESIN_BALL,
         AlienResinBlocks.RESIN,
         AlienResinBlocks.RESIN_SLAB,
@@ -90,77 +86,61 @@ public class ResinRecipeProvider {
     }
 
     private static void createResinRecipes(RecipeBuilder builder) {
-        createResinRecipesFromSet(builder, ABERRANT_SET);
-        createResinRecipesFromSet(builder, IRRADIATED_SET);
+        createResinRecipesFromSet(builder, BASE_SET);
         createResinRecipesFromSet(builder, NETHER_SET);
-        createResinRecipesFromSet(builder, NORMAL_SET);
+        createResinRecipesFromSet(builder.withCondition(AVPHumanFabric.IS_LOADED), ABERRANT_SET);
+        createResinRecipesFromSet(builder.withCondition(AVPHumanFabric.IS_LOADED), IRRADIATED_SET);
     }
 
     private static void createResinRecipesFromSet(RecipeBuilder builder, ResinSet set) {
         builder.shaped()
             .withCategory(RecipeCategory.BUILDING_BLOCKS)
-            .apply(RecipeTemplates.PLUS_CROSS.apply(set.resinBallItem.get()))
-            .into(5, set.vein);
+            .apply(RecipeTemplates.PLUS_CROSS.apply(set.resinBallItem().get()))
+            .into(5, set.vein());
 
         builder.shaped()
             .withCategory(RecipeCategory.BUILDING_BLOCKS)
-            .apply(RecipeTemplates.X_CROSS.apply(set.resinBallItem.get()))
-            .into(1, set.web);
+            .apply(RecipeTemplates.X_CROSS.apply(set.resinBallItem().get()))
+            .into(1, set.web());
 
         // Resin block
-        RecipeUtil.createCompressedBlockRecipes2x2(builder, set.resinBallItem.get(), set.resinBlock.get());
+        RecipeUtil.createCompressedBlockRecipes2x2(builder, set.resinBallItem().get(), set.resinBlock().get());
 
-        RecipeUtil.createSlabBlockManualAndStonecutterRecipes(builder, set.resinBlock.get(), set.resinBlockSlab.get());
-        RecipeUtil.createStairBlockManualAndStonecutterRecipes(builder, set.resinBlock.get(), set.resinBlockStairs.get());
+        RecipeUtil.createSlabBlockManualAndStonecutterRecipes(builder, set.resinBlock().get(), set.resinBlockSlab().get());
+        RecipeUtil.createStairBlockManualAndStonecutterRecipes(builder, set.resinBlock().get(), set.resinBlockStairs().get());
 
-        builder.stonecut(set.resinBlock)
-            .into(1, set.brick);
+        builder.stonecut(set.resinBlock())
+            .into(1, set.brick());
 
-        RecipeUtil.createSlabBlockManualAndStonecutterRecipes(builder, set.resinBlock.get(), set.brickSlab.get());
-        RecipeUtil.createStairBlockManualAndStonecutterRecipes(builder, set.resinBlock.get(), set.brickStairs.get());
-        RecipeUtil.createWallBlockManualAndStonecutterRecipes(builder, set.resinBlock.get(), set.brickWall.get());
+        RecipeUtil.createSlabBlockManualAndStonecutterRecipes(builder, set.resinBlock().get(), set.brickSlab().get());
+        RecipeUtil.createStairBlockManualAndStonecutterRecipes(builder, set.resinBlock().get(), set.brickStairs().get());
+        RecipeUtil.createWallBlockManualAndStonecutterRecipes(builder, set.resinBlock().get(), set.brickWall().get());
 
-        builder.stonecut(set.resinBlock)
-            .into(1, set.smooth);
+        builder.stonecut(set.resinBlock())
+            .into(1, set.smooth());
 
-        RecipeUtil.createSlabBlockManualAndStonecutterRecipes(builder, set.resinBlock.get(), set.smoothSlab.get());
-        RecipeUtil.createStairBlockManualAndStonecutterRecipes(builder, set.resinBlock.get(), set.smoothStairs.get());
-        RecipeUtil.createWallBlockManualAndStonecutterRecipes(builder, set.resinBlock.get(), set.smoothWall.get());
+        RecipeUtil.createSlabBlockManualAndStonecutterRecipes(builder, set.resinBlock().get(), set.smoothSlab().get());
+        RecipeUtil.createStairBlockManualAndStonecutterRecipes(builder, set.resinBlock().get(), set.smoothStairs().get());
+        RecipeUtil.createWallBlockManualAndStonecutterRecipes(builder, set.resinBlock().get(), set.smoothWall().get());
 
         // Brick resin block
 
-        RecipeUtil.createSlabBlockManualAndStonecutterRecipes(builder, set.brick.get(), set.brickSlab.get());
-        RecipeUtil.createStairBlockManualAndStonecutterRecipes(builder, set.brick.get(), set.brickStairs.get());
-        RecipeUtil.createWallBlockManualAndStonecutterRecipes(builder, set.brick.get(), set.brickWall.get());
+        RecipeUtil.createSlabBlockManualAndStonecutterRecipes(builder, set.brick().get(), set.brickSlab().get());
+        RecipeUtil.createStairBlockManualAndStonecutterRecipes(builder, set.brick().get(), set.brickStairs().get());
+        RecipeUtil.createWallBlockManualAndStonecutterRecipes(builder, set.brick().get(), set.brickWall().get());
 
         // Smooth resin block
 
-        builder.stonecut(set.smooth)
-            .into(1, set.brick);
+        builder.stonecut(set.smooth())
+            .into(1, set.brick());
 
-        RecipeUtil.createSlabBlockManualAndStonecutterRecipes(builder, set.smooth.get(), set.smoothSlab.get());
-        RecipeUtil.createStairBlockManualAndStonecutterRecipes(builder, set.smooth.get(), set.smoothStairs.get());
-        RecipeUtil.createWallBlockManualAndStonecutterRecipes(builder, set.smooth.get(), set.smoothWall.get());
+        RecipeUtil.createSlabBlockManualAndStonecutterRecipes(builder, set.smooth().get(), set.smoothSlab().get());
+        RecipeUtil.createStairBlockManualAndStonecutterRecipes(builder, set.smooth().get(), set.smoothStairs().get());
+        RecipeUtil.createWallBlockManualAndStonecutterRecipes(builder, set.smooth().get(), set.smoothWall().get());
 
-        RecipeUtil.createSlabBlockManualAndStonecutterRecipes(builder, set.smooth.get(), set.brickSlab.get());
-        RecipeUtil.createStairBlockManualAndStonecutterRecipes(builder, set.smooth.get(), set.brickStairs.get());
-        RecipeUtil.createWallBlockManualAndStonecutterRecipes(builder, set.smooth.get(), set.brickWall.get());
+        RecipeUtil.createSlabBlockManualAndStonecutterRecipes(builder, set.smooth().get(), set.brickSlab().get());
+        RecipeUtil.createStairBlockManualAndStonecutterRecipes(builder, set.smooth().get(), set.brickStairs().get());
+        RecipeUtil.createWallBlockManualAndStonecutterRecipes(builder, set.smooth().get(), set.brickWall().get());
     }
 
-    private record ResinSet(
-        Supplier<Item> resinBallItem,
-        Supplier<Block> resinBlock,
-        Supplier<Block> resinBlockSlab,
-        Supplier<Block> resinBlockStairs,
-        Supplier<Block> brick,
-        Supplier<Block> brickSlab,
-        Supplier<Block> brickStairs,
-        Supplier<Block> brickWall,
-        Supplier<Block> smooth,
-        Supplier<Block> smoothSlab,
-        Supplier<Block> smoothStairs,
-        Supplier<Block> smoothWall,
-        Supplier<ResinVeinBlock> vein,
-        Supplier<Block> web
-    ) {}
 }

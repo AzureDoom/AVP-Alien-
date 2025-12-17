@@ -2,9 +2,9 @@ package com.alien.fabric.data.recipe;
 
 import com.alien.Alien;
 import com.alien.fabric.data.recipe.impl.ArmorRecipeProvider;
-import com.alien.fabric.data.recipe.impl.ChitinRecipeProvider;
 import com.alien.fabric.data.recipe.impl.MiscellaneousRecipeProvider;
-import com.alien.fabric.data.recipe.impl.ResinRecipeProvider;
+import com.alien.fabric.data.recipe.impl.chitin.ChitinRecipeProvider;
+import com.alien.fabric.data.recipe.impl.resin.ResinRecipeProvider;
 import com.blib.fabric.data.recipe.builder.RecipeBuilder;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
@@ -21,7 +21,7 @@ public class RecipeProvider extends FabricRecipeProvider {
 
     @Override
     public void buildRecipes(RecipeOutput recipeOutput) {
-        var builder = RecipeBuilder.with(Alien.MOD, recipeOutput);
+        var builder = RecipeBuilder.with(Alien.MOD, recipeOutput, this::withConditions);
         ArmorRecipeProvider.provide(builder);
         MiscellaneousRecipeProvider.provide(builder);
         ChitinRecipeProvider.provide(builder);

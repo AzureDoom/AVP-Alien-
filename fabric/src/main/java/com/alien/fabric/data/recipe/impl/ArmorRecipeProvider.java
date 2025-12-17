@@ -2,6 +2,7 @@ package com.alien.fabric.data.recipe.impl;
 
 import com.alien.common.registry.init.item.AlienArmorItems;
 import com.alien.common.registry.init.item.AlienItems;
+import com.alien.fabric.compatibility.AVPHumanFabric;
 import com.blib.fabric.data.recipe.RecipeTemplates;
 import com.blib.fabric.data.recipe.builder.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -12,19 +13,11 @@ public class ArmorRecipeProvider {
 
     public static void provide(RecipeBuilder builder) {
         createPlatedChitinArmorSetRecipes(builder);
-        createPlatedAberrantChitinArmorSetRecipes(builder);
+        createPlatedNetherChitinArmorSetRecipes(builder);
+        createPlatedAberrantChitinArmorSetRecipes(builder.withCondition(AVPHumanFabric.IS_LOADED));
         // TODO: Re-implement these at some point in the future.
         // createPlatedIrradiatedChitinArmorSetRecipes(builder);
-        createPlatedNetherChitinArmorSetRecipes(builder);
 
-        createStandardArmorSetRecipes(
-            builder,
-            AlienItems.ABERRANT_CHITIN.get(),
-            AlienArmorItems.ABERRANT_CHITIN_HELMET.get(),
-            AlienArmorItems.ABERRANT_CHITIN_CHESTPLATE.get(),
-            AlienArmorItems.ABERRANT_CHITIN_LEGGINGS.get(),
-            AlienArmorItems.ABERRANT_CHITIN_BOOTS.get()
-        );
         createStandardArmorSetRecipes(
             builder,
             AlienItems.CHITIN.get(),
@@ -32,6 +25,22 @@ public class ArmorRecipeProvider {
             AlienArmorItems.CHITIN_CHESTPLATE.get(),
             AlienArmorItems.CHITIN_LEGGINGS.get(),
             AlienArmorItems.CHITIN_BOOTS.get()
+        );
+        createStandardArmorSetRecipes(
+            builder,
+            AlienItems.NETHER_CHITIN.get(),
+            AlienArmorItems.NETHER_CHITIN_HELMET.get(),
+            AlienArmorItems.NETHER_CHITIN_CHESTPLATE.get(),
+            AlienArmorItems.NETHER_CHITIN_LEGGINGS.get(),
+            AlienArmorItems.NETHER_CHITIN_BOOTS.get()
+        );
+        createStandardArmorSetRecipes(
+            builder.withCondition(AVPHumanFabric.IS_LOADED),
+            AlienItems.ABERRANT_CHITIN.get(),
+            AlienArmorItems.ABERRANT_CHITIN_HELMET.get(),
+            AlienArmorItems.ABERRANT_CHITIN_CHESTPLATE.get(),
+            AlienArmorItems.ABERRANT_CHITIN_LEGGINGS.get(),
+            AlienArmorItems.ABERRANT_CHITIN_BOOTS.get()
         );
         // TODO: Re-implement these at some point in the future.
         // createStandardArmorSetRecipes(
@@ -42,14 +51,6 @@ public class ArmorRecipeProvider {
         // ArmorItems.IRRADIATED_CHITIN_LEGGINGS,
         // ArmorItems.IRRADIATED_CHITIN_BOOTS
         // );
-        createStandardArmorSetRecipes(
-            builder,
-            AlienItems.NETHER_CHITIN.get(),
-            AlienArmorItems.NETHER_CHITIN_HELMET.get(),
-            AlienArmorItems.NETHER_CHITIN_CHESTPLATE.get(),
-            AlienArmorItems.NETHER_CHITIN_LEGGINGS.get(),
-            AlienArmorItems.NETHER_CHITIN_BOOTS.get()
-        );
     }
 
     private static void createPlatedAberrantChitinArmorSetRecipes(RecipeBuilder builder) {
