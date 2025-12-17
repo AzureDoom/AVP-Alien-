@@ -1,13 +1,13 @@
-package com.alien.mixin;
+package com.alien.mixin_util;
 
 import com.alien.compatibility.avp_human.GeneManagerProxy;
 import com.human.common.gameplay.gene.GeneOperationType;
 import com.human.common.gameplay.gene.Genes;
 import net.minecraft.world.entity.LivingEntity;
 
-class MixinItem_ChorusEmbryo$Compatibility {
+public class MixinItem_ChorusEmbryo$Compatibility {
 
-    static void addWarpGene(LivingEntity livingEmbryo) {
+    public static void addWarpGene(LivingEntity livingEmbryo) {
         GeneManagerProxy.getOrCreate(livingEmbryo)
             .getGeneContainer()
             .ifPresent(

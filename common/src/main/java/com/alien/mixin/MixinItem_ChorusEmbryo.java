@@ -4,6 +4,7 @@ import com.alien.common.data.AlienAdvancements;
 import com.alien.common.model.alien.Host;
 import com.alien.common.util.AlienEmbryoUtil;
 import com.alien.common.util.AlienPredicates;
+import com.alien.mixin_util.MixinItem_ChorusEmbryo$Compatibility;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
