@@ -15,6 +15,7 @@ import com.alien.common.util.AcidBleedUtil;
 import com.alien.common.util.AlienTransitionUtil;
 import com.alien.compatibility.avp_human.AVPHuman;
 import com.alien.compatibility.avp_human.GeneManagerProxy;
+import com.alien.compatibility.avp_predator.AVPPredator;
 import com.blib.common.gameplay.entity.manager.VibrationSystemManager;
 import com.blib.common.network.data.DataAccessor;
 import com.blib.common.network.data.DataUser;
@@ -23,6 +24,7 @@ import com.blib.common.util.MovementAnalyzer;
 import com.human.common.gameplay.gene.Genes;
 import com.human.common.registry.key.HumanBiomeKeys;
 import com.just.core.functional.option.Option;
+import com.predator.common.registry.init.PredatorEntityTypes;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -122,10 +124,12 @@ public abstract class Alien extends Monster implements DataUser {
         } else if (entityType.is(AlienEntityTypeTags.SPITTERS)) {
             return EntityType.LLAMA;
         }
-        // FIXME:
-        // else if (entityType.is(AVPEntityTypeTags.PREDALIENS)) {
-        // return PredatorEntityTypes.YAUTJA.get();
-        // }
+
+        if (AVPPredator.MOD.isLoaded()) {
+            if (entityType.is(AlienEntityTypeTags.PREDALIENS)) {
+                return PredatorEntityTypes.YAUTJA.get();
+            }
+        }
 
         return EntityType.VILLAGER;
     }
