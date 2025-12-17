@@ -43,6 +43,7 @@ dependencies {
     compileOnly "maven.modrinth:gigeresque:${project.gigeresque_version}"
 
     compileOnly "com.avp.human:avp_human-common-1.21.1:${project.avp_human_version}"
+    compileOnly "com.avp.predator:avp_predator-common-1.21.1:${project.avp_predator_version}"
 }
 
 configurations.configureEach {

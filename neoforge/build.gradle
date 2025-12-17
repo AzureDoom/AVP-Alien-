@@ -75,6 +75,9 @@ dependencies {
 
     compileOnly "com.avp.human:avp_human-neoforge-1.21.1:${project.avp_human_version}"
     runtimeOnly "com.avp.human:avp_human-neoforge-1.21.1:${project.avp_human_version}"
+
+    compileOnly "com.avp.predator:avp_predator-neoforge-1.21.1:${project.avp_predator_version}"
+    runtimeOnly "com.avp.predator:avp_predator-neoforge-1.21.1:${project.avp_predator_version}"
 }
 
 configurations.configureEach {

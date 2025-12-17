@@ -39,6 +39,7 @@
 		"azurelib": ">=${azurelib_version}"
 	},
 	"suggests": {
-		"avp_human": "~${avp_human_version}"
+		"avp_human": "~${avp_human_version}",
+		"avp_predator": "~${avp_predator_version}"
 	}
 }

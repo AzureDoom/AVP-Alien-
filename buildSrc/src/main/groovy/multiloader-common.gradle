@@ -48,6 +48,7 @@ repositories {
         url = 'https://maven.blamejared.com'
     }
     maven { url = "https://maven.bvanseghi.dev/avp_human" }
+    maven { url = "https://maven.bvanseghi.dev/avp_predator" }
     maven { url = "https://maven.bvanseghi.dev/blib" }
     maven { url = "https://maven.bvanseghi.dev/just" }
     maven { url = "https://maven.azuredoom.com/mods" }
@@ -108,9 +109,10 @@ processResources {
             'neoforge_loader_version_range': neoforge_loader_version_range,
             'credits'                      : credits,
             'java_version'                 : java_version,
-            'blib_version'                  : blib_version,
+            'blib_version'                 : blib_version,
             'azurelib_version'             : azurelib_version,
             'avp_human_version'            : avp_human_version,
+            'avp_predator_version'         : avp_predator_version,
     ]
 
     filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml', '*.mixins.json']) {

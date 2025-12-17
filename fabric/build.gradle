@@ -94,6 +94,9 @@ dependencies {
 
     modCompileOnly "com.avp.human:avp_human-fabric-1.21.1:${project.avp_human_version}"
     modRuntimeOnly "com.avp.human:avp_human-fabric-1.21.1:${project.avp_human_version}"
+
+    modCompileOnly "com.avp.predator:avp_predator-fabric-1.21.1:${project.avp_predator_version}"
+    modRuntimeOnly "com.avp.predator:avp_predator-fabric-1.21.1:${project.avp_predator_version}"
 }
 
 loom {
