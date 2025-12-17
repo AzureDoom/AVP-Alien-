@@ -4,7 +4,6 @@ import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.compatibility.gigeresque.common.registry.tag.GigeresqueEntityTypeTags;
 import com.alien.fabric.data.compatibility.stellaris.StellarisConstants;
-import com.human.common.registry.init.HumanEntityTypes;
 import com.human.common.registry.tag.HumanEntityTypeTags;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
@@ -47,7 +46,6 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
         addPredaliens();
         addProwlers();
         addQueens();
-        addRadiationResistant();
         addRoyalAliens();
         addRoyalXenomorphs();
         addRunners();
@@ -55,7 +53,9 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
         addWarriors();
         addXenomorphs();
 
+        // Compatibility
         addCompatibilityTags();
+        addRadiationResistant();
     }
 
     private void addAberrantAliens() {
@@ -167,8 +167,7 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
 
     private void addHatedByXenomorphs() {
         getOrCreateTagBuilder(AlienEntityTypeTags.HATED_BY_XENOMORPHS)
-            .add(EntityType.PLAYER)
-            .add(HumanEntityTypes.MARINE.get());
+            .add(EntityType.PLAYER);
     }
 
     private void addHiveAliens() {
@@ -213,8 +212,7 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
                 EntityType.TRADER_LLAMA,
                 EntityType.VILLAGER,
                 EntityType.WANDERING_TRADER,
-                EntityType.WITCH,
-                HumanEntityTypes.MARINE.get()
+                EntityType.WITCH
             );
     }
 
@@ -359,11 +357,6 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
             );
     }
 
-    private void addRadiationResistant() {
-        getOrCreateTagBuilder(HumanEntityTypeTags.RADIATION_RESISTANT)
-            .addTag(AlienEntityTypeTags.XENOMORPHS);
-    }
-
     private void addRoyalAliens() {
         getOrCreateTagBuilder(AlienEntityTypeTags.ROYAL_ALIENS)
             .addTag(AlienEntityTypeTags.ROYAL_XENOMORPHS)
@@ -463,5 +456,10 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
         getOrCreateTagBuilder(StellarisConstants.NO_OXYGEN_NEEDED)
             .setReplace(false)
             .addTag(AlienEntityTypeTags.ALIENS);
+    }
+
+    private void addRadiationResistant() {
+        getOrCreateTagBuilder(HumanEntityTypeTags.RADIATION_RESISTANT)
+            .addTag(AlienEntityTypeTags.XENOMORPHS);
     }
 }
