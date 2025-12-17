@@ -47,6 +47,7 @@ repositories {
         name = 'BlameJared'
         url = 'https://maven.blamejared.com'
     }
+    maven { url = "https://maven.bvanseghi.dev/avp_alien" }
     maven { url = "https://maven.bvanseghi.dev/avp_human" }
     maven { url = "https://maven.bvanseghi.dev/avp_predator" }
     maven { url = "https://maven.bvanseghi.dev/blib" }
