@@ -23,6 +23,8 @@ import java.util.function.Supplier;
 
 public class DigToTargetGoal extends Goal {
 
+    private static final float DESTROY_TIME_LIMIT = 6F;
+
     private static final float BREAKING_SPEED = 50F;
 
     private final Mob mob;
@@ -210,9 +212,7 @@ public class DigToTargetGoal extends Goal {
                         state.hasBlockEntity()
                             || state.getDestroySpeed(mob.level(), rayTraceResult.getBlockPos()) == -1
                             // TODO: Make this configurable
-                            // FIXME:
-                            // || state.getBlock().defaultDestroyTime() >=
-                            // HumanSteelBlocks.STEEL_BLOCK.get().defaultDestroyTime()
+                            || state.getBlock().defaultDestroyTime() >= DESTROY_TIME_LIMIT
                             // TODO: Make this configurable
                             || state.is(AlienBlockTags.XENOMORPH_IMMUNE)
                     ) {
