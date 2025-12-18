@@ -1,128 +1,108 @@
-package com.alien.client.render.entity.parasite;
+package com.alien.client.render.entity.parasite.attachment;
 
-import com.just.core.functional.function.Lazy;
+import com.alien.client.render.entity.head.EntityHeadData;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiFunction;
+public class AlienParasiteHeadAttachmentOffsetData {
 
-public record EntityHeadOffsetData(
-    BiFunction<EntityHeadData, Entity, Double> verticalOffsetSupplier,
-    BiFunction<EntityHeadData, Entity, Double> faceOffsetSupplier
-) {
-
-    private static final EntityHeadOffsetData COW = new EntityHeadOffsetData(
-        EntityHeadOffsetData::cowVerticalOffset,
-        EntityHeadOffsetData::cowFaceOffset
+    public static final ParasiteHeadAttachmentOffsetData CAMEL = new ParasiteHeadAttachmentOffsetData(
+        AlienParasiteHeadAttachmentOffsetData::camelVerticalOffset,
+        AlienParasiteHeadAttachmentOffsetData::camelFaceOffset
     );
 
-    private static final EntityHeadOffsetData HOGLIN = new EntityHeadOffsetData(
-        EntityHeadOffsetData::hoglinVerticalOffset,
-        EntityHeadOffsetData::hoglinFaceOffset
+    public static final ParasiteHeadAttachmentOffsetData COW = new ParasiteHeadAttachmentOffsetData(
+        AlienParasiteHeadAttachmentOffsetData::cowVerticalOffset,
+        AlienParasiteHeadAttachmentOffsetData::cowFaceOffset
     );
 
-    private static final EntityHeadOffsetData LLAMA = new EntityHeadOffsetData(
-        EntityHeadOffsetData::llamaVerticalOffset,
-        EntityHeadOffsetData::llamaFaceOffset
+    public static final ParasiteHeadAttachmentOffsetData DONKEY = new ParasiteHeadAttachmentOffsetData(
+        AlienParasiteHeadAttachmentOffsetData::donkeyVerticalOffset,
+        AlienParasiteHeadAttachmentOffsetData::donkeyFaceOffset
     );
 
-    private static final EntityHeadOffsetData VILLAGER = new EntityHeadOffsetData(
-        EntityHeadOffsetData::villagerVerticalOffset,
-        EntityHeadOffsetData::villagerFaceOffset
+    public static final ParasiteHeadAttachmentOffsetData DOLPHIN = new ParasiteHeadAttachmentOffsetData(
+        AlienParasiteHeadAttachmentOffsetData::dolphinVerticalOffset,
+        AlienParasiteHeadAttachmentOffsetData::dolphinFaceOffset
     );
 
-    public static final Lazy<Map<EntityType<?>, EntityHeadOffsetData>> ENTITY_HEAD_OFFSET_DATA_BY_TYPE = Lazy.of(
-        () -> new HashMap<>(
-            Map.ofEntries(
-                Map.entry(
-                    EntityType.CAMEL,
-                    new EntityHeadOffsetData(EntityHeadOffsetData::camelVerticalOffset, EntityHeadOffsetData::camelFaceOffset)
-                ),
-                Map.entry(EntityType.COW, COW),
-                Map.entry(
-                    EntityType.DONKEY,
-                    new EntityHeadOffsetData(EntityHeadOffsetData::donkeyVerticalOffset, EntityHeadOffsetData::donkeyFaceOffset)
-                ),
-                Map.entry(
-                    EntityType.DOLPHIN,
-                    new EntityHeadOffsetData(EntityHeadOffsetData::dolphinVerticalOffset, EntityHeadOffsetData::dolphinFaceOffset)
-                ),
-                Map.entry(EntityType.EVOKER, VILLAGER),
-                Map.entry(
-                    EntityType.FOX,
-                    new EntityHeadOffsetData(EntityHeadOffsetData::foxVerticalOffset, EntityHeadOffsetData::foxFaceOffset)
-                ),
-                Map.entry(
-                    EntityType.GOAT,
-                    new EntityHeadOffsetData(EntityHeadOffsetData::goatVerticalOffset, EntityHeadOffsetData::goatFaceOffset)
-                ),
-                Map.entry(EntityType.HOGLIN, HOGLIN),
-                Map.entry(
-                    EntityType.HORSE,
-                    new EntityHeadOffsetData(EntityHeadOffsetData::horseVerticalOffset, EntityHeadOffsetData::horseFaceOffset)
-                ),
-                Map.entry(EntityType.ILLUSIONER, VILLAGER),
-                Map.entry(EntityType.LLAMA, LLAMA),
-                Map.entry(EntityType.MOOSHROOM, COW),
-                Map.entry(
-                    EntityType.MULE,
-                    new EntityHeadOffsetData(EntityHeadOffsetData::muleVerticalOffset, EntityHeadOffsetData::muleFaceOffset)
-                ),
-                Map.entry(
-                    EntityType.PANDA,
-                    new EntityHeadOffsetData(EntityHeadOffsetData::pandaVerticalOffset, EntityHeadOffsetData::pandaFaceOffset)
-                ),
-                Map.entry(
-                    EntityType.PIG,
-                    new EntityHeadOffsetData(EntityHeadOffsetData::pigVerticalOffset, EntityHeadOffsetData::pigFaceOffset)
-                ),
-                Map.entry(EntityType.PIGLIN, VILLAGER),
-                Map.entry(EntityType.PIGLIN_BRUTE, VILLAGER),
-                Map.entry(EntityType.PILLAGER, VILLAGER),
-                Map.entry(
-                    EntityType.PLAYER,
-                    new EntityHeadOffsetData(EntityHeadOffsetData::playerVerticalOffset, EntityHeadOffsetData::playerFaceOffset)
-                ),
-                Map.entry(
-                    EntityType.POLAR_BEAR,
-                    new EntityHeadOffsetData(EntityHeadOffsetData::polarBearVerticalOffset, EntityHeadOffsetData::polarBearFaceOffset)
-                ),
-                Map.entry(
-                    EntityType.RAVAGER,
-                    new EntityHeadOffsetData(EntityHeadOffsetData::ravagerVerticalOffset, EntityHeadOffsetData::ravagerFaceOffset)
-                ),
-                Map.entry(
-                    EntityType.SHEEP,
-                    new EntityHeadOffsetData(EntityHeadOffsetData::sheepVerticalOffset, EntityHeadOffsetData::sheepFaceOffset)
-                ),
-                Map.entry(
-                    EntityType.SNIFFER,
-                    new EntityHeadOffsetData(EntityHeadOffsetData::snifferVerticalOffset, EntityHeadOffsetData::snifferFaceOffset)
-                ),
-                Map.entry(EntityType.TRADER_LLAMA, LLAMA),
-                Map.entry(EntityType.VILLAGER, VILLAGER),
-                Map.entry(EntityType.VINDICATOR, VILLAGER),
-                Map.entry(EntityType.WANDERING_TRADER, VILLAGER),
-                Map.entry(
-                    EntityType.WITCH,
-                    new EntityHeadOffsetData(EntityHeadOffsetData::witchVerticalOffset, EntityHeadOffsetData::villagerFaceOffset)
-                ),
-                Map.entry(
-                    EntityType.WOLF,
-                    new EntityHeadOffsetData(EntityHeadOffsetData::wolfVerticalOffset, EntityHeadOffsetData::wolfFaceOffset)
-                ),
-                Map.entry(EntityType.ZOGLIN, HOGLIN),
-                Map.entry(EntityType.ZOMBIE_VILLAGER, VILLAGER)
-                // FIXME:
-                // Map.entry(
-                // HumanEntityTypes.MARINE.get(),
-                // new EntityHeadOffsetData(EntityHeadOffsetData::marineVerticalOffset,
-                // EntityHeadOffsetData::marineFaceOffset)
-                // )
-            )
-        )
+    public static final ParasiteHeadAttachmentOffsetData FOX = new ParasiteHeadAttachmentOffsetData(
+        AlienParasiteHeadAttachmentOffsetData::foxVerticalOffset,
+        AlienParasiteHeadAttachmentOffsetData::foxFaceOffset
+    );
+
+    public static final ParasiteHeadAttachmentOffsetData GOAT = new ParasiteHeadAttachmentOffsetData(
+        AlienParasiteHeadAttachmentOffsetData::goatVerticalOffset,
+        AlienParasiteHeadAttachmentOffsetData::goatFaceOffset
+    );
+
+    public static final ParasiteHeadAttachmentOffsetData HOGLIN = new ParasiteHeadAttachmentOffsetData(
+        AlienParasiteHeadAttachmentOffsetData::hoglinVerticalOffset,
+        AlienParasiteHeadAttachmentOffsetData::hoglinFaceOffset
+    );
+
+    public static final ParasiteHeadAttachmentOffsetData HORSE = new ParasiteHeadAttachmentOffsetData(
+        AlienParasiteHeadAttachmentOffsetData::horseVerticalOffset,
+        AlienParasiteHeadAttachmentOffsetData::horseFaceOffset
+    );
+
+    public static final ParasiteHeadAttachmentOffsetData LLAMA = new ParasiteHeadAttachmentOffsetData(
+        AlienParasiteHeadAttachmentOffsetData::llamaVerticalOffset,
+        AlienParasiteHeadAttachmentOffsetData::llamaFaceOffset
+    );
+
+    public static final ParasiteHeadAttachmentOffsetData MULE = new ParasiteHeadAttachmentOffsetData(
+        AlienParasiteHeadAttachmentOffsetData::muleVerticalOffset,
+        AlienParasiteHeadAttachmentOffsetData::muleFaceOffset
+    );
+
+    public static final ParasiteHeadAttachmentOffsetData PANDA = new ParasiteHeadAttachmentOffsetData(
+        AlienParasiteHeadAttachmentOffsetData::pandaVerticalOffset,
+        AlienParasiteHeadAttachmentOffsetData::pandaFaceOffset
+    );
+
+    public static final ParasiteHeadAttachmentOffsetData PIG = new ParasiteHeadAttachmentOffsetData(
+        AlienParasiteHeadAttachmentOffsetData::pigVerticalOffset,
+        AlienParasiteHeadAttachmentOffsetData::pigFaceOffset
+    );
+
+    public static final ParasiteHeadAttachmentOffsetData PLAYER = new ParasiteHeadAttachmentOffsetData(
+        AlienParasiteHeadAttachmentOffsetData::playerVerticalOffset,
+        AlienParasiteHeadAttachmentOffsetData::playerFaceOffset
+    );
+
+    public static final ParasiteHeadAttachmentOffsetData POLAR_BEAR = new ParasiteHeadAttachmentOffsetData(
+        AlienParasiteHeadAttachmentOffsetData::polarBearVerticalOffset,
+        AlienParasiteHeadAttachmentOffsetData::polarBearFaceOffset
+    );
+
+    public static final ParasiteHeadAttachmentOffsetData RAVAGER = new ParasiteHeadAttachmentOffsetData(
+        AlienParasiteHeadAttachmentOffsetData::ravagerVerticalOffset,
+        AlienParasiteHeadAttachmentOffsetData::ravagerFaceOffset
+    );
+
+    public static final ParasiteHeadAttachmentOffsetData SHEEP = new ParasiteHeadAttachmentOffsetData(
+        AlienParasiteHeadAttachmentOffsetData::sheepVerticalOffset,
+        AlienParasiteHeadAttachmentOffsetData::sheepFaceOffset
+    );
+
+    public static final ParasiteHeadAttachmentOffsetData SNIFFER = new ParasiteHeadAttachmentOffsetData(
+        AlienParasiteHeadAttachmentOffsetData::snifferVerticalOffset,
+        AlienParasiteHeadAttachmentOffsetData::snifferFaceOffset
+    );
+
+    public static final ParasiteHeadAttachmentOffsetData VILLAGER = new ParasiteHeadAttachmentOffsetData(
+        AlienParasiteHeadAttachmentOffsetData::villagerVerticalOffset,
+        AlienParasiteHeadAttachmentOffsetData::villagerFaceOffset
+    );
+
+    public static final ParasiteHeadAttachmentOffsetData WITCH = new ParasiteHeadAttachmentOffsetData(
+        AlienParasiteHeadAttachmentOffsetData::witchVerticalOffset,
+        AlienParasiteHeadAttachmentOffsetData::villagerFaceOffset
+    );
+
+    public static final ParasiteHeadAttachmentOffsetData WOLF = new ParasiteHeadAttachmentOffsetData(
+        AlienParasiteHeadAttachmentOffsetData::wolfVerticalOffset,
+        AlienParasiteHeadAttachmentOffsetData::wolfFaceOffset
     );
 
     private static double marineVerticalOffset(EntityHeadData data, Entity parasite) {

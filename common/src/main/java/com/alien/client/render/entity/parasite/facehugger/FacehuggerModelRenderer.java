@@ -1,7 +1,8 @@
 package com.alien.client.render.entity.parasite.facehugger;
 
-import com.alien.client.render.entity.parasite.EntityHeadData;
-import com.alien.client.render.entity.parasite.EntityHeadOffsetData;
+import com.alien.client.render.entity.head.EntityHeadData;
+import com.alien.client.render.entity.head.EntityHeadDataCache;
+import com.alien.client.render.entity.parasite.attachment.ParasiteHeadAttachmentOffsetDataCache;
 import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.Facehugger;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -47,7 +48,7 @@ public class FacehuggerModelRenderer extends AzEntityModelRenderer<Facehugger> {
             return;
         }
 
-        var data = EntityHeadData.ENTITY_HEAD_DATA_BY_TYPE.get().get(host.getType());
+        var data = EntityHeadDataCache.get(host.getType());
 
         if (data == null) {
             return;
@@ -82,7 +83,7 @@ public class FacehuggerModelRenderer extends AzEntityModelRenderer<Facehugger> {
         poseStack.mulPose(Axis.XP.rotationDegrees(headPitch));
         poseStack.translate(-xPivot, -yPivot + host.getBbHeight(), zPivot);
 
-        var offsetSuppliers = EntityHeadOffsetData.ENTITY_HEAD_OFFSET_DATA_BY_TYPE.get().get(host.getType());
+        var offsetSuppliers = ParasiteHeadAttachmentOffsetDataCache.get(host.getType());
 
         if (offsetSuppliers != null) {
             var yOffset = offsetSuppliers.verticalOffsetSupplier().apply(data, facehugger);
