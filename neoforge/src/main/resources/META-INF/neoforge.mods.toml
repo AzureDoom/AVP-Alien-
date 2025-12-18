@@ -31,7 +31,13 @@ side          = "BOTH"
 [[dependencies.${mod_id}]]
 modId         = "azurelib"
 type          = "required"
-versionRange  = "${azurelib_version}"
+versionRange  = "[${azurelib_version},3.2.0)"
+ordering      = "NONE"
+side          = "BOTH"
+[[dependencies.${mod_id}]]
+modId         = "azurelib"
+type          = "discouraged"
+versionRange  = "[3.1.2,)"
 ordering      = "NONE"
 side          = "BOTH"
 [[dependencies.${mod_id}]]
