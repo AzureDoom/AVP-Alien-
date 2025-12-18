@@ -114,6 +114,7 @@ processResources {
             'azurelib_version'             : azurelib_version,
             'avp_human_version'            : avp_human_version,
             'avp_predator_version'         : avp_predator_version,
+            'gigeresque_version'           : gigeresque_version,
     ]
 
     filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml', '*.mixins.json']) {

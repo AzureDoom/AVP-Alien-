@@ -30,6 +30,9 @@
 		"${mod_id}.mixins.json",
 		"${mod_id}.fabric.mixins.json"
 	],
+	"breaks": {
+		"gigeresque": "<${gigeresque_version}"
+	},
 	"depends": {
 		"fabricloader": ">=${fabric_loader_version}",
 		"minecraft": "~${minecraft_version}",
@@ -40,6 +43,7 @@
 	},
 	"suggests": {
 		"avp_human": "~${avp_human_version}",
-		"avp_predator": "~${avp_predator_version}"
+		"avp_predator": "~${avp_predator_version}",
+		"gigeresque": "~${gigeresque_version}"
 	}
 }
