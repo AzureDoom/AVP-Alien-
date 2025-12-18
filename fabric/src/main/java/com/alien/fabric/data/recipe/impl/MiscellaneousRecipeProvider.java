@@ -2,7 +2,7 @@ package com.alien.fabric.data.recipe.impl;
 
 import com.alien.common.registry.init.block.AlienBlocks;
 import com.alien.common.registry.init.item.AlienItems;
-import com.alien.fabric.compatibility.AVPHumanFabric;
+import com.alien.fabric.compatibility.avp_human.AVPHumanFabric;
 import com.blib.fabric.data.recipe.RecipeConstants;
 import com.blib.fabric.data.recipe.builder.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeCategory;

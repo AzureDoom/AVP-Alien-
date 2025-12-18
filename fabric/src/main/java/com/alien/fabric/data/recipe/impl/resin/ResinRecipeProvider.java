@@ -5,7 +5,7 @@ import com.alien.common.registry.init.block.AlienResinBlocks;
 import com.alien.common.registry.init.block.IrradiatedAlienResinBlocks;
 import com.alien.common.registry.init.block.NetherAlienResinBlocks;
 import com.alien.common.registry.init.item.AlienItems;
-import com.alien.fabric.compatibility.AVPHumanFabric;
+import com.alien.fabric.compatibility.avp_human.AVPHumanFabric;
 import com.blib.fabric.data.recipe.RecipeTemplates;
 import com.blib.fabric.data.recipe.builder.RecipeBuilder;
 import com.blib.fabric.data.recipe.util.RecipeUtil;

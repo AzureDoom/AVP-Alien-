@@ -3,7 +3,7 @@ package com.alien.fabric.data.tag;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.compatibility.gigeresque.common.registry.tag.GigeresqueEntityTypeTags;
-import com.alien.fabric.data.compatibility.stellaris.StellarisConstants;
+import com.alien.fabric.compatibility.stellaris.common.registry.tag.StellarisEntityTypeTags;
 import com.human.common.registry.tag.HumanEntityTypeTags;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
@@ -456,8 +456,7 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
         getOrCreateTagBuilder(GigeresqueEntityTypeTags.ACID_RESISTANT)
             .addTag(AlienEntityTypeTags.ALIENS);
 
-        getOrCreateTagBuilder(StellarisConstants.NO_OXYGEN_NEEDED)
-            .setReplace(false)
+        getOrCreateTagBuilder(StellarisEntityTypeTags.NO_OXYGEN_NEEDED)
             .addTag(AlienEntityTypeTags.ALIENS);
     }
 
