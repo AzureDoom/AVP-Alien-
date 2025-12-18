@@ -453,6 +453,9 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
         getOrCreateTagBuilder(AlienEntityTypeTags.ACID_IMMUNE)
             .addOptionalTag(GigeresqueEntityTypeTags.ACID_RESISTANT);
 
+        getOrCreateTagBuilder(GigeresqueEntityTypeTags.ACID_RESISTANT)
+            .addTag(AlienEntityTypeTags.ALIENS);
+
         getOrCreateTagBuilder(StellarisConstants.NO_OXYGEN_NEEDED)
             .setReplace(false)
             .addTag(AlienEntityTypeTags.ALIENS);
