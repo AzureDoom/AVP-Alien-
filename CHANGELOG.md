@@ -18,17 +18,17 @@
 - Plated irradiated chitin armor now glows.
 - Alien spawn eggs in the Alien Spawn Eggs creative mode tab are now sorted based on their lifecycle.
 
+## 🧩 Compatibility
+- Added constraints for which gigeresque versions are usable w/ AVP:
+  - Gigeresque 0.8.16+ (up to 0.9.0) is supported.
+  - Older versions of gigeresque are no longer supported.
+
 ## 🐞 Fixes
 - Fixed royal ovomorphs using incorrect textures.
 - Fixed AVP aliens taking damage from Gigeresque acid.
-
-## 🧪 Experimental
-- N/A
+- Fixed a crash occurring when Gigeresque's surgery kit item is used to remove an AVP chestburster.
 
 ## 🛠 Data Pack
 - Added `#avp_alien:predalien_adolescents` entity type tag.
 - Added `#avp_alien:predalien_chestbursters` entity type tag.
 - Added `#avp_alien:predaliens` entity type tag.
-
-## 🔬 Technical Changes
-- N/A
