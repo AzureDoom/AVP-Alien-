@@ -39,7 +39,7 @@ public class GigeresqueSurgeryKitPatch {
     }
 
     private static void applySurgeryKitBehavior(Player player, LivingEntity livingEntity, ItemStack itemStack) {
-        player.getCooldowns().addCooldown(itemStack.getItem(), CommonMod.config.surgeryKitCooldownTicks);
+        player.getCooldowns().addCooldown(itemStack.getItem(), CommonMod.config.generalConfigs.surgeryKitCooldownTicks);
 
         if (!player.isCreative() || !player.isSpectator()) {
             itemStack.hurtAndBreak(1, player, livingEntity.getEquipmentSlotForItem(itemStack));
