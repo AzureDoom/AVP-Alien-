@@ -106,8 +106,8 @@ public class Alien {
             // Listeners/Events
             AlienReloadListeners.initialize();
 
-            MOD.events().afterLevelTick().register(Alien::tickHivesInLevel);
-            MOD.events().afterLevelTick().register(Alien::tickQueenSpawnCooldown);
+            MOD.events().postLevelTick().register(Alien::tickHivesInLevel);
+            MOD.events().postLevelTick().register(Alien::tickQueenSpawnCooldown);
             MOD.events().onTagsUpdated().register(Alien::onTagsUpdated);
         });
     }
