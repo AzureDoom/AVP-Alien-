@@ -20,7 +20,7 @@ public class ParasiteHeadAttachmentOffsetDataCache {
 
     public static void put(
         BLibClientMod mod,
-        Supplier<EntityType<?>> entityTypeSupplier,
+        Supplier<? extends EntityType<?>> entityTypeSupplier,
         ParasiteHeadAttachmentOffsetData parasiteHeadAttachmentOffsetData
     ) {
         mod.events()

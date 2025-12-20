@@ -18,7 +18,7 @@ public class EntityHeadDataCache {
         return CACHE.get(BuiltInRegistries.ENTITY_TYPE.getKey(entityType));
     }
 
-    public static void put(BLibClientMod mod, Supplier<EntityType<?>> entityTypeSupplier, EntityHeadData entityHeadData) {
+    public static void put(BLibClientMod mod, Supplier<? extends EntityType<?>> entityTypeSupplier, EntityHeadData entityHeadData) {
         mod.events()
             .onClientSetup()
             .register(() -> {
