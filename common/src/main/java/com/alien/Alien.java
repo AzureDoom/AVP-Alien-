@@ -9,6 +9,7 @@ import com.alien.common.registry.GrowthStageRegistry;
 import com.alien.common.registry.InfectionRegistry;
 import com.alien.common.registry.init.AlienArmorMaterials;
 import com.alien.common.registry.init.AlienBlockEntityTypes;
+import com.alien.common.registry.init.AlienCommands;
 import com.alien.common.registry.init.AlienCompostingChances;
 import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienDecoratedPotPatterns;
@@ -99,6 +100,8 @@ public class Alien {
             AlienCompostingChances.initialize();
             AlienDataSyncKeys.initialize();
             AlienEntitySpawns.initialize();
+
+            AlienCommands.initialize();
 
             // Data Migration
             AlienDataMigrations.initialize();
