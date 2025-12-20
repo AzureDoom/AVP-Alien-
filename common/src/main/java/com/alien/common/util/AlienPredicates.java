@@ -144,7 +144,7 @@ public class AlienPredicates {
         return target.getType().is(AlienEntityTypeTags.HOSTS) &&
             BLibEntityPredicates.isAlive(target) &&
             !BLibEntityPredicates.isBaby(target) &&
-            !BLibEntityPredicates.isInvulnerable((LivingEntity) target);
+            !BLibEntityPredicates.isInvulnerable(target);
     }
 
     public static boolean isParasiteAttached(Entity target) {
