@@ -58,61 +58,63 @@ public class Alien {
 
         AlienConfig.initialize();
 
-        MOD.initialize(() -> {
-            // No dependencies.
-            AlienBlocks.initialize();
-            AlienChitinBlocks.initialize();
-            AlienResinBlocks.initialize();
-            NetherAlienChitinBlocks.initialize();
-            NetherAlienResinBlocks.initialize();
-            AberrantAlienChitinBlocks.initialize();
-            AberrantAlienResinBlocks.initialize();
-            IrradiatedAlienResinBlocks.initialize();
-            AlienItems.initialize();
-            AlienEntityTypes.initialize();
-            AlienSoundEvents.initialize();
+        MOD.initialize(Alien::runInitialization);
+    }
 
-            // Depends on blocks.
-            AlienBlockItems.initialize();
-            AlienChitinBlockItems.initialize();
-            AlienResinBlockItems.initialize();
-            NetherAlienChitinBlockItems.initialize();
-            NetherAlienResinBlockItems.initialize();
-            AberrantAlienChitinBlockItems.initialize();
-            AberrantAlienResinBlockItems.initialize();
-            IrradiatedAlienResinBlockItems.initialize();
-            // Depends on sound events.
-            AlienArmorMaterials.initialize();
-            // Depends on armor materials.
-            AlienArmorItems.initialize();
-            // Depends on entity types.
-            AlienSpawnEggItems.initialize();
-            // Depends on blocks.
-            AlienBlockEntityTypes.initialize();
-            // Depends on blocks, items, block items, etc.
-            AlienCreativeModeTabs.initialize();
+    private static void runInitialization() {
+        // No dependencies.
+        AlienBlocks.initialize();
+        AlienChitinBlocks.initialize();
+        AlienResinBlocks.initialize();
+        NetherAlienChitinBlocks.initialize();
+        NetherAlienResinBlocks.initialize();
+        AberrantAlienChitinBlocks.initialize();
+        AberrantAlienResinBlocks.initialize();
+        IrradiatedAlienResinBlocks.initialize();
+        AlienItems.initialize();
+        AlienEntityTypes.initialize();
+        AlienSoundEvents.initialize();
 
-            AlienGameEvents.initialize();
-            AlienParticleTypes.initialize();
+        // Depends on blocks.
+        AlienBlockItems.initialize();
+        AlienChitinBlockItems.initialize();
+        AlienResinBlockItems.initialize();
+        NetherAlienChitinBlockItems.initialize();
+        NetherAlienResinBlockItems.initialize();
+        AberrantAlienChitinBlockItems.initialize();
+        AberrantAlienResinBlockItems.initialize();
+        IrradiatedAlienResinBlockItems.initialize();
+        // Depends on sound events.
+        AlienArmorMaterials.initialize();
+        // Depends on armor materials.
+        AlienArmorItems.initialize();
+        // Depends on entity types.
+        AlienSpawnEggItems.initialize();
+        // Depends on blocks.
+        AlienBlockEntityTypes.initialize();
+        // Depends on blocks, items, block items, etc.
+        AlienCreativeModeTabs.initialize();
 
-            // Functionality
-            AlienDecoratedPotPatterns.initialize();
-            AlienCompostingChances.initialize();
-            AlienDataSyncKeys.initialize();
-            AlienEntitySpawns.initialize();
+        AlienGameEvents.initialize();
+        AlienParticleTypes.initialize();
 
-            AlienCommands.initialize();
+        // Functionality
+        AlienDecoratedPotPatterns.initialize();
+        AlienCompostingChances.initialize();
+        AlienDataSyncKeys.initialize();
+        AlienEntitySpawns.initialize();
 
-            // Data Migration
-            AlienDataMigrations.initialize();
+        AlienCommands.initialize();
 
-            // Listeners/Events
-            AlienReloadListeners.initialize();
+        // Data Migration
+        AlienDataMigrations.initialize();
 
-            MOD.events().postLevelTick().register(Alien::tickHivesInLevel);
-            MOD.events().postLevelTick().register(Alien::tickQueenSpawnCooldown);
-            MOD.events().onTagsUpdated().register(Alien::onTagsUpdated);
-        });
+        // Listeners/Events
+        AlienReloadListeners.initialize();
+
+        MOD.events().postLevelTick().register(Alien::tickHivesInLevel);
+        MOD.events().postLevelTick().register(Alien::tickQueenSpawnCooldown);
+        MOD.events().onTagsUpdated().register(Alien::onTagsUpdated);
     }
 
     private static void tickHivesInLevel(Level level) {

@@ -53,7 +53,7 @@ neoForge {
 }
 
 dependencies {
-    implementation "com.blib:blib-neoforge-${project.minecraft_version}:${project.blib_version}";
+    implementation "com.blib:blib-neoforge-${project.minecraft_version}:${project.blib_version}"
     implementation "mod.azure.azurelib:azurelib-neo-${project.minecraft_version}:${project.azurelib_version}"
 
     compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:${project.rei_version}"
