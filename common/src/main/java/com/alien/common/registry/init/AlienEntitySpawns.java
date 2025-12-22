@@ -10,7 +10,6 @@ import com.blib.common.gameplay.model.spawning.BLibEntitySpawnData;
 import com.blib.common.gameplay.model.spawning.SpawnSettings;
 import com.blib.common.registry.BLibHolder;
 import com.blib.common.registry.impl.BLibEntitySpawnRegistry;
-import com.human.common.registry.tag.HumanBiomeTags;
 import net.minecraft.world.entity.EntityType;
 
 public class AlienEntitySpawns {
@@ -72,7 +71,7 @@ public class AlienEntitySpawns {
         register(AlienEntityTypes.IRRADIATED_RUNNER, AlienConfig.INSTANCE.spawnConfigs.IRRADIATED_RUNNER_SPAWN);
         REGISTRY.register(
             BLibEntitySpawnData.builder(AlienEntityTypes.IRRADIATED_QUEEN)
-                .withBiomeTagKey(HumanBiomeTags.IS_IRRADIATED)
+                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
                 .withSpawnPredicate(QueenSpawning.PREDICATE)
                 .withSpawnSettings(convert(AlienConfig.INSTANCE.spawnConfigs.IRRADIATED_QUEEN_SPAWN))
                 .build()
