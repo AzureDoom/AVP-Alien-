@@ -73,13 +73,21 @@ dependencies {
     // Compatibility
     implementation "maven.modrinth:gigeresque:${project.gigeresque_version}"
 
-    compileOnly "com.avp.human:avp_human-neoforge-1.21.1:${project.avp_human_version}"
+    compileOnly ("com.avp.human:avp_human-neoforge-1.21.1:${project.avp_human_version}") {
+        exclude group: project.group
+    }
     // Uncomment to test compatibility.
-    runtimeOnly "com.avp.human:avp_human-neoforge-1.21.1:${project.avp_human_version}"
+    runtimeOnly ("com.avp.human:avp_human-neoforge-1.21.1:${project.avp_human_version}") {
+        exclude group: project.group
+    }
 
-    compileOnly "com.avp.predator:avp_predator-neoforge-1.21.1:${project.avp_predator_version}"
+    compileOnly ("com.avp.predator:avp_predator-neoforge-1.21.1:${project.avp_predator_version}") {
+        exclude group: project.group
+    }
     // Uncomment to test compatibility.
-    runtimeOnly "com.avp.predator:avp_predator-neoforge-1.21.1:${project.avp_predator_version}"
+    runtimeOnly ("com.avp.predator:avp_predator-neoforge-1.21.1:${project.avp_predator_version}") {
+        exclude group: project.group
+    }
 }
 
 configurations.configureEach {

@@ -92,13 +92,21 @@ dependencies {
     // Compatibility
     modImplementation "maven.modrinth:gigeresque:${project.gigeresque_modrinth_version}"
 
-    modCompileOnly "com.avp.human:avp_human-fabric-1.21.1:${project.avp_human_version}"
+    modCompileOnly ("com.avp.human:avp_human-fabric-1.21.1:${project.avp_human_version}") {
+        exclude group: project.group
+    }
     // Uncomment to test compatibility.
-    modRuntimeOnly "com.avp.human:avp_human-fabric-1.21.1:${project.avp_human_version}"
+    modLocalRuntime ("com.avp.human:avp_human-fabric-1.21.1:${project.avp_human_version}") {
+        exclude group: project.group
+    }
 
-    modCompileOnly "com.avp.predator:avp_predator-fabric-1.21.1:${project.avp_predator_version}"
+    modCompileOnly ("com.avp.predator:avp_predator-fabric-1.21.1:${project.avp_predator_version}") {
+        exclude group: project.group
+    }
     // Uncomment to test compatibility.
-    modRuntimeOnly "com.avp.predator:avp_predator-fabric-1.21.1:${project.avp_predator_version}"
+    modLocalRuntime ("com.avp.predator:avp_predator-fabric-1.21.1:${project.avp_predator_version}") {
+        exclude group: project.group
+    }
 }
 
 loom {
