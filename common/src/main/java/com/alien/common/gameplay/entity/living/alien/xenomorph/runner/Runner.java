@@ -8,6 +8,7 @@ import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.EggCarrier;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.EggPickupManager;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphNavigationManager;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienEntityTypes;
@@ -125,8 +126,8 @@ public class Runner extends Xenomorph implements EggCarrier {
     }
 
     @Override
-    protected double getPursuitSpeedModifier() {
-        return 1.2;
+    protected @NotNull XenomorphNavigationManager createNavigationManager() {
+        return new XenomorphNavigationManager(this, moveControl, 1.2, 2);
     }
 
     public RunnerAnimationDispatcher getAnimationDispatcher() {

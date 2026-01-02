@@ -27,10 +27,14 @@ public class XenomorphNavigationManager {
     private final Goal waterAttackGoal;
 
     public XenomorphNavigationManager(Xenomorph xenomorph, MoveControl moveControl) {
+        this(xenomorph, moveControl, 1.1, 2);
+    }
+
+    public XenomorphNavigationManager(Xenomorph xenomorph, MoveControl moveControl, double groundSpeedModifier, double waterSpeedModifier) {
         // Ground navigation.
         this.groundAttackGoal = new DelayedAttackGoal(
             xenomorph,
-            xenomorph.getPursuitSpeedModifier(),
+            groundSpeedModifier,
             false,
             xenomorph.getAttackDelayInTicks(),
             xenomorph::runAttackAnimations
@@ -50,7 +54,7 @@ public class XenomorphNavigationManager {
 
         // Water navigation.
         xenomorph.setPathfindingMalus(PathType.WATER, 0.0F);
-        this.waterAttackGoal = new DelayedAttackGoal(xenomorph, 2, false, 7, xenomorph::runAttackAnimations);
+        this.waterAttackGoal = new DelayedAttackGoal(xenomorph, waterSpeedModifier, false, 7, xenomorph::runAttackAnimations);
         this.waterMoveControl = new WaterMoveControl(xenomorph);
         this.waterNavigation = new WaterBoundPathNavigation(xenomorph, xenomorph.level());
     }

@@ -16,6 +16,8 @@
 ## ♻️ Changes
 - Irradiated chitin armor now glows.
 - Plated irradiated chitin armor now glows.
+- Queens now move 60% faster than their base speed when chasing targets on land (was previously 10% faster).
+- Queens now move 60% faster than their base speed when chasing targets in water (was previously 100% faster).
 - Alien spawn eggs in the Alien Spawn Eggs creative mode tab are now sorted based on their lifecycle.
 
 ## 🧩 Compatibility

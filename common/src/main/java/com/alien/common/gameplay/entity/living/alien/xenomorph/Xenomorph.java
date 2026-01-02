@@ -68,15 +68,15 @@ public abstract class Xenomorph extends Alien implements ResinProducer {
         this.crawlingManager = new CrawlingManager(this, isCrawling);
         this.growthManager = new GrowthManager(this, XenomorphGrowthUtil.GROW_UP_CALLBACK)
             .setGrowOverTime(false);
-        this.navigationManager = new XenomorphNavigationManager(this, moveControl);
+        this.navigationManager = createNavigationManager();
         this.resinManager = new ResinManager(this, createResinData());
         this.wasUnderwaterLastTick = false;
 
         isCrawling.onChange($ -> refreshDimensions());
     }
 
-    protected double getPursuitSpeedModifier() {
-        return 1.1;
+    protected @NotNull XenomorphNavigationManager createNavigationManager() {
+        return new XenomorphNavigationManager(this, moveControl);
     }
 
     protected int getAttackDelayInTicks() {

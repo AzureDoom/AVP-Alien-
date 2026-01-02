@@ -3,6 +3,7 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.crusher;
 import com.alien.common.config.AlienConfig;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphNavigationManager;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienEntityTypes;
@@ -12,6 +13,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class Crusher extends Xenomorph {
@@ -45,8 +47,8 @@ public class Crusher extends Xenomorph {
     }
 
     @Override
-    protected double getPursuitSpeedModifier() {
-        return 1.2;
+    protected @NotNull XenomorphNavigationManager createNavigationManager() {
+        return new XenomorphNavigationManager(this, moveControl, 1.2, 2);
     }
 
     @Override

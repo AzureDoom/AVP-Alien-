@@ -6,6 +6,7 @@ import com.alien.common.gameplay.ai.goal.DigToTargetGoal;
 import com.alien.common.gameplay.ai.goal.QueenLayEggGoal;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphNavigationManager;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
 import com.alien.common.gameplay.level.saveddata.QueenSpawnChunkData;
 import com.alien.common.gameplay.level.saveddata.StrainLeakData;
@@ -52,6 +53,11 @@ public class Queen extends Xenomorph {
         this.animationDispatcher = new QueenAnimationDispatcher(this);
         this.ovipositorManager = new OvipositorManager(this);
         this.config = AlienConfig.INSTANCE.statsConfigs.QUEEN_STATS;
+    }
+
+    @Override
+    protected @NotNull XenomorphNavigationManager createNavigationManager() {
+        return new XenomorphNavigationManager(this, moveControl, 1.6, 1.6);
     }
 
     @Override
