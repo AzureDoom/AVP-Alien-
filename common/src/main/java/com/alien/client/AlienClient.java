@@ -53,14 +53,18 @@ public class AlienClient {
     private static final BLibClientMod MOD = BLibClientMod.createFor(Alien.MOD);
 
     public static void initialize() {
+        MOD.initialize(AlienClient::runInitialization);
+    }
+
+    private static void runInitialization() {
         registerArmorRenderers();
         registerBlockRenderLayers();
-        registerParasiteHeadAttachmentOffsetData();
+        registerEntityRenderers();
         registerParticleProviderFactories();
 
-        MOD.initialize(() -> {
+        MOD.events().onClientSetup().register(() -> {
             registerEntityHeadData();
-            registerEntityRenderers();
+            registerParasiteHeadAttachmentOffsetData();
         });
     }
 
