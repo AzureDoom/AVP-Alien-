@@ -38,9 +38,9 @@ public class SpawnEggsCreativeModeTabInitializer {
         CreativeModeTabUtil.accept(output, AlienSpawnEggItems.CRUSHER_SPAWN_EGG);
 
         if (AVPPredator.MOD.isLoaded()) {
-            // CreativeModeTabUtil.accept(output, AlienSpawnEggItems.PREDALIEN_CHESTBURSTER_SPAWN_EGG);
-            // CreativeModeTabUtil.accept(output, AlienSpawnEggItems.PREDALIEN_ADOLESCENT_SPAWN_EGG);
-            // CreativeModeTabUtil.accept(output, AlienSpawnEggItems.PREDALIEN_SPAWN_EGG);
+            CreativeModeTabUtil.accept(output, AlienSpawnEggItems.PREDALIEN_CHESTBURSTER_SPAWN_EGG);
+            CreativeModeTabUtil.accept(output, AlienSpawnEggItems.PREDALIEN_ADOLESCENT_SPAWN_EGG);
+            CreativeModeTabUtil.accept(output, AlienSpawnEggItems.PREDALIEN_SPAWN_EGG);
         }
 
         CreativeModeTabUtil.accept(output, AlienSpawnEggItems.BOILER_SPAWN_EGG);
@@ -66,9 +66,9 @@ public class SpawnEggsCreativeModeTabInitializer {
         CreativeModeTabUtil.accept(output, AlienSpawnEggItems.NETHER_CRUSHER_SPAWN_EGG);
 
         if (AVPPredator.MOD.isLoaded()) {
-            // CreativeModeTabUtil.accept(output, AlienSpawnEggItems.NETHER_PREDALIEN_CHESTBURSTER_SPAWN_EGG);
-            // CreativeModeTabUtil.accept(output, AlienSpawnEggItems.NETHER_PREDALIEN_ADOLESCENT_SPAWN_EGG);
-            // CreativeModeTabUtil.accept(output, AlienSpawnEggItems.NETHER_PREDALIEN_SPAWN_EGG);
+            CreativeModeTabUtil.accept(output, AlienSpawnEggItems.NETHER_PREDALIEN_CHESTBURSTER_SPAWN_EGG);
+            CreativeModeTabUtil.accept(output, AlienSpawnEggItems.NETHER_PREDALIEN_ADOLESCENT_SPAWN_EGG);
+            CreativeModeTabUtil.accept(output, AlienSpawnEggItems.NETHER_PREDALIEN_SPAWN_EGG);
         }
 
         CreativeModeTabUtil.accept(output, AlienSpawnEggItems.NETHER_BOILER_SPAWN_EGG);
@@ -94,9 +94,9 @@ public class SpawnEggsCreativeModeTabInitializer {
         CreativeModeTabUtil.accept(output, AlienSpawnEggItems.ABERRANT_CRUSHER_SPAWN_EGG);
 
         if (AVPPredator.MOD.isLoaded()) {
-            // CreativeModeTabUtil.accept(output, AlienSpawnEggItems.ABERRANT_PREDALIEN_CHESTBURSTER_SPAWN_EGG);
-            // CreativeModeTabUtil.accept(output, AlienSpawnEggItems.ABERRANT_PREDALIEN_ADOLESCENT_SPAWN_EGG);
-            // CreativeModeTabUtil.accept(output, AlienSpawnEggItems.ABERRANT_PREDALIEN_SPAWN_EGG);
+            CreativeModeTabUtil.accept(output, AlienSpawnEggItems.ABERRANT_PREDALIEN_CHESTBURSTER_SPAWN_EGG);
+            CreativeModeTabUtil.accept(output, AlienSpawnEggItems.ABERRANT_PREDALIEN_ADOLESCENT_SPAWN_EGG);
+            CreativeModeTabUtil.accept(output, AlienSpawnEggItems.ABERRANT_PREDALIEN_SPAWN_EGG);
         }
 
         CreativeModeTabUtil.accept(output, AlienSpawnEggItems.ABERRANT_BOILER_SPAWN_EGG);
@@ -114,7 +114,7 @@ public class SpawnEggsCreativeModeTabInitializer {
         CreativeModeTabUtil.accept(output, AlienSpawnEggItems.IRRADIATED_CRUSHER_SPAWN_EGG);
 
         if (AVPPredator.MOD.isLoaded()) {
-            // CreativeModeTabUtil.accept(output, AlienSpawnEggItems.IRRADIATED_PREDALIEN_SPAWN_EGG);
+            CreativeModeTabUtil.accept(output, AlienSpawnEggItems.IRRADIATED_PREDALIEN_SPAWN_EGG);
         }
     }
 }
