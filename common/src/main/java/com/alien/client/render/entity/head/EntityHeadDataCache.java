@@ -1,6 +1,5 @@
 package com.alien.client.render.entity.head;
 
-import com.blib.client.BLibClientMod;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -18,22 +17,15 @@ public class EntityHeadDataCache {
         return CACHE.get(BuiltInRegistries.ENTITY_TYPE.getKey(entityType));
     }
 
-    public static void put(BLibClientMod mod, Supplier<? extends EntityType<?>> entityTypeSupplier, EntityHeadData entityHeadData) {
-        mod.events()
-            .onClientSetup()
-            .register(() -> {
-                var entityType = entityTypeSupplier.get();
-                var resourceLocation = BuiltInRegistries.ENTITY_TYPE.getKey(entityType);
-
-                put(mod, resourceLocation, entityHeadData);
-            });
+    public static void put(Supplier<? extends EntityType<?>> entityTypeSupplier, EntityHeadData entityHeadData) {
+        put(entityTypeSupplier.get(), entityHeadData);
     }
 
-    public static void put(BLibClientMod mod, EntityType<?> entityType, EntityHeadData entityHeadData) {
-        put(mod, BuiltInRegistries.ENTITY_TYPE.getKey(entityType), entityHeadData);
+    public static void put(EntityType<?> entityType, EntityHeadData entityHeadData) {
+        put(BuiltInRegistries.ENTITY_TYPE.getKey(entityType), entityHeadData);
     }
 
-    public static void put(BLibClientMod mod, ResourceLocation resourceLocation, EntityHeadData entityHeadData) {
+    public static void put(ResourceLocation resourceLocation, EntityHeadData entityHeadData) {
         CACHE.put(resourceLocation, entityHeadData);
     }
 }
