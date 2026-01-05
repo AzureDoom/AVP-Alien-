@@ -164,37 +164,37 @@ public class AlienClient {
     }
 
     private static void registerEntityHeadData() {
-        EntityHeadDataCache.put(MOD, EntityType.CAMEL, AlienEntityHeadData.CAMEL);
-        EntityHeadDataCache.put(MOD, EntityType.COW, AlienEntityHeadData.COW);
-        EntityHeadDataCache.put(MOD, EntityType.DONKEY, AlienEntityHeadData.HORSE);
-        EntityHeadDataCache.put(MOD, EntityType.DOLPHIN, AlienEntityHeadData.DOLPHIN);
-        EntityHeadDataCache.put(MOD, EntityType.EVOKER, AlienEntityHeadData.VILLAGER);
-        EntityHeadDataCache.put(MOD, EntityType.FOX, AlienEntityHeadData.FOX);
-        EntityHeadDataCache.put(MOD, EntityType.GOAT, AlienEntityHeadData.GOAT);
-        EntityHeadDataCache.put(MOD, EntityType.HOGLIN, AlienEntityHeadData.HOGLIN);
-        EntityHeadDataCache.put(MOD, EntityType.HORSE, AlienEntityHeadData.HORSE);
-        EntityHeadDataCache.put(MOD, EntityType.ILLUSIONER, AlienEntityHeadData.VILLAGER);
-        EntityHeadDataCache.put(MOD, EntityType.LLAMA, AlienEntityHeadData.LLAMA);
-        EntityHeadDataCache.put(MOD, EntityType.MOOSHROOM, AlienEntityHeadData.COW);
-        EntityHeadDataCache.put(MOD, EntityType.MULE, AlienEntityHeadData.HORSE);
-        EntityHeadDataCache.put(MOD, EntityType.PANDA, AlienEntityHeadData.PANDA);
-        EntityHeadDataCache.put(MOD, EntityType.PIG, AlienEntityHeadData.PIG);
-        EntityHeadDataCache.put(MOD, EntityType.PIGLIN, AlienEntityHeadData.PIGLIN);
-        EntityHeadDataCache.put(MOD, EntityType.PIGLIN_BRUTE, AlienEntityHeadData.PIGLIN);
-        EntityHeadDataCache.put(MOD, EntityType.PILLAGER, AlienEntityHeadData.VILLAGER);
-        EntityHeadDataCache.put(MOD, EntityType.PLAYER, AlienEntityHeadData.PLAYER);
-        EntityHeadDataCache.put(MOD, EntityType.POLAR_BEAR, AlienEntityHeadData.POLAR_BEAR);
-        EntityHeadDataCache.put(MOD, EntityType.RAVAGER, AlienEntityHeadData.RAVAGER);
-        EntityHeadDataCache.put(MOD, EntityType.SHEEP, AlienEntityHeadData.SHEEP);
-        EntityHeadDataCache.put(MOD, EntityType.SNIFFER, AlienEntityHeadData.SNIFFER);
-        EntityHeadDataCache.put(MOD, EntityType.TRADER_LLAMA, AlienEntityHeadData.LLAMA);
-        EntityHeadDataCache.put(MOD, EntityType.VILLAGER, AlienEntityHeadData.VILLAGER);
-        EntityHeadDataCache.put(MOD, EntityType.VINDICATOR, AlienEntityHeadData.VILLAGER);
-        EntityHeadDataCache.put(MOD, EntityType.WITCH, AlienEntityHeadData.VILLAGER);
-        EntityHeadDataCache.put(MOD, EntityType.WANDERING_TRADER, AlienEntityHeadData.VILLAGER);
-        EntityHeadDataCache.put(MOD, EntityType.WOLF, AlienEntityHeadData.WOLF);
-        EntityHeadDataCache.put(MOD, EntityType.ZOGLIN, AlienEntityHeadData.HOGLIN);
-        EntityHeadDataCache.put(MOD, EntityType.ZOMBIE_VILLAGER, AlienEntityHeadData.VILLAGER);
+        EntityHeadDataCache.put(EntityType.CAMEL, AlienEntityHeadData.CAMEL);
+        EntityHeadDataCache.put(EntityType.COW, AlienEntityHeadData.COW);
+        EntityHeadDataCache.put(EntityType.DONKEY, AlienEntityHeadData.HORSE);
+        EntityHeadDataCache.put(EntityType.DOLPHIN, AlienEntityHeadData.DOLPHIN);
+        EntityHeadDataCache.put(EntityType.EVOKER, AlienEntityHeadData.VILLAGER);
+        EntityHeadDataCache.put(EntityType.FOX, AlienEntityHeadData.FOX);
+        EntityHeadDataCache.put(EntityType.GOAT, AlienEntityHeadData.GOAT);
+        EntityHeadDataCache.put(EntityType.HOGLIN, AlienEntityHeadData.HOGLIN);
+        EntityHeadDataCache.put(EntityType.HORSE, AlienEntityHeadData.HORSE);
+        EntityHeadDataCache.put(EntityType.ILLUSIONER, AlienEntityHeadData.VILLAGER);
+        EntityHeadDataCache.put(EntityType.LLAMA, AlienEntityHeadData.LLAMA);
+        EntityHeadDataCache.put(EntityType.MOOSHROOM, AlienEntityHeadData.COW);
+        EntityHeadDataCache.put(EntityType.MULE, AlienEntityHeadData.HORSE);
+        EntityHeadDataCache.put(EntityType.PANDA, AlienEntityHeadData.PANDA);
+        EntityHeadDataCache.put(EntityType.PIG, AlienEntityHeadData.PIG);
+        EntityHeadDataCache.put(EntityType.PIGLIN, AlienEntityHeadData.PIGLIN);
+        EntityHeadDataCache.put(EntityType.PIGLIN_BRUTE, AlienEntityHeadData.PIGLIN);
+        EntityHeadDataCache.put(EntityType.PILLAGER, AlienEntityHeadData.VILLAGER);
+        EntityHeadDataCache.put(EntityType.PLAYER, AlienEntityHeadData.PLAYER);
+        EntityHeadDataCache.put(EntityType.POLAR_BEAR, AlienEntityHeadData.POLAR_BEAR);
+        EntityHeadDataCache.put(EntityType.RAVAGER, AlienEntityHeadData.RAVAGER);
+        EntityHeadDataCache.put(EntityType.SHEEP, AlienEntityHeadData.SHEEP);
+        EntityHeadDataCache.put(EntityType.SNIFFER, AlienEntityHeadData.SNIFFER);
+        EntityHeadDataCache.put(EntityType.TRADER_LLAMA, AlienEntityHeadData.LLAMA);
+        EntityHeadDataCache.put(EntityType.VILLAGER, AlienEntityHeadData.VILLAGER);
+        EntityHeadDataCache.put(EntityType.VINDICATOR, AlienEntityHeadData.VILLAGER);
+        EntityHeadDataCache.put(EntityType.WITCH, AlienEntityHeadData.VILLAGER);
+        EntityHeadDataCache.put(EntityType.WANDERING_TRADER, AlienEntityHeadData.VILLAGER);
+        EntityHeadDataCache.put(EntityType.WOLF, AlienEntityHeadData.WOLF);
+        EntityHeadDataCache.put(EntityType.ZOGLIN, AlienEntityHeadData.HOGLIN);
+        EntityHeadDataCache.put(EntityType.ZOMBIE_VILLAGER, AlienEntityHeadData.VILLAGER);
     }
 
     private static void registerEntityRenderers() {
@@ -283,37 +283,37 @@ public class AlienClient {
     }
 
     private static void registerParasiteHeadAttachmentOffsetData() {
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.CAMEL, AlienParasiteHeadAttachmentOffsetData.CAMEL);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.COW, AlienParasiteHeadAttachmentOffsetData.COW);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.DONKEY, AlienParasiteHeadAttachmentOffsetData.DONKEY);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.DOLPHIN, AlienParasiteHeadAttachmentOffsetData.DOLPHIN);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.EVOKER, AlienParasiteHeadAttachmentOffsetData.VILLAGER);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.FOX, AlienParasiteHeadAttachmentOffsetData.FOX);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.GOAT, AlienParasiteHeadAttachmentOffsetData.GOAT);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.HOGLIN, AlienParasiteHeadAttachmentOffsetData.HOGLIN);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.HORSE, AlienParasiteHeadAttachmentOffsetData.HORSE);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.ILLUSIONER, AlienParasiteHeadAttachmentOffsetData.VILLAGER);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.LLAMA, AlienParasiteHeadAttachmentOffsetData.LLAMA);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.MOOSHROOM, AlienParasiteHeadAttachmentOffsetData.COW);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.MULE, AlienParasiteHeadAttachmentOffsetData.MULE);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.PANDA, AlienParasiteHeadAttachmentOffsetData.PANDA);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.PIG, AlienParasiteHeadAttachmentOffsetData.PIG);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.PIGLIN, AlienParasiteHeadAttachmentOffsetData.VILLAGER);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.PIGLIN_BRUTE, AlienParasiteHeadAttachmentOffsetData.VILLAGER);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.PILLAGER, AlienParasiteHeadAttachmentOffsetData.VILLAGER);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.PLAYER, AlienParasiteHeadAttachmentOffsetData.PLAYER);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.POLAR_BEAR, AlienParasiteHeadAttachmentOffsetData.POLAR_BEAR);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.RAVAGER, AlienParasiteHeadAttachmentOffsetData.RAVAGER);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.SHEEP, AlienParasiteHeadAttachmentOffsetData.SHEEP);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.SNIFFER, AlienParasiteHeadAttachmentOffsetData.SNIFFER);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.TRADER_LLAMA, AlienParasiteHeadAttachmentOffsetData.LLAMA);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.VILLAGER, AlienParasiteHeadAttachmentOffsetData.VILLAGER);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.VINDICATOR, AlienParasiteHeadAttachmentOffsetData.VILLAGER);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.WANDERING_TRADER, AlienParasiteHeadAttachmentOffsetData.VILLAGER);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.WITCH, AlienParasiteHeadAttachmentOffsetData.WITCH);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.WOLF, AlienParasiteHeadAttachmentOffsetData.WOLF);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.ZOGLIN, AlienParasiteHeadAttachmentOffsetData.HOGLIN);
-        ParasiteHeadAttachmentOffsetDataCache.put(MOD, EntityType.ZOMBIE_VILLAGER, AlienParasiteHeadAttachmentOffsetData.VILLAGER);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.CAMEL, AlienParasiteHeadAttachmentOffsetData.CAMEL);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.COW, AlienParasiteHeadAttachmentOffsetData.COW);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.DONKEY, AlienParasiteHeadAttachmentOffsetData.DONKEY);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.DOLPHIN, AlienParasiteHeadAttachmentOffsetData.DOLPHIN);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.EVOKER, AlienParasiteHeadAttachmentOffsetData.VILLAGER);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.FOX, AlienParasiteHeadAttachmentOffsetData.FOX);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.GOAT, AlienParasiteHeadAttachmentOffsetData.GOAT);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.HOGLIN, AlienParasiteHeadAttachmentOffsetData.HOGLIN);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.HORSE, AlienParasiteHeadAttachmentOffsetData.HORSE);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.ILLUSIONER, AlienParasiteHeadAttachmentOffsetData.VILLAGER);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.LLAMA, AlienParasiteHeadAttachmentOffsetData.LLAMA);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.MOOSHROOM, AlienParasiteHeadAttachmentOffsetData.COW);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.MULE, AlienParasiteHeadAttachmentOffsetData.MULE);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.PANDA, AlienParasiteHeadAttachmentOffsetData.PANDA);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.PIG, AlienParasiteHeadAttachmentOffsetData.PIG);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.PIGLIN, AlienParasiteHeadAttachmentOffsetData.VILLAGER);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.PIGLIN_BRUTE, AlienParasiteHeadAttachmentOffsetData.VILLAGER);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.PILLAGER, AlienParasiteHeadAttachmentOffsetData.VILLAGER);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.PLAYER, AlienParasiteHeadAttachmentOffsetData.PLAYER);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.POLAR_BEAR, AlienParasiteHeadAttachmentOffsetData.POLAR_BEAR);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.RAVAGER, AlienParasiteHeadAttachmentOffsetData.RAVAGER);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.SHEEP, AlienParasiteHeadAttachmentOffsetData.SHEEP);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.SNIFFER, AlienParasiteHeadAttachmentOffsetData.SNIFFER);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.TRADER_LLAMA, AlienParasiteHeadAttachmentOffsetData.LLAMA);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.VILLAGER, AlienParasiteHeadAttachmentOffsetData.VILLAGER);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.VINDICATOR, AlienParasiteHeadAttachmentOffsetData.VILLAGER);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.WANDERING_TRADER, AlienParasiteHeadAttachmentOffsetData.VILLAGER);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.WITCH, AlienParasiteHeadAttachmentOffsetData.WITCH);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.WOLF, AlienParasiteHeadAttachmentOffsetData.WOLF);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.ZOGLIN, AlienParasiteHeadAttachmentOffsetData.HOGLIN);
+        ParasiteHeadAttachmentOffsetDataCache.put(EntityType.ZOMBIE_VILLAGER, AlienParasiteHeadAttachmentOffsetData.VILLAGER);
     }
 
     private static void registerParticleProviderFactories() {
