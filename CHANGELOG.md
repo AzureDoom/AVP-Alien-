@@ -3,9 +3,6 @@
 ## ✍️ Developer Notes
 - For help or other questions, concerns, etc. check out our Discord server: https://discord.gg/wp7mvmbkVb
 
-## ☢️ Breaking Changes
-- N/A
-
 ## ✨ What's New
 - Added predalien.
 - Added predalien adolescent.
@@ -20,14 +17,6 @@
 - Queens now move 60% faster than their base speed when chasing targets in water (was previously 100% faster).
 - Alien spawn eggs in the Alien Spawn Eggs creative mode tab are now sorted based on their lifecycle.
 - Updated praetorian model + textures.
-
-## 🧩 Compatibility
-- Added constraints for which azurelib versions are usable w/ AVP:
-  - AzureLib 3.1.1+ (up to 3.2.0 exclusive) is supported.
-  - AzureLib 3.1.2+ is discouraged. Please use exactly 3.1.1 if you are able to. You can still use 3.1.2+ (up to 3.2.0 exclusive), but there may be bugs present.
-- Added constraints for which gigeresque versions are usable w/ AVP:
-  - Gigeresque 0.8.16+ (up to 0.9.0 exclusive) is supported.
-  - Older versions of gigeresque are no longer supported.
 
 ## 🐞 Fixes
 - Fixed royal ovomorphs using incorrect textures.
