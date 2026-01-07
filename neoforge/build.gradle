@@ -75,14 +75,9 @@ dependencies {
     localRuntime "me.shedaniel.cloth:cloth-config-neoforge:${project.cloth_version}"
 
     // Compatibility
-    compileOnly "maven.modrinth:gigeresque:${project.gigeresque_version}"
-    // Uncomment to test compatibility.
-    localRuntime "maven.modrinth:gigeresque:${project.gigeresque_version}"
-
     compileOnly ("com.avp.human:avp_human-neoforge-1.21.1:${project.avp_human_version}") {
         exclude group: project.group
     }
-    // Uncomment to test compatibility.
     localRuntime ("com.avp.human:avp_human-neoforge-1.21.1:${project.avp_human_version}") {
         exclude group: project.group
     }
@@ -90,18 +85,24 @@ dependencies {
     compileOnly ("com.avp.predator:avp_predator-neoforge-1.21.1:${project.avp_predator_version}") {
         exclude group: project.group
     }
-    // Uncomment to test compatibility.
     localRuntime ("com.avp.predator:avp_predator-neoforge-1.21.1:${project.avp_predator_version}") {
         exclude group: project.group
     }
 
+    compileOnly "maven.modrinth:gigeresque:${project.gigeresque_version}"
+    localRuntime "maven.modrinth:gigeresque:${project.gigeresque_version}"
+
+    compileOnly "dev.emi:emi-neoforge:${emi_version}"
+    compileOnly "mezz.jei:jei-$minecraft_version-neoforge:${jei_version}"
+    compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:${rei_version}"
+
     // Thanks to Rearth from Oritech for this little trick. :)
     switch (recipe_viewer.toLowerCase(Locale.ROOT)) {
         case "emi": localRuntime "dev.emi:emi-neoforge:${emi_version}"; break
-        case "jei": localRuntime "mezz.jei:jei-$minecraft_version-neoforge:${jei_version}"; break
+        case "jei": localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"; break
         case "rei": localRuntime "me.shedaniel:RoughlyEnoughItems-neoforge:${rei_version}"; break
         case "disabled": break
-        default: println("Unknown recipe viewer specified: $recipe_viewer. Must be EMI, REI, JEI, or disabled.")
+        default: println("Unknown recipe viewer specified: ${recipe_viewer}. Must be EMI, REI, JEI, or disabled.")
     }
 }
 

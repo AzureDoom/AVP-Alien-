@@ -34,15 +34,16 @@ dependencies {
         exclude group: "com.just", module: "just-goap"
     }
     compileOnly "mod.azure.azurelib:azurelib-common-${project.minecraft_version}:${project.azurelib_version}"
+
+    // Compatibility
+    compileOnly "com.avp.human:avp_human-common-1.21.1:${project.avp_human_version}"
+    compileOnly "com.avp.predator:avp_predator-common-1.21.1:${project.avp_predator_version}"
+
+    compileOnly "maven.modrinth:gigeresque:${project.gigeresque_version}"
+
     compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${project.jei_version}"
     compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:${project.rei_version}"
     compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:${project.rei_version}"
-
-    // Compatibility
-    compileOnly "maven.modrinth:gigeresque:${project.gigeresque_version}"
-
-    compileOnly "com.avp.human:avp_human-common-1.21.1:${project.avp_human_version}"
-    compileOnly "com.avp.predator:avp_predator-common-1.21.1:${project.avp_predator_version}"
 }
 
 configurations.configureEach {

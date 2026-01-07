@@ -82,12 +82,9 @@ dependencies {
     //modApi "maven.modrinth:modernfix:5.21.0+mc1.21.1"
 
     // Compatibility
-    modApi "maven.modrinth:gigeresque:${project.gigeresque_modrinth_version}"
-
     modCompileOnly ("com.avp.human:avp_human-fabric-1.21.1:${project.avp_human_version}") {
         exclude group: project.group
     }
-    // Uncomment to test compatibility.
     modLocalRuntime ("com.avp.human:avp_human-fabric-1.21.1:${project.avp_human_version}") {
         exclude group: project.group
     }
@@ -95,18 +92,27 @@ dependencies {
     modCompileOnly ("com.avp.predator:avp_predator-fabric-1.21.1:${project.avp_predator_version}") {
         exclude group: project.group
     }
-    // Uncomment to test compatibility.
     modLocalRuntime ("com.avp.predator:avp_predator-fabric-1.21.1:${project.avp_predator_version}") {
         exclude group: project.group
     }
 
+    modCompileOnly "maven.modrinth:gigeresque:${project.gigeresque_modrinth_version}"
+    modLocalRuntime "maven.modrinth:gigeresque:${project.gigeresque_modrinth_version}"
+
+    // Here in case of any issues
+    //modImplementation "maven.modrinth:modernfix:5.21.0+mc1.21.1"
+
+    modCompileOnly "dev.emi:emi-fabric:${project.emi_version}"
+    modCompileOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
+    modCompileOnly "mezz.jei:jei-${project.minecraft_version}-fabric:${project.jei_version}"
+
     // Thanks to Rearth from Oritech for this little trick. :)
     switch (recipe_viewer.toLowerCase(Locale.ROOT)) {
-        case "emi": modLocalRuntime "dev.emi:emi-fabric:$emi_version"; break
-        case "jei": modLocalRuntime "mezz.jei:jei-$minecraft_version-fabric:$jei_version"; break
-        case "rei": modLocalRuntime "me.shedaniel:RoughlyEnoughItems-fabric:$rei_version"; break
+        case "emi": modLocalRuntime "dev.emi:emi-fabric:${emi_version}"; break
+        case "jei": modLocalRuntime "mezz.jei:jei-${minecraft_version}-fabric:${jei_version}"; break
+        case "rei": modLocalRuntime "me.shedaniel:RoughlyEnoughItems-fabric:${rei_version}"; break
         case "disabled": break
-        default: println("Unknown recipe viewer specified: $recipe_viewer. Must be EMI, REI, JEI, or disabled.")
+        default: println("Unknown recipe viewer specified: ${recipe_viewer}. Must be EMI, REI, JEI, or disabled.")
     }
 }
 
