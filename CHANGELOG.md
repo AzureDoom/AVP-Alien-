@@ -3,23 +3,7 @@
 ## ✍️ Developer Notes
 - For help or other questions, concerns, etc. check out our Discord server: https://discord.gg/wp7mvmbkVb
 
-## ☢️ Breaking Changes
-- N/A
-
 ## ✨ What's New
-- N/A
-
-## ♻️ Changes
-- N/A
-
-## 🐞 Fixes
-- N/A
-
-## 🧪 Experimental
-- N/A
-
-## 🛠 Data Pack
-- N/A
-
-## 🔬 Technical Changes
-- N/A
+- AzureLib 3.1.3 is now required.
+- [Fabric] Fabric Loader 0.18.4 is now required.
+- [NeoForge] NeoForge 21.1.217 is now required.
