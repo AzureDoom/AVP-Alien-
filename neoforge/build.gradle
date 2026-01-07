@@ -4,7 +4,18 @@ plugins {
     id 'multiloader-loader'
     id 'net.neoforged.moddev'
     id 'me.modmuss50.mod-publish-plugin'
-    id 'org.moddedmc.wiki.toolkit'
+}
+
+// create a runtime-only configuration that published to POM
+configurations {
+    localRuntime {
+        canBeConsumed = false
+        visible = false
+    }
+
+    named(sourceSets.main.runtimeClasspathConfigurationName) {
+        extendsFrom(configurations.localRuntime)
+    }
 }
 
 neoForge {
@@ -56,28 +67,23 @@ dependencies {
     implementation "com.blib:blib-neoforge-${project.minecraft_version}:${project.blib_version}"
     implementation "mod.azure.azurelib:azurelib-neo-${project.minecraft_version}:${project.azurelib_version}"
 
-    compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:${project.rei_version}"
-    compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:${project.rei_version}"
-    runtimeOnly "me.shedaniel:RoughlyEnoughItems-neoforge:${project.rei_version}"
-
-    implementation "dev.architectury:architectury-neoforge:${project.architectury_version}"
-    implementation "me.shedaniel.cloth:cloth-config-neoforge:${project.cloth_version}"
-
-    compileOnly("mezz.jei:jei-${minecraft_version}-neoforge-api:${project.jei_version}")
-    runtimeOnly("mezz.jei:jei-${minecraft_version}-neoforge:${project.jei_version}")
-
     implementation("com.just:just-codec:${project.just_codec_version}")
     implementation("com.just:just-core:${project.just_core_version}")
     implementation("com.just:just-goap:${project.just_goap_version}")
 
+    localRuntime "dev.architectury:architectury-neoforge:${project.architectury_version}"
+    localRuntime "me.shedaniel.cloth:cloth-config-neoforge:${project.cloth_version}"
+
     // Compatibility
-    implementation "maven.modrinth:gigeresque:${project.gigeresque_version}"
+    compileOnly "maven.modrinth:gigeresque:${project.gigeresque_version}"
+    // Uncomment to test compatibility.
+    localRuntime "maven.modrinth:gigeresque:${project.gigeresque_version}"
 
     compileOnly ("com.avp.human:avp_human-neoforge-1.21.1:${project.avp_human_version}") {
         exclude group: project.group
     }
     // Uncomment to test compatibility.
-    runtimeOnly ("com.avp.human:avp_human-neoforge-1.21.1:${project.avp_human_version}") {
+    localRuntime ("com.avp.human:avp_human-neoforge-1.21.1:${project.avp_human_version}") {
         exclude group: project.group
     }
 
@@ -85,22 +91,31 @@ dependencies {
         exclude group: project.group
     }
     // Uncomment to test compatibility.
-    runtimeOnly ("com.avp.predator:avp_predator-neoforge-1.21.1:${project.avp_predator_version}") {
+    localRuntime ("com.avp.predator:avp_predator-neoforge-1.21.1:${project.avp_predator_version}") {
         exclude group: project.group
+    }
+
+    // Thanks to Rearth from Oritech for this little trick. :)
+    switch (recipe_viewer.toLowerCase(Locale.ROOT)) {
+        case "emi": localRuntime "dev.emi:emi-neoforge:${emi_version}"; break
+        case "jei": localRuntime "mezz.jei:jei-$minecraft_version-neoforge:${jei_version}"; break
+        case "rei": localRuntime "me.shedaniel:RoughlyEnoughItems-neoforge:${rei_version}"; break
+        case "disabled": break
+        default: println("Unknown recipe viewer specified: $recipe_viewer. Must be EMI, REI, JEI, or disabled.")
     }
 }
 
 configurations.configureEach {
     resolutionStrategy {
-        force 'org.slf4j:slf4j-api:2.0.9'
+        force "org.slf4j:slf4j-api:${project.slf4j_version}"
 
         eachDependency { DependencyResolveDetails details ->
             if (details.requested.group == 'org.slf4j' && details.requested.name == 'slf4j-api') {
-                details.useVersion '2.0.9'
+                details.useVersion project.slf4j_version
                 details.because 'Aligning SLF4J version to satisfy NeoForge strict constraint'
             }
             if (details.requested.group == 'ch.qos.logback' && details.requested.name == 'logback-classic') {
-                details.useVersion '1.4.11'
+                details.useVersion project.logback_classic_version
                 details.because 'Logback 1.5.x requires slf4j-api 2.0.17+, incompatible with NeoForge'
             }
         }
@@ -131,7 +146,7 @@ if (keyPropsFile.exists()) {
             avatarUrl = "https://i.imgur.com/5Y0EZ9x.jpeg"
             content = changelog.map { text ->
                 def maxEmbedCharacterCount = 4096
-                def header = "# A new version of AVP for NeoForge has been released!\n"
+                def header = "# A new version of ${project.mod_name} for NeoForge has been released!\n"
                 def footer = "\n...and more! Check the mod page for more details."
 
                 def needsTruncation = (header.length() + text.length()) > maxEmbedCharacterCount
@@ -175,6 +190,9 @@ if (keyPropsFile.exists()) {
             requires {
                 slug = "azurelib"
             }
+            requires {
+                slug = "blib"
+            }
         }
 
         modrinth {
@@ -184,6 +202,9 @@ if (keyPropsFile.exists()) {
             announcementTitle = "Download from Modrinth"
             requires {
                 slug = "azurelib"
+            }
+            requires {
+                slug = "blib"
             }
         }
     }

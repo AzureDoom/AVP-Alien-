@@ -31,34 +31,34 @@ side          = "BOTH"
 [[dependencies.${mod_id}]]
 modId         = "azurelib"
 type          = "required"
-versionRange  = "[${azurelib_version},3.2.0)"
+versionRange  = "[${azurelib_version},${azurelib_excl_end_version})"
 ordering      = "NONE"
 side          = "BOTH"
 [[dependencies.${mod_id}]]
 modId         = "azurelib"
 type          = "discouraged"
-versionRange  = "[3.1.2,)"
+versionRange  = "[${azurelib_discouraged_version},)"
 ordering      = "NONE"
 side          = "BOTH"
 [[dependencies.${mod_id}]]
 modId         = "blib"
 type          = "required"
-versionRange  = "[${blib_version},0.2.0)"
+versionRange  = "[${blib_version},${blib_excl_end_version})"
 side          = "BOTH"
 [[dependencies.${mod_id}]]
 modId         = "avp_human"
 type          = "optional"
-versionRange  = "[${avp_human_version},0.2.0)"
+versionRange  = "[${avp_human_version},${avp_human_excl_end_version})"
 side          = "BOTH"
 [[dependencies.${mod_id}]]
 modId         = "avp_predator"
 type          = "optional"
-versionRange  = "[${avp_predator_version},0.2.0)"
+versionRange  = "[${avp_predator_version},${avp_predator_excl_end_version})"
 side          = "BOTH"
 [[dependencies.${mod_id}]]
 modId         = "gigeresque"
 type          = "optional"
-versionRange  = "[${gigeresque_version},0.9.0)"
+versionRange  = "[${gigeresque_version},${gigeresque_excl_end_version})"
 side          = "BOTH"
 
 # Features are specific properties of the game environment, that you may want to declare you require. This example declares

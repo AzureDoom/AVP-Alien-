@@ -109,11 +109,17 @@ processResources {
             'neoforge_loader_version_range': neoforge_loader_version_range,
             'credits'                      : credits,
             'java_version'                 : java_version,
-            'blib_version'                 : blib_version,
-            'azurelib_version'             : azurelib_version,
             'avp_human_version'            : avp_human_version,
+            'avp_human_excl_end_version'   : avp_human_excl_end_version,
             'avp_predator_version'         : avp_predator_version,
+            'avp_predator_excl_end_version': avp_predator_excl_end_version,
+            'azurelib_version'             : azurelib_version,
+            'azurelib_discouraged_version' : azurelib_discouraged_version,
+            'azurelib_excl_end_version'    : azurelib_excl_end_version,
+            'blib_version'                 : blib_version,
+            'blib_excl_end_version'        : blib_excl_end_version,
             'gigeresque_version'           : gigeresque_version,
+            'gigeresque_excl_end_version'  : gigeresque_excl_end_version,
     ]
 
     filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml', '*.mixins.json']) {

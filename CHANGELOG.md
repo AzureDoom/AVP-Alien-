@@ -1,29 +1,25 @@
-# v0.1.0
+# v0.1.1
 
 ## ✍️ Developer Notes
 - For help or other questions, concerns, etc. check out our Discord server: https://discord.gg/wp7mvmbkVb
 
+## ☢️ Breaking Changes
+- N/A
+
 ## ✨ What's New
-- Added predalien.
-- Added predalien adolescent.
-- Added predalien chestburster.
-- Added new textures for all alien spawn egg items.
-  - Thanks to Danlogo for contributing the textures!
+- N/A
 
 ## ♻️ Changes
-- Irradiated chitin armor now glows.
-- Plated irradiated chitin armor now glows.
-- Queens now move 60% faster than their base speed when chasing targets on land (was previously 10% faster).
-- Queens now move 60% faster than their base speed when chasing targets in water (was previously 100% faster).
-- Alien spawn eggs in the Alien Spawn Eggs creative mode tab are now sorted based on their lifecycle.
-- Updated praetorian model + textures.
+- N/A
 
 ## 🐞 Fixes
-- Fixed royal ovomorphs using incorrect textures.
-- Fixed AVP aliens taking damage from Gigeresque acid.
-- Fixed a crash occurring when Gigeresque's surgery kit item is used to remove an AVP chestburster.
+- N/A
+
+## 🧪 Experimental
+- N/A
 
 ## 🛠 Data Pack
-- Added `#avp_alien:predalien_adolescents` entity type tag.
-- Added `#avp_alien:predalien_chestbursters` entity type tag.
-- Added `#avp_alien:predaliens` entity type tag.
+- N/A
+
+## 🔬 Technical Changes
+- N/A
