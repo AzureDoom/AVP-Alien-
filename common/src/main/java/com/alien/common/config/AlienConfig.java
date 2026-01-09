@@ -33,172 +33,172 @@ public class AlienConfig {
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Modifying these will require restarting the game.")
-        public SpawnSettings ABERRANT_CHESTBURSTER_SPAWN = new SpawnSettings(true, 1, 2, 10);
+        public SpawnSettings ABERRANT_CHESTBURSTER_SPAWN = new SpawnSettings(true, 1, 2, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Aberrant Crusher spawn settings. Modifying these will require restarting the game.")
-        public SpawnSettings ABERRANT_CRUSHER_SPAWN = new SpawnSettings(true, 1, 1, 10);
+        public SpawnSettings ABERRANT_CRUSHER_SPAWN = new SpawnSettings(true, 1, 1, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Modifying these will require restarting the game.")
-        public SpawnSettings ABERRANT_DRONE_SPAWN = new SpawnSettings(true, 1, 2, 50);
+        public SpawnSettings ABERRANT_DRONE_SPAWN = new SpawnSettings(true, 1, 2, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Aberrant Praetorian spawn settings. Modifying these will require restarting the game.")
-        public SpawnSettings ABERRANT_PRAETORIAN_SPAWN = new SpawnSettings(true, 1, 1, 10);
+        public SpawnSettings ABERRANT_PRAETORIAN_SPAWN = new SpawnSettings(true, 1, 1, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Aberrant Prowler spawn settings. Modifying these will require restarting the game.")
-        public SpawnSettings ABERRANT_PROWLER_SPAWN = new SpawnSettings(true, 1, 2, 25);
+        public SpawnSettings ABERRANT_PROWLER_SPAWN = new SpawnSettings(true, 1, 2, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Aberrant Queen spawn settings. Modifying these will require restarting the game.")
-        public SpawnSettings ABERRANT_QUEEN_SPAWN = new SpawnSettings(true, 1, 1, 5);
+        public SpawnSettings ABERRANT_QUEEN_SPAWN = new SpawnSettings(true, 1, 1, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Modifying these will require restarting the game.")
-        public SpawnSettings ABERRANT_RUNNER_SPAWN = new SpawnSettings(true, 1, 2, 50);
+        public SpawnSettings ABERRANT_RUNNER_SPAWN = new SpawnSettings(true, 1, 2, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Aberrant Spitter spawn settings. Modifying these will require restarting the game.")
-        public SpawnSettings ABERRANT_SPITTER_SPAWN = new SpawnSettings(true, 1, 2, 15);
+        public SpawnSettings ABERRANT_SPITTER_SPAWN = new SpawnSettings(true, 1, 2, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Aberrant Warrior spawn settings. Modifying these will require restarting the game.")
-        public SpawnSettings ABERRANT_WARRIOR_SPAWN = new SpawnSettings(true, 1, 2, 25);
+        public SpawnSettings ABERRANT_WARRIOR_SPAWN = new SpawnSettings(true, 1, 2, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Modifying these will require restarting the game.")
-        public SpawnSettings CHESTBURSTER_SPAWN = new SpawnSettings(true, 1, 2, 10);
+        public SpawnSettings CHESTBURSTER_SPAWN = new SpawnSettings(true, 1, 2, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Crusher spawn settings. Modifying these will require restarting the game.")
-        public SpawnSettings CRUSHER_SPAWN = new SpawnSettings(true, 1, 1, 10);
+        public SpawnSettings CRUSHER_SPAWN = new SpawnSettings(true, 1, 1, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Modifying these will require restarting the game.")
-        public SpawnSettings DRONE_SPAWN = new SpawnSettings(true, 1, 2, 50);
+        public SpawnSettings DRONE_SPAWN = new SpawnSettings(true, 1, 2, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Irradiated Crusher spawn settings. Modifying these will require restarting the game.")
-        public SpawnSettings IRRADIATED_CRUSHER_SPAWN = new SpawnSettings(true, 1, 1, 10);
+        public SpawnSettings IRRADIATED_CRUSHER_SPAWN = new SpawnSettings(true, 1, 1, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Irradiated Drone spawn settings. Modifying these will require restarting the game.")
-        public SpawnSettings IRRADIATED_DRONE_SPAWN = new SpawnSettings(true, 1, 2, 50);
+        public SpawnSettings IRRADIATED_DRONE_SPAWN = new SpawnSettings(true, 1, 2, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Irradiated Praetorian spawn settings. Modifying these will require restarting the game.")
-        public SpawnSettings IRRADIATED_PRAETORIAN_SPAWN = new SpawnSettings(true, 1, 1, 10);
+        public SpawnSettings IRRADIATED_PRAETORIAN_SPAWN = new SpawnSettings(true, 1, 1, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Irradiated Prowler spawn settings. Modifying these will require restarting the game.")
-        public SpawnSettings IRRADIATED_PROWLER_SPAWN = new SpawnSettings(true, 1, 2, 25);
+        public SpawnSettings IRRADIATED_PROWLER_SPAWN = new SpawnSettings(true, 1, 2, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Irradiated Queen spawn settings. Modifying these will require restarting the game.")
-        public SpawnSettings IRRADIATED_QUEEN_SPAWN = new SpawnSettings(true, 1, 1, 5);
+        public SpawnSettings IRRADIATED_QUEEN_SPAWN = new SpawnSettings(true, 1, 1, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Irradiated Runner spawn settings. Modifying these will require restarting the game.")
-        public SpawnSettings IRRADIATED_RUNNER_SPAWN = new SpawnSettings(true, 1, 2, 50);
+        public SpawnSettings IRRADIATED_RUNNER_SPAWN = new SpawnSettings(true, 1, 2, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Irradiated Warrior spawn settings. Modifying these will require restarting the game.")
-        public SpawnSettings IRRADIATED_WARRIOR_SPAWN = new SpawnSettings(true, 1, 2, 25);
+        public SpawnSettings IRRADIATED_WARRIOR_SPAWN = new SpawnSettings(true, 1, 2, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Modifying these will require restarting the game.")
-        public SpawnSettings NETHER_CHESTBURSTER_SPAWN = new SpawnSettings(true, 1, 2, 10);
+        public SpawnSettings NETHER_CHESTBURSTER_SPAWN = new SpawnSettings(true, 1, 2, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Nether Crusher spawn settings. Modifying these will require restarting the game.")
-        public SpawnSettings NETHER_CRUSHER_SPAWN = new SpawnSettings(true, 1, 1, 10);
+        public SpawnSettings NETHER_CRUSHER_SPAWN = new SpawnSettings(true, 1, 1, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Modifying these will require restarting the game.")
-        public SpawnSettings NETHER_DRONE_SPAWN = new SpawnSettings(true, 1, 2, 50);
+        public SpawnSettings NETHER_DRONE_SPAWN = new SpawnSettings(true, 1, 2, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Nether Praetorian spawn settings. Modifying these will require restarting the game.")
-        public SpawnSettings NETHER_PRAETORIAN_SPAWN = new SpawnSettings(true, 1, 1, 10);
+        public SpawnSettings NETHER_PRAETORIAN_SPAWN = new SpawnSettings(true, 1, 1, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Nether Prowler spawn settings. Modifying these will require restarting the game.")
-        public SpawnSettings NETHER_PROWLER_SPAWN = new SpawnSettings(true, 1, 2, 25);
+        public SpawnSettings NETHER_PROWLER_SPAWN = new SpawnSettings(true, 1, 2, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Nether Queen spawn settings. Modifying these will require restarting the game.")
-        public SpawnSettings NETHER_QUEEN_SPAWN = new SpawnSettings(true, 1, 1, 5);
+        public SpawnSettings NETHER_QUEEN_SPAWN = new SpawnSettings(true, 1, 1, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Modifying these will require restarting the game.")
-        public SpawnSettings NETHER_RUNNER_SPAWN = new SpawnSettings(true, 1, 2, 50);
+        public SpawnSettings NETHER_RUNNER_SPAWN = new SpawnSettings(true, 1, 2, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Nether Spitter spawn settings. Modifying these will require restarting the game.")
-        public SpawnSettings NETHER_SPITTER_SPAWN = new SpawnSettings(true, 1, 2, 15);
+        public SpawnSettings NETHER_SPITTER_SPAWN = new SpawnSettings(true, 1, 2, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Nether Warrior spawn settings. Modifying these will require restarting the game.")
-        public SpawnSettings NETHER_WARRIOR_SPAWN = new SpawnSettings(true, 1, 2, 25);
+        public SpawnSettings NETHER_WARRIOR_SPAWN = new SpawnSettings(true, 1, 2, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Praetorian spawn settings. Modifying these will require restarting the game.")
-        public SpawnSettings PRAETORIAN_SPAWN = new SpawnSettings(true, 1, 1, 10);
+        public SpawnSettings PRAETORIAN_SPAWN = new SpawnSettings(true, 1, 1, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Prowler spawn settings. Modifying these will require restarting the game.")
-        public SpawnSettings PROWLER_SPAWN = new SpawnSettings(true, 1, 2, 25);
+        public SpawnSettings PROWLER_SPAWN = new SpawnSettings(true, 1, 2, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Queen spawn settings. Modifying these will require restarting the game.")
-        public SpawnSettings QUEEN_SPAWN = new SpawnSettings(true, 1, 1, 5);
+        public SpawnSettings QUEEN_SPAWN = new SpawnSettings(true, 1, 1, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Modifying these will require restarting the game.")
-        public SpawnSettings RUNNER_SPAWN = new SpawnSettings(true, 1, 2, 50);
+        public SpawnSettings RUNNER_SPAWN = new SpawnSettings(true, 1, 2, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Spitter spawn settings. Modifying these will require restarting the game.")
-        public SpawnSettings SPITTER_SPAWN = new SpawnSettings(true, 1, 2, 15);
+        public SpawnSettings SPITTER_SPAWN = new SpawnSettings(true, 1, 2, 100);
 
         @Configurable
         @Configurable.Synchronized
         @Configurable.Comment("Warrior spawn settings. Modifying these will require restarting the game.")
-        public SpawnSettings WARRIOR_SPAWN = new SpawnSettings(true, 1, 2, 25);
+        public SpawnSettings WARRIOR_SPAWN = new SpawnSettings(true, 1, 2, 100);
 
         public static class SpawnSettings {
 
