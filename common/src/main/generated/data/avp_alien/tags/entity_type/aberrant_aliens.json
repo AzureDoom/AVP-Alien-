@@ -1,0 +1,24 @@
+{
+  "values": [
+    "avp_alien:aberrant_adolescent",
+    "avp_alien:aberrant_boiler",
+    "avp_alien:aberrant_chestburster",
+    "avp_alien:aberrant_crusher",
+    "avp_alien:aberrant_drone",
+    "avp_alien:aberrant_facehugger",
+    "avp_alien:aberrant_ovomorph",
+    "avp_alien:aberrant_praetorian",
+    "avp_alien:aberrant_predalien",
+    "avp_alien:aberrant_predalien_adolescent",
+    "avp_alien:aberrant_predalien_chestburster",
+    "avp_alien:aberrant_prowler",
+    "avp_alien:aberrant_queen",
+    "avp_alien:aberrant_runner",
+    "avp_alien:aberrant_spitter",
+    "avp_alien:aberrant_warrior",
+    "avp_alien:royal_aberrant_adolescent",
+    "avp_alien:royal_aberrant_chestburster",
+    "avp_alien:royal_aberrant_facehugger",
+    "avp_alien:royal_aberrant_ovomorph"
+  ]
+}

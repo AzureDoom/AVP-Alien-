@@ -1,0 +1,5 @@
+{
+  "from": "avp_alien:crusher",
+  "growthTimeInTicks": 12000,
+  "to": "avp_alien:queen"
+}

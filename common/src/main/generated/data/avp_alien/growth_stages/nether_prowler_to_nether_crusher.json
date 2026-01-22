@@ -1,0 +1,5 @@
+{
+  "from": "avp_alien:nether_prowler",
+  "growthTimeInTicks": 9000,
+  "to": "avp_alien:nether_crusher"
+}

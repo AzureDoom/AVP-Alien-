@@ -1,0 +1,88 @@
+{
+  "values": {
+    "avp_alien:aberrant_resin": {
+      "chance": 1.0
+    },
+    "avp_alien:aberrant_resin_ball": {
+      "chance": 0.3
+    },
+    "avp_alien:aberrant_resin_node": {
+      "chance": 1.0
+    },
+    "avp_alien:aberrant_resin_slab": {
+      "chance": 0.5
+    },
+    "avp_alien:aberrant_resin_stairs": {
+      "chance": 0.66
+    },
+    "avp_alien:aberrant_resin_vein": {
+      "chance": 0.3
+    },
+    "avp_alien:aberrant_resin_web": {
+      "chance": 0.65
+    },
+    "avp_alien:irradiated_resin": {
+      "chance": 1.0
+    },
+    "avp_alien:irradiated_resin_ball": {
+      "chance": 0.3
+    },
+    "avp_alien:irradiated_resin_node": {
+      "chance": 1.0
+    },
+    "avp_alien:irradiated_resin_slab": {
+      "chance": 0.5
+    },
+    "avp_alien:irradiated_resin_stairs": {
+      "chance": 0.66
+    },
+    "avp_alien:irradiated_resin_vein": {
+      "chance": 0.3
+    },
+    "avp_alien:irradiated_resin_web": {
+      "chance": 0.65
+    },
+    "avp_alien:nether_resin": {
+      "chance": 1.0
+    },
+    "avp_alien:nether_resin_ball": {
+      "chance": 0.3
+    },
+    "avp_alien:nether_resin_node": {
+      "chance": 1.0
+    },
+    "avp_alien:nether_resin_slab": {
+      "chance": 0.5
+    },
+    "avp_alien:nether_resin_stairs": {
+      "chance": 0.66
+    },
+    "avp_alien:nether_resin_vein": {
+      "chance": 0.3
+    },
+    "avp_alien:nether_resin_web": {
+      "chance": 0.65
+    },
+    "avp_alien:resin": {
+      "chance": 1.0
+    },
+    "avp_alien:resin_ball": {
+      "chance": 0.3
+    },
+    "avp_alien:resin_node": {
+      "chance": 1.0
+    },
+    "avp_alien:resin_slab": {
+      "chance": 0.5
+    },
+    "avp_alien:resin_stairs": {
+      "chance": 0.66
+    },
+    "avp_alien:resin_vein": {
+      "chance": 0.3
+    },
+    "avp_alien:resin_web": {
+      "chance": 0.65
+    }
+  }
+}

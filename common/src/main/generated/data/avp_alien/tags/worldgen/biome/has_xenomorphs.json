@@ -1,0 +1,16 @@
+{
+  "values": [
+    {
+      "id": "#minecraft:is_end",
+      "required": false
+    },
+    {
+      "id": "#minecraft:is_nether",
+      "required": false
+    },
+    {
+      "id": "#minecraft:is_overworld",
+      "required": false
+    }
+  ]
+}

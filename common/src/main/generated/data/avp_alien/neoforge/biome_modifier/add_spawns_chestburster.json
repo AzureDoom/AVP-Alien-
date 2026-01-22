@@ -1,0 +1,10 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": "#avp_alien:has_xenomorphs",
+  "spawners": {
+    "type": "avp_alien:chestburster",
+    "maxCount": 2,
+    "minCount": 1,
+    "weight": 100
+  }
+}

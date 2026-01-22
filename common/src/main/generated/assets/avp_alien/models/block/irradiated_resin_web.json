@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "avp_alien:block/irradiated_resin_web"
+  }
+}

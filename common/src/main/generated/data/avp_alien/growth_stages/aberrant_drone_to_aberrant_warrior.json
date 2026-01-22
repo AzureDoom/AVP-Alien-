@@ -1,0 +1,5 @@
+{
+  "from": "avp_alien:aberrant_drone",
+  "growthTimeInTicks": 12000,
+  "to": "avp_alien:aberrant_warrior"
+}

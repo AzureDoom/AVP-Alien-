@@ -1,0 +1,5 @@
+{
+  "from": "avp_alien:praetorian",
+  "growthTimeInTicks": 24000,
+  "to": "avp_alien:queen"
+}

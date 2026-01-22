@@ -1,0 +1,5 @@
+{
+  "from": "avp_alien:nether_praetorian",
+  "growthTimeInTicks": 24000,
+  "to": "avp_alien:nether_queen"
+}

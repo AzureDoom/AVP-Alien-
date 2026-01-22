@@ -1,0 +1,5 @@
+{
+  "from": "avp_alien:aberrant_warrior",
+  "growthTimeInTicks": 18000,
+  "to": "avp_alien:aberrant_praetorian"
+}
