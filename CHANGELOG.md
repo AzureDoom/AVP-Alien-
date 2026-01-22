@@ -1,8 +1,25 @@
-# v0.1.2
+# v0.1.3
 
 ## ✍️ Developer Notes
 - For help or other questions, concerns, etc. check out our Discord server: https://discord.gg/wp7mvmbkVb
 
+## ☢️ Breaking Changes
+- N/A
+
+## ✨ What's New
+- N/A
+
+## ♻️ Changes
+- N/A
+
 ## 🐞 Fixes
-- Fixed default alien spawn weights being far too low now that aliens share the 'MONSTERS' mob category with other mobs.
-  - For this fix to apply, you will have to delete your config file for `avp_alien`!
+- N/A
+
+## 🧪 Experimental
+- N/A
+
+## 🛠 Data Pack
+- N/A
+
+## 🔬 Technical Changes
+- N/A

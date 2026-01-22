@@ -2,7 +2,7 @@ package com.alien.common.gameplay.entity.living.alien.ovomorph.ai;
 
 import com.alien.common.gameplay.entity.living.alien.ovomorph.Ovomorph;
 import com.alien.common.model.alien.HatchState;
-import com.just.goap.Action;
+import com.just.goap.action.Action;
 import com.just.goap.condition.expression.Expressions;
 
 public class OvomorphGOAPActions {
@@ -11,7 +11,8 @@ public class OvomorphGOAPActions {
         .addPrecondition(OvomorphGOAPStateKeys.WANTS_TO_HATCH, Expressions.Boolean.isTrue())
         .addPrecondition(OvomorphGOAPStateKeys.HATCH_STATE, Expressions.Compare.doesNotEqual(HatchState.HATCHED))
         .addEffect(OvomorphGOAPStateKeys.HATCH_STATE.asDerived(), HatchState.HATCHED)
-        .withPerformCallback((ovomorph, $2, $3) -> {
+        .withPerformCallback(context -> {
+            var ovomorph = context.getActor();
             ovomorph.getHatchManager().hatch();
             return Action.Signal.CONTINUE;
         })

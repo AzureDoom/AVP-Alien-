@@ -45,7 +45,7 @@ public abstract class MixinMob_IncapacitateHost extends LivingEntity implements 
         self.setAggressive(false);
         self.setSilent(true);
 
-        var agent = ((GOAPUser<?>) self).getGOAPAgentOrNull();
+        var agent = ((GOAPUser<?>) self).blib$getGOAPAgentOrNull();
 
         if (agent != null) {
             agent.setEnabled(false);
@@ -58,7 +58,7 @@ public abstract class MixinMob_IncapacitateHost extends LivingEntity implements 
         self.setAggressive(true);
         self.setSilent(false);
 
-        var agent = ((GOAPUser<?>) self).getGOAPAgentOrNull();
+        var agent = ((GOAPUser<?>) self).blib$getGOAPAgentOrNull();
 
         if (agent != null) {
             agent.setEnabled(true);

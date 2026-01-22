@@ -69,7 +69,7 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
     }
 
     @Override
-    public @Nullable Graph<Ovomorph> getCurrentGraph() {
+    public @Nullable Graph<Ovomorph> blib$getGOAPGraphOrNull() {
         return OvomorphGOAP.GRAPH;
     }
 

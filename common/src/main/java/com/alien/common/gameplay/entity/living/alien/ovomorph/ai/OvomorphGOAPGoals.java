@@ -1,8 +1,8 @@
 package com.alien.common.gameplay.entity.living.alien.ovomorph.ai;
 
 import com.alien.common.model.alien.HatchState;
-import com.just.goap.Goal;
 import com.just.goap.condition.expression.Expressions;
+import com.just.goap.goal.Goal;
 
 public class OvomorphGOAPGoals {
 
