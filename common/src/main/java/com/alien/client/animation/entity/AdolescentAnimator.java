@@ -3,11 +3,11 @@ package com.alien.client.animation.entity;
 import com.alien.AlienResources;
 import com.alien.common.gameplay.entity.living.alien.adolescent.Adolescent;
 import com.alien.common.util.AzAlienAnimationUtil;
-import mod.azure.azurelib.common.animation.AzAnimatorConfig;
-import mod.azure.azurelib.common.animation.controller.AzAnimationController;
-import mod.azure.azurelib.common.animation.controller.AzAnimationControllerContainer;
-import mod.azure.azurelib.common.animation.impl.AzEntityAnimator;
-import mod.azure.azurelib.common.model.AzBakedModel;
+import com.blib.azurelib.common.animation.AzAnimatorConfig;
+import com.blib.azurelib.common.animation.controller.AzAnimationController;
+import com.blib.azurelib.common.animation.controller.AzAnimationControllerContainer;
+import com.blib.azurelib.common.animation.impl.AzEntityAnimator;
+import com.blib.azurelib.common.model.AzBakedModel;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 

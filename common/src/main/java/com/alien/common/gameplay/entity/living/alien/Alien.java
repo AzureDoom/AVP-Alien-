@@ -1,9 +1,6 @@
 package com.alien.common.gameplay.entity.living.alien;
 
-import com.alien.common.config.AlienConfig;
 import com.alien.common.data.AlienVariantTypes;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
 import com.alien.common.gameplay.level.saveddata.HiveLevelData;
 import com.alien.common.gameplay.level.saveddata.StrainLeakData;
 import com.alien.common.model.alien.variant.AlienVariant;
@@ -16,15 +13,13 @@ import com.alien.common.util.AlienTransitionUtil;
 import com.alien.compatibility.avp_human.AVPHuman;
 import com.alien.compatibility.avp_human.GeneManagerProxy;
 import com.alien.compatibility.avp_predator.AVPPredator;
-import com.blib.common.gameplay.entity.manager.VibrationSystemManager;
-import com.blib.common.network.data.DataAccessor;
-import com.blib.common.network.data.DataUser;
-import com.blib.common.registry.init.BLibDataSyncKeys;
-import com.blib.common.util.MovementAnalyzer;
-import com.human.common.gameplay.gene.Genes;
+import com.blib.api.common.data_sync.v1.DataAccessor;
+import com.blib.api.common.data_sync.v1.model.DataUser;
+import com.blib.api.common.entity.v1.MovementAnalyzer;
+import com.blib.api.common.entity.v1.manager.VibrationSystemManager;
+import com.blib.mod.common.registry.init.BLibDataSyncKeys;
 import com.human.common.registry.key.HumanBiomeKeys;
 import com.just.core.functional.option.Option;
-import com.predator.common.registry.init.PredatorEntityTypes;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -43,6 +38,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
@@ -82,8 +78,6 @@ public abstract class Alien extends Monster implements DataUser {
     private int jellyCount;
 
     private int lastHurtTimeInTicks;
-
-    protected AlienConfig.StatsConfigs.AdvancedStats config;
 
     protected Alien(EntityType<? extends Alien> entityType, Level level) {
         super(entityType, level);
@@ -127,7 +121,8 @@ public abstract class Alien extends Monster implements DataUser {
 
         if (AVPPredator.MOD.isLoaded()) {
             if (entityType.is(AlienEntityTypeTags.PREDALIENS)) {
-                return PredatorEntityTypes.YAUTJA.get();
+                // FIXME:
+                // return PredatorEntityTypes.YAUTJA.get();
             }
         }
 
@@ -292,7 +287,7 @@ public abstract class Alien extends Monster implements DataUser {
 
             healPassively();
             applyMalusBasedOnVariant();
-            applyDynamicAttributes(config);
+            applyDynamicAttributes();
             becomeIrradiated();
         }
     }
@@ -359,21 +354,22 @@ public abstract class Alien extends Monster implements DataUser {
             // TODO: Only "wild" hives should have spontaneous growth from mob kills.
         ) {
             hiveManager.hive().ifSome(hive -> {
-                var wasRunnerHostKilled = entity.getType().is(AlienEntityTypeTags.RUNNER_HOSTS);
-
-                var bonusCount = switch (getGeneManager()) {
-                    case GeneManagerProxy.EMPTY ignored -> 1;
-                    case GeneManagerProxy.Wrapper geneManagerProxy -> (int) geneManagerProxy.geneManager()
-                        .getGeneContainer()
-                        .getActiveGeneMap()
-                        .getValue(Genes.BONUS_EMBRYO_COUNT);
-                };
-
-                var alienEntityType = wasRunnerHostKilled
-                    ? Runner.getType(hive.getVariant())
-                    : Drone.getType(hive.getVariant());
-
-                hive.getReserveManager().add(alienEntityType, bonusCount);
+                // FIXME:
+                // var wasRunnerHostKilled = entity.getType().is(AlienEntityTypeTags.RUNNER_HOSTS);
+                //
+                // var bonusCount = switch (getGeneManager()) {
+                // case GeneManagerProxy.EMPTY ignored -> 1;
+                // case GeneManagerProxy.Wrapper geneManagerProxy -> (int) geneManagerProxy.geneManager()
+                // .getGeneContainer()
+                // .getActiveGeneMap()
+                // .getValue(Genes.BONUS_EMBRYO_COUNT);
+                // };
+                //
+                // var alienEntityType = wasRunnerHostKilled
+                // ? Runner.getType(hive.getVariant())
+                // : Drone.getType(hive.getVariant());
+                //
+                // hive.getReserveManager().add(alienEntityType, bonusCount);
             });
         }
 
@@ -583,38 +579,38 @@ public abstract class Alien extends Monster implements DataUser {
         this.hostTypeOption = Option.some(hostType);
     }
 
-    public void applyDynamicAttributes(AlienConfig.StatsConfigs.AdvancedStats config) {
+    private static final ResourceLocation aberrantDebuff = com.alien.Alien.MOD.resources().createLocation("aberrant_debuff");
+
+    private static final ResourceLocation irradiatedBuff = com.alien.Alien.MOD.resources().createLocation("irradiated_buff");
+
+    private void applyDynamicAttributes() {
         if (isAberrant()) {
-            applyAttributes(config, AlienConfig.INSTANCE.statsConfigs.ABERRANT_STATS_MULTIPLIER);
+            var percentage = -0.2;
+            applyBuff(Attributes.MAX_HEALTH, percentage, aberrantDebuff);
+            applyBuff(Attributes.ATTACK_DAMAGE, percentage, aberrantDebuff);
+            applyBuff(Attributes.ARMOR, percentage, aberrantDebuff);
+            applyBuff(Attributes.ARMOR_TOUGHNESS, percentage, aberrantDebuff);
         } else if (isIrradiated()) {
-            applyAttributes(config, AlienConfig.INSTANCE.statsConfigs.IRRADIATED_STATS_MULTIPLIER);
+            var percentage = 0.2;
+            applyBuff(Attributes.MAX_HEALTH, percentage, irradiatedBuff);
+            applyBuff(Attributes.ATTACK_DAMAGE, percentage, irradiatedBuff);
+            applyBuff(Attributes.ARMOR, percentage, irradiatedBuff);
+            applyBuff(Attributes.ARMOR_TOUGHNESS, percentage, irradiatedBuff);
         }
     }
 
-    private void applyAttributes(AlienConfig.StatsConfigs.AdvancedStats config, float scaleFactor) {
-        setAttribute(Attributes.MAX_HEALTH, config.health * scaleFactor);
-        setAttribute(Attributes.ATTACK_DAMAGE, config.attackDamage * scaleFactor);
-        setAttribute(Attributes.ARMOR, config.armor * scaleFactor);
-        setAttribute(Attributes.ARMOR_TOUGHNESS, config.armorToughness * scaleFactor);
-    }
+    private void applyBuff(Holder<Attribute> attribute, double percentage, ResourceLocation resourceLocation) {
+        var instance = getAttributes().getInstance(attribute);
 
-    private void setAttribute(Holder<Attribute> attribute, float value) {
-        var instance = getAttribute(attribute);
-        if (instance != null) {
-            instance.setBaseValue(value);
+        if (instance == null || instance.hasModifier(resourceLocation)) {
+            return;
         }
+
+        var modifier = new AttributeModifier(resourceLocation, instance.getBaseValue() * percentage, AttributeModifier.Operation.ADD_VALUE);
+        instance.addPermanentModifier(modifier);
     }
 
-    public static AttributeSupplier.Builder applyFrom(AlienConfig.StatsConfigs.AdvancedStats config, AttributeSupplier.Builder builder) {
-        builder.add(Attributes.ARMOR, config.armor);
-        builder.add(Attributes.ARMOR_TOUGHNESS, config.armorToughness);
-        builder.add(Attributes.ATTACK_DAMAGE, config.attackDamage);
-        builder.add(Attributes.FOLLOW_RANGE, config.followRange);
-        builder.add(Attributes.KNOCKBACK_RESISTANCE, config.knockbackResistance);
-        builder.add(Attributes.MAX_HEALTH, config.health);
-        builder.add(Attributes.MOVEMENT_SPEED, config.moveSpeed);
-        builder.add(Attributes.JUMP_STRENGTH, 0.1F);
-
-        return builder;
+    public static AttributeSupplier.Builder createAlienAttributes() {
+        return Monster.createMonsterAttributes();
     }
 }

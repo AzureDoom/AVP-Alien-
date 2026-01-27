@@ -4,7 +4,7 @@ import com.alien.Alien;
 import com.alien.common.gameplay.command.count.CountCommand;
 import com.alien.common.gameplay.command.hive.CurrentHiveLayerCommand;
 import com.alien.common.gameplay.command.hive.NearestHiveCommand;
-import com.blib.common.registry.impl.BLibCommandRegistry;
+import com.blib.api.common.registry.v1.impl.BLibCommandRegistry;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;

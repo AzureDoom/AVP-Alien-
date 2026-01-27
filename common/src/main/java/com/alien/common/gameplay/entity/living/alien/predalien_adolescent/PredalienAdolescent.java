@@ -1,20 +1,25 @@
 package com.alien.common.gameplay.entity.living.alien.predalien_adolescent;
 
-import com.alien.common.config.AlienConfig;
+import com.alien.common.constant.AttackDamageConstants;
+import com.alien.common.constant.FollowRangeConstants;
+import com.alien.common.constant.HealthConstants;
+import com.alien.common.constant.HealthRegenConstants;
+import com.alien.common.constant.KnockbackResistanceConstants;
+import com.alien.common.constant.MoveSpeedConstants;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.GrowthManager;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.util.AlienPredicates;
 import com.alien.common.util.XenomorphGrowthUtil;
-import com.blib.common.gameplay.util.BLibEntityPredicates;
+import com.blib.api.common.entity.v1.BLibEntityPredicates;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
-import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +27,14 @@ import org.jetbrains.annotations.Nullable;
 public class PredalienAdolescent extends Alien {
 
     public static AttributeSupplier.Builder createPredalienAdolescentAttributes() {
-        return applyFrom(AlienConfig.INSTANCE.statsConfigs.PREDALIEN_ADOLESCENT_STATS, Monster.createMonsterAttributes());
+        return Alien.createAlienAttributes()
+            .add(Attributes.ARMOR, 0f)
+            .add(Attributes.ARMOR_TOUGHNESS, 0f)
+            .add(Attributes.ATTACK_DAMAGE, AttackDamageConstants.PREDALIEN_ADOLESCENT_ATTACK_DAMAGE)
+            .add(Attributes.FOLLOW_RANGE, FollowRangeConstants.PREDALIEN_ADOLESCENT_FOLLOW_RANGE)
+            .add(Attributes.KNOCKBACK_RESISTANCE, KnockbackResistanceConstants.PREDALIEN_ADOLESCENT_KNOCKBACK_RESISTANCE)
+            .add(Attributes.MAX_HEALTH, HealthConstants.PREDALIEN_ADOLESCENT_HEALTH)
+            .add(Attributes.MOVEMENT_SPEED, MoveSpeedConstants.PREDALIEN_ADOLESCENT_SPEED);
     }
 
     private final PredalienAdolescentAnimationDispatcher animationDispatcher;
@@ -35,7 +47,6 @@ public class PredalienAdolescent extends Alien {
         this.animationDispatcher = new PredalienAdolescentAnimationDispatcher(this);
         this.growthManager = new GrowthManager(this, XenomorphGrowthUtil.GROW_UP_CALLBACK)
             .setGrowOverTime(true);
-        this.config = AlienConfig.INSTANCE.statsConfigs.PREDALIEN_ADOLESCENT_STATS;
     }
 
     @Override
@@ -69,7 +80,7 @@ public class PredalienAdolescent extends Alien {
 
     @Override
     protected float getHealthRegenPerSecond() {
-        return AlienConfig.INSTANCE.statsConfigs.PREDALIEN_ADOLESCENT_STATS.healthRegenPerSecond;
+        return HealthRegenConstants.PREDALIEN_ADOLESCENT_HEALTH_REGEN;
     }
 
     @Override

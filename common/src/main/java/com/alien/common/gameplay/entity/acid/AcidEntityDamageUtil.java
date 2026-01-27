@@ -1,10 +1,11 @@
 package com.alien.common.gameplay.entity.acid;
 
-import com.alien.common.config.AlienConfig;
+import com.alien.common.property.AlienProperties;
+import com.alien.common.property.AlienPropertyAccess;
 import com.alien.common.registry.key.AlienDamageTypeKeys;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.registry.tag.AlienItemTags;
-import com.blib.common.gameplay.util.BLibEntityPredicates;
+import com.blib.api.common.entity.v1.BLibEntityPredicates;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
@@ -67,7 +68,7 @@ public class AcidEntityDamageUtil {
             return;
         }
 
-        var damage = AlienConfig.INSTANCE.statsConfigs.ACID_ATTACK_DAMAGE;
+        var damage = AlienPropertyAccess.INSTANCE.getOrThrow(AlienProperties.Entities.Acid.ATTACK_DAMAGE);
         var registry = acid.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
         var damageSource = new DamageSource(registry.getHolderOrThrow(AlienDamageTypeKeys.ACID));
 

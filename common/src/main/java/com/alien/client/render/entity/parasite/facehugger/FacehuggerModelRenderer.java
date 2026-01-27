@@ -4,11 +4,11 @@ import com.alien.client.render.entity.head.EntityHeadData;
 import com.alien.client.render.entity.head.EntityHeadDataCache;
 import com.alien.client.render.entity.parasite.attachment.ParasiteHeadAttachmentOffsetDataCache;
 import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.Facehugger;
+import com.blib.azurelib.common.render.AzLayerRenderer;
+import com.blib.azurelib.common.render.entity.AzEntityModelRenderer;
+import com.blib.azurelib.common.render.entity.AzEntityRendererPipeline;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import mod.azure.azurelib.common.render.AzLayerRenderer;
-import mod.azure.azurelib.common.render.entity.AzEntityModelRenderer;
-import mod.azure.azurelib.common.render.entity.AzEntityRendererPipeline;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 

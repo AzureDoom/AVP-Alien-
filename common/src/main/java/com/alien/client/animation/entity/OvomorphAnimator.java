@@ -3,10 +3,10 @@ package com.alien.client.animation.entity;
 import com.alien.AlienResources;
 import com.alien.common.constant.animation.OvomorphAnimationRefs;
 import com.alien.common.gameplay.entity.living.alien.ovomorph.Ovomorph;
-import mod.azure.azurelib.common.animation.AzAnimatorConfig;
-import mod.azure.azurelib.common.animation.controller.AzAnimationController;
-import mod.azure.azurelib.common.animation.controller.AzAnimationControllerContainer;
-import mod.azure.azurelib.common.animation.impl.AzEntityAnimator;
+import com.blib.azurelib.common.animation.AzAnimatorConfig;
+import com.blib.azurelib.common.animation.controller.AzAnimationController;
+import com.blib.azurelib.common.animation.controller.AzAnimationControllerContainer;
+import com.blib.azurelib.common.animation.impl.AzEntityAnimator;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 

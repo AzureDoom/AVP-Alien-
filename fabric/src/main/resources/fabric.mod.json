@@ -33,16 +33,12 @@
 	"breaks": {
 		"gigeresque": "<${gigeresque_version}"
 	},
-	"conflicts": {
-		"azurelib": ">${azurelib_version}"
-	},
 	"depends": {
 		"fabricloader": ">=${fabric_loader_version}",
 		"minecraft": "~${minecraft_version}",
 		"java": ">=${java_version}",
 		"fabric-api": "*",
-		"blib": "~${blib_version}",
-		"azurelib": ">=${azurelib_version}"
+		"blib": "~${blib_version}"
 	},
 	"suggests": {
 		"avp_human": "~${avp_human_version}",

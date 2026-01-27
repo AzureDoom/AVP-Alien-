@@ -1,10 +1,10 @@
 package com.alien.compatibility.avp_human;
 
-import com.blib.BLib;
-import com.blib.BLibMod;
+import com.blib.api.BLibAPI;
+import com.blib.api.common.mod.v1.BLibMod;
 
 public class AVPHuman {
 
-    public static final BLibMod MOD = BLib.createMod("avp_human");
+    public static final BLibMod MOD = BLibAPI.createMod("avp_human");
 
 }

@@ -3,10 +3,10 @@ package com.alien.common.registry.init;
 import com.alien.Alien;
 import com.alien.AlienResources;
 import com.alien.common.gameplay.entity.living.alien.ovomorph.Ovomorph;
-import com.blib.common.network.data.DataSyncKey;
-import com.blib.common.registry.BLibBuiltInRegistries;
-import com.blib.common.registry.BLibHolder;
-import com.blib.common.registry.BLibRegistry;
+import com.blib.api.common.data_sync.v1.model.DataSyncKey;
+import com.blib.api.common.registry.v1.BLibBuiltInRegistries;
+import com.blib.api.common.registry.v1.BLibHolder;
+import com.blib.api.common.registry.v1.BLibRegistry;
 import com.just.codec.stream.impl.StreamCodecs;
 import com.mojang.serialization.Codec;
 

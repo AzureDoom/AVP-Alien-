@@ -2,7 +2,7 @@ package com.alien.common.model.alien.variant;
 
 import com.alien.common.gameplay.block.resin.vein.ResinVeinBlock;
 import com.alien.common.gameplay.block.resin.vent.ResinVentBlock;
-import com.blib.common.registry.BLibHolder;
+import com.blib.api.common.registry.v1.BLibHolder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.tags.TagKey;

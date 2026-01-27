@@ -5,7 +5,7 @@ import com.alien.common.model.alien.Host;
 import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.key.AlienDamageTypeKeys;
 import com.alien.common.util.AlienPredicates;
-import com.blib.common.network.data.DataAccessor;
+import com.blib.api.common.data_sync.v1.DataAccessor;
 import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;

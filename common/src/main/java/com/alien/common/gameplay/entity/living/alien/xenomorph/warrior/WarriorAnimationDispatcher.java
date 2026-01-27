@@ -2,9 +2,9 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.warrior;
 
 import com.alien.common.constant.animation.WarriorAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
-import com.blib.common.util.AzAnimationUtil;
-import mod.azure.azurelib.common.animation.dispatch.command.AzCommand;
-import mod.azure.azurelib.common.animation.play_behavior.AzPlayBehaviors;
+import com.blib.api.client.animation.v1.AzAnimationUtil;
+import com.blib.azurelib.common.animation.dispatch.command.AzCommand;
+import com.blib.azurelib.common.animation.play_behavior.AzPlayBehaviors;
 
 public class WarriorAnimationDispatcher {
 

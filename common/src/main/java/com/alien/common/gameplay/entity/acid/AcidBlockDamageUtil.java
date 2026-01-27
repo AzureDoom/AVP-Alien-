@@ -2,7 +2,7 @@ package com.alien.common.gameplay.entity.acid;
 
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienBlockTags;
-import com.blib.server.BlockBreakProgressManager;
+import com.blib.api.common.block.v1.BlockBreakProgressManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundSource;

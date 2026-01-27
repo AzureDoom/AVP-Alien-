@@ -2,7 +2,7 @@ package com.alien.mixin;
 
 import com.alien.common.model.alien.FreeMob;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
-import com.blib.common.gameplay.goap.GOAPUser;
+import com.blib.api.common.goap.v1.GOAPUser;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;

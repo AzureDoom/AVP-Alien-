@@ -2,7 +2,7 @@ package com.alien.common.data.fixer.migration;
 
 import com.alien.Alien;
 import com.alien.common.data.fixer.migration.impl.AVP_0_3_0_To_Alien_0_1_0;
-import com.blib.common.data.fixer.migration.BLibDataMigration;
+import com.blib.api.common.data_fix.v1.BLibDataMigration;
 
 import java.util.List;
 

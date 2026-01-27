@@ -2,7 +2,7 @@ package com.alien.common.gameplay.block.resin.node;
 
 import com.alien.common.gameplay.block.entity.resin.node.ResinNodeBlockEntity;
 import com.alien.common.registry.init.AlienBlockEntityTypes;
-import com.blib.common.gameplay.util.spatial.block.BlockPosUtil;
+import com.blib.api.common.spatial.v1.block.BlockPosUtil;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;

@@ -3,7 +3,7 @@ package com.alien.common.gameplay.hive.membership;
 import com.alien.Alien;
 import com.alien.common.gameplay.hive.Hive;
 import com.alien.common.model.hive.HiveMemberData;
-import com.blib.common.gameplay.model.NBTSerializable;
+import com.blib.api.common.nbt.v1.model.NBTSerializable;
 import com.just.core.functional.option.Option;
 import com.mojang.serialization.Dynamic;
 import net.minecraft.core.registries.BuiltInRegistries;

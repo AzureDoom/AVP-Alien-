@@ -2,7 +2,7 @@ package com.alien.common.util;
 
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.model.alien.variant.AlienVariant;
-import com.blib.common.util.EntityTransitionUtil;
+import com.blib.api.common.entity.v1.EntityTransitionUtil;
 import net.minecraft.world.entity.EntityType;
 
 public class AlienTransitionUtil {

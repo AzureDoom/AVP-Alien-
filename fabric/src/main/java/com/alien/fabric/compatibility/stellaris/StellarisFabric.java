@@ -1,11 +1,11 @@
 package com.alien.fabric.compatibility.stellaris;
 
-import com.blib.BLib;
-import com.blib.BLibMod;
+import com.blib.api.BLibAPI;
+import com.blib.api.common.mod.v1.BLibMod;
 
 public class StellarisFabric {
 
     public static final String MOD_ID = "stellaris";
 
-    public static final BLibMod MOD = BLib.createMod(MOD_ID);
+    public static final BLibMod MOD = BLibAPI.createMod(MOD_ID);
 }

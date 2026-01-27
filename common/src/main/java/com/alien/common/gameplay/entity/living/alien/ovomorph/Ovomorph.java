@@ -1,6 +1,8 @@
 package com.alien.common.gameplay.entity.living.alien.ovomorph;
 
-import com.alien.common.config.AlienConfig;
+import com.alien.common.constant.HealthConstants;
+import com.alien.common.constant.HealthRegenConstants;
+import com.alien.common.constant.KnockbackResistanceConstants;
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.ovomorph.ai.OvomorphGOAP;
@@ -11,9 +13,9 @@ import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.util.AlienPredicates;
-import com.blib.common.gameplay.entity.manager.VibrationSystemManager;
-import com.blib.common.gameplay.goap.GOAPUser;
-import com.blib.common.network.data.DataAccessor;
+import com.blib.api.common.data_sync.v1.DataAccessor;
+import com.blib.api.common.entity.v1.manager.VibrationSystemManager;
+import com.blib.api.common.goap.v1.GOAPUser;
 import com.just.core.functional.option.Option;
 import com.just.goap.graph.Graph;
 import net.minecraft.sounds.SoundEvents;
@@ -25,7 +27,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Shearable;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
-import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -38,7 +40,14 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
     public static final HatchState DEFAULT_HATCH_STATE = HatchState.SLEEPING;
 
     public static AttributeSupplier.Builder createOvomorphAttributes() {
-        return applyFrom(AlienConfig.INSTANCE.statsConfigs.OVOMORPH_STATS, Monster.createMonsterAttributes());
+        return Alien.createAlienAttributes()
+            .add(Attributes.ARMOR, 0f)
+            .add(Attributes.ARMOR_TOUGHNESS, 0f)
+            .add(Attributes.ATTACK_DAMAGE, 0f)
+            .add(Attributes.FOLLOW_RANGE, 0f)
+            .add(Attributes.KNOCKBACK_RESISTANCE, KnockbackResistanceConstants.OVOMORPH_KNOCKBACK_RESISTANCE)
+            .add(Attributes.MAX_HEALTH, HealthConstants.OVOMORPH_HEALTH)
+            .add(Attributes.MOVEMENT_SPEED, 0f);
     }
 
     public final DataAccessor<Byte> hatchStateId;
@@ -64,7 +73,6 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
 
         this.animationDispatcher = new OvomorphAnimationDispatcher(this);
         this.hatchManager = new HatchManager(this, 3 * 20, 3 * 20);
-        this.config = AlienConfig.INSTANCE.statsConfigs.OVOMORPH_STATS;
         this.wantsPickup = false;
     }
 
@@ -253,7 +261,7 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
 
     @Override
     protected float getHealthRegenPerSecond() {
-        return AlienConfig.INSTANCE.statsConfigs.OVOMORPH_STATS.healthRegenPerSecond;
+        return HealthRegenConstants.OVOMORPH_HEALTH_REGEN;
     }
 
     public HatchManager getHatchManager() {

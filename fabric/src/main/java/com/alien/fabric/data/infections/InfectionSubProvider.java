@@ -3,7 +3,7 @@ package com.alien.fabric.data.infections;
 import com.alien.common.model.lifecycle.infection.Infection;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
-import com.blib.common.data.EntityTypePredicate;
+import com.blib.api.common.entity.v1.EntityTypePredicate;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 
 import java.util.Optional;

@@ -1,6 +1,13 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.predalien;
 
-import com.alien.common.config.AlienConfig;
+import com.alien.common.constant.ArmorConstants;
+import com.alien.common.constant.ArmorToughnessConstants;
+import com.alien.common.constant.AttackDamageConstants;
+import com.alien.common.constant.FollowRangeConstants;
+import com.alien.common.constant.HealthConstants;
+import com.alien.common.constant.HealthRegenConstants;
+import com.alien.common.constant.KnockbackResistanceConstants;
+import com.alien.common.constant.MoveSpeedConstants;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.model.alien.variant.AlienVariant;
@@ -9,14 +16,21 @@ import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
-import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 public class Predalien extends Xenomorph {
 
     public static AttributeSupplier.Builder createPredalienAttributes() {
-        return applyFrom(AlienConfig.INSTANCE.statsConfigs.PREDALIEN_STATS, Monster.createMonsterAttributes());
+        return Alien.createAlienAttributes()
+            .add(Attributes.ARMOR, ArmorConstants.PREDALIEN_ARMOR)
+            .add(Attributes.ARMOR_TOUGHNESS, ArmorToughnessConstants.PREDALIEN_ARMOR_TOUGHNESS)
+            .add(Attributes.ATTACK_DAMAGE, AttackDamageConstants.PREDALIEN_ATTACK_DAMAGE)
+            .add(Attributes.FOLLOW_RANGE, FollowRangeConstants.PREDALIEN_FOLLOW_RANGE)
+            .add(Attributes.KNOCKBACK_RESISTANCE, KnockbackResistanceConstants.PREDALIEN_KNOCKBACK_RESISTANCE)
+            .add(Attributes.MAX_HEALTH, HealthConstants.PREDALIEN_HEALTH)
+            .add(Attributes.MOVEMENT_SPEED, MoveSpeedConstants.PREDALIEN_SPEED);
     }
 
     private final PredalienAnimationDispatcher animationDispatcher;
@@ -24,7 +38,6 @@ public class Predalien extends Xenomorph {
     public Predalien(EntityType<? extends Predalien> entityType, Level level) {
         super(entityType, level);
         this.animationDispatcher = new PredalienAnimationDispatcher(this);
-        this.config = AlienConfig.INSTANCE.statsConfigs.PREDALIEN_STATS;
     }
 
     @Override
@@ -34,12 +47,12 @@ public class Predalien extends Xenomorph {
 
     @Override
     protected @Nullable ResinData createResinData() {
-        return new ResinData(0, 64, 1, AlienConfig.INSTANCE.statsConfigs.PREDALIEN_STATS.nestTickrate);
+        return new ResinData(0, 64, 1, 20);
     }
 
     @Override
     protected float getHealthRegenPerSecond() {
-        return AlienConfig.INSTANCE.statsConfigs.PREDALIEN_STATS.healthRegenPerSecond;
+        return HealthRegenConstants.PREDALIEN_HEALTH_REGEN;
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.alien.common.gameplay.entity.living.alien.ovomorph;
 
 import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.util.AlienPredicates;
-import com.blib.common.network.data.DataAccessor;
+import com.blib.api.common.data_sync.v1.DataAccessor;
 import net.minecraft.world.level.gameevent.vibrations.VibrationInfo;
 
 import java.util.Objects;

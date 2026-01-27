@@ -6,7 +6,7 @@ import com.alien.common.model.alien.HatchState;
 import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.compatibility.avp_human.GeneManagerProxy;
-import com.blib.common.network.data.DataAccessor;
+import com.blib.api.common.data_sync.v1.DataAccessor;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;

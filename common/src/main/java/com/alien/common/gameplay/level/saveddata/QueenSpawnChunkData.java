@@ -1,7 +1,7 @@
 package com.alien.common.gameplay.level.saveddata;
 
-import com.blib.common.data.Cooldown;
-import com.blib.common.gameplay.util.spatial.region.RegionPos;
+import com.blib.api.common.spatial.v1.region.RegionPos;
+import com.blib.api.common.time.v1.Cooldown;
 import com.just.core.functional.option.Option;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;

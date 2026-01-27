@@ -65,7 +65,6 @@ neoForge {
 
 dependencies {
     implementation "com.blib:blib-neoforge-${project.minecraft_version}:${project.blib_version}"
-    implementation "mod.azure.azurelib:azurelib-neo-${project.minecraft_version}:${project.azurelib_version}"
 
     implementation("com.just:just-codec:${project.just_codec_version}")
     implementation("com.just:just-core:${project.just_core_version}")
@@ -91,6 +90,8 @@ dependencies {
 
     compileOnly "maven.modrinth:gigeresque:${project.gigeresque_version}"
     localRuntime "maven.modrinth:gigeresque:${project.gigeresque_version}"
+    // Required for gigeresque.
+    localRuntime "mod.azure.azurelib:azurelib-neo-${project.minecraft_version}:${project.azurelib_version}"
 
     compileOnly "dev.emi:emi-neoforge:${emi_version}"
     compileOnly "mezz.jei:jei-$minecraft_version-neoforge:${jei_version}"

@@ -72,7 +72,6 @@ dependencies {
         exclude group: "com.just", module: "just-core"
         exclude group: "com.just", module: "just-goap"
     }
-    modImplementation "mod.azure.azurelib:azurelib-fabric-${project.minecraft_version}:${project.azurelib_version}"
 
     modApi "com.terraformersmc:modmenu:${project.modmenu_version}"
     modApi "dev.architectury:architectury-fabric:${project.architectury_version}"
@@ -98,6 +97,8 @@ dependencies {
 
     modCompileOnly "maven.modrinth:gigeresque:${project.gigeresque_modrinth_version}"
     modLocalRuntime "maven.modrinth:gigeresque:${project.gigeresque_modrinth_version}"
+    // Required for gigeresque.
+    modLocalRuntime "mod.azure.azurelib:azurelib-fabric-${project.minecraft_version}:${project.azurelib_version}"
 
     // Here in case of any issues
     //modImplementation "maven.modrinth:modernfix:5.21.0+mc1.21.1"

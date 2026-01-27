@@ -1,10 +1,10 @@
 package com.alien;
 
-import com.alien.common.config.AlienConfig;
 import com.alien.common.data.AlienReloadListeners;
 import com.alien.common.data.fixer.migration.AlienDataMigrations;
 import com.alien.common.gameplay.level.saveddata.HiveLevelData;
 import com.alien.common.gameplay.level.saveddata.QueenSpawnChunkData;
+import com.alien.common.property.AlienPropertyAccess;
 import com.alien.common.registry.GrowthStageRegistry;
 import com.alien.common.registry.InfectionRegistry;
 import com.alien.common.registry.init.AlienArmorMaterials;
@@ -38,8 +38,8 @@ import com.alien.common.registry.init.item.block.AlienResinBlockItems;
 import com.alien.common.registry.init.item.block.IrradiatedAlienResinBlockItems;
 import com.alien.common.registry.init.item.block.NetherAlienChitinBlockItems;
 import com.alien.common.registry.init.item.block.NetherAlienResinBlockItems;
-import com.blib.BLib;
-import com.blib.BLibMod;
+import com.blib.api.BLibAPI;
+import com.blib.api.common.mod.v1.BLibMod;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.level.Level;
 import org.slf4j.Logger;
@@ -51,12 +51,12 @@ public class Alien {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    public static final BLibMod MOD = BLib.createMod(MOD_ID);
+    public static final BLibMod MOD = BLibAPI.createMod(MOD_ID);
 
     public static void initialize() {
-        LOGGER.info("Initializing AVP (Alien) for mod loader '{}'", BLib.getModLoaderType());
+        LOGGER.info("Initializing AVP (Alien) for mod loader '{}'", BLibAPI.getModLoaderType());
 
-        AlienConfig.initialize();
+        AlienPropertyAccess.INSTANCE.save();
 
         MOD.initialize(Alien::runInitialization);
     }

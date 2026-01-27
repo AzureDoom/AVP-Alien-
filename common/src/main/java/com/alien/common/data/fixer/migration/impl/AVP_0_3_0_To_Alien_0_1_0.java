@@ -2,9 +2,9 @@ package com.alien.common.data.fixer.migration.impl;
 
 import com.alien.Alien;
 import com.alien.AlienResources;
-import com.blib.common.data.fixer.BLibDataFixerRegistry;
-import com.blib.common.data.fixer.migration.BLibDataMigration;
-import com.blib.common.model.Version;
+import com.blib.api.common.data_fix.v1.BLibDataFixerRegistry;
+import com.blib.api.common.data_fix.v1.BLibDataMigration;
+import com.blib.api.common.mod.v1.model.Version;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;

@@ -1,7 +1,7 @@
 package com.alien.common.data;
 
 import com.alien.Alien;
-import com.blib.common.data.BLibAdvancementAccess;
+import com.blib.api.common.advancement.v1.BLibAdvancementAccess;
 
 public class AlienAdvancements {
 

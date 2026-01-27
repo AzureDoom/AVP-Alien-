@@ -4,7 +4,7 @@ import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.block.entity.resin.vent.ResinVentBlockEntity;
 import com.alien.common.registry.tag.AlienBlockTags;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
-import com.blib.common.gameplay.util.spatial.block.BlockPosUtil;
+import com.blib.api.common.spatial.v1.block.BlockPosUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;

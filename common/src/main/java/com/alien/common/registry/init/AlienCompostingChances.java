@@ -6,7 +6,7 @@ import com.alien.common.registry.init.block.AlienResinBlocks;
 import com.alien.common.registry.init.block.IrradiatedAlienResinBlocks;
 import com.alien.common.registry.init.block.NetherAlienResinBlocks;
 import com.alien.common.registry.init.item.AlienItems;
-import com.blib.common.registry.impl.BLibCompostableRegistry;
+import com.blib.api.common.registry.v1.impl.BLibCompostableRegistry;
 
 public class AlienCompostingChances {
 

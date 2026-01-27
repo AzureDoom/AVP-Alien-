@@ -2,8 +2,8 @@ package com.alien.common.registry.init.item;
 
 import com.alien.Alien;
 import com.alien.common.registry.init.AlienEntityTypes;
-import com.blib.common.registry.BLibHolder;
-import com.blib.common.registry.BLibRegistry;
+import com.blib.api.common.registry.v1.BLibHolder;
+import com.blib.api.common.registry.v1.BLibRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;

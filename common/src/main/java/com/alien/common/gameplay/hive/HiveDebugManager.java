@@ -1,6 +1,7 @@
 package com.alien.common.gameplay.hive;
 
-import com.alien.common.config.AlienConfig;
+import com.alien.common.property.AlienProperties;
+import com.alien.common.property.AlienPropertyAccess;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
@@ -50,14 +51,14 @@ public class HiveDebugManager {
     }
 
     public boolean isDebugEnabled() {
-        return AlienConfig.INSTANCE.hiveConfigs.HIVE_DEBUG_ENABLED;
+        return AlienPropertyAccess.INSTANCE.getOrThrow(AlienProperties.Hive.Debug.ENABLED);
     }
 
     public boolean isDebugHiveMemberHighlightEnabled() {
-        return AlienConfig.INSTANCE.hiveConfigs.HIVE_DEBUG_HIGHLIGHT_ALL_MEMBERS;
+        return AlienPropertyAccess.INSTANCE.getOrThrow(AlienProperties.Hive.Debug.HIGHLIGHT_ALL_MEMBERS);
     }
 
     public boolean isDebugLeaderHighlightEnabled() {
-        return AlienConfig.INSTANCE.hiveConfigs.HIVE_DEBUG_HIGHLIGHT_LEADER;
+        return AlienPropertyAccess.INSTANCE.getOrThrow(AlienProperties.Hive.Debug.HIGHLIGHT_LEADER);
     }
 }

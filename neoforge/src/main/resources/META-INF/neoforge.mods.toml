@@ -29,18 +29,6 @@ versionRange  = "${minecraft_version_range}"
 ordering      = "NONE"
 side          = "BOTH"
 [[dependencies.${mod_id}]]
-modId         = "azurelib"
-type          = "required"
-versionRange  = "[${azurelib_version},${azurelib_excl_end_version})"
-ordering      = "NONE"
-side          = "BOTH"
-[[dependencies.${mod_id}]]
-modId         = "azurelib"
-type          = "discouraged"
-versionRange  = "[${azurelib_discouraged_version},)"
-ordering      = "NONE"
-side          = "BOTH"
-[[dependencies.${mod_id}]]
 modId         = "blib"
 type          = "required"
 versionRange  = "[${blib_version},${blib_excl_end_version})"

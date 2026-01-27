@@ -2,8 +2,8 @@ package com.alien.client.render.entity;
 
 import com.alien.AlienResources;
 import com.alien.common.gameplay.entity.living.alien.ovipositor.Ovipositor;
-import mod.azure.azurelib.common.render.entity.AzEntityRenderer;
-import mod.azure.azurelib.common.render.entity.AzEntityRendererConfig;
+import com.blib.azurelib.common.render.entity.AzEntityRenderer;
+import com.blib.azurelib.common.render.entity.AzEntityRendererConfig;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 

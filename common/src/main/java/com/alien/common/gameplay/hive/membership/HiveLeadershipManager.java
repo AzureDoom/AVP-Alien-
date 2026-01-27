@@ -2,8 +2,8 @@ package com.alien.common.gameplay.hive.membership;
 
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.hive.Hive;
-import com.blib.common.gameplay.model.NBTSerializable;
-import com.blib.common.gameplay.util.CompoundTagUtil;
+import com.blib.api.common.nbt.v1.CompoundTagUtil;
+import com.blib.api.common.nbt.v1.model.NBTSerializable;
 import com.just.core.functional.option.Option;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;

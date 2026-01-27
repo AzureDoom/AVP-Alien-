@@ -1,6 +1,12 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.drone;
 
-import com.alien.common.config.AlienConfig;
+import com.alien.common.constant.ArmorConstants;
+import com.alien.common.constant.AttackDamageConstants;
+import com.alien.common.constant.FollowRangeConstants;
+import com.alien.common.constant.HealthConstants;
+import com.alien.common.constant.HealthRegenConstants;
+import com.alien.common.constant.KnockbackResistanceConstants;
+import com.alien.common.constant.MoveSpeedConstants;
 import com.alien.common.gameplay.ai.CreateVentGoal;
 import com.alien.common.gameplay.ai.DropOffEggGoal;
 import com.alien.common.gameplay.ai.PickUpEggGoal;
@@ -13,13 +19,13 @@ import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
-import com.blib.common.gameplay.entity.ai.goal.combat.LungeAtTargetGoal;
-import com.blib.common.util.EntityUtil;
+import com.blib.api.common.entity.v1.EntityUtil;
+import com.blib.api.common.entity.v1.ai.goal.combat.LungeAtTargetGoal;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
-import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.DynamicGameEventListener;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +36,14 @@ import java.util.function.BiConsumer;
 public class Drone extends Xenomorph implements EggCarrier {
 
     public static AttributeSupplier.Builder createDroneAttributes() {
-        return applyFrom(AlienConfig.INSTANCE.statsConfigs.DRONE_STATS, Monster.createMonsterAttributes());
+        return Alien.createAlienAttributes()
+            .add(Attributes.ARMOR, ArmorConstants.DRONE_ARMOR)
+            .add(Attributes.ARMOR_TOUGHNESS, 0f)
+            .add(Attributes.ATTACK_DAMAGE, AttackDamageConstants.DRONE_ATTACK_DAMAGE)
+            .add(Attributes.FOLLOW_RANGE, FollowRangeConstants.DRONE_FOLLOW_RANGE)
+            .add(Attributes.KNOCKBACK_RESISTANCE, KnockbackResistanceConstants.DRONE_KNOCKBACK_RESISTANCE)
+            .add(Attributes.MAX_HEALTH, HealthConstants.DRONE_HEALTH)
+            .add(Attributes.MOVEMENT_SPEED, MoveSpeedConstants.DRONE_SPEED);
     }
 
     private final DroneAnimationDispatcher animationDispatcher;
@@ -40,7 +53,6 @@ public class Drone extends Xenomorph implements EggCarrier {
     public Drone(EntityType<? extends Drone> entityType, Level level) {
         super(entityType, level);
         this.animationDispatcher = new DroneAnimationDispatcher(this);
-        this.config = AlienConfig.INSTANCE.statsConfigs.DRONE_STATS;
         this.eggPickupManager = new EggPickupManager(this);
     }
 
@@ -51,7 +63,7 @@ public class Drone extends Xenomorph implements EggCarrier {
 
     @Override
     protected @Nullable ResinData createResinData() {
-        return new ResinData(0, 16, 1, AlienConfig.INSTANCE.statsConfigs.DRONE_STATS.nestTickrate);
+        return new ResinData(0, 16, 1, 20);
     }
 
     @Override
@@ -116,7 +128,7 @@ public class Drone extends Xenomorph implements EggCarrier {
 
     @Override
     protected float getHealthRegenPerSecond() {
-        return AlienConfig.INSTANCE.statsConfigs.DRONE_STATS.healthRegenPerSecond;
+        return HealthRegenConstants.DRONE_HEALTH_REGEN;
     }
 
     @Override

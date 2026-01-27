@@ -1,6 +1,6 @@
 package com.alien.common.gameplay.block.resin;
 
-import com.blib.common.gameplay.util.spatial.block.BlockPosUtil;
+import com.blib.api.common.spatial.v1.block.BlockPosUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;

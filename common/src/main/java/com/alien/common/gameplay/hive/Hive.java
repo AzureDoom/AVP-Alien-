@@ -1,6 +1,5 @@
 package com.alien.common.gameplay.hive;
 
-import com.alien.common.config.AlienConfig;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.Crusher;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
@@ -20,9 +19,11 @@ import com.alien.common.gameplay.hive.membership.HiveReserveManager;
 import com.alien.common.gameplay.hive.vent.HiveVentManager;
 import com.alien.common.gameplay.level.saveddata.QueenSpawnChunkData;
 import com.alien.common.model.alien.variant.AlienVariant;
+import com.alien.common.property.AlienProperties;
+import com.alien.common.property.AlienPropertyAccess;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
-import com.blib.common.gameplay.model.NBTSerializable;
-import com.blib.common.gameplay.util.spatial.chunk.ChunkPosUtil;
+import com.blib.api.common.nbt.v1.model.NBTSerializable;
+import com.blib.api.common.spatial.v1.chunk.ChunkPosUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.RandomSource;
@@ -234,7 +235,9 @@ public class Hive implements NBTSerializable {
             QueenSpawnChunkData.getOrCreate(level)
                 .ifSome(queenSpawnChunkData -> {
                     // TODO: Use a precise circular area of chunks based on the hive's radius/size.
-                    var chunkRadiusToBlacklist = AlienConfig.INSTANCE.hiveConfigs.MINIMUM_DISTANCE_BETWEEN_NATURAL_QUEEN_SPAWNS_IN_CHUNKS;
+                    var chunkRadiusToBlacklist = AlienPropertyAccess.INSTANCE.getOrThrow(
+                        AlienProperties.Hive.MINIMUM_DISTANCE_BETWEEN_NATURAL_QUEEN_SPAWNS_IN_CHUNKS
+                    );
                     var nearbyChunkPositions = ChunkPosUtil.getChunksAround(centerPosition(), chunkRadiusToBlacklist);
 
                     nearbyChunkPositions.forEach(queenSpawnChunkData::addChunkToBlacklist);

@@ -1,13 +1,14 @@
 package com.alien.common.gameplay.hive;
 
-import com.alien.common.config.AlienConfig;
-import com.blib.common.gameplay.util.spatial.Vec3Like;
-import com.blib.common.gameplay.util.spatial.block.BlockPosVec3;
-import com.blib.common.gameplay.util.spatial.sphere.layer.LayeredSphere;
-import com.blib.common.gameplay.util.spatial.sphere.layer.SphereLayer;
-import com.blib.common.gameplay.util.spatial.sphere.layer.SphereLayerDistanceTarget;
-import com.blib.common.gameplay.util.spatial.sphere.layer.impl.PercentileSphereLayer;
-import com.blib.common.gameplay.util.spatial.sphere.layer.impl.SupplyingPercentileSphereLayer;
+import com.alien.common.property.AlienProperties;
+import com.alien.common.property.AlienPropertyAccess;
+import com.blib.api.common.spatial.v1.Vec3Like;
+import com.blib.api.common.spatial.v1.block.BlockPosVec3;
+import com.blib.api.common.spatial.v1.sphere.layer.LayeredSphere;
+import com.blib.api.common.spatial.v1.sphere.layer.SphereLayer;
+import com.blib.api.common.spatial.v1.sphere.layer.SphereLayerDistanceTarget;
+import com.blib.api.common.spatial.v1.sphere.layer.impl.PercentileSphereLayer;
+import com.blib.api.common.spatial.v1.sphere.layer.impl.SupplyingPercentileSphereLayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
@@ -41,8 +42,8 @@ public class HiveSpaceManager implements LayeredSphere {
     // Beyond resin layers
 
     private static final Supplier<Float> MAX_NORMALIZED_LEASH_RANGE_SUPPLIER = () -> {
-        var hiveRadiusBlocks = AlienConfig.INSTANCE.hiveConfigs.HIVE_RADIUS_IN_BLOCKS;
-        var hiveLeashRadiusInBlocks = AlienConfig.INSTANCE.hiveConfigs.HIVE_LEASH_RADIUS_IN_BLOCKS;
+        var hiveRadiusBlocks = AlienPropertyAccess.INSTANCE.getOrThrow(AlienProperties.Hive.RADIUS_IN_BLOCKS);
+        var hiveLeashRadiusInBlocks = AlienPropertyAccess.INSTANCE.getOrThrow(AlienProperties.Hive.LEASH_RADIUS_IN_BLOCKS);
 
         return 1F + (hiveLeashRadiusInBlocks / hiveRadiusBlocks);
     };
@@ -146,7 +147,7 @@ public class HiveSpaceManager implements LayeredSphere {
 
     @Override
     public float getRadius() {
-        return AlienConfig.INSTANCE.hiveConfigs.HIVE_RADIUS_IN_BLOCKS;
+        return AlienPropertyAccess.INSTANCE.getOrThrow(AlienProperties.Hive.RADIUS_IN_BLOCKS);
     }
 
     @Override

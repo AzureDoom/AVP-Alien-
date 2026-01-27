@@ -1,7 +1,7 @@
 package com.alien.client.render.layer;
 
-import mod.azure.azurelib.common.render.AzRendererPipelineContext;
-import mod.azure.azurelib.common.render.layer.AzAutoGlowingLayer;
+import com.blib.azurelib.common.render.AzRendererPipelineContext;
+import com.blib.azurelib.common.render.layer.AzAutoGlowingLayer;
 
 import java.util.UUID;
 

@@ -1,8 +1,9 @@
 package com.alien.common.gameplay.hive.ai.task.impl.balance;
 
-import com.alien.common.config.AlienConfig;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.hive.Hive;
+import com.alien.common.property.AlienProperties;
+import com.alien.common.property.AlienPropertyAccess;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
@@ -97,8 +98,10 @@ public class BalanceStepHiveTask extends BalanceHiveTask {
     }
 
     private int computeDesiredUnitCount(int xenomorphHiveMemberCount, int desiredUnitCount) {
-        var hiveMembersRequiredForPraetorian = AlienConfig.INSTANCE.hiveConfigs.HIVE_MEMBERS_REQUIRED_FOR_PRAETORIAN;
-        var maxPraetorianCount = AlienConfig.INSTANCE.hiveConfigs.HIVE_MAX_PRAETORIAN_COUNT;
+        var hiveMembersRequiredForPraetorian = AlienPropertyAccess.INSTANCE.getOrThrow(
+            AlienProperties.Hive.MEMBERS_REQUIRED_FOR_PRAETORIAN
+        );
+        var maxPraetorianCount = AlienPropertyAccess.INSTANCE.getOrThrow(AlienProperties.Hive.MAX_PRAETORIAN_COUNT);
 
         return hiveMembersRequiredForPraetorian > 0
             ? Math.max(

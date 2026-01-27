@@ -1,6 +1,13 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.queen;
 
-import com.alien.common.config.AlienConfig;
+import com.alien.common.constant.ArmorConstants;
+import com.alien.common.constant.ArmorToughnessConstants;
+import com.alien.common.constant.AttackDamageConstants;
+import com.alien.common.constant.FollowRangeConstants;
+import com.alien.common.constant.HealthConstants;
+import com.alien.common.constant.HealthRegenConstants;
+import com.alien.common.constant.KnockbackResistanceConstants;
+import com.alien.common.constant.MoveSpeedConstants;
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.ai.goal.DigToTargetGoal;
 import com.alien.common.gameplay.ai.goal.QueenLayEggGoal;
@@ -15,8 +22,8 @@ import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
-import com.blib.common.util.EntityUtil;
-import com.blib.common.util.PlayerUtil;
+import com.blib.api.common.entity.v1.EntityUtil;
+import com.blib.api.common.entity.v1.PlayerUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -30,7 +37,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
-import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import org.jetbrains.annotations.NotNull;
@@ -41,7 +48,14 @@ import java.util.Objects;
 public class Queen extends Xenomorph {
 
     public static AttributeSupplier.Builder createQueenAttributes() {
-        return applyFrom(AlienConfig.INSTANCE.statsConfigs.QUEEN_STATS, Monster.createMonsterAttributes());
+        return Alien.createAlienAttributes()
+            .add(Attributes.ARMOR, ArmorConstants.QUEEN_ARMOR)
+            .add(Attributes.ARMOR_TOUGHNESS, ArmorToughnessConstants.QUEEN_ARMOR_TOUGHNESS)
+            .add(Attributes.ATTACK_DAMAGE, AttackDamageConstants.QUEEN_ATTACK_DAMAGE)
+            .add(Attributes.FOLLOW_RANGE, FollowRangeConstants.QUEEN_FOLLOW_RANGE)
+            .add(Attributes.KNOCKBACK_RESISTANCE, KnockbackResistanceConstants.QUEEN_KNOCKBACK_RESISTANCE)
+            .add(Attributes.MAX_HEALTH, HealthConstants.QUEEN_HEALTH)
+            .add(Attributes.MOVEMENT_SPEED, MoveSpeedConstants.QUEEN_SPEED);
     }
 
     private final QueenAnimationDispatcher animationDispatcher;
@@ -52,7 +66,6 @@ public class Queen extends Xenomorph {
         super(entityType, level);
         this.animationDispatcher = new QueenAnimationDispatcher(this);
         this.ovipositorManager = new OvipositorManager(this);
-        this.config = AlienConfig.INSTANCE.statsConfigs.QUEEN_STATS;
     }
 
     @Override
@@ -67,7 +80,7 @@ public class Queen extends Xenomorph {
 
     @Override
     protected @Nullable ResinData createResinData() {
-        return new ResinData(0, 128, 1, AlienConfig.INSTANCE.statsConfigs.QUEEN_STATS.nestTickrate);
+        return new ResinData(0, 128, 1, 20);
     }
 
     @Override
@@ -181,7 +194,7 @@ public class Queen extends Xenomorph {
 
     @Override
     protected float getHealthRegenPerSecond() {
-        return AlienConfig.INSTANCE.statsConfigs.QUEEN_STATS.healthRegenPerSecond;
+        return HealthRegenConstants.QUEEN_HEALTH_REGEN;
     }
 
     @Override

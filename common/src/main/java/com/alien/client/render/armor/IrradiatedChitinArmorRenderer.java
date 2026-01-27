@@ -1,9 +1,9 @@
 package com.alien.client.render.armor;
 
 import com.alien.AlienResources;
-import mod.azure.azurelib.common.render.armor.AzArmorRenderer;
-import mod.azure.azurelib.common.render.armor.AzArmorRendererConfig;
-import mod.azure.azurelib.common.render.layer.AzAutoGlowingLayer;
+import com.blib.azurelib.common.render.armor.AzArmorRenderer;
+import com.blib.azurelib.common.render.armor.AzArmorRendererConfig;
+import com.blib.azurelib.common.render.layer.AzAutoGlowingLayer;
 import net.minecraft.resources.ResourceLocation;
 
 public class IrradiatedChitinArmorRenderer extends AzArmorRenderer {

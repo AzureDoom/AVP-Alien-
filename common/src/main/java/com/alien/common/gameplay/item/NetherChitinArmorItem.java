@@ -2,9 +2,9 @@ package com.alien.common.gameplay.item;
 
 import com.alien.common.registry.init.AlienArmorMaterials;
 import com.alien.common.registry.init.item.AlienArmorItems;
-import com.blib.common.data.TooltipHintBuilder;
-import com.blib.common.data.TooltipTranslationKeys;
-import com.blib.common.gameplay.model.TooltipCategoryType;
+import com.blib.api.common.tooltip.v1.TooltipCategoryType;
+import com.blib.api.common.tooltip.v1.TooltipHintBuilder;
+import com.blib.api.common.tooltip.v1.TooltipTranslationKeys;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;

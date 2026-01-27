@@ -9,7 +9,7 @@ import com.alien.common.registry.init.block.NetherAlienChitinBlocks;
 import com.alien.common.registry.init.block.NetherAlienResinBlocks;
 import com.alien.common.registry.tag.AlienBlockTags;
 import com.alien.compatibility.gigeresque.common.registry.tag.GigeresqueBlockTags;
-import com.blib.common.data.tag.BLibBlockTags;
+import com.blib.api.common.tag.v1.BLibBlockTags;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.core.HolderLookup;

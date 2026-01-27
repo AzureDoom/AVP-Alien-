@@ -1,9 +1,10 @@
 package com.alien.common.gameplay.hive;
 
-import com.alien.common.config.AlienConfig;
 import com.alien.common.data.AlienAdvancements;
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.model.alien.variant.AlienVariant;
+import com.alien.common.property.AlienProperties;
+import com.alien.common.property.AlienPropertyAccess;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.util.AlienPredicates;
 import net.minecraft.network.chat.Component;
@@ -55,7 +56,7 @@ public class HiveBossBarManager {
             ALIEN_VARIANT_TO_COMPONENT_NAME_MAP.get(hive.getVariant()),
             BossEvent.BossBarColor.GREEN,
             BossEvent.BossBarOverlay.PROGRESS
-        ).setDarkenScreen(AlienConfig.INSTANCE.hiveConfigs.HIVE_DARKEN_SCREEN);
+        ).setDarkenScreen(AlienPropertyAccess.INSTANCE.getOrThrow(AlienProperties.Hive.DARKEN_SCREEN));
         this.hive = hive;
     }
 

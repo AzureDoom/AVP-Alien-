@@ -1,22 +1,25 @@
 package com.alien.common.gameplay.entity.living.alien.parasite.facehugger;
 
-import com.alien.common.config.AlienConfig;
+import com.alien.common.constant.FollowRangeConstants;
+import com.alien.common.constant.HealthConstants;
+import com.alien.common.constant.KnockbackResistanceConstants;
+import com.alien.common.constant.MoveSpeedConstants;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.parasite.Parasite;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
-import com.blib.common.gameplay.entity.ai.goal.combat.LungeAtTargetGoal;
+import com.blib.api.common.entity.v1.ai.goal.combat.LungeAtTargetGoal;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +28,14 @@ import org.jetbrains.annotations.Nullable;
 public class Facehugger extends Parasite {
 
     public static AttributeSupplier.Builder createFacehuggerAttributes() {
-        return applyFrom(AlienConfig.INSTANCE.statsConfigs.FACEHUGGER_STATS, Monster.createMonsterAttributes());
+        return Alien.createAlienAttributes()
+            .add(Attributes.ARMOR, 0f)
+            .add(Attributes.ARMOR_TOUGHNESS, 0f)
+            .add(Attributes.ATTACK_DAMAGE, 0f)
+            .add(Attributes.FOLLOW_RANGE, FollowRangeConstants.FACEHUGGER_FOLLOW_RANGE)
+            .add(Attributes.KNOCKBACK_RESISTANCE, KnockbackResistanceConstants.FACEHUGGER_KNOCKBACK_RESISTANCE)
+            .add(Attributes.MAX_HEALTH, HealthConstants.FACEHUGGER_HEALTH)
+            .add(Attributes.MOVEMENT_SPEED, MoveSpeedConstants.FACEHUGGER_SPEED);
     }
 
     private final FacehuggerAnimationDispatcher animationDispatcher;
@@ -33,7 +43,6 @@ public class Facehugger extends Parasite {
     public Facehugger(EntityType<? extends Facehugger> entityType, Level level) {
         super(entityType, level);
         this.animationDispatcher = new FacehuggerAnimationDispatcher(this);
-        this.config = AlienConfig.INSTANCE.statsConfigs.FACEHUGGER_STATS;
     }
 
     @Override

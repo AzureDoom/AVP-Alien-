@@ -1,6 +1,12 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.runner;
 
-import com.alien.common.config.AlienConfig;
+import com.alien.common.constant.ArmorConstants;
+import com.alien.common.constant.AttackDamageConstants;
+import com.alien.common.constant.FollowRangeConstants;
+import com.alien.common.constant.HealthConstants;
+import com.alien.common.constant.HealthRegenConstants;
+import com.alien.common.constant.KnockbackResistanceConstants;
+import com.alien.common.constant.MoveSpeedConstants;
 import com.alien.common.gameplay.ai.CreateVentGoal;
 import com.alien.common.gameplay.ai.DropOffEggGoal;
 import com.alien.common.gameplay.ai.PickUpEggGoal;
@@ -14,13 +20,13 @@ import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
-import com.blib.common.gameplay.entity.ai.goal.combat.LungeAtTargetGoal;
-import com.blib.common.util.EntityUtil;
+import com.blib.api.common.entity.v1.EntityUtil;
+import com.blib.api.common.entity.v1.ai.goal.combat.LungeAtTargetGoal;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
-import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.DynamicGameEventListener;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +37,14 @@ import java.util.function.BiConsumer;
 public class Runner extends Xenomorph implements EggCarrier {
 
     public static AttributeSupplier.Builder createRunnerAttributes() {
-        return applyFrom(AlienConfig.INSTANCE.statsConfigs.RUNNER_STATS, Monster.createMonsterAttributes());
+        return Alien.createAlienAttributes()
+            .add(Attributes.ARMOR, ArmorConstants.RUNNER_ARMOR)
+            .add(Attributes.ARMOR_TOUGHNESS, 0f)
+            .add(Attributes.ATTACK_DAMAGE, AttackDamageConstants.RUNNER_ATTACK_DAMAGE)
+            .add(Attributes.FOLLOW_RANGE, FollowRangeConstants.RUNNER_FOLLOW_RANGE)
+            .add(Attributes.KNOCKBACK_RESISTANCE, KnockbackResistanceConstants.RUNNER_KNOCKBACK_RESISTANCE)
+            .add(Attributes.MAX_HEALTH, HealthConstants.RUNNER_HEALTH)
+            .add(Attributes.MOVEMENT_SPEED, MoveSpeedConstants.RUNNER_SPEED);
     }
 
     private final RunnerAnimationDispatcher animationDispatcher;
@@ -41,7 +54,6 @@ public class Runner extends Xenomorph implements EggCarrier {
     public Runner(EntityType<? extends Runner> entityType, Level level) {
         super(entityType, level);
         this.animationDispatcher = new RunnerAnimationDispatcher(this);
-        this.config = AlienConfig.INSTANCE.statsConfigs.RUNNER_STATS;
         this.eggPickupManager = new EggPickupManager(this);
     }
 
@@ -52,7 +64,7 @@ public class Runner extends Xenomorph implements EggCarrier {
 
     @Override
     protected @Nullable ResinData createResinData() {
-        return new ResinData(0, 16, 1, AlienConfig.INSTANCE.statsConfigs.RUNNER_STATS.nestTickrate);
+        return new ResinData(0, 16, 1, 20);
     }
 
     @Override
@@ -117,7 +129,7 @@ public class Runner extends Xenomorph implements EggCarrier {
 
     @Override
     protected float getHealthRegenPerSecond() {
-        return AlienConfig.INSTANCE.statsConfigs.RUNNER_STATS.healthRegenPerSecond;
+        return HealthRegenConstants.RUNNER_HEALTH_REGEN;
     }
 
     @Override

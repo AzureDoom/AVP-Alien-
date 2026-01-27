@@ -1,7 +1,8 @@
 package com.alien.common.data;
 
 import com.alien.Alien;
-import com.blib.common.registry.impl.BLibReloadListenerRegistry;
+import com.blib.api.common.registry.v1.impl.BLibReloadListenerRegistry;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 
 public class AlienReloadListeners {
@@ -13,7 +14,7 @@ public class AlienReloadListeners {
     public static final PreparableReloadListener INFECTIONS_RELOAD_LISTENER = new InfectionReloadListener();
 
     public static void initialize() {
-        REGISTRY.register(GrowthStageReloadListener.DIRECTORY_NAME, GROWTH_STAGES_RELOAD_LISTENER);
-        REGISTRY.register(InfectionReloadListener.DIRECTORY_NAME, INFECTIONS_RELOAD_LISTENER);
+        REGISTRY.register(GrowthStageReloadListener.DIRECTORY_NAME, GROWTH_STAGES_RELOAD_LISTENER, PackType.SERVER_DATA);
+        REGISTRY.register(InfectionReloadListener.DIRECTORY_NAME, INFECTIONS_RELOAD_LISTENER, PackType.SERVER_DATA);
     }
 }

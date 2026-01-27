@@ -1,6 +1,12 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.boiler;
 
-import com.alien.common.config.AlienConfig;
+import com.alien.common.constant.ArmorConstants;
+import com.alien.common.constant.AttackDamageConstants;
+import com.alien.common.constant.FollowRangeConstants;
+import com.alien.common.constant.HealthConstants;
+import com.alien.common.constant.HealthRegenConstants;
+import com.alien.common.constant.KnockbackResistanceConstants;
+import com.alien.common.constant.MoveSpeedConstants;
 import com.alien.common.gameplay.ai.InvestigateVibrationGoal;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
@@ -13,7 +19,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
-import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +30,14 @@ import java.util.List;
 public class Boiler extends Xenomorph {
 
     public static AttributeSupplier.Builder createBoilerAttributes() {
-        return applyFrom(AlienConfig.INSTANCE.statsConfigs.BOILER_STATS, Monster.createMonsterAttributes());
+        return Alien.createAlienAttributes()
+            .add(Attributes.ARMOR, ArmorConstants.BOILER_ARMOR)
+            .add(Attributes.ARMOR_TOUGHNESS, 0f)
+            .add(Attributes.ATTACK_DAMAGE, AttackDamageConstants.BOILER_ATTACK_DAMAGE)
+            .add(Attributes.FOLLOW_RANGE, FollowRangeConstants.BOILER_FOLLOW_RANGE)
+            .add(Attributes.KNOCKBACK_RESISTANCE, KnockbackResistanceConstants.BOILER_KNOCKBACK_RESISTANCE)
+            .add(Attributes.MAX_HEALTH, HealthConstants.BOILER_HEALTH)
+            .add(Attributes.MOVEMENT_SPEED, MoveSpeedConstants.BOILER_SPEED);
     }
 
     private final BoilerAnimationDispatcher animationDispatcher;
@@ -32,7 +45,6 @@ public class Boiler extends Xenomorph {
     public Boiler(EntityType<? extends Boiler> entityType, Level level) {
         super(entityType, level);
         this.animationDispatcher = new BoilerAnimationDispatcher(this);
-        this.config = AlienConfig.INSTANCE.statsConfigs.BOILER_STATS;
     }
 
     @Override
@@ -101,7 +113,7 @@ public class Boiler extends Xenomorph {
 
     @Override
     protected float getHealthRegenPerSecond() {
-        return AlienConfig.INSTANCE.statsConfigs.BOILER_STATS.healthRegenPerSecond;
+        return HealthRegenConstants.BOILER_HEALTH_REGEN;
     }
 
     @Override

@@ -1,23 +1,36 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.warrior;
 
-import com.alien.common.config.AlienConfig;
+import com.alien.common.constant.ArmorConstants;
+import com.alien.common.constant.AttackDamageConstants;
+import com.alien.common.constant.FollowRangeConstants;
+import com.alien.common.constant.HealthConstants;
+import com.alien.common.constant.HealthRegenConstants;
+import com.alien.common.constant.KnockbackResistanceConstants;
+import com.alien.common.constant.MoveSpeedConstants;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
-import com.blib.common.gameplay.entity.ai.goal.combat.LungeAtTargetGoal;
+import com.blib.api.common.entity.v1.ai.goal.combat.LungeAtTargetGoal;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
-import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 public class Warrior extends Xenomorph {
 
     public static AttributeSupplier.Builder createWarriorAttributes() {
-        return applyFrom(AlienConfig.INSTANCE.statsConfigs.WARRIOR_STATS, Monster.createMonsterAttributes());
+        return Alien.createAlienAttributes()
+            .add(Attributes.ARMOR, ArmorConstants.WARRIOR_ARMOR)
+            .add(Attributes.ARMOR_TOUGHNESS, 0f)
+            .add(Attributes.ATTACK_DAMAGE, AttackDamageConstants.WARRIOR_ATTACK_DAMAGE)
+            .add(Attributes.FOLLOW_RANGE, FollowRangeConstants.WARRIOR_FOLLOW_RANGE)
+            .add(Attributes.KNOCKBACK_RESISTANCE, KnockbackResistanceConstants.WARRIOR_KNOCKBACK_RESISTANCE)
+            .add(Attributes.MAX_HEALTH, HealthConstants.WARRIOR_HEALTH)
+            .add(Attributes.MOVEMENT_SPEED, MoveSpeedConstants.WARRIOR_SPEED);
     }
 
     private final WarriorAnimationDispatcher animationDispatcher;
@@ -25,7 +38,6 @@ public class Warrior extends Xenomorph {
     public Warrior(EntityType<? extends Warrior> entityType, Level level) {
         super(entityType, level);
         this.animationDispatcher = new WarriorAnimationDispatcher(this);
-        this.config = AlienConfig.INSTANCE.statsConfigs.WARRIOR_STATS;
     }
 
     @Override
@@ -35,12 +47,12 @@ public class Warrior extends Xenomorph {
 
     @Override
     protected float getHealthRegenPerSecond() {
-        return AlienConfig.INSTANCE.statsConfigs.WARRIOR_STATS.healthRegenPerSecond;
+        return HealthRegenConstants.WARRIOR_HEALTH_REGEN;
     }
 
     @Override
     protected @Nullable ResinData createResinData() {
-        return new ResinData(0, 32, 1, AlienConfig.INSTANCE.statsConfigs.WARRIOR_STATS.nestTickrate);
+        return new ResinData(0, 32, 1, 20);
     }
 
     @Override

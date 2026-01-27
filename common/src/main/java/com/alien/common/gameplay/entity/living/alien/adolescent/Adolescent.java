@@ -1,6 +1,11 @@
 package com.alien.common.gameplay.entity.living.alien.adolescent;
 
-import com.alien.common.config.AlienConfig;
+import com.alien.common.constant.AttackDamageConstants;
+import com.alien.common.constant.FollowRangeConstants;
+import com.alien.common.constant.HealthConstants;
+import com.alien.common.constant.HealthRegenConstants;
+import com.alien.common.constant.KnockbackResistanceConstants;
+import com.alien.common.constant.MoveSpeedConstants;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.GrowthManager;
 import com.alien.common.model.alien.variant.AlienVariant;
@@ -9,15 +14,15 @@ import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.util.AlienPredicates;
 import com.alien.common.util.XenomorphGrowthUtil;
-import com.blib.common.gameplay.util.BLibEntityPredicates;
-import com.blib.common.network.data.DataAccessor;
+import com.blib.api.common.data_sync.v1.DataAccessor;
+import com.blib.api.common.entity.v1.BLibEntityPredicates;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
-import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,7 +30,14 @@ import org.jetbrains.annotations.Nullable;
 public class Adolescent extends Alien {
 
     public static AttributeSupplier.Builder createAdolescentAttributes() {
-        return applyFrom(AlienConfig.INSTANCE.statsConfigs.ADOLESCENT_STATS, Monster.createMonsterAttributes());
+        return Alien.createAlienAttributes()
+            .add(Attributes.ARMOR, 0f)
+            .add(Attributes.ARMOR_TOUGHNESS, 0f)
+            .add(Attributes.ATTACK_DAMAGE, AttackDamageConstants.ADOLESCENT_ATTACK_DAMAGE)
+            .add(Attributes.FOLLOW_RANGE, FollowRangeConstants.ADOLESCENT_FOLLOW_RANGE)
+            .add(Attributes.KNOCKBACK_RESISTANCE, KnockbackResistanceConstants.ADOLESCENT_KNOCKBACK_RESISTANCE)
+            .add(Attributes.MAX_HEALTH, HealthConstants.ADOLESCENT_HEALTH)
+            .add(Attributes.MOVEMENT_SPEED, MoveSpeedConstants.ADOLESCENT_SPEED);
     }
 
     private static final String NBT_HAS_DORSAL_TUBES = "hasDorsalTubes";
@@ -44,7 +56,6 @@ public class Adolescent extends Alien {
         this.animationDispatcher = new AdolescentAnimationDispatcher(this);
         this.growthManager = new GrowthManager(this, XenomorphGrowthUtil.GROW_UP_CALLBACK)
             .setGrowOverTime(true);
-        this.config = AlienConfig.INSTANCE.statsConfigs.ADOLESCENT_STATS;
     }
 
     @Override
@@ -82,7 +93,7 @@ public class Adolescent extends Alien {
 
     @Override
     protected float getHealthRegenPerSecond() {
-        return AlienConfig.INSTANCE.statsConfigs.ADOLESCENT_STATS.healthRegenPerSecond;
+        return HealthRegenConstants.ADOLESCENT_HEALTH_REGEN;
     }
 
     @Override
