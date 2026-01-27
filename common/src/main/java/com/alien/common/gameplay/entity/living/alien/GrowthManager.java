@@ -8,6 +8,8 @@ import com.alien.compatibility.avp_human.AVPHuman;
 import com.alien.compatibility.avp_human.GeneManagerProxy;
 import com.blib.api.common.entity.v1.EntityTransitionUtil;
 import com.blib.api.common.nbt.v1.model.NBTSerializable;
+import com.human.common.gameplay.gene.GeneOperationType;
+import com.human.common.gameplay.gene.Genes;
 import com.human.common.model.GeneCarrier;
 import com.human.common.util.GeneIntegrityUtil;
 import net.minecraft.Util;
@@ -206,17 +208,15 @@ public class GrowthManager implements NBTSerializable {
         return switch (entity.getGeneManager()) {
             case GeneManagerProxy.EMPTY ignored -> false;
             case GeneManagerProxy.Wrapper wrapper -> {
-                yield false;
-                // FIXME:
-                // var geneContainer = wrapper.geneManager().getGeneContainer();
-                // var additiveAcidVolatility = geneContainer.getActiveGeneMap()
-                // .getValue(Genes.ACID_VOLATILITY, GeneOperationType.ADDITIVE);
-                // var multiplicativeAcidVolatility = geneContainer.getActiveGeneMap()
-                // .getValue(Genes.ACID_VOLATILITY, GeneOperationType.MULTIPLICATIVE);
-                //
-                // var totalAcidVolatility = additiveAcidVolatility + multiplicativeAcidVolatility;
-                //
-                // yield entity.getRandom().nextDouble() < totalAcidVolatility;
+                var geneContainer = wrapper.geneManager().getGeneContainer();
+                var additiveAcidVolatility = geneContainer.getActiveGeneMap()
+                    .getValue(Genes.ACID_VOLATILITY, GeneOperationType.ADDITIVE);
+                var multiplicativeAcidVolatility = geneContainer.getActiveGeneMap()
+                    .getValue(Genes.ACID_VOLATILITY, GeneOperationType.MULTIPLICATIVE);
+
+                var totalAcidVolatility = additiveAcidVolatility + multiplicativeAcidVolatility;
+
+                yield entity.getRandom().nextDouble() < totalAcidVolatility;
             }
         };
     }

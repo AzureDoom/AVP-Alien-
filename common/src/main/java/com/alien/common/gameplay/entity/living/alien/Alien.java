@@ -1,6 +1,8 @@
 package com.alien.common.gameplay.entity.living.alien;
 
 import com.alien.common.data.AlienVariantTypes;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
 import com.alien.common.gameplay.level.saveddata.HiveLevelData;
 import com.alien.common.gameplay.level.saveddata.StrainLeakData;
 import com.alien.common.model.alien.variant.AlienVariant;
@@ -18,8 +20,10 @@ import com.blib.api.common.data_sync.v1.model.DataUser;
 import com.blib.api.common.entity.v1.MovementAnalyzer;
 import com.blib.api.common.entity.v1.manager.VibrationSystemManager;
 import com.blib.mod.common.registry.init.BLibDataSyncKeys;
+import com.human.common.gameplay.gene.Genes;
 import com.human.common.registry.key.HumanBiomeKeys;
 import com.just.core.functional.option.Option;
+import com.predator.common.registry.init.PredatorEntityTypes;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -121,8 +125,7 @@ public abstract class Alien extends Monster implements DataUser {
 
         if (AVPPredator.MOD.isLoaded()) {
             if (entityType.is(AlienEntityTypeTags.PREDALIENS)) {
-                // FIXME:
-                // return PredatorEntityTypes.YAUTJA.get();
+                return PredatorEntityTypes.YAUTJA.get();
             }
         }
 
@@ -354,22 +357,21 @@ public abstract class Alien extends Monster implements DataUser {
             // TODO: Only "wild" hives should have spontaneous growth from mob kills.
         ) {
             hiveManager.hive().ifSome(hive -> {
-                // FIXME:
-                // var wasRunnerHostKilled = entity.getType().is(AlienEntityTypeTags.RUNNER_HOSTS);
-                //
-                // var bonusCount = switch (getGeneManager()) {
-                // case GeneManagerProxy.EMPTY ignored -> 1;
-                // case GeneManagerProxy.Wrapper geneManagerProxy -> (int) geneManagerProxy.geneManager()
-                // .getGeneContainer()
-                // .getActiveGeneMap()
-                // .getValue(Genes.BONUS_EMBRYO_COUNT);
-                // };
-                //
-                // var alienEntityType = wasRunnerHostKilled
-                // ? Runner.getType(hive.getVariant())
-                // : Drone.getType(hive.getVariant());
-                //
-                // hive.getReserveManager().add(alienEntityType, bonusCount);
+                var wasRunnerHostKilled = entity.getType().is(AlienEntityTypeTags.RUNNER_HOSTS);
+
+                var bonusCount = switch (getGeneManager()) {
+                    case GeneManagerProxy.EMPTY ignored -> 1;
+                    case GeneManagerProxy.Wrapper geneManagerProxy -> (int) geneManagerProxy.geneManager()
+                        .getGeneContainer()
+                        .getActiveGeneMap()
+                        .getValue(Genes.BONUS_EMBRYO_COUNT);
+                };
+
+                var alienEntityType = wasRunnerHostKilled
+                    ? Runner.getType(hive.getVariant())
+                    : Drone.getType(hive.getVariant());
+
+                hive.getReserveManager().add(alienEntityType, bonusCount);
             });
         }
 

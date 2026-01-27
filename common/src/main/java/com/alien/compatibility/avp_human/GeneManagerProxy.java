@@ -17,9 +17,7 @@ public sealed interface GeneManagerProxy {
     default GeneContainerProxy getGeneContainer() {
         return switch (this) {
             case EMPTY ignored -> GeneContainerProxy.EMPTY.INSTANCE;
-            case Wrapper ignored -> GeneContainerProxy.EMPTY.INSTANCE;
-            // FIXME:
-            // case Wrapper wrapper -> new GeneContainerProxy.Wrapper(wrapper.geneManager().getGeneContainer());
+            case Wrapper wrapper -> new GeneContainerProxy.Wrapper(wrapper.geneManager().getGeneContainer());
         };
     }
 
@@ -37,13 +35,12 @@ public sealed interface GeneManagerProxy {
         switch (this) {
             case EMPTY ignored -> {/* NO-OP */}
             case Wrapper thisWrapper -> {
-                // FIXME:
-                // switch (other) {
-                // case GeneContainerProxy.EMPTY ignored -> {/* NO-OP */}
-                // case GeneContainerProxy.Wrapper wrapper -> thisWrapper.geneManager()
-                // .getGeneContainer()
-                // .transfer(wrapper.geneContainer(), activateDormantGenes);
-                // }
+                switch (other) {
+                    case GeneContainerProxy.EMPTY ignored -> {/* NO-OP */}
+                    case GeneContainerProxy.Wrapper wrapper -> thisWrapper.geneManager()
+                        .getGeneContainer()
+                        .transfer(wrapper.geneContainer(), activateDormantGenes);
+                }
             }
         }
     }

@@ -1,8 +1,11 @@
 package com.alien.common.gameplay.block.resin.vein;
 
 import com.alien.compatibility.avp_human.AVPHuman;
+import com.human.common.gameplay.effect.RadiationStatusEffect;
+import com.human.common.registry.init.HumanMobEffects;
 import com.human.util.HumanPredicates;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -23,10 +26,9 @@ public class IrradiatedResinVeinBlock extends ResinVeinBlock {
 
         if (HumanPredicates.canBeIrradiated(entity) && entity instanceof LivingEntity livingEntity) {
             // Apply radiation effect.
-            // FIXME:
-            // livingEntity.addEffect(
-            // new MobEffectInstance(HumanMobEffects.RADIATION, RadiationStatusEffect.EFFECT_DURATION_IN_TICKS, 0)
-            // );
+            livingEntity.addEffect(
+                new MobEffectInstance(HumanMobEffects.getRadiationHolder(), RadiationStatusEffect.EFFECT_DURATION_IN_TICKS, 0)
+            );
         }
 
         super.stepOn(level, blockPos, blockState, entity);

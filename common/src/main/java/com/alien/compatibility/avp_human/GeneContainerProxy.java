@@ -21,22 +21,19 @@ public sealed interface GeneContainerProxy {
 
     default void clear() {
         if (this instanceof Wrapper(var geneContainer)) {
-            // FIXME:
-            // geneContainer.clear();
+            geneContainer.clear();
         }
     }
 
     default void load(CompoundTag compoundTag) {
         if (this instanceof Wrapper(var geneContainer)) {
-            // FIXME:
-            // geneContainer.load(compoundTag);
+            geneContainer.load(compoundTag);
         }
     }
 
     default void save(CompoundTag compoundTag) {
         if (this instanceof Wrapper(var geneContainer)) {
-            // FIXME:
-            // geneContainer.save(compoundTag);
+            geneContainer.save(compoundTag);
         }
     }
 
