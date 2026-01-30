@@ -14,7 +14,7 @@ import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.util.AlienPredicates;
 import com.blib.api.common.data_sync.v1.DataAccessor;
-import com.blib.api.common.entity.v1.manager.VibrationSystemManager;
+import com.blib.api.common.entity.v1.vibration.VibrationSystemManager;
 import com.blib.api.common.goap.v1.GOAPUser;
 import com.just.core.functional.option.Option;
 import com.just.goap.graph.Graph;

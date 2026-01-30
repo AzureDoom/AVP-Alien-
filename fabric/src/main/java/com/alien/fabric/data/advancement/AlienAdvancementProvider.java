@@ -115,8 +115,8 @@ public class AlienAdvancementProvider {
         var root = Advancement.Builder.advancement()
             .display(
                 AlienResinBlocks.RESIN.get(),
-                AlienAdvancements.ROOT.getTitleComponent(),
-                AlienAdvancements.ROOT.getDescriptionComponent(),
+                AlienAdvancements.ROOT.titleComponent(),
+                AlienAdvancements.ROOT.descriptionComponent(),
                 AlienResources.location("textures/gui/advancements/backgrounds/resin.png"),
                 AdvancementType.TASK,
                 false,
@@ -124,7 +124,7 @@ public class AlienAdvancementProvider {
                 false
             )
             .addCriterion("crafting_table", InventoryChangeTrigger.TriggerInstance.hasItems(Blocks.CRAFTING_TABLE))
-            .save(consumer, AlienAdvancements.ROOT.getResourceLocation().toString());
+            .save(consumer, AlienAdvancements.ROOT.resourceLocation().toString());
 
         var removeEmbryoWithChorusFruitAdvancement = addRemoveEmbryoWithChorusFruitAdvancement(root, consumer);
 
@@ -137,8 +137,8 @@ public class AlienAdvancementProvider {
             .parent(alienKillerAdvancement)
             .display(
                 Items.SHEARS,
-                AlienAdvancements.SHEAR_AN_OVOMORPH.getTitleComponent(),
-                AlienAdvancements.SHEAR_AN_OVOMORPH.getDescriptionComponent(),
+                AlienAdvancements.SHEAR_AN_OVOMORPH.titleComponent(),
+                AlienAdvancements.SHEAR_AN_OVOMORPH.descriptionComponent(),
                 null,
                 AdvancementType.TASK,
                 true,
@@ -152,7 +152,7 @@ public class AlienAdvancementProvider {
                     Optional.of(EntityPredicate.wrap(EntityPredicate.Builder.entity().of(AlienEntityTypeTags.OVOMORPHS)))
                 )
             )
-            .save(consumer, AlienAdvancements.SHEAR_AN_OVOMORPH.getResourceLocation().toString());
+            .save(consumer, AlienAdvancements.SHEAR_AN_OVOMORPH.resourceLocation().toString());
 
         var addChitinArmorAdvancement = addChitinArmorAdvancements(alienKillerAdvancement, consumer);
 
@@ -164,8 +164,8 @@ public class AlienAdvancementProvider {
             .parent(parent)
             .display(
                 AlienArmorItems.CHITIN_HELMET.get(),
-                AlienAdvancements.WEAR_CHITIN_ARMOR.getTitleComponent(),
-                AlienAdvancements.WEAR_CHITIN_ARMOR.getDescriptionComponent(),
+                AlienAdvancements.WEAR_CHITIN_ARMOR.titleComponent(),
+                AlienAdvancements.WEAR_CHITIN_ARMOR.descriptionComponent(),
                 null,
                 AdvancementType.TASK,
                 true,
@@ -200,7 +200,7 @@ public class AlienAdvancementProvider {
                 )
             )
             .requirements(AdvancementRequirements.Strategy.OR)
-            .save(consumer, AlienAdvancements.WEAR_CHITIN_ARMOR.getResourceLocation().toString());
+            .save(consumer, AlienAdvancements.WEAR_CHITIN_ARMOR.resourceLocation().toString());
     }
 
     private static AdvancementHolder addPlatedChitinArmorAdvancement(AdvancementHolder parent, Consumer<AdvancementHolder> consumer) {
@@ -208,8 +208,8 @@ public class AlienAdvancementProvider {
             .parent(parent)
             .display(
                 AlienArmorItems.PLATED_CHITIN_HELMET.get(),
-                AlienAdvancements.WEAR_PLATED_CHITIN_ARMOR.getTitleComponent(),
-                AlienAdvancements.WEAR_PLATED_CHITIN_ARMOR.getDescriptionComponent(),
+                AlienAdvancements.WEAR_PLATED_CHITIN_ARMOR.titleComponent(),
+                AlienAdvancements.WEAR_PLATED_CHITIN_ARMOR.descriptionComponent(),
                 null,
                 AdvancementType.CHALLENGE,
                 true,
@@ -245,7 +245,7 @@ public class AlienAdvancementProvider {
             )
             .requirements(AdvancementRequirements.Strategy.OR)
             .rewards(AdvancementRewards.Builder.experience(100))
-            .save(consumer, AlienAdvancements.WEAR_PLATED_CHITIN_ARMOR.getResourceLocation().toString());
+            .save(consumer, AlienAdvancements.WEAR_PLATED_CHITIN_ARMOR.resourceLocation().toString());
     }
 
     private static AdvancementHolder addAlienKillerAdvancement(AdvancementHolder parent, Consumer<AdvancementHolder> consumer) {
@@ -253,8 +253,8 @@ public class AlienAdvancementProvider {
             .parent(parent)
             .display(
                 AlienItems.CHITIN.get(),
-                AlienAdvancements.KILL_AN_ALIEN.getTitleComponent(),
-                AlienAdvancements.KILL_AN_ALIEN.getDescriptionComponent(),
+                AlienAdvancements.KILL_AN_ALIEN.titleComponent(),
+                AlienAdvancements.KILL_AN_ALIEN.descriptionComponent(),
                 null,
                 AdvancementType.TASK,
                 true,
@@ -262,7 +262,7 @@ public class AlienAdvancementProvider {
                 false
             )
             .requirements(AdvancementRequirements.Strategy.OR)
-            .save(consumer, AlienAdvancements.KILL_AN_ALIEN.getResourceLocation().toString());
+            .save(consumer, AlienAdvancements.KILL_AN_ALIEN.resourceLocation().toString());
     }
 
     private static AdvancementHolder addRoyalAlienKillerAdvancement(AdvancementHolder parent, Consumer<AdvancementHolder> consumer) {
@@ -270,8 +270,8 @@ public class AlienAdvancementProvider {
             .parent(parent)
             .display(
                 AlienItems.PLATED_CHITIN.get(),
-                AlienAdvancements.KILL_A_ROYAL_ALIEN.getTitleComponent(),
-                AlienAdvancements.KILL_A_ROYAL_ALIEN.getDescriptionComponent(),
+                AlienAdvancements.KILL_A_ROYAL_ALIEN.titleComponent(),
+                AlienAdvancements.KILL_A_ROYAL_ALIEN.descriptionComponent(),
                 null,
                 AdvancementType.TASK,
                 true,
@@ -279,7 +279,7 @@ public class AlienAdvancementProvider {
                 false
             )
             .requirements(AdvancementRequirements.Strategy.OR)
-            .save(consumer, AlienAdvancements.KILL_A_ROYAL_ALIEN.getResourceLocation().toString());
+            .save(consumer, AlienAdvancements.KILL_A_ROYAL_ALIEN.resourceLocation().toString());
     }
 
     private static AdvancementHolder addXenocideAdvancement(AdvancementHolder parent, Consumer<AdvancementHolder> consumer) {
@@ -287,8 +287,8 @@ public class AlienAdvancementProvider {
             .parent(parent)
             .display(
                 AlienBlocks.ROYAL_JELLY_BLOCK.get(),
-                AlienAdvancements.KILL_ALL_ALIENS.getTitleComponent(),
-                AlienAdvancements.KILL_ALL_ALIENS.getDescriptionComponent(),
+                AlienAdvancements.KILL_ALL_ALIENS.titleComponent(),
+                AlienAdvancements.KILL_ALL_ALIENS.descriptionComponent(),
                 null,
                 AdvancementType.CHALLENGE,
                 true,
@@ -297,7 +297,7 @@ public class AlienAdvancementProvider {
             )
             .requirements(AdvancementRequirements.Strategy.AND)
             .rewards(AdvancementRewards.Builder.experience(100))
-            .save(consumer, AlienAdvancements.KILL_ALL_ALIENS.getResourceLocation().toString());
+            .save(consumer, AlienAdvancements.KILL_ALL_ALIENS.resourceLocation().toString());
     }
 
     private static AdvancementHolder addHiveBusterAdvancement(AdvancementHolder parent, Consumer<AdvancementHolder> consumer) {
@@ -306,8 +306,8 @@ public class AlienAdvancementProvider {
             .parent(parent)
             .display(
                 AlienItems.RAW_ROYAL_JELLY.get(),
-                AlienAdvancements.KILL_A_HIVE.getTitleComponent(),
-                AlienAdvancements.KILL_A_HIVE.getDescriptionComponent(),
+                AlienAdvancements.KILL_A_HIVE.titleComponent(),
+                AlienAdvancements.KILL_A_HIVE.descriptionComponent(),
                 null,
                 AdvancementType.CHALLENGE,
                 true,
@@ -315,7 +315,7 @@ public class AlienAdvancementProvider {
                 false
             )
             .rewards(AdvancementRewards.Builder.experience(100))
-            .save(consumer, AlienAdvancements.KILL_A_HIVE.getResourceLocation().toString());
+            .save(consumer, AlienAdvancements.KILL_A_HIVE.resourceLocation().toString());
     }
 
     private static AdvancementHolder addRemoveEmbryoWithChorusFruitAdvancement(
@@ -330,15 +330,15 @@ public class AlienAdvancementProvider {
             .parent(parent)
             .display(
                 Items.CHORUS_FRUIT,
-                AlienAdvancements.REMOVE_EMBRYO_WITH_CHORUS_FRUIT.getTitleComponent(),
-                AlienAdvancements.REMOVE_EMBRYO_WITH_CHORUS_FRUIT.getDescriptionComponent(),
+                AlienAdvancements.REMOVE_EMBRYO_WITH_CHORUS_FRUIT.titleComponent(),
+                AlienAdvancements.REMOVE_EMBRYO_WITH_CHORUS_FRUIT.descriptionComponent(),
                 null,
                 AdvancementType.TASK,
                 true,
                 true,
                 false
             )
-            .save(consumer, AlienAdvancements.REMOVE_EMBRYO_WITH_CHORUS_FRUIT.getResourceLocation().toString());
+            .save(consumer, AlienAdvancements.REMOVE_EMBRYO_WITH_CHORUS_FRUIT.resourceLocation().toString());
     }
 
     private static Advancement.Builder addMobsToKill(

@@ -1,8 +1,8 @@
 package com.alien.client.render.armor;
 
 import com.alien.AlienResources;
-import com.blib.azurelib.common.render.armor.AzArmorRenderer;
-import com.blib.azurelib.common.render.armor.AzArmorRendererConfig;
+import com.blib.api.client.render.v1.armor.AzArmorRenderer;
+import com.blib.api.client.render.v1.armor.AzArmorRendererConfig;
 import net.minecraft.resources.ResourceLocation;
 
 public class ChitinArmorRenderer extends AzArmorRenderer {

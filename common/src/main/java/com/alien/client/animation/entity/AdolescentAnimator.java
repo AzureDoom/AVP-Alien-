@@ -3,11 +3,11 @@ package com.alien.client.animation.entity;
 import com.alien.AlienResources;
 import com.alien.common.gameplay.entity.living.alien.adolescent.Adolescent;
 import com.alien.common.util.AzAlienAnimationUtil;
-import com.blib.azurelib.common.animation.AzAnimatorConfig;
-import com.blib.azurelib.common.animation.controller.AzAnimationController;
-import com.blib.azurelib.common.animation.controller.AzAnimationControllerContainer;
-import com.blib.azurelib.common.animation.impl.AzEntityAnimator;
-import com.blib.azurelib.common.model.AzBakedModel;
+import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
+import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
+import com.blib.api.client.animation.v1.controller.AzAnimationController;
+import com.blib.api.client.animation.v1.controller.AzAnimationControllerContainer;
+import com.blib.api.client.model.v1.AzBakedModel;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
@@ -56,11 +56,13 @@ public class AdolescentAnimator extends AzEntityAnimator<Adolescent> {
     @Override
     public void setCustomAnimations(Adolescent animatable, float partialTicks) {
         super.setCustomAnimations(animatable, partialTicks);
+        // TODO: This belongs in rendering, not in animation.
         showDorsalTubes(animatable);
 
         runPassiveAnimations(animatable);
     }
 
+    // TODO: This belongs in rendering, not in animation.
     private void showDorsalTubes(Adolescent entity) {
         var bakedModel = context().boneCache().getBakedModel();
         hideDorsalTube(entity, bakedModel, "gLeftUpperDorsalTubeNub");
@@ -69,6 +71,7 @@ public class AdolescentAnimator extends AzEntityAnimator<Adolescent> {
         hideDorsalTube(entity, bakedModel, "gRightLowerDorsalTubeNub");
     }
 
+    // TODO: This belongs in rendering, not in animation.
     private static void hideDorsalTube(Adolescent entity, AzBakedModel bakedModel, String dorsalTubeBoneName) {
         var dorsalTubeNub = bakedModel.getBoneOrNull(dorsalTubeBoneName);
 

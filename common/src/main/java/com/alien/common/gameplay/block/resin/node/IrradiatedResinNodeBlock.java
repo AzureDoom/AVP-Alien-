@@ -27,7 +27,7 @@ public class IrradiatedResinNodeBlock extends ResinNodeBlock {
         if (HumanPredicates.canBeIrradiated(entity) && entity instanceof LivingEntity livingEntity) {
             // Apply radiation effect.
             livingEntity.addEffect(
-                new MobEffectInstance(HumanMobEffects.getRadiationHolder(), RadiationStatusEffect.EFFECT_DURATION_IN_TICKS, 0)
+                new MobEffectInstance(HumanMobEffects.getRadiationHolder(), RadiationStatusEffect.SHORT_EFFECT_DURATION_IN_TICKS, 0)
             );
         }
 
