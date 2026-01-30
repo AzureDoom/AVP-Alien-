@@ -4,7 +4,6 @@ import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.AlienSpawning;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.QueenSpawning;
 import com.alien.common.registry.tag.AlienBiomeTags;
-import com.alien.compatibility.avp_human.AVPHuman;
 import com.blib.api.common.entity.v1.spawning.BLibEntitySpawnData;
 import com.blib.api.common.entity.v1.spawning.SpawnSettings;
 import com.blib.api.common.registry.v1.BLibHolder;
@@ -20,11 +19,8 @@ public class AlienEntitySpawns {
     public static void initialize() {
         registerNetherAlienSpawns();
         registerNormalAlienSpawns();
-
-        if (AVPHuman.MOD.isLoaded()) {
-            registerAberrantAlienSpawns();
-            registerIrradiatedAlienSpawns();
-        }
+        registerAberrantAlienSpawns();
+        registerIrradiatedAlienSpawns();
     }
 
     private static void registerNormalAlienSpawns() {

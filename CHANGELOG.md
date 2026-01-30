@@ -13,7 +13,8 @@
 - N/A
 
 ## 🐞 Fixes
-- N/A
+- Fixed aberrant aliens spawning uncontrollably when avp human module is not present.
+- Fixed irradiated aliens spawning uncontrollably when avp human module is not present.
 
 ## 🧪 Experimental
 - N/A
