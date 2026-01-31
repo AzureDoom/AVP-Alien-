@@ -1,0 +1,27 @@
+## Prerequisites ##
+* [Java Development Kit 21]
+* [Gradle]
+
+## Development Guide
+The majority of mod should be developed in the `common` project. The `common` project is compiled against the vanilla game and is used to hold code shared between the different loader-specific versions of your mod. The `common` project has no knowledge or access to ModLoader specific code, apis, or concepts. Code that requires something from a specific loader must be done through the project that is specific to that loader, such as the `fabric` or `neoforge` projects.
+
+Loader-specific projects such as the `fabric` and `neoforge` project are used to load the `common` project into the game. These projects also define code that is specific to that loader. Loader-specific projects can access all the code in the `common` project. It is important to remember that the `common` project cannot access code from loader-specific projects.
+
+## Contributing ##
+Before contributing to this project, please ensure that you read the following guidelines. It's crucial to have your development environment configured correctly. Additionally, pull requests that do not adhere to the specified format will not be accepted.
+
+### 1) Clone The Repository ###
+Follow the steps here: https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository
+
+### 2) Setup in [IntelliJ IDEA] ###
+1. Open the template's root folder as a new project in IDEA. This is the folder that contains this README.md file and the gradlew executable.
+2. If your default JVM/JDK is not Java 21 you will encounter an error when opening the project. This error is fixed by going to `File > Settings > Build, Execution, Deployment > Build Tools > Gradle > Gradle JVM` and changing the value to a valid Java 21 JVM. You will also need to set the Project SDK to Java 21. This can be done by going to `File > Project Structure > Project SDK`. Once both have been set open the Gradle tab in IDEA and click the refresh button to reload the project.
+3. Open your Run/Debug Configurations. Under the `Application` category there should now be options to run Fabric and NeoForge projects. Select one of the client options and try to run it.
+4. Assuming you were able to run the game in step 3 your workspace should now be set up.
+
+__**Eclipse/VSCode not supported**__
+
+### 3) Creating a PR ###
+Please do at least one build via `Tasks > build > build` to have the spotless plugin format all code before submitting the PR.
+
+Follow the steps here: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request
