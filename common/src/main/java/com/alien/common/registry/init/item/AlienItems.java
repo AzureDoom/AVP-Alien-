@@ -23,12 +23,12 @@ public class AlienItems {
 
     public static final BLibHolder<Item> ABERRANT_CHITIN = create(
         "aberrant_chitin",
-        new Item.Properties().fireResistant()
+        new Item.Properties()
     );
 
     public static final BLibHolder<Item> ABERRANT_RESIN_BALL = create(
         "aberrant_resin_ball",
-        new Item.Properties().fireResistant()
+        new Item.Properties()
     );
 
     public static final BLibHolder<Item> ALIEN_MUSIC_DISC_1 = create(
@@ -62,7 +62,7 @@ public class AlienItems {
 
     public static final BLibHolder<Item> PLATED_ABERRANT_CHITIN = create(
         "plated_aberrant_chitin",
-        new Item.Properties().fireResistant()
+        new Item.Properties()
     );
 
     public static final BLibHolder<Item> PLATED_IRRADIATED_CHITIN = create("plated_irradiated_chitin");

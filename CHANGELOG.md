@@ -7,5 +7,8 @@
 - AzureLib is no longer required.
 
 ## 🐞 Fixes
+- Fixed aberrant chitin not burning in fire or lava.
+- Fixed aberrant resin not burning in fire or lava.
+- Fixed plated aberrant chitin not burning in fire or lava.
 - Fixed aberrant aliens spawning uncontrollably when avp human module is not present.
 - Fixed irradiated aliens spawning uncontrollably when avp human module is not present.
