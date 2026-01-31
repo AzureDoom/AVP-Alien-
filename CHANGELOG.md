@@ -5,6 +5,7 @@
 
 ## ✨ What's New
 - AzureLib is no longer required.
+- BLib 0.2.0+ is now required.
 
 ## 🐞 Fixes
 - Fixed aberrant chitin not burning in fire or lava.
