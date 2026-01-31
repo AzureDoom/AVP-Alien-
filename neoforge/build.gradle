@@ -190,9 +190,6 @@ if (keyPropsFile.exists()) {
             clientRequired = true
             serverRequired = true
             requires {
-                slug = "azurelib"
-            }
-            requires {
                 slug = "blib"
             }
         }
@@ -202,9 +199,6 @@ if (keyPropsFile.exists()) {
             accessToken = releaseProp.getProperty('modrinthKey')
             minecraftVersions.add(project.minecraft_version)
             announcementTitle = "Download from Modrinth"
-            requires {
-                slug = "azurelib"
-            }
             requires {
                 slug = "blib"
             }
