@@ -1,4 +1,4 @@
-package com.alien.compatibility.gigeresque.common.registry.tag;
+package com.alien.fabric.compatibility.gigeresque.registry.tag;
 
 import com.alien.compatibility.gigeresque.Gigeresque;
 import net.minecraft.core.registries.Registries;
