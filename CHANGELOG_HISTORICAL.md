@@ -1,3 +1,19 @@
+# v0.1.3
+
+## ✍️ Developer Notes
+- For help or other questions, concerns, etc. check out our Discord server: https://discord.gg/wp7mvmbkVb
+
+## ✨ What's New
+- AzureLib is no longer required.
+- BLib 0.2.0+ is now required.
+
+## 🐞 Fixes
+- Fixed aberrant chitin not burning in fire or lava.
+- Fixed aberrant resin not burning in fire or lava.
+- Fixed plated aberrant chitin not burning in fire or lava.
+- Fixed aberrant aliens spawning uncontrollably when avp human module is not present.
+- Fixed irradiated aliens spawning uncontrollably when avp human module is not present.
+
 # v0.1.2
 
 ## ✍️ Developer Notes
