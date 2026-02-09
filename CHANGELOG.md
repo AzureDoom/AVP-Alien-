@@ -1,10 +1,7 @@
-# v0.1.4
+# v0.1.5
 
 ## ✍️ Developer Notes
 - For help or other questions, concerns, etc. check out our Discord server: https://discord.gg/wp7mvmbkVb
 
-## 🐞 Fixes
-- Fixed acid damage configuration missing from properties file.
-- Fixed acid dealing damage causing the game to crash.
-- [Gigeresque] Fixed gigeresque facehuggers targeting avp aliens.
-- [Gigeresque] Fixed avp aliens being affected gigeresque's DNA disintegration effect.
+## ♻️ Changes
+- Updated predalien model, textures and animations.
