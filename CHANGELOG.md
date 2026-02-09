@@ -5,3 +5,5 @@
 
 ## ♻️ Changes
 - Updated predalien model, textures and animations.
+- Updated chitin models and textures.
+- Updated plated chitin models and textures.
