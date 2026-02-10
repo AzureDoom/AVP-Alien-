@@ -2,9 +2,9 @@ package com.alien.fabric.data.tag;
 
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
-import com.alien.fabric.compatibility.gigeresque.registry.tag.GigeresqueEntityTypeTags;
 import com.alien.fabric.compatibility.stellaris.common.registry.tag.StellarisEntityTypeTags;
 import com.human.common.registry.tag.HumanEntityTypeTags;
+import mods.cybercat.gigeresque.common.tags.GigTags;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.core.HolderLookup;
@@ -451,15 +451,15 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
 
     private void addCompatibilityTags() {
         getOrCreateTagBuilder(AlienEntityTypeTags.ACID_IMMUNE)
-            .addOptionalTag(GigeresqueEntityTypeTags.ACID_RESISTANT);
+            .addOptionalTag(GigTags.ACID_RESISTANT_ENTITY);
 
-        getOrCreateTagBuilder(GigeresqueEntityTypeTags.ACID_RESISTANT)
+        getOrCreateTagBuilder(GigTags.ACID_RESISTANT_ENTITY)
             .addTag(AlienEntityTypeTags.ALIENS);
 
-        getOrCreateTagBuilder(GigeresqueEntityTypeTags.DNA_IMMUNE)
+        getOrCreateTagBuilder(GigTags.DNAIMMUNE)
             .addTag(AlienEntityTypeTags.ALIENS);
 
-        getOrCreateTagBuilder(GigeresqueEntityTypeTags.FACEHUGGER_BLACKLIST)
+        getOrCreateTagBuilder(GigTags.FACEHUGGER_BLACKLIST)
             .addTag(AlienEntityTypeTags.ALIENS);
 
         getOrCreateTagBuilder(StellarisEntityTypeTags.NO_OXYGEN_NEEDED)

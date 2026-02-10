@@ -8,8 +8,8 @@ import com.alien.common.registry.init.block.IrradiatedAlienResinBlocks;
 import com.alien.common.registry.init.block.NetherAlienChitinBlocks;
 import com.alien.common.registry.init.block.NetherAlienResinBlocks;
 import com.alien.common.registry.tag.AlienBlockTags;
-import com.alien.fabric.compatibility.gigeresque.registry.tag.GigeresqueBlockTags;
 import com.blib.api.common.tag.v1.BLibBlockTags;
+import mods.cybercat.gigeresque.common.tags.GigTags;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.core.HolderLookup;
@@ -360,6 +360,6 @@ public class AlienBlockTagProvider extends FabricTagProvider.BlockTagProvider {
 
     private void addCompatibilityTags() {
         getOrCreateTagBuilder(AlienBlockTags.ACID_IMMUNE)
-            .addOptionalTag(GigeresqueBlockTags.ACID_RESISTANT);
+            .addOptionalTag(GigTags.ACID_RESISTANT);
     }
 }
