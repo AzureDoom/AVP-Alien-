@@ -51,7 +51,7 @@ public class Boiler extends Xenomorph {
     public Boiler(EntityType<? extends Boiler> entityType, Level level) {
         super(entityType, level);
         this.animationDispatcher = new BoilerAnimationDispatcher(this);
-        this.vibrationSystemManager = createVibrationSystemManager();
+        this.vibrationSystemManager = new VibrationSystemManager(this, 2.5F, 32);
     }
 
     @Override

@@ -80,7 +80,7 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
         this.animationDispatcher = new OvomorphAnimationDispatcher(this);
         this.hatchManager = new HatchManager(this, 3 * 20, 3 * 20);
         this.wantsPickup = false;
-        this.vibrationSystemManager = createVibrationSystemManager();
+        this.vibrationSystemManager = new VibrationSystemManager(this, 2.5F, 8);
     }
 
     @Override
@@ -96,11 +96,6 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
     @Override
     public @Nullable EntityType<? extends Alien> getTypeForVariant(AlienVariant alienVariant) {
         return getType(alienVariant, isRoyal());
-    }
-
-    @Override
-    protected VibrationSystemManager createVibrationSystemManager() {
-        return new VibrationSystemManager(this, 2.5F, 8);
     }
 
     @Override

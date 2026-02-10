@@ -18,7 +18,6 @@ import com.alien.compatibility.avp_predator.AVPPredator;
 import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.data_sync.v1.model.DataUser;
 import com.blib.api.common.entity.v1.MovementAnalyzer;
-import com.blib.api.common.entity.v1.vibration.VibrationSystemManager;
 import com.blib.mod.common.registry.init.BLibDataSyncKeys;
 import com.human.common.gameplay.gene.Genes;
 import com.human.common.registry.key.HumanBiomeKeys;
@@ -97,10 +96,6 @@ public abstract class Alien extends Monster implements DataUser {
     public abstract @Nullable EntityType<? extends Alien> getTypeForVariant(AlienVariant alienVariant);
 
     protected abstract float getHealthRegenPerSecond();
-
-    protected VibrationSystemManager createVibrationSystemManager() {
-        return new VibrationSystemManager(this, 2.5F, 32);
-    }
 
     @Override
     public float maxUpStep() {
