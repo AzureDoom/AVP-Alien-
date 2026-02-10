@@ -8,6 +8,8 @@
 - Updated predalien model, textures and animations.
 - Updated chitin models and textures.
 - Updated plated chitin models and textures.
+- Only ovomorphs and boilers now respond to vibrations, rather than all aliens.
+- Only boilers now investigate vibrations and become aggressive from repeated disturbances.
 
 ## 🐞 Fixes
 - Fixed gigeresque acid melting through chitin and resin blocks.

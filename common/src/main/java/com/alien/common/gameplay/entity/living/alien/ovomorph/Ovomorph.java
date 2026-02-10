@@ -18,6 +18,7 @@ import com.blib.api.common.entity.v1.vibration.VibrationSystemManager;
 import com.blib.api.common.goap.v1.GOAPUser;
 import com.just.core.functional.option.Option;
 import com.just.goap.graph.Graph;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -31,9 +32,12 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gameevent.DynamicGameEventListener;
 import net.minecraft.world.level.gameevent.GameEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.function.BiConsumer;
 
 public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
 
@@ -58,6 +62,8 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
 
     private final OvomorphAnimationDispatcher animationDispatcher;
 
+    private final VibrationSystemManager vibrationSystemManager;
+
     private final HatchManager hatchManager;
 
     public boolean pickupRequestAcknowledged;
@@ -74,6 +80,12 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
         this.animationDispatcher = new OvomorphAnimationDispatcher(this);
         this.hatchManager = new HatchManager(this, 3 * 20, 3 * 20);
         this.wantsPickup = false;
+        this.vibrationSystemManager = createVibrationSystemManager();
+    }
+
+    @Override
+    public void updateDynamicGameEventListener(@NotNull BiConsumer<DynamicGameEventListener<?>, ServerLevel> biConsumer) {
+        vibrationSystemManager.updateDynamicGameEventListener(biConsumer);
     }
 
     @Override
@@ -95,6 +107,7 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
     public void tick() {
         super.tick();
         hatchManager.tick();
+        vibrationSystemManager.tick();
 
         if (!level().isClientSide) {
             this.wantsPickup = canBePickedUp();
@@ -279,6 +292,10 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
 
     public OvomorphAnimationDispatcher getAnimationDispatcher() {
         return animationDispatcher;
+    }
+
+    public VibrationSystemManager getVibrationSystemManager() {
+        return vibrationSystemManager;
     }
 
     public static @Nullable EntityType<? extends Ovomorph> getType(AlienVariant alienVariant, boolean isRoyal) {

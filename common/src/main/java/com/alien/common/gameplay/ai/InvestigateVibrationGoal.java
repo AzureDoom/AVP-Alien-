@@ -1,6 +1,6 @@
 package com.alien.common.gameplay.ai;
 
-import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.boiler.Boiler;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.util.AlienPredicates;
 import com.blib.api.common.time.v1.Cooldown;
@@ -21,15 +21,15 @@ public class InvestigateVibrationGoal extends Goal {
 
     private final Cooldown hissCooldownInTicks;
 
-    private final Xenomorph xenomorph;
+    private final Boiler boiler;
 
     private Path path;
 
     private int pissedMeter;
 
-    public InvestigateVibrationGoal(Xenomorph xenomorph) {
+    public InvestigateVibrationGoal(Boiler boiler) {
         this.hissCooldownInTicks = Cooldown.withCooldownTime("hissCooldownInTicks", Duration.ofSeconds(3));
-        this.xenomorph = xenomorph;
+        this.boiler = boiler;
         this.path = null;
         this.pissedMeter = PISSED_METER_MIN;
 
@@ -38,11 +38,11 @@ public class InvestigateVibrationGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        if (xenomorph.getTarget() != null) {
+        if (boiler.getTarget() != null) {
             return false;
         }
 
-        var lastVibration = xenomorph.getVibrationSystemManager()
+        var lastVibration = boiler.getVibrationSystemManager()
             .getVibrationData()
             .getCurrentVibration();
 
@@ -50,12 +50,12 @@ public class InvestigateVibrationGoal extends Goal {
             return false;
         }
 
-        if (!AlienPredicates.canTarget(xenomorph, livingEntity)) {
+        if (!AlienPredicates.canTarget(boiler, livingEntity)) {
             return false;
         }
 
         var pos = lastVibration.pos();
-        this.path = xenomorph.getNavigation().createPath(pos.x, pos.y, pos.z, 0);
+        this.path = boiler.getNavigation().createPath(pos.x, pos.y, pos.z, 0);
 
         return path != null;
     }
@@ -63,50 +63,50 @@ public class InvestigateVibrationGoal extends Goal {
     @Override
     public boolean canContinueToUse() {
         return path != null
-            && xenomorph.getTarget() == null;
+            && boiler.getTarget() == null;
     }
 
     @Override
     public void start() {
         if (path != null) {
-            xenomorph.getNavigation().moveTo(path, 0.5);
+            boiler.getNavigation().moveTo(path, 0.5);
             getPissed();
         }
     }
 
     @Override
     public void tick() {
-        var lastVibration = xenomorph.getVibrationSystemManager()
+        var lastVibration = boiler.getVibrationSystemManager()
             .getVibrationData()
             .getCurrentVibration();
 
         if (lastVibration != null && !Objects.equals(path.getTarget(), BlockPos.containing(lastVibration.pos()))) {
             var pos = lastVibration.pos();
-            this.path = xenomorph.getNavigation().createPath(pos.x, pos.y, pos.z, 0);
+            this.path = boiler.getNavigation().createPath(pos.x, pos.y, pos.z, 0);
 
             if (path != null) {
-                xenomorph.getNavigation().moveTo(path, 0.5);
+                boiler.getNavigation().moveTo(path, 0.5);
                 getPissed();
             }
 
             if (pissedMeter >= PISSED_METER_MAX && lastVibration.entity() instanceof LivingEntity livingEntity) {
-                xenomorph.setTarget(livingEntity);
+                boiler.setTarget(livingEntity);
                 pissedMeter = PISSED_METER_MIN;
-                xenomorph.level()
+                boiler.level()
                     .playSound(
                         null,
-                        xenomorph.getX(),
-                        xenomorph.getY(),
-                        xenomorph.getZ(),
+                        boiler.getX(),
+                        boiler.getY(),
+                        boiler.getZ(),
                         AlienSoundEvents.ENTITY_XENOMORPH_LUNGE.get(),
-                        xenomorph.getSoundSource(),
+                        boiler.getSoundSource(),
                         1F,
-                        (xenomorph.getRandom().nextFloat() - xenomorph.getRandom().nextFloat()) * 0.2F + 1.0F
+                        (boiler.getRandom().nextFloat() - boiler.getRandom().nextFloat()) * 0.2F + 1.0F
                     );
             }
         }
 
-        if (xenomorph.getNavigation().isDone()) {
+        if (boiler.getNavigation().isDone()) {
             this.path = null;
         }
 
@@ -130,16 +130,16 @@ public class InvestigateVibrationGoal extends Goal {
         this.pissedMeter += Math.clamp((int) (PISSED_METER_MAX * 0.34), PISSED_METER_MIN, PISSED_METER_MAX);
 
         if (!hissCooldownInTicks.isActive()) {
-            xenomorph.level()
+            boiler.level()
                 .playSound(
                     null,
-                    xenomorph.getX(),
-                    xenomorph.getY(),
-                    xenomorph.getZ(),
+                    boiler.getX(),
+                    boiler.getY(),
+                    boiler.getZ(),
                     AlienSoundEvents.ENTITY_XENOMORPH_HISS.get(),
-                    xenomorph.getSoundSource(),
+                    boiler.getSoundSource(),
                     1F,
-                    (xenomorph.getRandom().nextFloat() - xenomorph.getRandom().nextFloat()) * 0.2F + 1.0F
+                    (boiler.getRandom().nextFloat() - boiler.getRandom().nextFloat()) * 0.2F + 1.0F
                 );
             hissCooldownInTicks.reset();
         }

@@ -14,18 +14,22 @@ import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.util.AcidBleedUtil;
+import com.blib.api.common.entity.v1.vibration.VibrationSystemManager;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gameevent.DynamicGameEventListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 public class Boiler extends Xenomorph {
 
@@ -42,9 +46,23 @@ public class Boiler extends Xenomorph {
 
     private final BoilerAnimationDispatcher animationDispatcher;
 
+    private final VibrationSystemManager vibrationSystemManager;
+
     public Boiler(EntityType<? extends Boiler> entityType, Level level) {
         super(entityType, level);
         this.animationDispatcher = new BoilerAnimationDispatcher(this);
+        this.vibrationSystemManager = createVibrationSystemManager();
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        vibrationSystemManager.tick();
+    }
+
+    @Override
+    public void updateDynamicGameEventListener(@NotNull BiConsumer<DynamicGameEventListener<?>, ServerLevel> biConsumer) {
+        vibrationSystemManager.updateDynamicGameEventListener(biConsumer);
     }
 
     @Override
@@ -123,6 +141,10 @@ public class Boiler extends Xenomorph {
 
     public BoilerAnimationDispatcher getAnimationDispatcher() {
         return animationDispatcher;
+    }
+
+    public VibrationSystemManager getVibrationSystemManager() {
+        return vibrationSystemManager;
     }
 
     public static EntityType<? extends Alien> getType(AlienVariant alienVariant) {

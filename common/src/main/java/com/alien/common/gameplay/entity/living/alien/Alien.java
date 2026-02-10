@@ -50,13 +50,11 @@ import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.Minecart;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.gameevent.DynamicGameEventListener;
 import net.minecraft.world.level.pathfinder.PathType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
-import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
 public abstract class Alien extends Monster implements DataUser {
@@ -75,8 +73,6 @@ public abstract class Alien extends Monster implements DataUser {
 
     protected final MovementAnalyzer movementAnalyzer;
 
-    private final VibrationSystemManager vibrationSystemManager;
-
     private Option<EntityType<?>> hostTypeOption;
 
     private int jellyCount;
@@ -92,7 +88,6 @@ public abstract class Alien extends Monster implements DataUser {
 
         this.hiveManager = new HiveManager(this);
         this.movementAnalyzer = new MovementAnalyzer(this);
-        this.vibrationSystemManager = createVibrationSystemManager();
 
         this.hostTypeOption = Option.ofNullable(getDefaultHostType(entityType));
         this.jellyCount = 0;
@@ -268,7 +263,6 @@ public abstract class Alien extends Monster implements DataUser {
     public void tick() {
         super.tick();
         hiveManager.tick();
-        vibrationSystemManager.tick();
 
         if (!level().isClientSide) {
             movementAnalyzer.tick();
@@ -293,11 +287,6 @@ public abstract class Alien extends Monster implements DataUser {
             applyDynamicAttributes();
             becomeIrradiated();
         }
-    }
-
-    @Override
-    public void updateDynamicGameEventListener(@NotNull BiConsumer<DynamicGameEventListener<?>, ServerLevel> biConsumer) {
-        vibrationSystemManager.updateDynamicGameEventListener(biConsumer);
     }
 
     /**
@@ -571,10 +560,6 @@ public abstract class Alien extends Monster implements DataUser {
 
     public MovementAnalyzer getMovementAnalyzer() {
         return movementAnalyzer;
-    }
-
-    public VibrationSystemManager getVibrationSystemManager() {
-        return vibrationSystemManager;
     }
 
     public void setHostType(EntityType<?> hostType) {
