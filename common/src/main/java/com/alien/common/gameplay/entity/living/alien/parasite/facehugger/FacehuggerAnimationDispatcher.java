@@ -1,6 +1,5 @@
 package com.alien.common.gameplay.entity.living.alien.parasite.facehugger;
 
-import com.alien.common.constant.animation.FacehuggerAnimationRefs;
 import com.blib.api.client.animation.v1.command.AzCommand;
 import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
 

@@ -1,8 +1,8 @@
 package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
-import com.alien.common.constant.animation.FacehuggerAnimationRefs;
 import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.Facehugger;
+import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.FacehuggerAnimationRefs;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
 import com.blib.api.client.animation.v1.controller.AzAnimationController;

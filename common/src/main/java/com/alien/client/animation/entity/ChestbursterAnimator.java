@@ -1,8 +1,8 @@
 package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
-import com.alien.common.constant.animation.ChestbursterAnimationRefs;
 import com.alien.common.gameplay.entity.living.alien.chestburster.Chestburster;
+import com.alien.common.gameplay.entity.living.alien.chestburster.ChestbursterAnimationRefs;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
 import com.blib.api.client.animation.v1.controller.AzAnimationController;

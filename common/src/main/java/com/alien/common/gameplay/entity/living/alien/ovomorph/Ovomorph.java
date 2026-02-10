@@ -1,8 +1,5 @@
 package com.alien.common.gameplay.entity.living.alien.ovomorph;
 
-import com.alien.common.constant.HealthConstants;
-import com.alien.common.constant.HealthRegenConstants;
-import com.alien.common.constant.KnockbackResistanceConstants;
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.ovomorph.ai.OvomorphGOAP;
@@ -14,6 +11,7 @@ import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.util.AlienPredicates;
 import com.blib.api.common.data_sync.v1.DataAccessor;
+import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.entity.v1.vibration.VibrationSystemManager;
 import com.blib.api.common.goap.v1.GOAPUser;
 import com.just.core.functional.option.Option;
@@ -49,8 +47,8 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
             .add(Attributes.ARMOR_TOUGHNESS, 0f)
             .add(Attributes.ATTACK_DAMAGE, 0f)
             .add(Attributes.FOLLOW_RANGE, 0f)
-            .add(Attributes.KNOCKBACK_RESISTANCE, KnockbackResistanceConstants.OVOMORPH_KNOCKBACK_RESISTANCE)
-            .add(Attributes.MAX_HEALTH, HealthConstants.OVOMORPH_HEALTH)
+            .add(Attributes.KNOCKBACK_RESISTANCE, 1f)
+            .add(Attributes.MAX_HEALTH, PlayerStatConstants.BASE_HEALTH * 1.5F)
             .add(Attributes.MOVEMENT_SPEED, 0f);
     }
 
@@ -269,7 +267,7 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
 
     @Override
     protected float getHealthRegenPerSecond() {
-        return HealthRegenConstants.OVOMORPH_HEALTH_REGEN;
+        return 0.5F;
     }
 
     public HatchManager getHatchManager() {

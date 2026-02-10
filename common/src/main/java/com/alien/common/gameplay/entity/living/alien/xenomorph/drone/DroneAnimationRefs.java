@@ -1,6 +1,6 @@
-package com.alien.common.constant.animation;
+package com.alien.common.gameplay.entity.living.alien.xenomorph.drone;
 
-public class AdolescentAnimationRefs {
+public class DroneAnimationRefs {
 
     // #####################
     // ## ANIMATION NAMES ##
@@ -10,4 +10,5 @@ public class AdolescentAnimationRefs {
 
     public static final String ATTACKBITE_HEAD_ANIMATION_NAME = "attackbite.head";
 
+    public static final String ATTACKTAIL_TAIL_ANIMATION_NAME = "attacktail.tail";
 }

@@ -1,6 +1,6 @@
 package com.alien.common.gameplay.entity.living.alien.predalien_chestburster;
 
-import com.alien.common.constant.animation.ChestbursterAnimationRefs;
+import com.alien.common.gameplay.entity.living.alien.chestburster.ChestbursterAnimationRefs;
 import com.blib.api.client.animation.v1.command.AzCommand;
 import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
 

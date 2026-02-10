@@ -1,14 +1,11 @@
 package com.alien.common.gameplay.entity.living.alien.parasite.facehugger;
 
-import com.alien.common.constant.FollowRangeConstants;
-import com.alien.common.constant.HealthConstants;
-import com.alien.common.constant.KnockbackResistanceConstants;
-import com.alien.common.constant.MoveSpeedConstants;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.parasite.Parasite;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
+import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.entity.v1.ai.goal.combat.LungeAtTargetGoal;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
@@ -32,10 +29,10 @@ public class Facehugger extends Parasite {
             .add(Attributes.ARMOR, 0f)
             .add(Attributes.ARMOR_TOUGHNESS, 0f)
             .add(Attributes.ATTACK_DAMAGE, 0f)
-            .add(Attributes.FOLLOW_RANGE, FollowRangeConstants.FACEHUGGER_FOLLOW_RANGE)
-            .add(Attributes.KNOCKBACK_RESISTANCE, KnockbackResistanceConstants.FACEHUGGER_KNOCKBACK_RESISTANCE)
-            .add(Attributes.MAX_HEALTH, HealthConstants.FACEHUGGER_HEALTH)
-            .add(Attributes.MOVEMENT_SPEED, MoveSpeedConstants.FACEHUGGER_SPEED);
+            .add(Attributes.FOLLOW_RANGE, 35F)
+            .add(Attributes.KNOCKBACK_RESISTANCE, 0f)
+            .add(Attributes.MAX_HEALTH, PlayerStatConstants.BASE_HEALTH * 0.15F)
+            .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1.1F);
     }
 
     private final FacehuggerAnimationDispatcher animationDispatcher;

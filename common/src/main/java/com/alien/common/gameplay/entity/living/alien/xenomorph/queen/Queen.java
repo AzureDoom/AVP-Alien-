@@ -1,13 +1,5 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.queen;
 
-import com.alien.common.constant.ArmorConstants;
-import com.alien.common.constant.ArmorToughnessConstants;
-import com.alien.common.constant.AttackDamageConstants;
-import com.alien.common.constant.FollowRangeConstants;
-import com.alien.common.constant.HealthConstants;
-import com.alien.common.constant.HealthRegenConstants;
-import com.alien.common.constant.KnockbackResistanceConstants;
-import com.alien.common.constant.MoveSpeedConstants;
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.ai.goal.DigToTargetGoal;
 import com.alien.common.gameplay.ai.goal.QueenLayEggGoal;
@@ -23,6 +15,7 @@ import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.entity.v1.EntityUtil;
+import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.entity.v1.PlayerUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
@@ -49,13 +42,13 @@ public class Queen extends Xenomorph {
 
     public static AttributeSupplier.Builder createQueenAttributes() {
         return Alien.createAlienAttributes()
-            .add(Attributes.ARMOR, ArmorConstants.QUEEN_ARMOR)
-            .add(Attributes.ARMOR_TOUGHNESS, ArmorToughnessConstants.QUEEN_ARMOR_TOUGHNESS)
-            .add(Attributes.ATTACK_DAMAGE, AttackDamageConstants.QUEEN_ATTACK_DAMAGE)
-            .add(Attributes.FOLLOW_RANGE, FollowRangeConstants.QUEEN_FOLLOW_RANGE)
-            .add(Attributes.KNOCKBACK_RESISTANCE, KnockbackResistanceConstants.QUEEN_KNOCKBACK_RESISTANCE)
-            .add(Attributes.MAX_HEALTH, HealthConstants.QUEEN_HEALTH)
-            .add(Attributes.MOVEMENT_SPEED, MoveSpeedConstants.QUEEN_SPEED);
+            .add(Attributes.ARMOR, 16.0F)
+            .add(Attributes.ARMOR_TOUGHNESS, 16.0F)
+            .add(Attributes.ATTACK_DAMAGE, PlayerStatConstants.BASE_HEALTH * 2.5F)
+            .add(Attributes.FOLLOW_RANGE, 35F)
+            .add(Attributes.KNOCKBACK_RESISTANCE, 1f)
+            .add(Attributes.MAX_HEALTH, PlayerStatConstants.BASE_HEALTH * 10F)
+            .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 0.9F);
     }
 
     private final QueenAnimationDispatcher animationDispatcher;
@@ -194,7 +187,7 @@ public class Queen extends Xenomorph {
 
     @Override
     protected float getHealthRegenPerSecond() {
-        return HealthRegenConstants.QUEEN_HEALTH_REGEN;
+        return 0.5F;
     }
 
     @Override

@@ -1,19 +1,12 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.praetorian;
 
-import com.alien.common.constant.ArmorConstants;
-import com.alien.common.constant.ArmorToughnessConstants;
-import com.alien.common.constant.AttackDamageConstants;
-import com.alien.common.constant.FollowRangeConstants;
-import com.alien.common.constant.HealthConstants;
-import com.alien.common.constant.HealthRegenConstants;
-import com.alien.common.constant.KnockbackResistanceConstants;
-import com.alien.common.constant.MoveSpeedConstants;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
+import com.blib.api.common.entity.v1.PlayerStatConstants;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -24,13 +17,13 @@ public class Praetorian extends Xenomorph {
 
     public static AttributeSupplier.Builder createPraetorianAttributes() {
         return Alien.createAlienAttributes()
-            .add(Attributes.ARMOR, ArmorConstants.PRAETORIAN_ARMOR)
-            .add(Attributes.ARMOR_TOUGHNESS, ArmorToughnessConstants.PRAETORIAN_ARMOR_TOUGHNESS)
-            .add(Attributes.ATTACK_DAMAGE, AttackDamageConstants.PRAETORIAN_ATTACK_DAMAGE)
-            .add(Attributes.FOLLOW_RANGE, FollowRangeConstants.PRAETORIAN_FOLLOW_RANGE)
-            .add(Attributes.KNOCKBACK_RESISTANCE, KnockbackResistanceConstants.PRAETORIAN_KNOCKBACK_RESISTANCE)
-            .add(Attributes.MAX_HEALTH, HealthConstants.PRAETORIAN_HEALTH)
-            .add(Attributes.MOVEMENT_SPEED, MoveSpeedConstants.PRAETORIAN_SPEED);
+            .add(Attributes.ARMOR, 12.0F)
+            .add(Attributes.ARMOR_TOUGHNESS, 12.0F)
+            .add(Attributes.ATTACK_DAMAGE, PlayerStatConstants.BASE_HEALTH * 0.75F)
+            .add(Attributes.FOLLOW_RANGE, 35F)
+            .add(Attributes.KNOCKBACK_RESISTANCE, 0.7f)
+            .add(Attributes.MAX_HEALTH, PlayerStatConstants.BASE_HEALTH * 5F)
+            .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1.2F);
     }
 
     private final PraetorianAnimationDispatcher animationDispatcher;
@@ -52,7 +45,7 @@ public class Praetorian extends Xenomorph {
 
     @Override
     protected float getHealthRegenPerSecond() {
-        return HealthRegenConstants.PRAETORIAN_HEALTH_REGEN;
+        return 0.5F;
     }
 
     @Override

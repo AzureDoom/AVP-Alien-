@@ -1,14 +1,12 @@
-package com.alien.common.constant.animation;
+package com.alien.common.gameplay.entity.living.alien.xenomorph.predalien;
 
-public class SpitterAnimationRefs {
+public class PredalienAnimationRefs {
 
     // #####################
     // ## ANIMATION NAMES ##
     // #####################
 
     public static final String ATTACKCLAW_RIGHTARM_ANIMATION_NAME = "attackclaw.rightarm";
-
-    public static final String ATTACKCLAWQUAD_RIGHTARM_ANIMATION_NAME = "attackclawquad.rightarm";
 
     public static final String ATTACKBITE_HEAD_ANIMATION_NAME = "attackbite.head";
 

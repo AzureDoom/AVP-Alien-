@@ -1,6 +1,5 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.spitter;
 
-import com.alien.common.constant.animation.SpitterAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.AzAnimationUtil;
 import com.blib.api.client.animation.v1.command.AzCommand;

@@ -1,6 +1,6 @@
 package com.alien.common.gameplay.entity.living.alien.predalien_adolescent;
 
-import com.alien.common.constant.animation.AdolescentAnimationRefs;
+import com.alien.common.gameplay.entity.living.alien.adolescent.AdolescentAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.AzAnimationUtil;
 import com.blib.api.client.animation.v1.command.AzCommand;

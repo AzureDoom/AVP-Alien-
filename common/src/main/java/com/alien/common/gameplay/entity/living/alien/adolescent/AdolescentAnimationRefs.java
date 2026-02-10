@@ -1,6 +1,6 @@
-package com.alien.common.constant.animation;
+package com.alien.common.gameplay.entity.living.alien.adolescent;
 
-public class PredalienAnimationRefs {
+public class AdolescentAnimationRefs {
 
     // #####################
     // ## ANIMATION NAMES ##
@@ -10,5 +10,4 @@ public class PredalienAnimationRefs {
 
     public static final String ATTACKBITE_HEAD_ANIMATION_NAME = "attackbite.head";
 
-    public static final String ATTACKTAIL_TAIL_ANIMATION_NAME = "attacktail.tail";
 }

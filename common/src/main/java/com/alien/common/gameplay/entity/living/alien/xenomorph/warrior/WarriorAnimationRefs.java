@@ -1,6 +1,6 @@
-package com.alien.common.constant.animation;
+package com.alien.common.gameplay.entity.living.alien.xenomorph.warrior;
 
-public class DroneAnimationRefs {
+public class WarriorAnimationRefs {
 
     // #####################
     // ## ANIMATION NAMES ##

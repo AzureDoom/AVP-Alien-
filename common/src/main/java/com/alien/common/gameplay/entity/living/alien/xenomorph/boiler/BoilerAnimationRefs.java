@@ -1,4 +1,4 @@
-package com.alien.common.constant.animation;
+package com.alien.common.gameplay.entity.living.alien.xenomorph.boiler;
 
 public class BoilerAnimationRefs {
 

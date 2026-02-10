@@ -1,18 +1,12 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.spitter;
 
-import com.alien.common.constant.ArmorConstants;
-import com.alien.common.constant.AttackDamageConstants;
-import com.alien.common.constant.FollowRangeConstants;
-import com.alien.common.constant.HealthConstants;
-import com.alien.common.constant.HealthRegenConstants;
-import com.alien.common.constant.KnockbackResistanceConstants;
-import com.alien.common.constant.MoveSpeedConstants;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
+import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.entity.v1.ai.goal.combat.LungeAtTargetGoal;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -24,13 +18,13 @@ public class Spitter extends Xenomorph {
 
     public static AttributeSupplier.Builder createSpitterAttributes() {
         return Alien.createAlienAttributes()
-            .add(Attributes.ARMOR, ArmorConstants.SPITTER_ARMOR)
+            .add(Attributes.ARMOR, 8.0F)
             .add(Attributes.ARMOR_TOUGHNESS, 0f)
-            .add(Attributes.ATTACK_DAMAGE, AttackDamageConstants.SPITTER_ATTACK_DAMAGE)
-            .add(Attributes.FOLLOW_RANGE, FollowRangeConstants.SPITTER_FOLLOW_RANGE)
-            .add(Attributes.KNOCKBACK_RESISTANCE, KnockbackResistanceConstants.SPITTER_KNOCKBACK_RESISTANCE)
-            .add(Attributes.MAX_HEALTH, HealthConstants.SPITTER_HEALTH)
-            .add(Attributes.MOVEMENT_SPEED, MoveSpeedConstants.SPITTER_SPEED);
+            .add(Attributes.ATTACK_DAMAGE, PlayerStatConstants.BASE_HEALTH * 0.5F)
+            .add(Attributes.FOLLOW_RANGE, 35F)
+            .add(Attributes.KNOCKBACK_RESISTANCE, 0.5f)
+            .add(Attributes.MAX_HEALTH, PlayerStatConstants.BASE_HEALTH * 3F)
+            .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1.1F);
     }
 
     private final SpitterAnimationDispatcher animationDispatcher;
@@ -80,7 +74,7 @@ public class Spitter extends Xenomorph {
 
     @Override
     protected float getHealthRegenPerSecond() {
-        return HealthRegenConstants.SPITTER_HEALTH_REGEN;
+        return 0.5F;
     }
 
     @Override

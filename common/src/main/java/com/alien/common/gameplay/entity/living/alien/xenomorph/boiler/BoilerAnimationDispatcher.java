@@ -1,6 +1,5 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.boiler;
 
-import com.alien.common.constant.animation.BoilerAnimationRefs;
 import com.blib.api.client.animation.v1.command.AzCommand;
 import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
 

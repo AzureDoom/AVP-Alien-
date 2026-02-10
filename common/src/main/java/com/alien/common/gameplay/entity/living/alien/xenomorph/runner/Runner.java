@@ -1,12 +1,5 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.runner;
 
-import com.alien.common.constant.ArmorConstants;
-import com.alien.common.constant.AttackDamageConstants;
-import com.alien.common.constant.FollowRangeConstants;
-import com.alien.common.constant.HealthConstants;
-import com.alien.common.constant.HealthRegenConstants;
-import com.alien.common.constant.KnockbackResistanceConstants;
-import com.alien.common.constant.MoveSpeedConstants;
 import com.alien.common.gameplay.ai.CreateVentGoal;
 import com.alien.common.gameplay.ai.DropOffEggGoal;
 import com.alien.common.gameplay.ai.PickUpEggGoal;
@@ -21,6 +14,7 @@ import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.entity.v1.EntityUtil;
+import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.entity.v1.ai.goal.combat.LungeAtTargetGoal;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -38,13 +32,13 @@ public class Runner extends Xenomorph implements EggCarrier {
 
     public static AttributeSupplier.Builder createRunnerAttributes() {
         return Alien.createAlienAttributes()
-            .add(Attributes.ARMOR, ArmorConstants.RUNNER_ARMOR)
+            .add(Attributes.ARMOR, 4.0F)
             .add(Attributes.ARMOR_TOUGHNESS, 0f)
-            .add(Attributes.ATTACK_DAMAGE, AttackDamageConstants.RUNNER_ATTACK_DAMAGE)
-            .add(Attributes.FOLLOW_RANGE, FollowRangeConstants.RUNNER_FOLLOW_RANGE)
-            .add(Attributes.KNOCKBACK_RESISTANCE, KnockbackResistanceConstants.RUNNER_KNOCKBACK_RESISTANCE)
-            .add(Attributes.MAX_HEALTH, HealthConstants.RUNNER_HEALTH)
-            .add(Attributes.MOVEMENT_SPEED, MoveSpeedConstants.RUNNER_SPEED);
+            .add(Attributes.ATTACK_DAMAGE, PlayerStatConstants.BASE_HEALTH * 0.25F)
+            .add(Attributes.FOLLOW_RANGE, 35F)
+            .add(Attributes.KNOCKBACK_RESISTANCE, 0.3f)
+            .add(Attributes.MAX_HEALTH, PlayerStatConstants.BASE_HEALTH * 2F)
+            .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1F);
     }
 
     private final RunnerAnimationDispatcher animationDispatcher;
@@ -129,7 +123,7 @@ public class Runner extends Xenomorph implements EggCarrier {
 
     @Override
     protected float getHealthRegenPerSecond() {
-        return HealthRegenConstants.RUNNER_HEALTH_REGEN;
+        return 0.5F;
     }
 
     @Override
