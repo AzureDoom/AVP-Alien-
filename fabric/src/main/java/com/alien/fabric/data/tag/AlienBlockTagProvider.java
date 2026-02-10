@@ -361,5 +361,9 @@ public class AlienBlockTagProvider extends FabricTagProvider.BlockTagProvider {
     private void addCompatibilityTags() {
         getOrCreateTagBuilder(AlienBlockTags.ACID_IMMUNE)
             .addOptionalTag(GigTags.ACID_RESISTANT);
+
+        getOrCreateTagBuilder(GigTags.ACID_RESISTANT)
+            .addTag(AlienBlockTags.CHITIN)
+            .addTag(AlienBlockTags.RESIN);
     }
 }
