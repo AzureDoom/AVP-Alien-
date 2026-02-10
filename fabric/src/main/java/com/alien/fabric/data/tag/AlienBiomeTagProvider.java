@@ -42,7 +42,6 @@ public class AlienBiomeTagProvider extends FabricTagProvider<Biome> {
             .addTag(AlienBiomeTags.HAS_DESERT_ALTAR);
 
         getOrCreateTagBuilder(AlienBiomeTags.HAS_XENOMORPHS)
-            .addOptionalTag(BiomeTags.IS_END)
             .addOptionalTag(BiomeTags.IS_NETHER)
             .addOptionalTag(BiomeTags.IS_OVERWORLD);
     }
