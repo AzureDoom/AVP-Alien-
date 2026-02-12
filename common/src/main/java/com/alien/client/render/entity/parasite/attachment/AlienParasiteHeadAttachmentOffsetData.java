@@ -105,14 +105,6 @@ public class AlienParasiteHeadAttachmentOffsetData {
         AlienParasiteHeadAttachmentOffsetData::wolfFaceOffset
     );
 
-    private static double marineVerticalOffset(EntityHeadData data, Entity parasite) {
-        return -data.size().y - (data.size().y / 4);
-    }
-
-    private static double marineFaceOffset(EntityHeadData data, Entity parasite) {
-        return data.size().z - (data.size().z / 2);
-    }
-
     private static double camelVerticalOffset(EntityHeadData data, Entity parasite) {
         return data.size().y / 1.5;
     }
