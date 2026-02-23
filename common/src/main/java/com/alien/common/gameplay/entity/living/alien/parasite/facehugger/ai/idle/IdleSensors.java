@@ -1,0 +1,18 @@
+package com.alien.common.gameplay.entity.living.alien.parasite.facehugger.ai.idle;
+
+import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.Facehugger;
+import com.just.goap.StateKey;
+import com.just.goap.sensor.Sensor;
+import com.just.goap.sensor.Sensors;
+
+public class IdleSensors {
+
+    public static final Sensor.Mono<Facehugger, Boolean> IS_BORED = Sensors.map(
+        StateKey.sensed("is_bored"),
+        facehugger -> facehugger.getTicksUntilBored() == 0
+    );
+
+    private IdleSensors() {
+        throw new UnsupportedOperationException();
+    }
+}

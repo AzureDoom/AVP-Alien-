@@ -2,27 +2,35 @@ package com.alien.common.gameplay.entity.living.alien.parasite.facehugger;
 
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.parasite.Parasite;
+import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.ai.FacehuggerGOAP;
 import com.alien.common.model.alien.variant.AlienVariant;
+import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
+import com.blib.api.common.data_sync.v1.DataAccessor;
+import com.blib.api.common.entity.v1.EntitySenseCache;
+import com.blib.api.common.entity.v1.EntitySenseCacheUser;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
-import com.blib.api.common.entity.v1.ai.goal.combat.LungeAtTargetGoal;
+import com.blib.api.common.goap.v1.GOAPUser;
+import com.just.goap.Agent;
+import com.just.goap.graph.Graph;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
-import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class Facehugger extends Parasite {
+public class Facehugger extends Parasite implements EntitySenseCacheUser, GOAPUser<Facehugger> {
+
+    public static final int MAX_IDLE_TIME_IN_TICKS = 12 * 20;
+
+    public static final int MIN_IDLE_TIME_IN_TICKS = 7 * 20;
 
     public static AttributeSupplier.Builder createFacehuggerAttributes() {
         return Alien.createAlienAttributes()
@@ -37,9 +45,30 @@ public class Facehugger extends Parasite {
 
     private final FacehuggerAnimationDispatcher animationDispatcher;
 
+    private final EntitySenseCache entitySenseCache;
+
+    public final DataAccessor<Integer> ticksUntilBored;
+
     public Facehugger(EntityType<? extends Facehugger> entityType, Level level) {
         super(entityType, level);
         this.animationDispatcher = new FacehuggerAnimationDispatcher(this);
+        this.entitySenseCache = new EntitySenseCache(this, 40);
+        this.ticksUntilBored = new DataAccessor<>(this, AlienDataSyncKeys.FACEHUGGER_TICKS_UNTIL_BORED.get());
+    }
+
+    @Override
+    public Agent.Builder<Facehugger> blib$applyGOAPAgentProperties(Agent.Builder<Facehugger> agentBuilder) {
+        return FacehuggerGOAP.applyAgentProperties(agentBuilder);
+    }
+
+    @Override
+    public @Nullable Graph<Facehugger> blib$getGOAPGraphOrNull() {
+        return FacehuggerGOAP.GRAPH;
+    }
+
+    @Override
+    public EntitySenseCache getEntitySenseCache() {
+        return entitySenseCache;
     }
 
     @Override
@@ -48,18 +77,18 @@ public class Facehugger extends Parasite {
     }
 
     @Override
-    protected void registerGoals() {
-        this.goalSelector.addGoal(3, new LungeAtTargetGoal(this, 0.75F, 20 * 3, 1, 12).setOnLungeCallback(this::runLungeAnimation));
-        this.goalSelector.addGoal(4, new MeleeAttackGoal(this, 1.1, false));
-        this.goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 0.5));
-        this.targetSelector.addGoal(
-            1,
-            new NearestAttackableTargetGoal<>(this, LivingEntity.class, true, this::isValidHost)
-        );
+    public void tick() {
+        super.tick();
+
+        if (!level().isClientSide()) {
+            ticksUntilBored.set(Math.max(ticksUntilBored.get() - 1, 0));
+        }
     }
 
-    private void runLungeAnimation() {
-        animationDispatcher.lunge();
+    @Override
+    public void readAdditionalSaveData(@NotNull CompoundTag compound) {
+        super.readAdditionalSaveData(compound);
+        resetTicksUntilBored();
     }
 
     @Override
@@ -83,6 +112,14 @@ public class Facehugger extends Parasite {
     @Override
     protected float getHealthRegenPerSecond() {
         return 0;
+    }
+
+    public int getTicksUntilBored() {
+        return ticksUntilBored.get();
+    }
+
+    public void resetTicksUntilBored() {
+        this.ticksUntilBored.set(getRandom().nextIntBetweenInclusive(MIN_IDLE_TIME_IN_TICKS, MAX_IDLE_TIME_IN_TICKS));
     }
 
     public FacehuggerAnimationDispatcher getAnimationDispatcher() {

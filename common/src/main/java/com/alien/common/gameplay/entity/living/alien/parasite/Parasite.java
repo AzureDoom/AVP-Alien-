@@ -60,13 +60,7 @@ public abstract class Parasite extends Alien {
         return true;
     }
 
-    protected boolean canAttachToHost(Entity entity) {
-        return entity instanceof LivingEntity livingEntity &&
-            isValidHost(livingEntity) &&
-            !BLibEntityPredicates.hasShield(entity) && !(this.isPassenger() || this.isVehicle());
-    }
-
-    protected boolean isValidHost(LivingEntity target) {
+    public boolean isValidHost(LivingEntity target) {
         return isFertile.get() && AlienPredicates.isFreeHost(this, target);
     }
 
@@ -97,17 +91,16 @@ public abstract class Parasite extends Alien {
     }
 
     @Override
+    public boolean isPushable() {
+        return isFertile.get();
+    }
+
+    @Override
     protected void doPush(@NotNull Entity entity) {
         super.doPush(entity);
 
         if (canAttachToHost(entity)) {
             startRiding(entity);
-        }
-    }
-
-    private void tryUpdatePlayerRiding(Entity entity) {
-        if (!level().isClientSide && entity instanceof ServerPlayer player) {
-            player.connection.send(new ClientboundSetPassengersPacket(entity));
         }
     }
 
@@ -121,9 +114,16 @@ public abstract class Parasite extends Alien {
         return isFertile.get() || attachmentManager.isAttachedToHost();
     }
 
-    @Override
-    public boolean isPushable() {
-        return isFertile.get();
+    protected boolean canAttachToHost(Entity entity) {
+        return entity instanceof LivingEntity livingEntity &&
+            isValidHost(livingEntity) &&
+            !BLibEntityPredicates.hasShield(entity) && !(this.isPassenger() || this.isVehicle());
+    }
+
+    private void tryUpdatePlayerRiding(Entity entity) {
+        if (!level().isClientSide && entity instanceof ServerPlayer player) {
+            player.connection.send(new ClientboundSetPassengersPacket(entity));
+        }
     }
 
     public ParasiteAttachmentManager getAttachmentManager() {
