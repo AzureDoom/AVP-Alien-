@@ -463,7 +463,8 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
             .addTag(AlienEntityTypeTags.ALIENS);
 
         getOrCreateTagBuilder(StellarisEntityTypeTags.NO_OXYGEN_NEEDED)
-            .addTag(AlienEntityTypeTags.ALIENS);
+            .addTag(AlienEntityTypeTags.ALIENS)
+            .add(AlienEntityTypes.OVIPOSITOR.get());
     }
 
     private void addRadiationResistant() {
