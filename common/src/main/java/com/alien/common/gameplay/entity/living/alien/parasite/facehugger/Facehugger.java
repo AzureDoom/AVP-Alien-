@@ -4,10 +4,8 @@ import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.parasite.Parasite;
 import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.ai.FacehuggerGOAP;
 import com.alien.common.model.alien.variant.AlienVariant;
-import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
-import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.entity.v1.EntitySenseCache;
 import com.blib.api.common.entity.v1.EntitySenseCacheUser;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
@@ -28,10 +26,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class Facehugger extends Parasite implements EntitySenseCacheUser, GOAPUser<Facehugger> {
 
-    public static final int MAX_IDLE_TIME_IN_TICKS = 12 * 20;
-
-    public static final int MIN_IDLE_TIME_IN_TICKS = 7 * 20;
-
     public static AttributeSupplier.Builder createFacehuggerAttributes() {
         return Alien.createAlienAttributes()
             .add(Attributes.ARMOR, 0f)
@@ -47,13 +41,13 @@ public class Facehugger extends Parasite implements EntitySenseCacheUser, GOAPUs
 
     private final EntitySenseCache entitySenseCache;
 
-    public final DataAccessor<Integer> ticksUntilBored;
+    private final FacehuggerData data;
 
     public Facehugger(EntityType<? extends Facehugger> entityType, Level level) {
         super(entityType, level);
         this.animationDispatcher = new FacehuggerAnimationDispatcher(this);
         this.entitySenseCache = new EntitySenseCache(this, 40);
-        this.ticksUntilBored = new DataAccessor<>(this, AlienDataSyncKeys.FACEHUGGER_TICKS_UNTIL_BORED.get());
+        this.data = new FacehuggerData(this);
     }
 
     @Override
@@ -81,14 +75,20 @@ public class Facehugger extends Parasite implements EntitySenseCacheUser, GOAPUs
         super.tick();
 
         if (!level().isClientSide()) {
-            ticksUntilBored.set(Math.max(ticksUntilBored.get() - 1, 0));
+            data.tick();
         }
     }
 
     @Override
-    public void readAdditionalSaveData(@NotNull CompoundTag compound) {
-        super.readAdditionalSaveData(compound);
-        resetTicksUntilBored();
+    public void readAdditionalSaveData(@NotNull CompoundTag compoundTag) {
+        super.readAdditionalSaveData(compoundTag);
+        data.load(compoundTag);
+    }
+
+    @Override
+    public void addAdditionalSaveData(@NotNull CompoundTag compoundTag) {
+        super.addAdditionalSaveData(compoundTag);
+        data.save(compoundTag);
     }
 
     @Override
@@ -114,12 +114,8 @@ public class Facehugger extends Parasite implements EntitySenseCacheUser, GOAPUs
         return 0;
     }
 
-    public int getTicksUntilBored() {
-        return ticksUntilBored.get();
-    }
-
-    public void resetTicksUntilBored() {
-        this.ticksUntilBored.set(getRandom().nextIntBetweenInclusive(MIN_IDLE_TIME_IN_TICKS, MAX_IDLE_TIME_IN_TICKS));
+    public FacehuggerData getData() {
+        return data;
     }
 
     public FacehuggerAnimationDispatcher getAnimationDispatcher() {

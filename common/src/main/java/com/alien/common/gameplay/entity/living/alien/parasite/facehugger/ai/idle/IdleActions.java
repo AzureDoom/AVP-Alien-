@@ -21,7 +21,7 @@ public class IdleActions {
                 10,
                 7,
                 0.5,
-                ctx -> ctx.getActor().resetTicksUntilBored()
+                ctx -> ctx.getActor().getData().resetTicksUntilBored()
             )
         )
         .withFinishCallback(WanderAction::onFinish)

@@ -9,7 +9,7 @@ public class IdleSensors {
 
     public static final Sensor.Mono<Facehugger, Boolean> IS_BORED = Sensors.map(
         StateKey.sensed("is_bored"),
-        facehugger -> facehugger.getTicksUntilBored() == 0
+        facehugger -> facehugger.getData().getTicksUntilBored() == 0
     );
 
     private IdleSensors() {

@@ -3,7 +3,6 @@ package com.alien.common.registry.init;
 import com.alien.Alien;
 import com.alien.AlienResources;
 import com.alien.common.gameplay.entity.living.alien.ovomorph.Ovomorph;
-import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.Facehugger;
 import com.blib.api.common.data_sync.v1.model.DataSyncKey;
 import com.blib.api.common.registry.v1.BLibBuiltInRegistries;
 import com.blib.api.common.registry.v1.BLibHolder;
@@ -86,12 +85,6 @@ public class AlienDataSyncKeys {
         "ovomorph_spawn_count",
         builder -> builder.persistent("spawnCount", Codec.INT)
             .build(0)
-    );
-
-    public static final BLibHolder<DataSyncKey<Integer>> FACEHUGGER_TICKS_UNTIL_BORED = create(
-        "facehugger_ticks_until_bored",
-        builder -> builder.persistent("ticksUntilBored", Codec.INT)
-            .build(Facehugger.MIN_IDLE_TIME_IN_TICKS)
     );
 
     public static final BLibHolder<DataSyncKey<Boolean>> PARASITE_IS_FERTILE = create(
