@@ -7,17 +7,17 @@ import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
 public class PredalienChestbursterAnimationDispatcher {
 
     private static final AzCommand IDLE_HEAD = AzCommand.create(
-        ChestbursterAnimationRefs.HEAD_CONTROLLER_NAME,
+        ChestbursterAnimationRefs.HEAD_TRACK_NAME,
         ChestbursterAnimationRefs.IDLE_HEAD_ANIMATION_NAME,
         AzPlayBehaviors.LOOP
     );
 
-    private static final AzCommand IDLE_TAIL = AzCommand.controllerBuilder()
-        .cancel(ChestbursterAnimationRefs.TAIL_CONTROLLER_NAME)
+    private static final AzCommand IDLE_TAIL = AzCommand.trackBuilder()
+        .cancel(ChestbursterAnimationRefs.TAIL_TRACK_NAME)
         .build();
 
     private static final AzCommand SLITHER_TAIL = AzCommand.create(
-        ChestbursterAnimationRefs.TAIL_CONTROLLER_NAME,
+        ChestbursterAnimationRefs.TAIL_TRACK_NAME,
         ChestbursterAnimationRefs.SLITHER_TAIL_ANIMATION_NAME,
         AzPlayBehaviors.LOOP
     );
@@ -33,10 +33,10 @@ public class PredalienChestbursterAnimationDispatcher {
     }
 
     public void idle() {
-        IDLE.sendForEntity(predalienChestburster);
+        IDLE.dispatch(predalienChestburster);
     }
 
     public void slowSlither() {
-        SLOW_SLITHER.sendForEntity(predalienChestburster);
+        SLOW_SLITHER.dispatch(predalienChestburster);
     }
 }

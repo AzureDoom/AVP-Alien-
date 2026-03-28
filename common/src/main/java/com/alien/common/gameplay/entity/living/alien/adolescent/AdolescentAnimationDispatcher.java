@@ -8,13 +8,13 @@ import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
 public class AdolescentAnimationDispatcher {
 
     private static final AzCommand ARMATTACK_RIGHTARM = AzCommand.create(
-        AzAlienAnimationUtil.RIGHT_ARM_CONTROLLER_NAME,
+        AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
         AdolescentAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME,
         AzPlayBehaviors.PLAY_ONCE
     );
 
     private static final AzCommand BITEATTACK_HEAD = AzCommand.create(
-        AzAlienAnimationUtil.HEAD_CONTROLLER_NAME,
+        AzAlienAnimationUtil.HEAD_TRACK_NAME,
         AdolescentAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME,
         AzPlayBehaviors.PLAY_ONCE
     );
@@ -48,38 +48,38 @@ public class AdolescentAnimationDispatcher {
     }
 
     public void crawl() {
-        CRAWL_ALL.sendForEntity(adolescent);
+        CRAWL_ALL.dispatch(adolescent);
     }
 
     public void crawlHold() {
-        CRAWL_ALL_HOLD.sendForEntity(adolescent);
+        CRAWL_ALL_HOLD.dispatch(adolescent);
     }
 
     public void idle() {
-        IDLE_ALL.sendForEntity(adolescent);
+        IDLE_ALL.dispatch(adolescent);
     }
 
     public void lunge() {
-        LUNGE_ALL.sendForEntity(adolescent);
+        LUNGE_ALL.dispatch(adolescent);
     }
 
     public void run() {
-        RUN_ALL.sendForEntity(adolescent);
+        RUN_ALL.dispatch(adolescent);
     }
 
     public void swim() {
-        SWIM_ALL.sendForEntity(adolescent);
+        SWIM_ALL.dispatch(adolescent);
     }
 
     public void walk() {
-        WALK_ALL.sendForEntity(adolescent);
+        WALK_ALL.dispatch(adolescent);
     }
 
     public void biteAttack() {
-        BITEATTACK_HEAD.sendForEntity(adolescent);
+        BITEATTACK_HEAD.dispatch(adolescent);
     }
 
     public void rightClawAttack() {
-        ARMATTACK_RIGHTARM.sendForEntity(adolescent);
+        ARMATTACK_RIGHTARM.dispatch(adolescent);
     }
 }

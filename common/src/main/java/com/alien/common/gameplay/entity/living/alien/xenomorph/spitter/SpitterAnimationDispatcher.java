@@ -8,25 +8,25 @@ import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
 public class SpitterAnimationDispatcher {
 
     private static final AzCommand ATTACKCLAW_RIGHTARM = AzCommand.create(
-        AzAlienAnimationUtil.RIGHT_ARM_CONTROLLER_NAME,
+        AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
         SpitterAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME,
         AzPlayBehaviors.PLAY_ONCE
     );
 
     private static final AzCommand ATTACKCLAWQUAD_RIGHTARM = AzCommand.create(
-        AzAlienAnimationUtil.RIGHT_ARM_CONTROLLER_NAME,
+        AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
         SpitterAnimationRefs.ATTACKCLAWQUAD_RIGHTARM_ANIMATION_NAME,
         AzPlayBehaviors.PLAY_ONCE
     );
 
     private static final AzCommand BITEATTACK_HEAD = AzCommand.create(
-        AzAlienAnimationUtil.HEAD_CONTROLLER_NAME,
+        AzAlienAnimationUtil.HEAD_TRACK_NAME,
         SpitterAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME,
         AzPlayBehaviors.PLAY_ONCE
     );
 
     private static final AzCommand TAILATTACKQUAD_TAIL = AzCommand.create(
-        AzAlienAnimationUtil.TAIL_CONTROLLER_NAME,
+        AzAlienAnimationUtil.TAIL_TRACK_NAME,
         SpitterAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME,
         AzPlayBehaviors.PLAY_ONCE
     );
@@ -60,46 +60,46 @@ public class SpitterAnimationDispatcher {
     }
 
     public void crawl() {
-        CRAWL_ALL.sendForEntity(spitter);
+        CRAWL_ALL.dispatch(spitter);
     }
 
     public void crawlHold() {
-        CRAWL_ALL_HOLD.sendForEntity(spitter);
+        CRAWL_ALL_HOLD.dispatch(spitter);
     }
 
     public void idle() {
-        IDLE_ALL.sendForEntity(spitter);
+        IDLE_ALL.dispatch(spitter);
     }
 
     public void lunge() {
-        LUNGE_ALL.sendForEntity(spitter);
+        LUNGE_ALL.dispatch(spitter);
     }
 
     public void run() {
-        RUN_ALL.sendForEntity(spitter);
+        RUN_ALL.dispatch(spitter);
     }
 
     public void swim() {
-        SWIM_ALL.sendForEntity(spitter);
+        SWIM_ALL.dispatch(spitter);
     }
 
     public void walk() {
-        WALK_ALL.sendForEntity(spitter);
+        WALK_ALL.dispatch(spitter);
     }
 
     public void biteAttack() {
-        BITEATTACK_HEAD.sendForEntity(spitter);
+        BITEATTACK_HEAD.dispatch(spitter);
     }
 
     public void rightClawAttack() {
-        ATTACKCLAW_RIGHTARM.sendForEntity(spitter);
+        ATTACKCLAW_RIGHTARM.dispatch(spitter);
     }
 
     public void rightClawAttackQuad() {
-        ATTACKCLAWQUAD_RIGHTARM.sendForEntity(spitter);
+        ATTACKCLAWQUAD_RIGHTARM.dispatch(spitter);
     }
 
     public void tailAttack() {
-        TAILATTACKQUAD_TAIL.sendForEntity(spitter);
+        TAILATTACKQUAD_TAIL.dispatch(spitter);
     }
 }

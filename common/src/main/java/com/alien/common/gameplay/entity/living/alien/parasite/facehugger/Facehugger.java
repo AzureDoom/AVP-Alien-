@@ -4,8 +4,10 @@ import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.parasite.Parasite;
 import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.ai.FacehuggerGOAP;
 import com.alien.common.model.alien.variant.AlienVariant;
+import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
+import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.entity.v1.EntitySenseCache;
 import com.blib.api.common.entity.v1.EntitySenseCacheUser;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
@@ -37,6 +39,8 @@ public class Facehugger extends Parasite implements EntitySenseCacheUser, GOAPUs
             .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1.1F);
     }
 
+    public final DataAccessor<Boolean> isLunging;
+
     private final FacehuggerAnimationDispatcher animationDispatcher;
 
     private final EntitySenseCache entitySenseCache;
@@ -45,8 +49,11 @@ public class Facehugger extends Parasite implements EntitySenseCacheUser, GOAPUs
 
     public Facehugger(EntityType<? extends Facehugger> entityType, Level level) {
         super(entityType, level);
+        this.isLunging = new DataAccessor<>(this, AlienDataSyncKeys.FACEHUGGER_IS_LUNGING.get());
         this.animationDispatcher = new FacehuggerAnimationDispatcher(this);
-        this.entitySenseCache = new EntitySenseCache(this, 40);
+        this.entitySenseCache = EntitySenseCache.builder(this)
+            .withScanRadius(40)
+            .build();
         this.data = new FacehuggerData(this);
     }
 
@@ -76,6 +83,10 @@ public class Facehugger extends Parasite implements EntitySenseCacheUser, GOAPUs
 
         if (!level().isClientSide()) {
             data.tick();
+
+            if (isLunging.get() && onGround()) {
+                isLunging.set(false);
+            }
         }
     }
 

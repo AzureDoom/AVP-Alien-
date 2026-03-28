@@ -8,19 +8,19 @@ import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
 public class RunnerAnimationDispatcher {
 
     private static final AzCommand ARMATTACK_RIGHTARM = AzCommand.create(
-        AzAlienAnimationUtil.RIGHT_ARM_CONTROLLER_NAME,
+        AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
         RunnerAnimationRefs.ATTACKCLAWQUAD_RIGHTARM_ANIMATION_NAME,
         AzPlayBehaviors.PLAY_ONCE
     );
 
     private static final AzCommand BITEATTACK_HEAD = AzCommand.create(
-        AzAlienAnimationUtil.HEAD_CONTROLLER_NAME,
+        AzAlienAnimationUtil.HEAD_TRACK_NAME,
         RunnerAnimationRefs.BITEATTACK_HEAD_ANIMATION_NAME,
         AzPlayBehaviors.PLAY_ONCE
     );
 
     private static final AzCommand TAILATTACKQUAD_TAIL = AzCommand.create(
-        AzAlienAnimationUtil.TAIL_CONTROLLER_NAME,
+        AzAlienAnimationUtil.TAIL_TRACK_NAME,
         RunnerAnimationRefs.TAILATTACKQUAD_TAIL_ANIMATION_NAME,
         AzPlayBehaviors.PLAY_ONCE
     );
@@ -54,42 +54,42 @@ public class RunnerAnimationDispatcher {
     }
 
     public void crawl() {
-        CRAWL_ALL.sendForEntity(runner);
+        CRAWL_ALL.dispatch(runner);
     }
 
     public void crawlHold() {
-        CRAWL_ALL_HOLD.sendForEntity(runner);
+        CRAWL_ALL_HOLD.dispatch(runner);
     }
 
     public void idle() {
-        IDLE_ALL.sendForEntity(runner);
+        IDLE_ALL.dispatch(runner);
     }
 
     public void lunge() {
-        LUNGE_ALL.sendForEntity(runner);
+        LUNGE_ALL.dispatch(runner);
     }
 
     public void run() {
-        RUN_ALL.sendForEntity(runner);
+        RUN_ALL.dispatch(runner);
     }
 
     public void swim() {
-        SWIM_ALL.sendForEntity(runner);
+        SWIM_ALL.dispatch(runner);
     }
 
     public void walk() {
-        WALK_ALL.sendForEntity(runner);
+        WALK_ALL.dispatch(runner);
     }
 
     public void biteAttack() {
-        BITEATTACK_HEAD.sendForEntity(runner);
+        BITEATTACK_HEAD.dispatch(runner);
     }
 
     public void rightClawAttack() {
-        ARMATTACK_RIGHTARM.sendForEntity(runner);
+        ARMATTACK_RIGHTARM.dispatch(runner);
     }
 
     public void tailAttackQuad() {
-        TAILATTACKQUAD_TAIL.sendForEntity(runner);
+        TAILATTACKQUAD_TAIL.dispatch(runner);
     }
 }

@@ -2,7 +2,7 @@ package com.alien.common.gameplay.entity.living.alien.ovomorph;
 
 public class OvomorphAnimationRefs {
 
-    public static final String BASE_CONTROLLER_NAME = "base";
+    public static final String BASE_TRACK_NAME = "base";
 
     public static final String CLOSE_HOLD_ANIMATION_NAME = "animation.eggclosehold";
 

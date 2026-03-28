@@ -5,8 +5,8 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.boiler.Boiler;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.boiler.BoilerAnimationRefs;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
-import com.blib.api.client.animation.v1.controller.AzAnimationController;
-import com.blib.api.client.animation.v1.controller.AzAnimationControllerContainer;
+import com.blib.api.client.animation.v1.track.AzAnimationTrack;
+import com.blib.api.client.animation.v1.track.AzAnimationTrackContainer;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,9 +21,9 @@ public class BoilerAnimator extends AzEntityAnimator<Boiler> {
     }
 
     @Override
-    public void registerControllers(AzAnimationControllerContainer<Boiler> animationControllerContainer) {
-        animationControllerContainer.add(
-            AzAnimationController.builder(this, BoilerAnimationRefs.FULL_BODY_CONTROLLER_NAME)
+    public void registerTracks(AzAnimationTrackContainer<Boiler> animationTrackContainer) {
+        animationTrackContainer.add(
+            AzAnimationTrack.builder(this, BoilerAnimationRefs.FULL_BODY_TRACK_NAME)
                 .setTransitionLength(5)
                 .build()
         );

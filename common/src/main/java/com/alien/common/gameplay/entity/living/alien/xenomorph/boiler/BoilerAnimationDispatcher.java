@@ -6,37 +6,37 @@ import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
 public class BoilerAnimationDispatcher {
 
     private static final AzCommand CRAWL = AzCommand.create(
-        BoilerAnimationRefs.FULL_BODY_CONTROLLER_NAME,
+        BoilerAnimationRefs.FULL_BODY_TRACK_NAME,
         BoilerAnimationRefs.CRAWL_ANIMATION_NAME,
         AzPlayBehaviors.LOOP
     );
 
     private static final AzCommand CRAWL_HOLD = AzCommand.create(
-        BoilerAnimationRefs.FULL_BODY_CONTROLLER_NAME,
+        BoilerAnimationRefs.FULL_BODY_TRACK_NAME,
         BoilerAnimationRefs.CRAWL_ANIMATION_NAME,
         AzPlayBehaviors.HOLD_ON_LAST_FRAME
     );
 
     private static final AzCommand IDLE = AzCommand.create(
-        BoilerAnimationRefs.FULL_BODY_CONTROLLER_NAME,
+        BoilerAnimationRefs.FULL_BODY_TRACK_NAME,
         BoilerAnimationRefs.IDLE_ANIMATION_NAME,
         AzPlayBehaviors.LOOP
     );
 
     private static final AzCommand RUN = AzCommand.create(
-        BoilerAnimationRefs.FULL_BODY_CONTROLLER_NAME,
+        BoilerAnimationRefs.FULL_BODY_TRACK_NAME,
         BoilerAnimationRefs.RUN_ANIMATION_NAME,
         AzPlayBehaviors.LOOP
     );
 
     private static final AzCommand SWIM = AzCommand.create(
-        BoilerAnimationRefs.FULL_BODY_CONTROLLER_NAME,
+        BoilerAnimationRefs.FULL_BODY_TRACK_NAME,
         BoilerAnimationRefs.SWIM_ANIMATION_NAME,
         AzPlayBehaviors.LOOP
     );
 
     private static final AzCommand WALK = AzCommand.create(
-        BoilerAnimationRefs.FULL_BODY_CONTROLLER_NAME,
+        BoilerAnimationRefs.FULL_BODY_TRACK_NAME,
         BoilerAnimationRefs.WALK_ANIMATION_NAME,
         AzPlayBehaviors.LOOP
     );
@@ -48,27 +48,27 @@ public class BoilerAnimationDispatcher {
     }
 
     public void crawl() {
-        CRAWL.sendForEntity(boiler);
+        CRAWL.dispatch(boiler);
     }
 
     public void crawlHold() {
-        CRAWL_HOLD.sendForEntity(boiler);
+        CRAWL_HOLD.dispatch(boiler);
     }
 
     public void idle() {
-        IDLE.sendForEntity(boiler);
+        IDLE.dispatch(boiler);
     }
 
     public void run() {
-        RUN.sendForEntity(boiler);
+        RUN.dispatch(boiler);
     }
 
     public void swim() {
-        SWIM.sendForEntity(boiler);
+        SWIM.dispatch(boiler);
     }
 
     public void walk() {
-        WALK.sendForEntity(boiler);
+        WALK.dispatch(boiler);
     }
 
 }

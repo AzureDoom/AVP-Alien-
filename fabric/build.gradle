@@ -56,22 +56,7 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
 
-    // Manually added dependencies
-    // TODO: Shouldn't need this implementation call, figure out how to remove.
-    implementation "com.just:just-codec:${project.just_codec_version}"
-    include "com.just:just-codec:${project.just_codec_version}"
-    // TODO: Shouldn't need this implementation call, figure out how to remove.
-    implementation "com.just:just-core:${project.just_core_version}"
-    include "com.just:just-core:${project.just_core_version}"
-    // TODO: Shouldn't need this implementation call, figure out how to remove.
-    implementation "com.just:just-goap:${project.just_goap_version}"
-    include "com.just:just-goap:${project.just_goap_version}"
-
-    modImplementation ("com.blib:blib-fabric-${project.minecraft_version}:${project.blib_version}") {
-        exclude group: "com.just", module: "just-codec"
-        exclude group: "com.just", module: "just-core"
-        exclude group: "com.just", module: "just-goap"
-    }
+    modImplementation "com.blib:blib-fabric-${project.minecraft_version}:${project.blib_version}"
 
     modApi "com.terraformersmc:modmenu:${project.modmenu_version}"
     modApi "dev.architectury:architectury-fabric:${project.architectury_version}"

@@ -8,19 +8,19 @@ import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
 public class ProwlerAnimationDispatcher {
 
     private static final AzCommand CLAWATTACKQUAD_RIGHTARM = AzCommand.create(
-        AzAlienAnimationUtil.RIGHT_ARM_CONTROLLER_NAME,
+        AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
         ProwlerAnimationRefs.CLAWATTACKQUAD_RIGHTARM_ANIMATION_NAME,
         AzPlayBehaviors.PLAY_ONCE
     );
 
     private static final AzCommand BITEATTACK_HEAD = AzCommand.create(
-        AzAlienAnimationUtil.HEAD_CONTROLLER_NAME,
+        AzAlienAnimationUtil.HEAD_TRACK_NAME,
         ProwlerAnimationRefs.BITEATTACK_HEAD_ANIMATION_NAME,
         AzPlayBehaviors.PLAY_ONCE
     );
 
     private static final AzCommand TAILATTACKQUAD_TAIL = AzCommand.create(
-        AzAlienAnimationUtil.TAIL_CONTROLLER_NAME,
+        AzAlienAnimationUtil.TAIL_TRACK_NAME,
         ProwlerAnimationRefs.TAILATTACKQUAD_TAIL_ANIMATION_NAME,
         AzPlayBehaviors.PLAY_ONCE
     );
@@ -54,42 +54,42 @@ public class ProwlerAnimationDispatcher {
     }
 
     public void crawl() {
-        CRAWL_ALL.sendForEntity(prowler);
+        CRAWL_ALL.dispatch(prowler);
     }
 
     public void crawlHold() {
-        CRAWL_ALL_HOLD.sendForEntity(prowler);
+        CRAWL_ALL_HOLD.dispatch(prowler);
     }
 
     public void idle() {
-        IDLE_ALL.sendForEntity(prowler);
+        IDLE_ALL.dispatch(prowler);
     }
 
     public void lunge() {
-        LUNGE_ALL.sendForEntity(prowler);
+        LUNGE_ALL.dispatch(prowler);
     }
 
     public void run() {
-        RUN_ALL.sendForEntity(prowler);
+        RUN_ALL.dispatch(prowler);
     }
 
     public void swim() {
-        SWIM_ALL.sendForEntity(prowler);
+        SWIM_ALL.dispatch(prowler);
     }
 
     public void walk() {
-        WALK_ALL.sendForEntity(prowler);
+        WALK_ALL.dispatch(prowler);
     }
 
     public void biteAttack() {
-        BITEATTACK_HEAD.sendForEntity(prowler);
+        BITEATTACK_HEAD.dispatch(prowler);
     }
 
     public void rightClawAttack() {
-        CLAWATTACKQUAD_RIGHTARM.sendForEntity(prowler);
+        CLAWATTACKQUAD_RIGHTARM.dispatch(prowler);
     }
 
     public void tailAttackQuad() {
-        TAILATTACKQUAD_TAIL.sendForEntity(prowler);
+        TAILATTACKQUAD_TAIL.dispatch(prowler);
     }
 }

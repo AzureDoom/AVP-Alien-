@@ -8,19 +8,19 @@ import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
 public class PraetorianAnimationDispatcher {
 
     private static final AzCommand ARMATTACK_RIGHTARM = AzCommand.create(
-        AzAlienAnimationUtil.RIGHT_ARM_CONTROLLER_NAME,
+        AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
         PraetorianAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME,
         AzPlayBehaviors.PLAY_ONCE
     );
 
     private static final AzCommand BITEATTACK_HEAD = AzCommand.create(
-        AzAlienAnimationUtil.HEAD_CONTROLLER_NAME,
+        AzAlienAnimationUtil.HEAD_TRACK_NAME,
         PraetorianAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME,
         AzPlayBehaviors.PLAY_ONCE
     );
 
     private static final AzCommand TAILATTACKQUAD_TAIL = AzCommand.create(
-        AzAlienAnimationUtil.TAIL_CONTROLLER_NAME,
+        AzAlienAnimationUtil.TAIL_TRACK_NAME,
         PraetorianAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME,
         AzPlayBehaviors.PLAY_ONCE
     );
@@ -40,30 +40,30 @@ public class PraetorianAnimationDispatcher {
     }
 
     public void idle() {
-        IDLE_ALL.sendForEntity(praetorian);
+        IDLE_ALL.dispatch(praetorian);
     }
 
     public void run() {
-        RUN_ALL.sendForEntity(praetorian);
+        RUN_ALL.dispatch(praetorian);
     }
 
     public void swim() {
-        SWIM_ALL.sendForEntity(praetorian);
+        SWIM_ALL.dispatch(praetorian);
     }
 
     public void walk() {
-        WALK_ALL.sendForEntity(praetorian);
+        WALK_ALL.dispatch(praetorian);
     }
 
     public void biteAttack() {
-        BITEATTACK_HEAD.sendForEntity(praetorian);
+        BITEATTACK_HEAD.dispatch(praetorian);
     }
 
     public void rightClawAttack() {
-        ARMATTACK_RIGHTARM.sendForEntity(praetorian);
+        ARMATTACK_RIGHTARM.dispatch(praetorian);
     }
 
     public void tailAttack() {
-        TAILATTACKQUAD_TAIL.sendForEntity(praetorian);
+        TAILATTACKQUAD_TAIL.dispatch(praetorian);
     }
 }

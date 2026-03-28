@@ -66,7 +66,7 @@ public class LungeAction {
 
             facehugger.setDeltaMovement(vectorDifference.x, Math.max(0.6, vectorDifference.y), vectorDifference.z);
 
-            facehugger.getAnimationDispatcher().lunge();
+            facehugger.isLunging.set(true);
             blackboard.set(KEY_HAS_LUNGED, true);
         }
 

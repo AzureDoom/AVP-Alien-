@@ -17,10 +17,6 @@ public class AttachToHostActions {
         .addPrecondition(GOAPSensors.HAS_ATTACK_TARGET.key(), Expressions.Boolean.isTrue())
         .addPrecondition(AttachToHostSensors.IS_ATTACK_TARGET_IN_LUNGE_RANGE.key(), Expressions.Boolean.isFalse())
         .addEffect(AttachToHostSensors.IS_ATTACK_TARGET_IN_LUNGE_RANGE.key().asDerived(), true)
-        .withStartCallback(context -> {
-            var facehugger = context.getActor();
-            facehugger.getAnimationDispatcher().run();
-        })
         .withPerformCallback(AttachToHostActions::performMoveToHost)
         .withFinishCallback(MoveToPosAction::onFinish)
         .build();

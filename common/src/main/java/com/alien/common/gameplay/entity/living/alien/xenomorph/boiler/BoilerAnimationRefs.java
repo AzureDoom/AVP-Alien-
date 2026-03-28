@@ -2,7 +2,7 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.boiler;
 
 public class BoilerAnimationRefs {
 
-    public static final String FULL_BODY_CONTROLLER_NAME = "full_body";
+    public static final String FULL_BODY_TRACK_NAME = "full_body";
 
     public static final String ATTACK_CLAW_ANIMATION_NAME = "animation.attackclaw";
 

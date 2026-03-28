@@ -66,10 +66,6 @@ neoForge {
 dependencies {
     implementation "com.blib:blib-neoforge-${project.minecraft_version}:${project.blib_version}"
 
-    implementation("com.just:just-codec:${project.just_codec_version}")
-    implementation("com.just:just-core:${project.just_core_version}")
-    implementation("com.just:just-goap:${project.just_goap_version}")
-
     localRuntime "dev.architectury:architectury-neoforge:${project.architectury_version}"
     localRuntime "me.shedaniel.cloth:cloth-config-neoforge:${project.cloth_version}"
 

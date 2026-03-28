@@ -5,8 +5,8 @@ import com.alien.common.gameplay.entity.living.alien.chestburster.Chestburster;
 import com.alien.common.gameplay.entity.living.alien.chestburster.ChestbursterAnimationRefs;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
-import com.blib.api.client.animation.v1.controller.AzAnimationController;
-import com.blib.api.client.animation.v1.controller.AzAnimationControllerContainer;
+import com.blib.api.client.animation.v1.track.AzAnimationTrack;
+import com.blib.api.client.animation.v1.track.AzAnimationTrackContainer;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,12 +21,12 @@ public class ChestbursterAnimator extends AzEntityAnimator<Chestburster> {
     }
 
     @Override
-    public void registerControllers(AzAnimationControllerContainer<Chestburster> animationControllerContainer) {
-        animationControllerContainer.add(
-            AzAnimationController.builder(this, ChestbursterAnimationRefs.HEAD_CONTROLLER_NAME)
+    public void registerTracks(AzAnimationTrackContainer<Chestburster> animationTrackContainer) {
+        animationTrackContainer.add(
+            AzAnimationTrack.builder(this, ChestbursterAnimationRefs.HEAD_TRACK_NAME)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, ChestbursterAnimationRefs.TAIL_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, ChestbursterAnimationRefs.TAIL_TRACK_NAME)
                 .setTransitionLength(5)
                 .build()
         );

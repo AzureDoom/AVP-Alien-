@@ -9,13 +9,13 @@ import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
 public class PredalienAdolescentAnimationDispatcher {
 
     private static final AzCommand ARMATTACK_RIGHTARM = AzCommand.create(
-        AzAlienAnimationUtil.RIGHT_ARM_CONTROLLER_NAME,
+        AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
         AdolescentAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME,
         AzPlayBehaviors.PLAY_ONCE
     );
 
     private static final AzCommand BITEATTACK_HEAD = AzCommand.create(
-        AzAlienAnimationUtil.HEAD_CONTROLLER_NAME,
+        AzAlienAnimationUtil.HEAD_TRACK_NAME,
         AdolescentAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME,
         AzPlayBehaviors.PLAY_ONCE
     );
@@ -49,38 +49,38 @@ public class PredalienAdolescentAnimationDispatcher {
     }
 
     public void crawl() {
-        CRAWL_ALL.sendForEntity(predalienAdolescent);
+        CRAWL_ALL.dispatch(predalienAdolescent);
     }
 
     public void crawlHold() {
-        CRAWL_ALL_HOLD.sendForEntity(predalienAdolescent);
+        CRAWL_ALL_HOLD.dispatch(predalienAdolescent);
     }
 
     public void idle() {
-        IDLE_ALL.sendForEntity(predalienAdolescent);
+        IDLE_ALL.dispatch(predalienAdolescent);
     }
 
     public void lunge() {
-        LUNGE_ALL.sendForEntity(predalienAdolescent);
+        LUNGE_ALL.dispatch(predalienAdolescent);
     }
 
     public void run() {
-        RUN_ALL.sendForEntity(predalienAdolescent);
+        RUN_ALL.dispatch(predalienAdolescent);
     }
 
     public void swim() {
-        SWIM_ALL.sendForEntity(predalienAdolescent);
+        SWIM_ALL.dispatch(predalienAdolescent);
     }
 
     public void walk() {
-        WALK_ALL.sendForEntity(predalienAdolescent);
+        WALK_ALL.dispatch(predalienAdolescent);
     }
 
     public void biteAttack() {
-        BITEATTACK_HEAD.sendForEntity(predalienAdolescent);
+        BITEATTACK_HEAD.dispatch(predalienAdolescent);
     }
 
     public void rightClawAttack() {
-        ARMATTACK_RIGHTARM.sendForEntity(predalienAdolescent);
+        ARMATTACK_RIGHTARM.dispatch(predalienAdolescent);
     }
 }

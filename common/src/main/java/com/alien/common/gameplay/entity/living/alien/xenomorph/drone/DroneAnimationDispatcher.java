@@ -8,19 +8,19 @@ import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
 public class DroneAnimationDispatcher {
 
     private static final AzCommand ARMATTACK_RIGHTARM = AzCommand.create(
-        AzAlienAnimationUtil.RIGHT_ARM_CONTROLLER_NAME,
+        AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
         DroneAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME,
         AzPlayBehaviors.PLAY_ONCE
     );
 
     private static final AzCommand BITEATTACK_HEAD = AzCommand.create(
-        AzAlienAnimationUtil.HEAD_CONTROLLER_NAME,
+        AzAlienAnimationUtil.HEAD_TRACK_NAME,
         DroneAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME,
         AzPlayBehaviors.PLAY_ONCE
     );
 
     private static final AzCommand TAILATTACKQUAD_TAIL = AzCommand.create(
-        AzAlienAnimationUtil.TAIL_CONTROLLER_NAME,
+        AzAlienAnimationUtil.TAIL_TRACK_NAME,
         DroneAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME,
         AzPlayBehaviors.PLAY_ONCE
     );
@@ -54,42 +54,42 @@ public class DroneAnimationDispatcher {
     }
 
     public void crawl() {
-        CRAWL_ALL.sendForEntity(drone);
+        CRAWL_ALL.dispatch(drone);
     }
 
     public void crawlHold() {
-        CRAWL_ALL_HOLD.sendForEntity(drone);
+        CRAWL_ALL_HOLD.dispatch(drone);
     }
 
     public void idle() {
-        IDLE_ALL.sendForEntity(drone);
+        IDLE_ALL.dispatch(drone);
     }
 
     public void lunge() {
-        LUNGE_ALL.sendForEntity(drone);
+        LUNGE_ALL.dispatch(drone);
     }
 
     public void run() {
-        RUN_ALL.sendForEntity(drone);
+        RUN_ALL.dispatch(drone);
     }
 
     public void swim() {
-        SWIM_ALL.sendForEntity(drone);
+        SWIM_ALL.dispatch(drone);
     }
 
     public void walk() {
-        WALK_ALL.sendForEntity(drone);
+        WALK_ALL.dispatch(drone);
     }
 
     public void biteAttack() {
-        BITEATTACK_HEAD.sendForEntity(drone);
+        BITEATTACK_HEAD.dispatch(drone);
     }
 
     public void rightClawAttack() {
-        ARMATTACK_RIGHTARM.sendForEntity(drone);
+        ARMATTACK_RIGHTARM.dispatch(drone);
     }
 
     public void tailAttack() {
-        TAILATTACKQUAD_TAIL.sendForEntity(drone);
+        TAILATTACKQUAD_TAIL.dispatch(drone);
     }
 }

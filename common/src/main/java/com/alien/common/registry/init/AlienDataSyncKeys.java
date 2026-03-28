@@ -87,6 +87,12 @@ public class AlienDataSyncKeys {
             .build(0)
     );
 
+    public static final BLibHolder<DataSyncKey<Boolean>> FACEHUGGER_IS_LUNGING = create(
+        "facehugger_is_lunging",
+        builder -> builder.networkSynchronized(StreamCodecs.BOOLEAN)
+            .build(false)
+    );
+
     public static final BLibHolder<DataSyncKey<Boolean>> PARASITE_IS_FERTILE = create(
         "parasite_is_fertile",
         builder -> builder.networkSynchronized(StreamCodecs.BOOLEAN)

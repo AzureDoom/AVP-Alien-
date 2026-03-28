@@ -6,19 +6,19 @@ import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
 public class OvomorphAnimationDispatcher {
 
     private static final AzCommand CLOSE_HOLD = AzCommand.create(
-        OvomorphAnimationRefs.BASE_CONTROLLER_NAME,
+        OvomorphAnimationRefs.BASE_TRACK_NAME,
         OvomorphAnimationRefs.CLOSE_HOLD_ANIMATION_NAME,
         AzPlayBehaviors.LOOP
     );
 
     private static final AzCommand OPEN = AzCommand.create(
-        OvomorphAnimationRefs.BASE_CONTROLLER_NAME,
+        OvomorphAnimationRefs.BASE_TRACK_NAME,
         OvomorphAnimationRefs.OPEN_ANIMATION_NAME,
         AzPlayBehaviors.HOLD_ON_LAST_FRAME
     );
 
     private static final AzCommand OPEN_HOLD = AzCommand.create(
-        OvomorphAnimationRefs.BASE_CONTROLLER_NAME,
+        OvomorphAnimationRefs.BASE_TRACK_NAME,
         OvomorphAnimationRefs.OPEN_HOLD_ANIMATION_NAME,
         AzPlayBehaviors.LOOP
     );
@@ -30,14 +30,14 @@ public class OvomorphAnimationDispatcher {
     }
 
     public void closeHold() {
-        CLOSE_HOLD.sendForEntity(ovomorph);
+        CLOSE_HOLD.dispatch(ovomorph);
     }
 
     public void open() {
-        OPEN.sendForEntity(ovomorph);
+        OPEN.dispatch(ovomorph);
     }
 
     public void openHold() {
-        OPEN_HOLD.sendForEntity(ovomorph);
+        OPEN_HOLD.dispatch(ovomorph);
     }
 }

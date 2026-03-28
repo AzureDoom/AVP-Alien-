@@ -4,11 +4,11 @@ public class FacehuggerAnimationRefs {
 
     public static final String FACEHUG_ANIMATION_NAME = "animation.hug";
 
-    public static final String LEGS_CONTROLLER_NAME = "legs";
+    public static final String LEGS_TRACK_NAME = "legs";
 
-    public static final String LUNGS_CONTROLLER_NAME = "lungs";
+    public static final String LUNGS_TRACK_NAME = "lungs";
 
-    public static final String TAIL_CONTROLLER_NAME = "tail";
+    public static final String TAIL_TRACK_NAME = "tail";
 
     public static final String IDLE_ANIMATION_NAME = "animation.idle";
 

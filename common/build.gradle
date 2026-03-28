@@ -25,14 +25,7 @@ dependencies {
     annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: "${mixinextras_common_version}"
 
     // Manually added dependencies
-    compileOnly "com.just:just-codec:${project.just_codec_version}"
-    compileOnly "com.just:just-core:${project.just_core_version}"
-    compileOnly "com.just:just-goap:${project.just_goap_version}"
-    compileOnly ("com.blib:blib-common-${project.minecraft_version}:${project.blib_version}") {
-        exclude group: "com.just", module: "just-codec"
-        exclude group: "com.just", module: "just-core"
-        exclude group: "com.just", module: "just-goap"
-    }
+    compileOnly "com.blib:blib-common-${project.minecraft_version}:${project.blib_version}"
 
     // Compatibility
     compileOnly "com.avp.human:avp_human-common-1.21.1:${project.avp_human_version}"

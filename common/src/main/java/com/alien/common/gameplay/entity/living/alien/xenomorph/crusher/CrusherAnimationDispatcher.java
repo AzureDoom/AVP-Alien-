@@ -10,19 +10,19 @@ import java.util.Objects;
 public class CrusherAnimationDispatcher {
 
     private static final AzCommand BITEATTACK_HEAD = AzCommand.create(
-        AzAlienAnimationUtil.HEAD_CONTROLLER_NAME,
+        AzAlienAnimationUtil.HEAD_TRACK_NAME,
         CrusherAnimationRefs.BITEATTACK_HEAD_ANIMATION_NAME,
         AzPlayBehaviors.PLAY_ONCE
     );
 
     private static final AzCommand IDLE_TAIL = AzCommand.create(
-        AzAlienAnimationUtil.TAIL_CONTROLLER_NAME,
+        AzAlienAnimationUtil.TAIL_TRACK_NAME,
         CrusherAnimationRefs.IDLE_TAIL_ANIMATION_NAME,
         AzPlayBehaviors.LOOP
     );
 
     private static final AzCommand RUN_TAIL_PLAY_ONCE = AzCommand.create(
-        AzAlienAnimationUtil.TAIL_CONTROLLER_NAME,
+        AzAlienAnimationUtil.TAIL_TRACK_NAME,
         CrusherAnimationRefs.RUN_TAIL_ANIMATION_NAME,
         AzPlayBehaviors.PLAY_ONCE
     );
@@ -43,7 +43,7 @@ public class CrusherAnimationDispatcher {
     private static final AzCommand SWIM_ALL = AzAnimationUtil.compose(AzAlienAnimationUtil.XENO_LIMB_NAMES, "swim");
 
     private static final AzCommand TAILATTACK_TAIL = AzCommand.create(
-        AzAlienAnimationUtil.TAIL_CONTROLLER_NAME,
+        AzAlienAnimationUtil.TAIL_TRACK_NAME,
         CrusherAnimationRefs.TAILATTACK_TAIL_ANIMATION_NAME,
         AzPlayBehaviors.PLAY_ONCE
     );
@@ -64,30 +64,30 @@ public class CrusherAnimationDispatcher {
     }
 
     public void biteAttack() {
-        BITEATTACK_HEAD.sendForEntity(crusher);
+        BITEATTACK_HEAD.dispatch(crusher);
     }
 
     public void idle() {
-        IDLE_ALL.sendForEntity(crusher);
+        IDLE_ALL.dispatch(crusher);
     }
 
     public void lunge() {
-        LEAP_ALL.sendForEntity(crusher);
+        LEAP_ALL.dispatch(crusher);
     }
 
     public void run() {
-        RUN_ALL.sendForEntity(crusher);
+        RUN_ALL.dispatch(crusher);
     }
 
     public void swim() {
-        SWIM_ALL.sendForEntity(crusher);
+        SWIM_ALL.dispatch(crusher);
     }
 
     public void tailAttack() {
-        TAILATTACK_TAIL.sendForEntity(crusher);
+        TAILATTACK_TAIL.dispatch(crusher);
     }
 
     public void walk() {
-        WALK_ALL.sendForEntity(crusher);
+        WALK_ALL.dispatch(crusher);
     }
 }
