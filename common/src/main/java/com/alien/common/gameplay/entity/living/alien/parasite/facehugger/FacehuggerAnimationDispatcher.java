@@ -43,11 +43,15 @@ public class FacehuggerAnimationDispatcher {
         AzPlayBehaviors.LOOP
     );
 
-    private static final AzCommand SACK = AzCommand.create(
+    private static final AzCommand BREATHE = AzCommand.create(
         FacehuggerAnimationRefs.LUNGS_TRACK_NAME,
         FacehuggerAnimationRefs.SACK_ANIMATION_NAME,
         AzPlayBehaviors.LOOP
     );
+
+    private static final AzCommand CANCEL_BREATHING = AzCommand.trackBuilder()
+        .cancel(FacehuggerAnimationRefs.LUNGS_TRACK_NAME)
+        .build();
 
     private static final AzCommand SWAY = AzCommand.create(
         FacehuggerAnimationRefs.TAIL_TRACK_NAME,
@@ -66,7 +70,7 @@ public class FacehuggerAnimationDispatcher {
             FacehuggerAnimationRefs.FACEHUG_ANIMATION_NAME,
             AzPlayBehaviors.HOLD_ON_LAST_FRAME
         ),
-        SACK
+        BREATHE
     );
 
     private static final AzCommand INFERTILE = AzCommand.compose(
@@ -79,12 +83,15 @@ public class FacehuggerAnimationDispatcher {
             FacehuggerAnimationRefs.TAIL_TRACK_NAME,
             FacehuggerAnimationRefs.INFERTILE_ANIMATION_NAME,
             AzPlayBehaviors.HOLD_ON_LAST_FRAME
-        )
+        ),
+        CANCEL_BREATHING
     );
 
-    private static final AzCommand RUN_AND_FLAIL = AzCommand.compose(RUN, FLAIL);
+    private static final AzCommand LUNGE_AND_CANCEL_BREATHING = AzCommand.compose(LUNGE, CANCEL_BREATHING);
 
-    private static final AzCommand IDLE_AND_SWAY = AzCommand.compose(IDLE, SWAY);
+    private static final AzCommand RUN_AND_FLAIL = AzCommand.compose(RUN, FLAIL, CANCEL_BREATHING);
+
+    private static final AzCommand IDLE_AND_SWAY = AzCommand.compose(IDLE, SWAY, CANCEL_BREATHING);
 
     private final Facehugger facehugger;
 
@@ -101,7 +108,7 @@ public class FacehuggerAnimationDispatcher {
     }
 
     public void lunge() {
-        LUNGE.dispatch(facehugger);
+        LUNGE_AND_CANCEL_BREATHING.dispatch(facehugger);
     }
 
     public void infertile() {
@@ -110,17 +117,5 @@ public class FacehuggerAnimationDispatcher {
 
     public void run() {
         RUN_AND_FLAIL.dispatch(facehugger);
-    }
-
-    public void sack() {
-        SACK.dispatch(facehugger);
-    }
-
-    public void tailFlail() {
-        FLAIL.dispatch(facehugger);
-    }
-
-    public void tailSway() {
-        SWAY.dispatch(facehugger);
     }
 }
