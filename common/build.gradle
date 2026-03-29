@@ -1,106 +1,11 @@
 plugins {
-    id 'com.diffplug.spotless'
-    id 'idea'
-    id 'multiloader-common'
-    id 'net.neoforged.moddev'
-}
-
-neoForge {
-    neoFormVersion = neo_form_version
-    // Automatically enable AccessTransformers if the file exists
-    def at = file('src/main/resources/META-INF/accesstransformer.cfg')
-    if (at.exists()) {
-        accessTransformers.from(at.absolutePath)
-    }
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
-    }
+    id 'blib-multiloader-common'
 }
 
 dependencies {
-    compileOnly group: 'org.spongepowered', name: 'mixin', version: "${mixin_version}"
-    // fabric and neoforge both bundle mixinextras, so it is safe to use it in common
-    compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: "${mixinextras_common_version}"
-    annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: "${mixinextras_common_version}"
-
-    // Manually added dependencies
-    compileOnly "com.blib:blib-common-${project.minecraft_version}:${project.blib_version}"
-
     // Compatibility
     compileOnly "com.avp.human:avp_human-common-1.21.1:${project.avp_human_version}"
     compileOnly "com.avp.predator:avp_predator-common-1.21.1:${project.avp_predator_version}"
 
     compileOnly "maven.modrinth:gigeresque:${project.gigeresque_version}"
-
-    compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${project.jei_version}"
-    compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:${project.rei_version}"
-    compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:${project.rei_version}"
 }
-
-configurations.configureEach {
-    resolutionStrategy {
-        force "org.slf4j:slf4j-api:${project.slf4j_version}"
-
-        eachDependency { DependencyResolveDetails details ->
-            if (details.requested.group == 'org.slf4j' && details.requested.name == 'slf4j-api') {
-                details.useVersion project.slf4j_version
-                details.because 'Aligning SLF4J version to satisfy NeoForge strict constraint'
-            }
-            if (details.requested.group == 'ch.qos.logback' && details.requested.name == 'logback-classic') {
-                details.useVersion project.logback_classic_version
-                details.because 'Logback 1.5.x requires slf4j-api 2.0.17+, incompatible with NeoForge'
-            }
-        }
-    }
-}
-
-configurations {
-    commonJava {
-        canBeResolved = false
-        canBeConsumed = true
-    }
-    commonResources {
-        canBeResolved = false
-        canBeConsumed = true
-    }
-}
-
-// ##################################################################################
-// # Generate common/src/main/generated and mark as resource folder.                #
-// ##################################################################################
-tasks.register('prepareGeneratedDir') {
-    doLast {
-        file('src/main/generated').mkdirs()
-    }
-}
-
-tasks.named('processResources') {
-    dependsOn 'prepareGeneratedDir'
-}
-// END
-
-// ##################################################################################
-// # Include src/main/generated as a resource folder for common.                    #
-// ##################################################################################
-sourceSets {
-    main {
-        resources {
-            srcDir 'src/main/generated'
-        }
-    }
-}
-
-tasks.register('packageCommonResources', Sync) {
-    from sourceSets.main.resources
-    into layout.buildDirectory.dir("commonResourcesOut")
-}
-
-artifacts {
-    commonJava sourceSets.main.java.sourceDirectories.singleFile
-
-    commonResources(tasks.named('packageCommonResources').get().outputs.files.singleFile) {
-        builtBy tasks.named('packageCommonResources')
-    }
-}
-// END

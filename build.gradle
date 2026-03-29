@@ -1,26 +1,53 @@
 plugins {
-	// see https://fabricmc.net/develop/ for new versions
-	id 'fabric-loom' version "${fabric_loom_version}" apply false
-	// see https://projects.neoforged.net/neoforged/moddevgradle for new versions
-	id 'net.neoforged.moddev' version "${neoforge_moddev_version}" apply false
-
-	// Manual plugins added here
-	id 'java'
-	id "me.modmuss50.mod-publish-plugin" version "${mod_publish_version}"
+    id 'blib-multiloader-root'
 }
 
-// #####################################################################################
-// # Convenience task that runs data gen for both NeoForge and Fabric (in that order). #
-// #####################################################################################
-tasks.register("runAllDatagen") {
-	dependsOn(":neoforge:runData", ":fabric:runDatagen")
-}
+blib {
+    version = project.blib_version
+    recipeViewer = 'rei'
 
-afterEvaluate {
-	project(":fabric").afterEvaluate { fabricProject ->
-		fabricProject.tasks.named("runDatagen").configure {
-			mustRunAfter(":neoforge:runData")
-		}
-	}
+    mod {
+        author = 'Stargazer Studios'
+        description = 'A module for the AVP universe that adds alien content.'
+        credits = 'Stargazer Studios'
+        group = 'com.avp.alien'
+        icon = 'assets/avp_alien/icon.png'
+        id = 'avp_alien'
+        license = 'All Rights Reserved'
+        name = 'AVP (Alien)'
+        version = '0.1.5'
+
+        publish {
+            dryRun = true
+
+            discordWebhook {
+                username = "MU/TH/UR"
+                avatarUrl = "https://i.imgur.com/5Y0EZ9x.jpeg"
+                thumbnailUrl = "https://cdn.modrinth.com/data/Uqo0H9FX/8ffabe2f364c34e6b0f13019664c5fe4989c2f95_96.webp"
+            }
+
+            curseforge {
+                projectId = '1406354'
+                projectSlug = 'avp-alien'
+            }
+
+            modrinth {
+                projectId = '6PQ9G0rJ'
+            }
+        }
+    }
+
+    maven {
+        repository 'https://maven.bvanseghi.dev/avp_human'
+        repository 'https://maven.bvanseghi.dev/avp_predator'
+
+        publish {
+            url = 'https://maven.bvanseghi.dev/avp_alien/'
+
+            credentials {
+                usernameEnv = 'AVP_MAVEN_USERNAME'
+                passwordEnv = 'AVP_MAVEN_PASSWORD'
+            }
+        }
+    }
 }
-// End
