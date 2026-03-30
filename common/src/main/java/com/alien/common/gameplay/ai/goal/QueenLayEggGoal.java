@@ -53,9 +53,8 @@ public class QueenLayEggGoal extends Goal {
                     hive -> hive.isAlive()
                         // AND the queen must be within the hive to lay eggs there.
                         && hive.getSpaceManager().isEntityWithinHive(queen)
-                        && hive.getMembershipManager()
-                            .getMembersMatching(member -> member.is(AlienEntityTypeTags.OVOMORPHS))
-                            .size() < MAX_EGG_COUNT_IN_HIVE
+                        && hive.getFactionData()
+                            .getLoadedMemberCount(member -> member.is(AlienEntityTypeTags.OVOMORPHS)) < MAX_EGG_COUNT_IN_HIVE
                 )
             // AND there must be no other eggs nearby already.
             && noEggsNearby();

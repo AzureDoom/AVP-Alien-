@@ -2,7 +2,7 @@ package com.alien;
 
 import com.alien.common.data.AlienReloadListeners;
 import com.alien.common.data.fixer.migration.AlienDataMigrations;
-import com.alien.common.gameplay.level.saveddata.HiveLevelData;
+import com.alien.common.gameplay.hive.HiveRegistry;
 import com.alien.common.gameplay.level.saveddata.QueenSpawnChunkData;
 import com.alien.common.property.AlienPropertyAccess;
 import com.alien.common.registry.GrowthStageRegistry;
@@ -15,6 +15,7 @@ import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienDecoratedPotPatterns;
 import com.alien.common.registry.init.AlienEntitySpawns;
 import com.alien.common.registry.init.AlienEntityTypes;
+import com.alien.common.registry.init.AlienFactionDataTypes;
 import com.alien.common.registry.init.AlienGameEvents;
 import com.alien.common.registry.init.AlienParticleTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
@@ -103,6 +104,7 @@ public class Alien {
         AlienCompostingChances.initialize();
         AlienDataSyncKeys.initialize();
         AlienEntitySpawns.initialize();
+        AlienFactionDataTypes.initialize();
 
         AlienCommands.initialize();
 
@@ -112,18 +114,25 @@ public class Alien {
         // Listeners/Events
         AlienReloadListeners.initialize();
 
-        MOD.events().postLevelTick().register(Alien::tickHivesInLevel);
+        MOD.events().postLevelTick().register(Alien::tickHives);
         MOD.events().postLevelTick().register(Alien::tickQueenSpawnCooldown);
         MOD.events().onTagsUpdated().register(Alien::onTagsUpdated);
+
+        MOD.events().onServerStarted().register(HiveRegistry.INSTANCE::onServerStarted);
+        MOD.events().onServerStopped().register(HiveRegistry.INSTANCE::onServerStopped);
+        MOD.events().onFactionRemove().register(HiveRegistry.INSTANCE::onFactionRemoved);
     }
 
-    private static void tickHivesInLevel(Level level) {
-        if (level.isClientSide) {
+    private static void tickHives(Level level) {
+        if (level.isClientSide || !level.dimension().equals(Level.OVERWORLD)) {
             return;
         }
 
-        HiveLevelData.getOrCreate(level)
-            .ifSome(HiveLevelData::tick);
+        var server = level.getServer();
+
+        if (server != null) {
+            HiveRegistry.INSTANCE.tick(server);
+        }
     }
 
     private static void tickQueenSpawnCooldown(Level level) {

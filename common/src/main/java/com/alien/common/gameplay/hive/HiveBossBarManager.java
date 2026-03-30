@@ -9,7 +9,6 @@ import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.util.AlienPredicates;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerBossEvent;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.Difficulty;
@@ -18,7 +17,6 @@ import net.minecraft.world.entity.EntityType;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -69,9 +67,8 @@ public class HiveBossBarManager {
 
     private void updateBossBarProgress() {
         // Get all xenomorphs that are loaded in the world right now.
-        var loadedXenomorphCount = hive.getMembershipManager()
-            .getMembersMatching(XENOMORPH_PREDICATE)
-            .size();
+        var loadedXenomorphCount = hive.getFactionData()
+            .getLoadedMemberCount(XENOMORPH_PREDICATE);
         // Get all xenomorphs that are in reserves right now.
         var currentReserveXenomorphCount = hive.getReserveManager()
             .getCountMatching(XENOMORPH_PREDICATE);
@@ -122,14 +119,14 @@ public class HiveBossBarManager {
     }
 
     private boolean isPlayerInSameDimensionAsHive(ServerPlayer player) {
-        return Objects.equals(player.level().dimensionType(), hive.level().dimensionType());
+        return player.level().dimension().equals(hive.getFactionData().getDimension());
     }
 
     public void onHiveRemoved() {
-        var level = hive.level();
+        var level = hive.getServer().getLevel(hive.getFactionData().getDimension());
 
-        if (level.getDifficulty() != Difficulty.PEACEFUL && level instanceof ServerLevel serverLevel) {
-            serverLevel.players()
+        if (level != null && level.getDifficulty() != Difficulty.PEACEFUL) {
+            level.players()
                 .stream()
                 .filter(player -> hive.getSpaceManager().isEntityWithinHive(player))
                 .forEach(AlienAdvancements.KILL_A_HIVE::grant);

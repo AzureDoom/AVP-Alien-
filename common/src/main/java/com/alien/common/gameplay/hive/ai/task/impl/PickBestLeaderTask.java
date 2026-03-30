@@ -4,6 +4,9 @@ import com.alien.common.gameplay.hive.Hive;
 import com.alien.common.gameplay.hive.ai.task.HiveTask;
 import com.alien.common.gameplay.hive.util.HiveLeaderDispositionUtil;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
+import net.minecraft.world.entity.EntityType;
+
+import java.util.UUID;
 
 public class PickBestLeaderTask extends HiveTask {
 
@@ -20,49 +23,50 @@ public class PickBestLeaderTask extends HiveTask {
 
     @Override
     public void run() {
-        var membershipManager = hive.getMembershipManager();
         var leadershipManager = hive.getLeadershipManager();
+        var loadedByType = hive.getFactionData().getLoadedMembersByType();
 
-        var candidateUUID = leadershipManager.getLeaderIdOrNull();
-        var candidateHiveMemberData = membershipManager.getMemberData(candidateUUID).unwrapOr(null);
+        UUID candidateUUID = leadershipManager.getLeaderIdOrNull();
+        EntityType<?> candidateType = findEntityType(candidateUUID, loadedByType);
 
-        for (var contestantUUID : membershipManager.getMemberUUIDs()) {
-            var contestantHiveMemberDataOption = membershipManager.getMemberData(contestantUUID);
+        for (var entry : loadedByType.entrySet()) {
+            var entityType = entry.getKey();
 
-            if (contestantHiveMemberDataOption.isNone()) {
-                // Contestant is not a hive member, skip.
+            if (!entityType.is(AlienEntityTypeTags.XENOMORPHS)) {
                 continue;
             }
 
-            var contestantHiveMemberData = contestantHiveMemberDataOption.unwrap();
-            var contestantType = contestantHiveMemberData.getEntityType().unwrapOr(null);
+            for (var contestantUUID : entry.getValue()) {
+                if (candidateType == null) {
+                    candidateUUID = contestantUUID;
+                    candidateType = entityType;
+                    continue;
+                }
 
-            if (contestantType == null || !contestantType.is(AlienEntityTypeTags.XENOMORPHS)) {
-                // Invalid contestant, skip.
-                continue;
-            }
-
-            var candidateType = candidateHiveMemberData == null
-                ? null
-                : candidateHiveMemberData.getEntityType().unwrapOr(null);
-
-            if (candidateHiveMemberData == null || candidateType == null) {
-                // Current candidate is null, so it can't compete against the current contestant.
-                // Current contestant wins by default.
-                candidateUUID = contestantUUID;
-                candidateHiveMemberData = contestantHiveMemberData;
-                continue;
-            }
-
-            // Both candidate type and contestant type should be non-null by this point.
-            if (HiveLeaderDispositionUtil.isLeftLowerDisposition(candidateType, contestantType)) {
-                // The contestant had a higher disposition/ranking over the current candidate.
-                // The current contestant wins.
-                candidateUUID = contestantUUID;
-                candidateHiveMemberData = contestantHiveMemberData;
+                if (HiveLeaderDispositionUtil.isLeftLowerDisposition(candidateType, entityType)) {
+                    candidateUUID = contestantUUID;
+                    candidateType = entityType;
+                }
             }
         }
 
         leadershipManager.setLeaderId(candidateUUID);
+    }
+
+    private EntityType<?> findEntityType(
+        UUID uuid,
+        java.util.Map<EntityType<?>, java.util.Set<UUID>> loadedByType
+    ) {
+        if (uuid == null) {
+            return null;
+        }
+
+        for (var entry : loadedByType.entrySet()) {
+            if (entry.getValue().contains(uuid)) {
+                return entry.getKey();
+            }
+        }
+
+        return null;
     }
 }

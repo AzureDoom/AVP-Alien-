@@ -1,6 +1,6 @@
 package com.alien.common.gameplay.command.count;
 
-import com.alien.common.gameplay.level.saveddata.HiveLevelData;
+import com.alien.common.gameplay.hive.HiveRegistry;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -37,9 +37,7 @@ public class CountCommand {
             .then(
                 Commands.literal(HIVE_ARGUMENT_NAME)
                     .executes(context -> {
-                        int count = HiveLevelData.getOrCreate(context.getSource().getLevel())
-                            .map(hiveLevelData -> hiveLevelData.allHives().size())
-                            .unwrapOr(0);
+                        var count = HiveRegistry.INSTANCE.allHives().size();
 
                         context.getSource().sendSuccess(() -> {
                             var areOrIs = count == 1 ? "is" : "are";

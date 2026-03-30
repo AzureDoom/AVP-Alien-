@@ -36,9 +36,9 @@ public abstract class BalanceHiveTask extends HiveTask {
         var isLeader = Objects.equals(xenomorph.getUUID(), hive.getLeadershipManager().getLeaderIdOrNull());
 
         // Remove the old entity's membership.
-        hive.getMembershipManager().removeMember(xenomorph);
+        hive.getRelationships().removeEntity(xenomorph.getUUID());
         // Add the new entity as a member.
-        hive.getMembershipManager().addMember(grownEntity);
+        hive.getRelationships().addEntity(grownEntity);
 
         if (isLeader) {
             hive.getLeadershipManager().setLeaderId(grownEntity.getUUID());

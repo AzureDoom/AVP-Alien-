@@ -4,7 +4,7 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
 import com.alien.common.gameplay.hive.Hive;
 
-import java.util.List;
+import java.util.Set;
 
 public class BalanceQueenHiveTask extends BalanceHiveTask {
 
@@ -14,23 +14,24 @@ public class BalanceQueenHiveTask extends BalanceHiveTask {
 
     @Override
     public void run() {
-        var membersByType = hive.getMembershipManager().getMembersByEntityType();
+        var loadedByType = hive.getFactionData().getLoadedMembersByType();
         var queenEntityType = Queen.getType(hive.getVariant());
-        var queens = membersByType.getOrDefault(queenEntityType, List.of());
+        var queens = loadedByType.getOrDefault(queenEntityType, Set.of());
 
         if (!queens.isEmpty()) {
             return;
         }
 
-        hive.getLeadershipManager().getLeader().ifSome(hiveLeader -> {
+        hive.getLeadershipManager().getLeader(hive.getServer()).ifSome(hiveLeader -> {
             if (!(hiveLeader instanceof Xenomorph xenomorph)) {
-                // If the hive leader is not a xenomorph (somehow), then return.
                 return;
             }
 
-            var hiveLeaderDataOption = hive.getMembershipManager().getMemberData(xenomorph.getUUID());
+            if (!hive.getRelationships().hasMember(com.blib.api.common.faction.v1.FactionMember.entity(xenomorph))) {
+                return;
+            }
 
-            hiveLeaderDataOption.ifSome($ -> growXenomorph(xenomorph));
+            growXenomorph(xenomorph);
         });
     }
 }

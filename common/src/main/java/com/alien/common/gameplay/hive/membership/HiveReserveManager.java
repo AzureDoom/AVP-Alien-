@@ -3,16 +3,19 @@ package com.alien.common.gameplay.hive.membership;
 import com.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
-import com.alien.common.gameplay.hive.Hive;
 import com.alien.common.gameplay.hive.HiveSpaceManager;
+import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.codec.v1.BLibCodecs;
 import com.blib.api.common.entity.v1.EntityReserves;
 import com.blib.api.common.nbt.v1.model.NBTSerializable;
 import com.blib.api.common.spatial.v1.block.BlockPosVec3;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -24,47 +27,45 @@ public class HiveReserveManager implements NBTSerializable {
 
     private final EntityReserves hiveMemberReserves;
 
-    private final Hive hive;
-
-    public HiveReserveManager(Hive hive) {
+    public HiveReserveManager() {
         this.hiveMemberReserves = new EntityReserves();
-        this.hive = hive;
     }
 
-    public void tick() {
-        if (hive.ageInTicks() % FIVE_MINUTES_IN_TICKS == 0) {
-            var warriorLayer = HiveSpaceManager.HiveLayer.WARRIOR.getSphereLayer();
-            // Note that this is XENOMORPHS, not aliens. This is deliberate.
-            var numberOfXenomorphsInOuterEdges = (int) hive.getMembershipManager()
-                .getLoadedMembers()
-                .stream()
-                .filter(
-                    entity -> entity.getType().is(AlienEntityTypeTags.XENOMORPHS) && !hive.getSpaceManager()
-                        .isWithinLayerOrBelow(warriorLayer, new BlockPosVec3(entity.blockPosition()))
-                )
-                .count();
+    public void tick(
+        int hiveAgeInTicks,
+        AlienVariant variant,
+        RandomSource randomSource,
+        HiveSpaceManager spaceManager,
+        Collection<? extends Entity> loadedMembers
+    ) {
+        if (hiveAgeInTicks % FIVE_MINUTES_IN_TICKS != 0) {
+            return;
+        }
 
-            if (numberOfXenomorphsInOuterEdges > 0) {
-                var half = numberOfXenomorphsInOuterEdges / 2;
-                var remainder = numberOfXenomorphsInOuterEdges % 2;
+        var warriorLayer = HiveSpaceManager.HiveLayer.WARRIOR.getSphereLayer();
 
-                var isDroneFirst = hive.getRandom().nextBoolean();
-                var droneType = Drone.getType(hive.getVariant());
-                var runnerType = Runner.getType(hive.getVariant());
+        var numberOfXenomorphsInOuterEdges = (int) loadedMembers.stream()
+            .filter(
+                entity -> entity.getType().is(AlienEntityTypeTags.XENOMORPHS)
+                    && !spaceManager.isWithinLayerOrBelow(warriorLayer, new BlockPosVec3(entity.blockPosition()))
+            )
+            .count();
 
-                // Always add half to each.
-                hiveMemberReserves.add(droneType, half);
-                hiveMemberReserves.add(runnerType, half);
+        if (numberOfXenomorphsInOuterEdges <= 0) {
+            return;
+        }
 
-                // Randomly assign a remainder (only happens if count is odd, i.e., 1).
-                if (remainder > 0) {
-                    var extraType = isDroneFirst
-                        ? droneType
-                        : runnerType;
+        var half = numberOfXenomorphsInOuterEdges / 2;
+        var remainder = numberOfXenomorphsInOuterEdges % 2;
+        var droneType = Drone.getType(variant);
+        var runnerType = Runner.getType(variant);
 
-                    hiveMemberReserves.add(extraType, 1);
-                }
-            }
+        hiveMemberReserves.add(droneType, half);
+        hiveMemberReserves.add(runnerType, half);
+
+        if (remainder > 0) {
+            var extraType = randomSource.nextBoolean() ? droneType : runnerType;
+            hiveMemberReserves.add(extraType, 1);
         }
     }
 

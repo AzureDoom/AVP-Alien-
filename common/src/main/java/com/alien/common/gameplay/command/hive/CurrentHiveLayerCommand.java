@@ -1,6 +1,6 @@
 package com.alien.common.gameplay.command.hive;
 
-import com.alien.common.gameplay.level.saveddata.HiveLevelData;
+import com.alien.common.gameplay.hive.HiveRegistry;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -14,31 +14,27 @@ public class CurrentHiveLayerCommand {
         return Commands.literal("current")
             .requires(CommandSourceStack::isPlayer)
             .executes(context -> {
-                var playerPos = Objects.requireNonNull(context.getSource().getPlayer()).blockPosition();
+                var player = Objects.requireNonNull(context.getSource().getPlayer());
+                var playerPos = player.blockPosition();
+                var level = context.getSource().getLevel();
 
-                HiveLevelData.getOrCreate(context.getSource().getLevel())
-                    .andThen(
-                        hiveLevelData -> hiveLevelData.findNearestHive(
-                            Objects.requireNonNull(context.getSource().getPlayer()).blockPosition()
-                        )
-                    )
-                    .inspect(hive -> {
-                        var currentLayer = hive.getSpaceManager().getLayerOrNull(playerPos);
+                var hive = HiveRegistry.INSTANCE.findNearestHive(playerPos, level.dimension());
 
-                        if (currentLayer == null) {
-                            context.getSource()
-                                .sendSuccess(() -> Component.literal("No layer found."), false);
-                        } else {
-                            var hiveLayer = hive.getSpaceManager().getHiveLayerOrNull(playerPos);
+                if (hive != null) {
+                    var hiveLayer = hive.getSpaceManager().getHiveLayerOrNull(playerPos);
 
-                            context.getSource()
-                                .sendSuccess(
-                                    () -> Component.literal("Current hive layer: " + hiveLayer),
-                                    false
-                                );
-                        }
-                    })
-                    .ifNone(() -> context.getSource().sendSuccess(() -> Component.literal("No nearby hive found."), false));
+                    if (hiveLayer == null) {
+                        context.getSource().sendSuccess(() -> Component.literal("No layer found."), false);
+                    } else {
+                        context.getSource()
+                            .sendSuccess(
+                                () -> Component.literal("Current hive layer: " + hiveLayer),
+                                false
+                            );
+                    }
+                } else {
+                    context.getSource().sendSuccess(() -> Component.literal("No nearby hive found."), false);
+                }
 
                 return 1;
             });

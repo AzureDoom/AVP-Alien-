@@ -14,7 +14,6 @@ import com.alien.common.gameplay.hive.ai.task.impl.balance.BalanceAveragingHiveT
 import com.alien.common.gameplay.hive.ai.task.impl.balance.BalanceQueenHiveTask;
 import com.alien.common.gameplay.hive.ai.task.impl.balance.BalanceStepHiveTask;
 import com.alien.common.gameplay.hive.membership.HiveLeadershipManager;
-import com.alien.common.gameplay.hive.membership.HiveMembershipManager;
 import com.alien.common.gameplay.hive.membership.HiveReserveManager;
 import com.alien.common.gameplay.hive.vent.HiveVentManager;
 import com.alien.common.gameplay.level.saveddata.QueenSpawnChunkData;
@@ -22,79 +21,59 @@ import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.property.AlienProperties;
 import com.alien.common.property.AlienPropertyAccess;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
-import com.blib.api.common.nbt.v1.model.NBTSerializable;
+import com.blib.api.common.faction.v1.FactionMember;
+import com.blib.api.common.faction.v1.FactionRelationships;
 import com.blib.api.common.spatial.v1.chunk.ChunkPosUtil;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
-public class Hive implements NBTSerializable {
+public class Hive {
 
-    private static final AlienVariant DEFAULT_VARIANT = AlienVariant.NORMAL;
+    private final ResourceLocation factionId;
 
-    private static final String AGE_IN_TICKS_KEY = "AgeInTicks";
+    private final FactionRelationships relationships;
 
-    private static final String CENTER_POS_KEY = "CenterPos";
+    private final HiveFactionData factionData;
 
-    private static final String VARIANT_ID_KEY = "VariantId";
+    private final MinecraftServer server;
 
     private final HiveBossBarManager bossBarManager;
 
     private final HiveDebugManager debugManager;
 
-    private final HiveLeadershipManager leadershipManager;
-
-    private final HiveMembershipManager membershipManager;
-
-    private final HiveReserveManager reserveManager;
-
     private final HiveSpaceManager spaceManager;
 
     private final HiveVentManager ventManager;
-
-    private final UUID id;
-
-    private final Level level;
 
     private final RandomSource randomSource;
 
     private final List<Task> tasks;
 
-    private @Nullable HiveRemovalReason removalReason;
-
-    private BlockPos centerPos;
-
-    private int ageInTicks;
-
-    private AlienVariant variant;
-
-    public Hive(Level level, UUID id) {
-        this.variant = DEFAULT_VARIANT;
-        this.tasks = new ArrayList<>();
-        this.id = id;
-        this.removalReason = null;
-        this.level = level;
+    public Hive(
+        MinecraftServer server,
+        ResourceLocation factionId,
+        FactionRelationships relationships,
+        HiveFactionData factionData
+    ) {
+        this.factionId = factionId;
+        this.relationships = relationships;
+        this.factionData = factionData;
+        this.server = server;
         this.bossBarManager = new HiveBossBarManager(this);
         this.debugManager = new HiveDebugManager(this);
-        this.leadershipManager = new HiveLeadershipManager(this);
-        this.membershipManager = new HiveMembershipManager(this);
-        this.randomSource = level.random.fork();
-        this.reserveManager = new HiveReserveManager(this);
+        this.randomSource = RandomSource.create();
         this.spaceManager = new HiveSpaceManager(this);
         this.ventManager = new HiveVentManager();
-        this.centerPos = BlockPos.ZERO;
-
-        // Order matters for hive tasks.
+        this.tasks = new ArrayList<>();
 
         tasks.add(
             new BalanceAveragingHiveTask(
@@ -110,7 +89,6 @@ public class Hive implements NBTSerializable {
                 () -> Crusher.getType(getVariant())
             )
         );
-
         tasks.add(
             new BalanceAveragingHiveTask(
                 this,
@@ -127,55 +105,53 @@ public class Hive implements NBTSerializable {
         );
 
         tasks.add(new BalanceQueenHiveTask(this));
-
         tasks.add(new PickBestLeaderTask(this));
         tasks.add(new MergeWithNearbyHiveTask(this));
     }
 
     public void tick() {
         if (!isActive()) {
-            // Don't bother updating the hive if it's not in a loaded chunk.
             return;
         }
 
+        var leadershipManager = factionData.getLeadershipManager();
+        var reserveManager = factionData.getReserveManager();
+
         bossBarManager.tick();
-        debugManager.tick();
-        leadershipManager.tick();
-        membershipManager.tick();
-        reserveManager.tick();
+        debugManager.tickDebug();
+        leadershipManager.tick(relationships);
+        reserveManager.tick(
+            factionData.getAgeInTicks(),
+            factionData.getVariant(),
+            randomSource,
+            spaceManager,
+            getLoadedMembers()
+        );
 
         tasks.stream()
             .filter(Task::canRun)
             .forEach(Task::run);
 
-        if (ageInTicks % 20 == 0 && !hasXenomorphs()) {
+        if (!hasXenomorphs()) {
             remove(HiveRemovalReason.KILLED);
         }
 
-        ageInTicks++;
-    }
-
-    public void moveCenter(BlockPos newCenterPos) {
-        this.centerPos = newCenterPos;
+        factionData.incrementAge();
     }
 
     public boolean requestToJoin(Entity requestingEntity) {
         if (
-            // If the requesting entity is not an alien...
             !(requestingEntity instanceof Alien alien)
-                // OR the alien is not the same variant as the hive...
-                || !Objects.equals(alien.getVariant(), variant)
+                || !Objects.equals(alien.getVariant(), factionData.getVariant())
         ) {
-            // Then reject the entity's request to join the hive.
             return false;
         }
 
         if (!spaceManager.isEntityLeashedToHive(requestingEntity)) {
-            // If the entity isn't within range of the hive, it shouldn't be able to join the hive.
             return false;
         }
 
-        membershipManager.addMember(requestingEntity);
+        relationships.addEntity(requestingEntity);
 
         return true;
     }
@@ -183,19 +159,19 @@ public class Hive implements NBTSerializable {
     public void ping(@NotNull Entity entity) {
         if (
             !entity.isAlive()
-                || (membershipManager.isMember(entity)
+                || (relationships.hasMember(FactionMember.entity(entity))
                     && !spaceManager.isEntityLeashedToHive(entity))
         ) {
             removeHiveMember(entity);
             return;
         }
 
-        membershipManager.addMember(entity);
+        relationships.addEntity(entity);
     }
 
     public void removeHiveMember(@NotNull Entity entity) {
-        leadershipManager.removeLeadership(entity);
-        membershipManager.removeMember(entity);
+        factionData.getLeadershipManager().removeLeadership(entity);
+        relationships.removeEntity(entity.getUUID());
     }
 
     public boolean isActive() {
@@ -203,38 +179,32 @@ public class Hive implements NBTSerializable {
     }
 
     public boolean isAlive() {
-        return !isRemoved();
+        return factionData.getRemovalReason() == null;
     }
 
     public boolean hasXenomorphs() {
-        // Ovomorphs, facehuggers and chestbursters do not sustain a hive. That's why we check the xenomorph count
-        // here instead of the overall hive member map size.
-        return !membershipManager.getMembersMatching(entityType -> entityType.is(AlienEntityTypeTags.XENOMORPHS))
-            .isEmpty();
+        return factionData.hasMemberMatching(
+            entityType -> entityType.is(AlienEntityTypeTags.XENOMORPHS)
+        );
     }
 
-    public @Nullable HiveRemovalReason getRemovalReason() {
-        return removalReason;
-    }
-
-    public boolean isRemoved() {
-        return removalReason != null;
+    public boolean isAngry() {
+        return bossBarManager.isTrackingPlayers();
     }
 
     public void remove(HiveRemovalReason removalReason) {
-        this.removalReason = removalReason;
+        factionData.setRemovalReason(removalReason);
     }
 
     public void onRemove() {
         bossBarManager.onHiveRemoved();
         debugManager.onHiveRemoved();
 
-        // Difficulty check because we don't want to blacklist chunks if the hive members simply de-spawned.
-        if (level.getDifficulty() != Difficulty.PEACEFUL) {
-            // Once the hive is defeated, blacklist chunks around the hive center so no more queens can spawn.
+        var level = server.getLevel(factionData.getDimension());
+
+        if (level != null && level.getDifficulty() != Difficulty.PEACEFUL) {
             QueenSpawnChunkData.getOrCreate(level)
                 .ifSome(queenSpawnChunkData -> {
-                    // TODO: Use a precise circular area of chunks based on the hive's radius/size.
                     var chunkRadiusToBlacklist = AlienPropertyAccess.INSTANCE.getOrThrow(
                         AlienProperties.Hive.MINIMUM_DISTANCE_BETWEEN_NATURAL_QUEEN_SPAWNS_IN_CHUNKS
                     );
@@ -245,49 +215,55 @@ public class Hive implements NBTSerializable {
         }
     }
 
-    public boolean isAngry() {
-        return bossBarManager.isTrackingPlayers();
+    public void moveCenter(BlockPos newCenterPos) {
+        factionData.setCenterPos(newCenterPos);
+    }
+
+    public List<Entity> getLoadedMembers() {
+        var loadedMembers = new ArrayList<Entity>();
+
+        for (var member : relationships.getMembers()) {
+            if (member instanceof FactionMember.Entity(var uuid)) {
+                for (var level : server.getAllLevels()) {
+                    var entity = level.getEntity(uuid);
+
+                    if (entity != null) {
+                        loadedMembers.add(entity);
+                        break;
+                    }
+                }
+            }
+        }
+
+        return loadedMembers;
     }
 
     private boolean isChunkLoaded() {
-        return level.getChunkSource().getChunkNow(centerPos.getX() >> 4, centerPos.getZ() >> 4) != null;
-    }
+        var level = server.getLevel(factionData.getDimension());
 
-    @Override
-    public void load(CompoundTag compoundTag) {
-        leadershipManager.load(compoundTag);
-        membershipManager.load(compoundTag);
-        reserveManager.load(compoundTag);
-
-        var centerPosComponents = compoundTag.getIntArray(CENTER_POS_KEY);
-        this.ageInTicks = compoundTag.getInt(AGE_IN_TICKS_KEY);
-        this.centerPos = new BlockPos(centerPosComponents[0], centerPosComponents[1], centerPosComponents[2]);
-
-        if (compoundTag.contains(VARIANT_ID_KEY)) {
-            this.variant = AlienVariant.getById(compoundTag.getByte(VARIANT_ID_KEY)).unwrapOr(DEFAULT_VARIANT);
+        if (level == null) {
+            return false;
         }
+
+        var center = factionData.getCenterPos();
+
+        return level.getChunkSource().getChunkNow(center.getX() >> 4, center.getZ() >> 4) != null;
     }
 
-    @Override
-    public void save(CompoundTag compoundTag) {
-        leadershipManager.save(compoundTag);
-        membershipManager.save(compoundTag);
-        reserveManager.save(compoundTag);
-
-        compoundTag.putInt(AGE_IN_TICKS_KEY, ageInTicks);
-
-        var centerPosComponents = new int[] { centerPos.getX(), centerPos.getY(), centerPos.getZ() };
-        compoundTag.putIntArray(CENTER_POS_KEY, centerPosComponents);
-
-        compoundTag.putByte(VARIANT_ID_KEY, (byte) variant.getId());
+    public MinecraftServer getServer() {
+        return server;
     }
 
-    public int ageInTicks() {
-        return ageInTicks;
+    public ResourceLocation getFactionId() {
+        return factionId;
     }
 
-    public BlockPos centerPosition() {
-        return centerPos;
+    public FactionRelationships getRelationships() {
+        return relationships;
+    }
+
+    public HiveFactionData getFactionData() {
+        return factionData;
     }
 
     public HiveBossBarManager getBossBarManager() {
@@ -298,24 +274,16 @@ public class Hive implements NBTSerializable {
         return debugManager;
     }
 
-    public UUID id() {
-        return id;
-    }
-
     public HiveLeadershipManager getLeadershipManager() {
-        return leadershipManager;
+        return factionData.getLeadershipManager();
     }
 
-    public HiveMembershipManager getMembershipManager() {
-        return membershipManager;
+    public HiveReserveManager getReserveManager() {
+        return factionData.getReserveManager();
     }
 
     public RandomSource getRandom() {
         return randomSource;
-    }
-
-    public HiveReserveManager getReserveManager() {
-        return reserveManager;
     }
 
     public HiveSpaceManager getSpaceManager() {
@@ -327,14 +295,18 @@ public class Hive implements NBTSerializable {
     }
 
     public AlienVariant getVariant() {
-        return variant;
+        return factionData.getVariant();
     }
 
     public void setVariant(AlienVariant variant) {
-        this.variant = variant;
+        factionData.setVariant(variant);
     }
 
-    public Level level() {
-        return level;
+    public int ageInTicks() {
+        return factionData.getAgeInTicks();
+    }
+
+    public BlockPos centerPosition() {
+        return factionData.getCenterPos();
     }
 }

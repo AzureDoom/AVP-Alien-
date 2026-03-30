@@ -3,7 +3,7 @@ package com.alien.common.gameplay.entity.living.alien;
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
-import com.alien.common.gameplay.level.saveddata.HiveLevelData;
+import com.alien.common.gameplay.hive.HiveRegistry;
 import com.alien.common.gameplay.level.saveddata.StrainLeakData;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienDataSyncKeys;
@@ -225,31 +225,27 @@ public abstract class Alien extends Monster implements DataUser {
     ) {
         var alienVariantType = AlienVariantTypes.getFor(getVariant());
 
-        HiveLevelData.getOrCreate(level.getLevel())
-            .andThen(
-                hiveLevelData -> hiveLevelData.findNearestHive(
-                    blockPosition(),
-                    // Find the nearest hive for this alien type's variant type.
-                    hive -> Objects.equals(hive.getVariant(), alienVariantType.variant())
-                )
-            )
-            .ifSome(hive -> {
-                var joinedHiveSuccessfully = hiveManager.tryJoinHive(hive);
+        var nearestHive = HiveRegistry.INSTANCE.findNearestHive(
+            blockPosition(),
+            level.getLevel().dimension(),
+            hive -> Objects.equals(hive.getVariant(), alienVariantType.variant())
+        );
 
-                if (joinedHiveSuccessfully) {
-                    // Decrease the reserve count for this entity's type.
-                    hive.getReserveManager().add(getType(), -1);
+        if (nearestHive != null) {
+            var joinedHiveSuccessfully = hiveManager.tryJoinHive(nearestHive);
 
-                    // Apply genetics of hive leader to this alien.
-                    hive.getLeadershipManager()
-                        .getLeader()
-                        .map(GeneManagerProxy::getOrCreate)
-                        .ifSome(leaderGeneContainer -> {
-                            var selfGeneContainer = GeneManagerProxy.getOrCreate(this);
-                            leaderGeneContainer.transfer(selfGeneContainer, true);
-                        });
-                }
-            });
+            if (joinedHiveSuccessfully) {
+                nearestHive.getReserveManager().add(getType(), -1);
+
+                nearestHive.getLeadershipManager()
+                    .getLeader(level.getLevel().getServer())
+                    .map(GeneManagerProxy::getOrCreate)
+                    .ifSome(leaderGeneContainer -> {
+                        var selfGeneContainer = GeneManagerProxy.getOrCreate(this);
+                        leaderGeneContainer.transfer(selfGeneContainer, true);
+                    });
+            }
+        }
 
         return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
     }
@@ -449,46 +445,62 @@ public abstract class Alien extends Monster implements DataUser {
     }
 
     @Override
+    public void checkDespawn() {
+        var wasAlive = isAlive() && !isRemoved();
+
+        super.checkDespawn();
+
+        if (wasAlive && isRemoved()) {
+            onDespawned();
+        }
+    }
+
+    private void onDespawned() {
+        hiveManager.hive().ifSome(hive -> {
+            if (hive.getSpaceManager().isEntityWithinHive(this)) {
+                hive.getReserveManager().add(getType(), 1);
+            } else {
+                onStrainLeak();
+            }
+        });
+    }
+
+    private void onStrainLeak() {
+        StrainLeakData.getOrCreate(level())
+            .ifSome(strainLeakData -> {
+                var alienVariant = getVariant();
+                var wasAlienVariantAlreadyPresent = strainLeakData.hasVariant(alienVariant);
+                var alienVariantType = AlienVariantTypes.getFor(this);
+
+                if (!(level() instanceof ServerLevel serverLevel)) {
+                    return;
+                }
+
+                var strainBasedLeakMessage = getStrainLeakMessageForVariant(alienVariant);
+
+                if (strainBasedLeakMessage == null) {
+                    return;
+                }
+
+                strainLeakData.add(alienVariant, 1);
+
+                if (!wasAlienVariantAlreadyPresent) {
+                    for (var player : serverLevel.players()) {
+                        player.sendSystemMessage(
+                            Component.literal(strainBasedLeakMessage)
+                                .withStyle(alienVariantType.chatColor(), ChatFormatting.ITALIC)
+                        );
+                    }
+                }
+            });
+    }
+
+    @Override
     public void remove(@NotNull RemovalReason removalReason) {
         super.remove(removalReason);
 
         switch (removalReason) {
-            case KILLED -> hiveManager.hive().ifSome(hive -> hive.removeHiveMember(this));
-            case DISCARDED -> hiveManager.hive().ifSome(hive -> {
-                hive.removeHiveMember(this);
-
-                if (hive.getSpaceManager().isEntityWithinHive(this)) {
-                    hive.getReserveManager().add(getType(), 1);
-                } else {
-                    StrainLeakData.getOrCreate(level())
-                        .ifSome(strainLeakData -> {
-                            var alienVariant = getVariant();
-                            var wasAlienVariantAlreadyPresent = strainLeakData.hasVariant(alienVariant);
-                            var alienVariantType = AlienVariantTypes.getFor(this);
-
-                            if (!(level() instanceof ServerLevel serverLevel)) {
-                                return;
-                            }
-
-                            var strainBasedLeakMessage = getStrainLeakMessageForVariant(alienVariant);
-
-                            if (strainBasedLeakMessage == null) {
-                                return;
-                            }
-
-                            strainLeakData.add(alienVariant, 1);
-
-                            if (!wasAlienVariantAlreadyPresent) {
-                                for (var player : serverLevel.players()) {
-                                    player.sendSystemMessage(
-                                        Component.literal(strainBasedLeakMessage)
-                                            .withStyle(alienVariantType.chatColor(), ChatFormatting.ITALIC)
-                                    );
-                                }
-                            }
-                        });
-                }
-            });
+            case KILLED, DISCARDED -> hiveManager.hive().ifSome(hive -> hive.removeHiveMember(this));
             case UNLOADED_TO_CHUNK, UNLOADED_WITH_PLAYER, CHANGED_DIMENSION -> { /* NO-OP */ }
         }
     }

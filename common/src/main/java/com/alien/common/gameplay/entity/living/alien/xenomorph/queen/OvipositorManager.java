@@ -109,9 +109,8 @@ public class OvipositorManager implements NBTSerializable {
                 .isSomeAnd(
                     hive -> hive.isAlive()
                         && !hive.isAngry()
-                        && hive.getMembershipManager()
-                            .getMembersMatching(entityType -> entityType.is(AlienEntityTypeTags.XENOMORPHS))
-                            .size() > 2
+                        && hive.getFactionData()
+                            .getLoadedMemberCount(entityType -> entityType.is(AlienEntityTypeTags.XENOMORPHS)) > 2
                 )
             && canOvipositorFit();
     }

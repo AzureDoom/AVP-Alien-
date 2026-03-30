@@ -1,13 +1,14 @@
 package com.alien.common.gameplay.hive.ai.task.impl;
 
 import com.alien.common.gameplay.hive.Hive;
+import com.alien.common.gameplay.hive.HiveRegistry;
 import com.alien.common.gameplay.hive.HiveRemovalReason;
 import com.alien.common.gameplay.hive.ai.task.HiveTask;
 import com.alien.common.gameplay.hive.util.HiveLeaderDispositionUtil;
-import com.alien.common.gameplay.level.saveddata.HiveLevelData;
+import com.blib.api.common.faction.v1.FactionMember;
 
-import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 public class MergeWithNearbyHiveTask extends HiveTask {
 
@@ -24,33 +25,25 @@ public class MergeWithNearbyHiveTask extends HiveTask {
 
     @Override
     public void run() {
-        var nearestHive = HiveLevelData.getOrCreate(hive.level())
-            .andThen(
-                hiveLevelData -> hiveLevelData.findNearestHive(
-                    hive.centerPosition(),
-                    hive -> !Objects.equals(hive.id(), this.hive.id())
-                        && Objects.equals(hive.getVariant(), this.hive.getVariant())
-                )
-            )
-            .unwrapOr(null);
+        var dimension = hive.getFactionData().getDimension();
+
+        var nearestHive = HiveRegistry.INSTANCE.findNearestHive(
+            hive.centerPosition(),
+            dimension,
+            candidate -> !Objects.equals(candidate.getFactionId(), hive.getFactionId())
+                && Objects.equals(candidate.getVariant(), hive.getVariant())
+        );
 
         if (nearestHive == null) {
             return;
         }
 
-        var neighborHiveCenter = nearestHive.centerPosition();
-
-        // Hives must be within the leash layer or lower to consider merging.
-        if (!hive.getSpaceManager().isBlockPosLeashedToHive(neighborHiveCenter)) {
+        if (!hive.getSpaceManager().isBlockPosLeashedToHive(nearestHive.centerPosition())) {
             return;
         }
 
-        // At this point we know there is a same-variant hive within our leash layer. We now have two choices:
-        // - merge this hive into the neighbor hive
-        // - merge the neighbor hive into this hive
-        // To determine which is more appropriate, we assume that the more powerful hive should absorb the weaker hive.
         var strongerHive = getStrongerHive(hive, nearestHive);
-        var weakerHive = Objects.equals(strongerHive.id(), hive.id())
+        var weakerHive = Objects.equals(strongerHive.getFactionId(), hive.getFactionId())
             ? nearestHive
             : hive;
 
@@ -58,8 +51,8 @@ public class MergeWithNearbyHiveTask extends HiveTask {
     }
 
     private Hive getStrongerHive(Hive left, Hive right) {
-        var leftLeader = left.getLeadershipManager().getLeaderOrNull();
-        var rightLeader = right.getLeadershipManager().getLeaderOrNull();
+        var leftLeader = left.getLeadershipManager().getLeaderOrNull(hive.getServer());
+        var rightLeader = right.getLeadershipManager().getLeaderOrNull(hive.getServer());
 
         if (leftLeader != null && rightLeader != null) {
             var leftDisposition = HiveLeaderDispositionUtil.getDispositionForEntityType(leftLeader.getType());
@@ -72,8 +65,8 @@ public class MergeWithNearbyHiveTask extends HiveTask {
             }
         }
 
-        var leftMemberCount = left.getMembershipManager().getMemberCount();
-        var rightMemberCount = right.getMembershipManager().getMemberCount();
+        var leftMemberCount = left.getRelationships().getMembers().size();
+        var rightMemberCount = right.getRelationships().getMembers().size();
 
         if (leftMemberCount > rightMemberCount) {
             return left;
@@ -81,42 +74,23 @@ public class MergeWithNearbyHiveTask extends HiveTask {
             return right;
         }
 
-        var leftAgeInTicks = left.ageInTicks();
-        var rightAgeInTicks = right.ageInTicks();
-
-        if (leftAgeInTicks > rightAgeInTicks) {
-            return left;
-        } else if (leftAgeInTicks < rightAgeInTicks) {
-            return right;
-        }
-
-        return left;
+        return left.ageInTicks() >= right.ageInTicks() ? left : right;
     }
 
     private void mergeLeftHiveIntoRight(Hive left, Hive right) {
-        // Gather the members that we need to migrate over.
-        var leftMemberData = left.getMembershipManager()
-            .getMemberUUIDs()
-            .stream()
-            .flatMap(
-                uuid -> left.getMembershipManager()
-                    .getMemberData(uuid)
-                    .map(hiveMemberData -> Map.entry(uuid, hiveMemberData))
-                    .toStream()
-            )
-            .toList();
+        var leftMembers = Set.copyOf(left.getRelationships().getMembers());
+        var memberUuids = new java.util.HashSet<java.util.UUID>();
 
-        // Migrate the members from left hive to right hive.
-        leftMemberData.forEach(
-            entry -> right.getMembershipManager()
-                .addMember(entry.getKey(), entry.getValue())
-        );
+        for (var member : leftMembers) {
+            if (member instanceof FactionMember.Entity(var uuid)) {
+                left.getRelationships().removeEntity(uuid);
+                right.getRelationships().addEntity(uuid);
+                memberUuids.add(uuid);
+            }
+        }
 
-        // Clear members from left hive after we've moved them.
-        left.getMembershipManager().clearMembers();
-        // Clear the left hive's leader.
+        left.getFactionData().transferMemberTypes(right.getFactionData(), memberUuids);
         left.getLeadershipManager().setLeaderId(null);
-        // Finally remove the left hive.
         left.remove(HiveRemovalReason.DISCARDED);
     }
 }

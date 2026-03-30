@@ -2,11 +2,9 @@ package com.alien.common.gameplay.hive.ai.task.impl.balance;
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.hive.Hive;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 
-import java.util.Comparator;
-import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 
 public class BalanceAveragingHiveTask extends BalanceHiveTask {
@@ -44,41 +42,36 @@ public class BalanceAveragingHiveTask extends BalanceHiveTask {
             return;
         }
 
-        // Subtract from base unit count by adding a negative.
         reserveManager.add(baseUnitType, -desiredUnitCount);
-        // Add desired unit count to desired unit type.
         reserveManager.add(desiredUnitType, desiredUnitCount);
     }
 
     private void balanceLoadedUnits() {
-        var membersByType = hive.getMembershipManager().getMembersByEntityType();
+        var loadedByType = hive.getFactionData().getLoadedMembersByType();
         var baseEntityType = baseUnitTypeSupplier.get();
         var desiredEntityType = desiredUnitTypeSupplier.get();
-        var baseUnits = membersByType.getOrDefault(baseEntityType, List.of());
-        var baseUnitCount = baseUnits.size();
-        var desiredUnits = membersByType.getOrDefault(desiredEntityType, List.of());
+        var baseUuids = loadedByType.getOrDefault(baseEntityType, Set.of());
+        var baseUnitCount = baseUuids.size();
+        var desiredUuids = loadedByType.getOrDefault(desiredEntityType, Set.of());
 
-        var desiredUnitCount = computeDesiredUnitCount(baseUnitCount, desiredUnits.size());
+        var desiredUnitCount = computeDesiredUnitCount(baseUnitCount, desiredUuids.size());
 
         if (desiredUnitCount == 0) {
             return;
         }
 
-        var offset = Math.max(baseUnitCount - desiredUnitCount, 0);
+        var uuidsToGrow = baseUuids.stream()
+            .limit(desiredUnitCount)
+            .toList();
 
-        baseUnits.stream()
-            .sorted(Comparator.comparingInt(a -> a.getValue().lastSeenTimestampInTicks()))
-            .toList()
-            .subList(offset, baseUnitCount)
-            .forEach(entry -> {
-                var baseUnit = ((ServerLevel) hive.level()).getEntity(entry.getKey());
+        var loadedMembers = hive.getLoadedMembers();
 
-                if (!(baseUnit instanceof Xenomorph xenomorph)) {
-                    return;
-                }
-
-                growXenomorph(xenomorph);
-            });
+        for (var uuid : uuidsToGrow) {
+            loadedMembers.stream()
+                .filter(entity -> entity.getUUID().equals(uuid) && entity instanceof Xenomorph)
+                .findFirst()
+                .ifPresent(entity -> growXenomorph((Xenomorph) entity));
+        }
     }
 
     private int computeDesiredUnitCount(int baseUnitCount, int desiredUnitCount) {

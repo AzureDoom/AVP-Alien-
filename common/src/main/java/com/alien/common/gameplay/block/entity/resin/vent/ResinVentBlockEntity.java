@@ -2,8 +2,8 @@ package com.alien.common.gameplay.block.entity.resin.vent;
 
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.hive.Hive;
+import com.alien.common.gameplay.hive.HiveRegistry;
 import com.alien.common.gameplay.level.gameevent.listener.CryForHelpListener;
-import com.alien.common.gameplay.level.saveddata.HiveLevelData;
 import com.alien.common.registry.init.AlienBlockEntityTypes;
 import com.blib.api.common.time.v1.Cooldown;
 import net.minecraft.core.BlockPos;
@@ -78,16 +78,15 @@ public class ResinVentBlockEntity extends BlockEntity implements GameEventListen
 
             var ventAlienVariant = ventVariantTypeOption.unwrap().variant();
 
-            // Try and set a hive.
-            HiveLevelData.getOrCreate(level)
-                .andThen(
-                    hiveLevelData -> hiveLevelData.findNearestHive(
-                        ventPos,
-                        nearestHive -> Objects.equals(nearestHive.getVariant(), ventAlienVariant)
-                    )
-                )
-                .filter(nearestHive -> nearestHive.isAlive() && nearestHive.getSpaceManager().isBlockPosWithinHive(ventPos))
-                .ifSome(resinVentBlockEntity::setHive);
+            var nearestHive = HiveRegistry.INSTANCE.findNearestHive(
+                ventPos,
+                level.dimension(),
+                nearestCandidate -> Objects.equals(nearestCandidate.getVariant(), ventAlienVariant)
+            );
+
+            if (nearestHive != null && nearestHive.isAlive() && nearestHive.getSpaceManager().isBlockPosWithinHive(ventPos)) {
+                resinVentBlockEntity.setHive(nearestHive);
+            }
         }
     }
 

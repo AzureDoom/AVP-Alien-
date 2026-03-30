@@ -1,12 +1,13 @@
 package com.alien.common.gameplay.hive.membership;
 
 import com.alien.common.gameplay.entity.living.alien.Alien;
-import com.alien.common.gameplay.hive.Hive;
+import com.blib.api.common.faction.v1.FactionMember;
+import com.blib.api.common.faction.v1.FactionRelationships;
 import com.blib.api.common.nbt.v1.CompoundTagUtil;
 import com.blib.api.common.nbt.v1.model.NBTSerializable;
 import com.just.core.functional.option.Option;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,18 +18,16 @@ public class HiveLeadershipManager implements NBTSerializable {
 
     private static final String LEADER_ID_KEY = "HiveLeaderId";
 
-    private final Hive hive;
-
     private Option<UUID> leaderIdOption;
 
-    public HiveLeadershipManager(Hive hive) {
-        this.hive = hive;
+    public HiveLeadershipManager() {
         this.leaderIdOption = Option.none();
     }
 
-    public void tick() {
-        if (!hive.getMembershipManager().isMember(getLeaderIdOrNull())) {
-            // If the hive leader id is no longer present in the hive member data map, clear the leader.
+    public void tick(FactionRelationships relationships) {
+        var leaderId = getLeaderIdOrNull();
+
+        if (leaderId != null && !relationships.hasMember(FactionMember.entity(leaderId))) {
             setLeaderId(null);
         }
     }
@@ -52,19 +51,22 @@ public class HiveLeadershipManager implements NBTSerializable {
         return leaderIdOption.unwrapOr(null);
     }
 
-    public Option<Alien> getLeader() {
-        return Option.ofNullable(getLeaderOrNull());
+    public Option<Alien> getLeader(MinecraftServer server) {
+        return Option.ofNullable(getLeaderOrNull(server));
     }
 
-    public @Nullable Alien getLeaderOrNull() {
-        if (!(hive.level() instanceof ServerLevel serverLevel)) {
-            return null;
-        }
+    public @Nullable Alien getLeaderOrNull(MinecraftServer server) {
+        return leaderIdOption.map(leaderId -> {
+            for (var level : server.getAllLevels()) {
+                var entity = level.getEntity(leaderId);
 
-        return leaderIdOption.map(serverLevel::getEntity)
-            .filter(entity -> entity instanceof Alien)
-            .map(entity -> (Alien) entity)
-            .unwrapOr(null);
+                if (entity instanceof Alien alien) {
+                    return alien;
+                }
+            }
+
+            return null;
+        }).unwrapOr(null);
     }
 
     public void setLeaderId(@Nullable UUID id) {

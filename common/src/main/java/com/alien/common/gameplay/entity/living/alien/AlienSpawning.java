@@ -2,7 +2,7 @@ package com.alien.common.gameplay.entity.living.alien;
 
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.hive.Hive;
-import com.alien.common.gameplay.level.saveddata.HiveLevelData;
+import com.alien.common.gameplay.hive.HiveRegistry;
 import com.alien.common.model.alien.variant.AlienVariantType;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import net.minecraft.core.BlockPos;
@@ -62,25 +62,23 @@ public class AlienSpawning {
         BlockPos blockPos
     ) {
         var alienVariantTypeOption = AlienVariantTypes.getFor(entityType);
+        var level = serverLevelAccessor.getLevel();
 
-        return HiveLevelData.getOrCreate(serverLevelAccessor.getLevel())
-            .andThen(
-                hiveLevelData -> hiveLevelData.findNearestHive(
-                    blockPos,
-                    // Find the nearest hive for this alien type's variant type.
-                    hive -> alienVariantTypeOption.isSomeAnd(
-                        alienVariantType -> Objects.equals(hive.getVariant(), alienVariantType.variant())
-                    )
-                )
+        var nearestHive = HiveRegistry.INSTANCE.findNearestHive(
+            blockPos,
+            level.dimension(),
+            hive -> alienVariantTypeOption.isSomeAnd(
+                alienVariantType -> Objects.equals(hive.getVariant(), alienVariantType.variant())
             )
-            .isSomeAnd(nearestHive ->
-            // Aliens can not spawn in hives that are dead.
-            nearestHive.isAlive()
-                // AND spawn position must be within range of the hive.
-                && canEntityTypeSpawnWithinHiveLayer(nearestHive, entityType, blockPos)
-                && nearestHive.getReserveManager()
-                    .canSpawn(entityType)
-            );
+        );
+
+        if (nearestHive == null) {
+            return false;
+        }
+
+        return nearestHive.isAlive()
+            && canEntityTypeSpawnWithinHiveLayer(nearestHive, entityType, blockPos)
+            && nearestHive.getReserveManager().canSpawn(entityType);
     }
 
     private static boolean canEntityTypeSpawnWithinHiveLayer(

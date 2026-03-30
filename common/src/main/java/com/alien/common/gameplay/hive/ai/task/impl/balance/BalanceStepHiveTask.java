@@ -5,11 +5,9 @@ import com.alien.common.gameplay.hive.Hive;
 import com.alien.common.property.AlienProperties;
 import com.alien.common.property.AlienPropertyAccess;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 
-import java.util.Comparator;
-import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -39,62 +37,51 @@ public class BalanceStepHiveTask extends BalanceHiveTask {
 
     private void balanceReserveUnits() {
         var reserveManager = hive.getReserveManager();
-        var reserveXenomorphCount = reserveManager
-            .getCountMatching(XENOMORPH_PREDICATE);
-
+        var reserveXenomorphCount = reserveManager.getCountMatching(XENOMORPH_PREDICATE);
         var baseUnitType = baseUnitTypeSupplier.get();
         var desiredUnitType = desiredUnitTypeSupplier.get();
         var currentBaseUnitCount = reserveManager.getCount(baseUnitType);
-
         var currentDesiredUnitCount = reserveManager.getCount(desiredUnitType);
-        var desiredUnitCount = computeDesiredUnitCount(reserveXenomorphCount, currentDesiredUnitCount);
 
-        // We can't grow desired units more than the number of base units.
+        var desiredUnitCount = computeDesiredUnitCount(reserveXenomorphCount, currentDesiredUnitCount);
         desiredUnitCount = Math.min(currentBaseUnitCount, desiredUnitCount);
 
         if (desiredUnitCount == 0) {
             return;
         }
 
-        // Subtract from base unit count by adding a negative.
         reserveManager.add(baseUnitType, -desiredUnitCount);
-        // Add desired unit count to desired unit type.
         reserveManager.add(desiredUnitType, desiredUnitCount);
     }
 
     private void balanceLoadedUnits() {
-        var membersByType = hive.getMembershipManager().getMembersByEntityType();
-        var xenomorphHiveMemberCount = hive.getMembershipManager()
-            .getMembersMatching(XENOMORPH_PREDICATE)
-            .size();
+        var loadedByType = hive.getFactionData().getLoadedMembersByType();
+        var xenomorphCount = hive.getFactionData().getLoadedMemberCount(XENOMORPH_PREDICATE);
         var baseEntityType = baseUnitTypeSupplier.get();
         var desiredEntityType = desiredUnitTypeSupplier.get();
-        var baseUnits = membersByType.getOrDefault(baseEntityType, List.of());
-        var baseUnitCount = baseUnits.size();
-        var desiredUnits = membersByType.getOrDefault(desiredEntityType, List.of());
-        var currentDesiredUnitCount = desiredUnits.size();
+        var baseUuids = loadedByType.getOrDefault(baseEntityType, Set.of());
+        var baseUnitCount = baseUuids.size();
+        var desiredUuids = loadedByType.getOrDefault(desiredEntityType, Set.of());
+        var currentDesiredUnitCount = desiredUuids.size();
 
-        var desiredUnitCount = computeDesiredUnitCount(xenomorphHiveMemberCount, currentDesiredUnitCount);
+        var desiredUnitCount = computeDesiredUnitCount(xenomorphCount, currentDesiredUnitCount);
 
         if (desiredUnitCount == 0) {
             return;
         }
 
-        var offset = Math.max(baseUnitCount - desiredUnitCount, 0);
+        var uuidsToGrow = baseUuids.stream()
+            .limit(desiredUnitCount)
+            .toList();
 
-        baseUnits.stream()
-            .sorted(Comparator.comparingInt(a -> a.getValue().lastSeenTimestampInTicks()))
-            .toList()
-            .subList(offset, baseUnitCount)
-            .forEach(entry -> {
-                var baseUnit = ((ServerLevel) hive.level()).getEntity(entry.getKey());
+        var loadedMembers = hive.getLoadedMembers();
 
-                if (!(baseUnit instanceof Xenomorph xenomorph)) {
-                    return;
-                }
-
-                growXenomorph(xenomorph);
-            });
+        for (var uuid : uuidsToGrow) {
+            loadedMembers.stream()
+                .filter(entity -> entity.getUUID().equals(uuid) && entity instanceof Xenomorph)
+                .findFirst()
+                .ifPresent(entity -> growXenomorph((Xenomorph) entity));
+        }
     }
 
     private int computeDesiredUnitCount(int xenomorphHiveMemberCount, int desiredUnitCount) {

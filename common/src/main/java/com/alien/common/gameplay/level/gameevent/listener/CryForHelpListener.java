@@ -80,7 +80,7 @@ public class CryForHelpListener implements GameEventListener {
 
         var hive = resinVentBlockEntity.getHive();
 
-        if (hive == null || hive.getMembershipManager().getLoadedMembers().size() >= MAXIMUM_SUMMONED_XENOMORPHS_PER_HIVE) {
+        if (hive == null || hive.getLoadedMembers().size() >= MAXIMUM_SUMMONED_XENOMORPHS_PER_HIVE) {
             return false;
         }
 

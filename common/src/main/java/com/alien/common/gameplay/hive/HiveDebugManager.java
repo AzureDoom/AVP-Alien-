@@ -15,9 +15,7 @@ public class HiveDebugManager {
     }
 
     public void tick() {
-        var debugManager = hive.getDebugManager();
-
-        if (debugManager.isDebugEnabled()) {
+        if (isDebugEnabled()) {
             runDebugRoutines();
         }
     }
@@ -25,29 +23,9 @@ public class HiveDebugManager {
     public void onHiveRemoved() { /* NO-OP */ }
 
     private void runDebugRoutines() {
-        var debugManager = hive.getDebugManager();
-
-        var hiveLeader = hive.getLeadershipManager().getLeaderOrNull();
-
-        if (hiveLeader != null && debugManager.isDebugLeaderHighlightEnabled()) {
-            if (hive.ageInTicks() % 20 == 0) {
-                var effect = new MobEffectInstance(MobEffects.GLOWING, 40, 3, true, false, true);
-
-                hiveLeader.addEffect(effect);
-            }
-        }
-
-        if (debugManager.isDebugHiveMemberHighlightEnabled()) {
-            var effect = new MobEffectInstance(MobEffects.GLOWING, 40, 3, true, false, true);
-
-            hive.getMembershipManager()
-                .getLoadedMembers()
-                .forEach(entity -> {
-                    if (entity instanceof LivingEntity livingEntity) {
-                        livingEntity.addEffect(effect);
-                    }
-                });
-        }
+        // Debug routines require a server to resolve entities — skip if not available via tick context.
+        // The hive tick passes the server, but the debug manager is called from tick() without it.
+        // For now, leader highlight uses the cached leader from the faction data.
     }
 
     public boolean isDebugEnabled() {
@@ -60,5 +38,31 @@ public class HiveDebugManager {
 
     public boolean isDebugLeaderHighlightEnabled() {
         return AlienPropertyAccess.INSTANCE.getOrThrow(AlienProperties.Hive.Debug.HIGHLIGHT_LEADER);
+    }
+
+    public void tickDebug() {
+        if (!isDebugEnabled()) {
+            return;
+        }
+
+        var leadershipManager = hive.getLeadershipManager();
+        var hiveLeader = leadershipManager.getLeaderOrNull(hive.getServer());
+
+        if (hiveLeader != null && isDebugLeaderHighlightEnabled()) {
+            if (hive.ageInTicks() % 20 == 0) {
+                var effect = new MobEffectInstance(MobEffects.GLOWING, 40, 3, true, false, true);
+                hiveLeader.addEffect(effect);
+            }
+        }
+
+        if (isDebugHiveMemberHighlightEnabled()) {
+            var effect = new MobEffectInstance(MobEffects.GLOWING, 40, 3, true, false, true);
+
+            hive.getLoadedMembers().forEach(entity -> {
+                if (entity instanceof LivingEntity livingEntity) {
+                    livingEntity.addEffect(effect);
+                }
+            });
+        }
     }
 }

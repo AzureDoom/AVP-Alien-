@@ -1,7 +1,7 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.queen;
 
 import com.alien.common.data.AlienVariantTypes;
-import com.alien.common.gameplay.level.saveddata.HiveLevelData;
+import com.alien.common.gameplay.hive.HiveRegistry;
 import com.alien.common.gameplay.level.saveddata.QueenSpawnChunkData;
 import com.alien.common.gameplay.level.saveddata.StrainLeakData;
 import net.minecraft.core.BlockPos;
@@ -82,21 +82,27 @@ public class QueenSpawning {
             blockPos,
             randomSource
         )
-            && HiveLevelData.getOrCreate(serverLevelAccessor.getLevel())
-                .andThen(
-                    hiveLevelData -> hiveLevelData.findNearestHive(
-                        blockPos,
-                        // Find the nearest hive for this alien type's variant type.
-                        hive -> alienVariantTypeOption.isSomeAnd(
-                            alienVariantType -> Objects.equals(hive.getVariant(), alienVariantType.variant())
-                        )
-                    )
-                )
-                .match(
-                    // If there is hive, we need to make sure it's far enough away from where the queen wants to spawn.
-                    nearestHive -> !nearestHive.getSpaceManager().isBlockPosWithinHiveBuffer(blockPos),
-                    // No "nearest hive" present, so the queen is clear to spawn.
-                    () -> true
-                );
+            && isNotWithinExistingHiveBuffer(serverLevelAccessor, blockPos, alienVariantTypeOption);
+    }
+
+    private static boolean isNotWithinExistingHiveBuffer(
+        ServerLevelAccessor serverLevelAccessor,
+        BlockPos blockPos,
+        com.just.core.functional.option.Option<com.alien.common.model.alien.variant.AlienVariantType> alienVariantTypeOption
+    ) {
+        var level = serverLevelAccessor.getLevel();
+        var nearestHive = HiveRegistry.INSTANCE.findNearestHive(
+            blockPos,
+            level.dimension(),
+            hive -> alienVariantTypeOption.isSomeAnd(
+                alienVariantType -> Objects.equals(hive.getVariant(), alienVariantType.variant())
+            )
+        );
+
+        if (nearestHive == null) {
+            return true;
+        }
+
+        return !nearestHive.getSpaceManager().isBlockPosWithinHiveBuffer(blockPos);
     }
 }
