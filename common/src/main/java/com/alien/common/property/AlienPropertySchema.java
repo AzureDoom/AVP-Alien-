@@ -26,13 +26,6 @@ public class AlienPropertySchema {
         .addProperty(AlienProperties.Hive.MEMBERS_REQUIRED_FOR_PRAETORIAN, 8)
         .addComment("Determines if the screen should darken when the hive boss bar appears.")
         .addProperty(AlienProperties.Hive.DARKEN_SCREEN, true)
-        .addBlankLine()
-        .addComment("Enables hive debugging.")
-        .addProperty(AlienProperties.Hive.Debug.ENABLED, false)
-        .addComment("Requires hive debugging to be enabled.")
-        .addProperty(AlienProperties.Hive.Debug.HIGHLIGHT_LEADER, true)
-        .addComment("Requires hive debugging to be enabled.")
-        .addProperty(AlienProperties.Hive.Debug.HIGHLIGHT_ALL_MEMBERS, false)
         .build();
 
     private AlienPropertySchema() {

@@ -43,22 +43,5 @@ public class AlienProperties {
             HIVE.leaf("minimum_distance_between_natural_queen_spawns_in_chunks", BLibPropertySerializers.INT);
 
         public static final BLibPropertyKey.Leaf<Integer> RADIUS_IN_BLOCKS = HIVE.leaf("radius_in_blocks", BLibPropertySerializers.INT);
-
-        public static class Debug {
-
-            private static final BLibPropertyKey.Parent DEBUG = HIVE.child("debug");
-
-            public static final BLibPropertyKey.Leaf<Boolean> ENABLED = DEBUG.leaf("enabled", BLibPropertySerializers.BOOLEAN);
-
-            public static final BLibPropertyKey.Leaf<Boolean> HIGHLIGHT_ALL_MEMBERS = DEBUG.leaf(
-                "highlight_all_members",
-                BLibPropertySerializers.BOOLEAN
-            );
-
-            public static final BLibPropertyKey.Leaf<Boolean> HIGHLIGHT_LEADER = DEBUG.leaf(
-                "highlight_leader",
-                BLibPropertySerializers.BOOLEAN
-            );
-        }
     }
 }

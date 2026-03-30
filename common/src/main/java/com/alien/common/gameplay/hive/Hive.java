@@ -48,8 +48,6 @@ public class Hive {
 
     private final HiveBossBarManager bossBarManager;
 
-    private final HiveDebugManager debugManager;
-
     private final HiveSpaceManager spaceManager;
 
     private final HiveVentManager ventManager;
@@ -69,7 +67,6 @@ public class Hive {
         this.factionData = factionData;
         this.server = server;
         this.bossBarManager = new HiveBossBarManager(this);
-        this.debugManager = new HiveDebugManager(this);
         this.randomSource = RandomSource.create();
         this.spaceManager = new HiveSpaceManager(this);
         this.ventManager = new HiveVentManager();
@@ -118,7 +115,6 @@ public class Hive {
         var reserveManager = factionData.getReserveManager();
 
         bossBarManager.tick();
-        debugManager.tickDebug();
         leadershipManager.tick(relationships);
         reserveManager.tick(
             factionData.getAgeInTicks(),
@@ -198,7 +194,6 @@ public class Hive {
 
     public void onRemove() {
         bossBarManager.onHiveRemoved();
-        debugManager.onHiveRemoved();
 
         var level = server.getLevel(factionData.getDimension());
 
@@ -268,10 +263,6 @@ public class Hive {
 
     public HiveBossBarManager getBossBarManager() {
         return bossBarManager;
-    }
-
-    public HiveDebugManager getDebugManager() {
-        return debugManager;
     }
 
     public HiveLeadershipManager getLeadershipManager() {
