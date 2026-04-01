@@ -19,6 +19,8 @@ public class AlienEntityTypeTags {
 
     public static final TagKey<EntityType<?>> CHESTBURSTERS = create("chestbursters");
 
+    public static final TagKey<EntityType<?>> CARRIERS = create("carriers");
+
     public static final TagKey<EntityType<?>> CHRYSALISES = create("chrysalises");
 
     public static final TagKey<EntityType<?>> CRUSHERS = create("crushers");
@@ -26,6 +28,8 @@ public class AlienEntityTypeTags {
     public static final TagKey<EntityType<?>> DRONES = create("drones");
 
     public static final TagKey<EntityType<?>> FACEHUGGERS = create("facehuggers");
+
+    public static final TagKey<EntityType<?>> HARBINGERS = create("harbingers");
 
     public static final TagKey<EntityType<?>> HATED_BY_XENOMORPHS = create("hated_by_xenomorphs");
 
@@ -55,6 +59,10 @@ public class AlienEntityTypeTags {
 
     public static final TagKey<EntityType<?>> QUEENS = create("queens");
 
+    public static final TagKey<EntityType<?>> RAVAGERS = create("ravagers");
+
+    public static final TagKey<EntityType<?>> RAZOR_CLAWS = create("razor_claws");
+
     public static final TagKey<EntityType<?>> ROYAL_ALIENS = create("royal_aliens");
 
     public static final TagKey<EntityType<?>> ROYAL_XENOMORPHS = create("royal_xenomorphs");
@@ -62,6 +70,8 @@ public class AlienEntityTypeTags {
     public static final TagKey<EntityType<?>> RUNNER_HOSTS = create("runner_hosts");
 
     public static final TagKey<EntityType<?>> RUNNERS = create("runners");
+
+    public static final TagKey<EntityType<?>> SCOURGE_ALIENS = create("scourge_aliens");
 
     public static final TagKey<EntityType<?>> SPAWNS_IN_HIVE_DRONE_LAYER = create("spawns_in_hive_drone_layer");
 

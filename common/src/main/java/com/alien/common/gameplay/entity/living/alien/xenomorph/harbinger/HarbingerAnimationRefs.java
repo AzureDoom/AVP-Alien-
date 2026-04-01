@@ -1,0 +1,10 @@
+package com.alien.common.gameplay.entity.living.alien.xenomorph.harbinger;
+
+public class HarbingerAnimationRefs {
+
+    public static final String ATTACKCLAW_RIGHTARM_ANIMATION_NAME = "attackclaw.rightarm";
+
+    public static final String ATTACKBITE_HEAD_ANIMATION_NAME = "attackbite.head";
+
+    public static final String ATTACKTAIL_TAIL_ANIMATION_NAME = "attacktail.tail";
+}

@@ -10,13 +10,17 @@ import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.Facehug
 import com.alien.common.gameplay.entity.living.alien.predalien_adolescent.PredalienAdolescent;
 import com.alien.common.gameplay.entity.living.alien.predalien_chestburster.PredalienChestburster;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.boiler.Boiler;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.Carrier;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.chrysalis.Chrysalis;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.Crusher;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.harbinger.Harbinger;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.praetorian.Praetorian;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.predalien.Predalien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.prowler.Prowler;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ravager.Ravager;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.razor_claw.RazorClaw;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.spitter.Spitter;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.warrior.Warrior;
@@ -53,6 +57,12 @@ public class AlienEntityTypes {
             .sized(0.35f, 0.35f)
     );
 
+    public static final BLibHolder<EntityType<Carrier>> ABERRANT_CARRIER = create(
+        "aberrant_carrier",
+        EntityType.Builder.of(Carrier::new, MobCategory.MONSTER)
+            .sized(0.98f, 3.98f)
+    );
+
     public static final BLibHolder<EntityType<Chrysalis>> ABERRANT_CHRYSALIS = create(
         "aberrant_chrysalis",
         EntityType.Builder.of(Chrysalis::new, MobCategory.MONSTER)
@@ -75,6 +85,12 @@ public class AlienEntityTypes {
         "aberrant_facehugger",
         EntityType.Builder.of(Facehugger::new, MobCategory.MONSTER)
             .sized(0.8f, 0.25f)
+    );
+
+    public static final BLibHolder<EntityType<Harbinger>> ABERRANT_HARBINGER = create(
+        "aberrant_harbinger",
+        EntityType.Builder.of(Harbinger::new, MobCategory.MONSTER)
+            .sized(0.98f, 3.98f)
     );
 
     public static final BLibHolder<EntityType<Ovomorph>> ABERRANT_OVOMORPH = create(
@@ -111,6 +127,18 @@ public class AlienEntityTypes {
         "aberrant_prowler",
         EntityType.Builder.of(Prowler::new, MobCategory.MONSTER)
             .sized(0.8f, 0.98f)
+    );
+
+    public static final BLibHolder<EntityType<RazorClaw>> ABERRANT_RAZOR_CLAW = create(
+        "aberrant_razor_claw",
+        EntityType.Builder.of(RazorClaw::new, MobCategory.MONSTER)
+            .sized(0.98f, 3.98f)
+    );
+
+    public static final BLibHolder<EntityType<Ravager>> ABERRANT_RAVAGER = create(
+        "aberrant_ravager",
+        EntityType.Builder.of(Ravager::new, MobCategory.MONSTER)
+            .sized(0.98f, 3.98f)
     );
 
     public static final BLibHolder<EntityType<Queen>> ABERRANT_QUEEN = create(
@@ -161,6 +189,12 @@ public class AlienEntityTypes {
             .sized(0.35f, 0.35f)
     );
 
+    public static final BLibHolder<EntityType<Carrier>> CARRIER = create(
+        "carrier",
+        EntityType.Builder.of(Carrier::new, MobCategory.MONSTER)
+            .sized(0.98f, 3.98f)
+    );
+
     public static final BLibHolder<EntityType<Chrysalis>> CHRYSALIS = create(
         "chrysalis",
         EntityType.Builder.of(Chrysalis::new, MobCategory.MONSTER)
@@ -179,10 +213,22 @@ public class AlienEntityTypes {
             .sized(0.8f, 1.98f)
     );
 
+    public static final BLibHolder<EntityType<Harbinger>> HARBINGER = create(
+        "harbinger",
+        EntityType.Builder.of(Harbinger::new, MobCategory.MONSTER)
+            .sized(0.98f, 3.98f)
+    );
+
     public static final BLibHolder<EntityType<Facehugger>> FACEHUGGER = create(
         "facehugger",
         EntityType.Builder.of(Facehugger::new, MobCategory.MONSTER)
             .sized(0.8f, 0.25f)
+    );
+
+    public static final BLibHolder<EntityType<Carrier>> IRRADIATED_CARRIER = create(
+        "irradiated_carrier",
+        EntityType.Builder.of(Carrier::new, MobCategory.MONSTER)
+            .sized(0.98f, 3.98f)
     );
 
     public static final BLibHolder<EntityType<Chrysalis>> IRRADIATED_CHRYSALIS = create(
@@ -221,6 +267,24 @@ public class AlienEntityTypes {
             .sized(0.8f, 0.98f)
     );
 
+    public static final BLibHolder<EntityType<Harbinger>> IRRADIATED_HARBINGER = create(
+        "irradiated_harbinger",
+        EntityType.Builder.of(Harbinger::new, MobCategory.MONSTER)
+            .sized(0.98f, 3.98f)
+    );
+
+    public static final BLibHolder<EntityType<RazorClaw>> IRRADIATED_RAZOR_CLAW = create(
+        "irradiated_razor_claw",
+        EntityType.Builder.of(RazorClaw::new, MobCategory.MONSTER)
+            .sized(0.98f, 3.98f)
+    );
+
+    public static final BLibHolder<EntityType<Ravager>> IRRADIATED_RAVAGER = create(
+        "irradiated_ravager",
+        EntityType.Builder.of(Ravager::new, MobCategory.MONSTER)
+            .sized(0.98f, 3.98f)
+    );
+
     public static final BLibHolder<EntityType<Queen>> IRRADIATED_QUEEN = create(
         "irradiated_queen",
         EntityType.Builder.of(Queen::new, MobCategory.MONSTER)
@@ -257,6 +321,12 @@ public class AlienEntityTypes {
             .sized(0.35f, 0.35f)
     );
 
+    public static final BLibHolder<EntityType<Carrier>> NETHER_CARRIER = create(
+        "nether_carrier",
+        EntityType.Builder.of(Carrier::new, MobCategory.MONSTER)
+            .sized(0.98f, 3.98f)
+    );
+
     public static final BLibHolder<EntityType<Chrysalis>> NETHER_CHRYSALIS = create(
         "nether_chrysalis",
         EntityType.Builder.of(Chrysalis::new, MobCategory.MONSTER)
@@ -279,6 +349,12 @@ public class AlienEntityTypes {
         "nether_facehugger",
         EntityType.Builder.of(Facehugger::new, MobCategory.MONSTER)
             .sized(0.8f, 0.25f)
+    );
+
+    public static final BLibHolder<EntityType<Harbinger>> NETHER_HARBINGER = create(
+        "nether_harbinger",
+        EntityType.Builder.of(Harbinger::new, MobCategory.MONSTER)
+            .sized(0.98f, 3.98f)
     );
 
     public static final BLibHolder<EntityType<Ovomorph>> NETHER_OVOMORPH = create(
@@ -315,6 +391,18 @@ public class AlienEntityTypes {
         "nether_prowler",
         EntityType.Builder.of(Prowler::new, MobCategory.MONSTER)
             .sized(0.8f, 0.98f)
+    );
+
+    public static final BLibHolder<EntityType<RazorClaw>> NETHER_RAZOR_CLAW = create(
+        "nether_razor_claw",
+        EntityType.Builder.of(RazorClaw::new, MobCategory.MONSTER)
+            .sized(0.98f, 3.98f)
+    );
+
+    public static final BLibHolder<EntityType<Ravager>> NETHER_RAVAGER = create(
+        "nether_ravager",
+        EntityType.Builder.of(Ravager::new, MobCategory.MONSTER)
+            .sized(0.98f, 3.98f)
     );
 
     public static final BLibHolder<EntityType<Queen>> NETHER_QUEEN = create(
@@ -381,6 +469,18 @@ public class AlienEntityTypes {
         "prowler",
         EntityType.Builder.of(Prowler::new, MobCategory.MONSTER)
             .sized(0.8f, 0.98f)
+    );
+
+    public static final BLibHolder<EntityType<RazorClaw>> RAZOR_CLAW = create(
+        "razor_claw",
+        EntityType.Builder.of(RazorClaw::new, MobCategory.MONSTER)
+            .sized(0.98f, 3.98f)
+    );
+
+    public static final BLibHolder<EntityType<Ravager>> RAVAGER = create(
+        "ravager",
+        EntityType.Builder.of(Ravager::new, MobCategory.MONSTER)
+            .sized(0.98f, 3.98f)
     );
 
     public static final BLibHolder<EntityType<Queen>> QUEEN = create(
@@ -491,10 +591,12 @@ public class AlienEntityTypes {
         ATTRIBUTE_REGISTRY.register(ABERRANT_ADOLESCENT, Adolescent::createAdolescentAttributes);
         ATTRIBUTE_REGISTRY.register(ABERRANT_BOILER, Boiler::createBoilerAttributes);
         ATTRIBUTE_REGISTRY.register(ABERRANT_CHESTBURSTER, Chestburster::createChestbursterAttributes);
+        ATTRIBUTE_REGISTRY.register(ABERRANT_CARRIER, Carrier::createCarrierAttributes);
         ATTRIBUTE_REGISTRY.register(ABERRANT_CHRYSALIS, Chrysalis::createChrysalisAttributes);
         ATTRIBUTE_REGISTRY.register(ABERRANT_CRUSHER, Crusher::createCrusherAttributes);
         ATTRIBUTE_REGISTRY.register(ABERRANT_DRONE, Drone::createDroneAttributes);
         ATTRIBUTE_REGISTRY.register(ABERRANT_FACEHUGGER, Facehugger::createFacehuggerAttributes);
+        ATTRIBUTE_REGISTRY.register(ABERRANT_HARBINGER, Harbinger::createHarbingerAttributes);
         ATTRIBUTE_REGISTRY.register(ABERRANT_OVOMORPH, Ovomorph::createOvomorphAttributes);
         ATTRIBUTE_REGISTRY.register(ABERRANT_PRAETORIAN, Praetorian::createPraetorianAttributes);
         ATTRIBUTE_REGISTRY.register(ABERRANT_PREDALIEN, Predalien::createPredalienAttributes);
@@ -507,33 +609,43 @@ public class AlienEntityTypes {
             PredalienChestburster::createPredalienChestbursterAttributes
         );
         ATTRIBUTE_REGISTRY.register(ABERRANT_PROWLER, Prowler::createProwlerAttributes);
+        ATTRIBUTE_REGISTRY.register(ABERRANT_RAZOR_CLAW, RazorClaw::createRazorClawAttributes);
+        ATTRIBUTE_REGISTRY.register(ABERRANT_RAVAGER, Ravager::createRavagerAttributes);
         ATTRIBUTE_REGISTRY.register(ABERRANT_QUEEN, Queen::createQueenAttributes);
         ATTRIBUTE_REGISTRY.register(ABERRANT_RUNNER, Runner::createRunnerAttributes);
         ATTRIBUTE_REGISTRY.register(ABERRANT_SPITTER, Spitter::createSpitterAttributes);
         ATTRIBUTE_REGISTRY.register(ABERRANT_WARRIOR, Warrior::createWarriorAttributes);
         ATTRIBUTE_REGISTRY.register(CHESTBURSTER, Chestburster::createChestbursterAttributes);
+        ATTRIBUTE_REGISTRY.register(CARRIER, Carrier::createCarrierAttributes);
         ATTRIBUTE_REGISTRY.register(CHRYSALIS, Chrysalis::createChrysalisAttributes);
         ATTRIBUTE_REGISTRY.register(ADOLESCENT, Adolescent::createAdolescentAttributes);
         ATTRIBUTE_REGISTRY.register(BOILER, Boiler::createBoilerAttributes);
         ATTRIBUTE_REGISTRY.register(CRUSHER, Crusher::createCrusherAttributes);
         ATTRIBUTE_REGISTRY.register(DRONE, Drone::createDroneAttributes);
+        ATTRIBUTE_REGISTRY.register(HARBINGER, Harbinger::createHarbingerAttributes);
         ATTRIBUTE_REGISTRY.register(FACEHUGGER, Facehugger::createFacehuggerAttributes);
+        ATTRIBUTE_REGISTRY.register(IRRADIATED_CARRIER, Carrier::createCarrierAttributes);
         ATTRIBUTE_REGISTRY.register(IRRADIATED_CHRYSALIS, Chrysalis::createChrysalisAttributes);
         ATTRIBUTE_REGISTRY.register(IRRADIATED_CRUSHER, Crusher::createCrusherAttributes);
         ATTRIBUTE_REGISTRY.register(IRRADIATED_DRONE, Drone::createDroneAttributes);
         ATTRIBUTE_REGISTRY.register(IRRADIATED_PRAETORIAN, Praetorian::createPraetorianAttributes);
         ATTRIBUTE_REGISTRY.register(IRRADIATED_PREDALIEN, Predalien::createPredalienAttributes);
         ATTRIBUTE_REGISTRY.register(IRRADIATED_PROWLER, Prowler::createProwlerAttributes);
+        ATTRIBUTE_REGISTRY.register(IRRADIATED_HARBINGER, Harbinger::createHarbingerAttributes);
+        ATTRIBUTE_REGISTRY.register(IRRADIATED_RAZOR_CLAW, RazorClaw::createRazorClawAttributes);
+        ATTRIBUTE_REGISTRY.register(IRRADIATED_RAVAGER, Ravager::createRavagerAttributes);
         ATTRIBUTE_REGISTRY.register(IRRADIATED_QUEEN, Queen::createQueenAttributes);
         ATTRIBUTE_REGISTRY.register(IRRADIATED_RUNNER, Runner::createRunnerAttributes);
         ATTRIBUTE_REGISTRY.register(IRRADIATED_WARRIOR, Warrior::createWarriorAttributes);
         ATTRIBUTE_REGISTRY.register(NETHER_ADOLESCENT, Adolescent::createAdolescentAttributes);
         ATTRIBUTE_REGISTRY.register(NETHER_BOILER, Boiler::createBoilerAttributes);
         ATTRIBUTE_REGISTRY.register(NETHER_CHESTBURSTER, Chestburster::createChestbursterAttributes);
+        ATTRIBUTE_REGISTRY.register(NETHER_CARRIER, Carrier::createCarrierAttributes);
         ATTRIBUTE_REGISTRY.register(NETHER_CHRYSALIS, Chrysalis::createChrysalisAttributes);
         ATTRIBUTE_REGISTRY.register(NETHER_CRUSHER, Crusher::createCrusherAttributes);
         ATTRIBUTE_REGISTRY.register(NETHER_DRONE, Drone::createDroneAttributes);
         ATTRIBUTE_REGISTRY.register(NETHER_FACEHUGGER, Facehugger::createFacehuggerAttributes);
+        ATTRIBUTE_REGISTRY.register(NETHER_HARBINGER, Harbinger::createHarbingerAttributes);
         ATTRIBUTE_REGISTRY.register(NETHER_OVOMORPH, Ovomorph::createOvomorphAttributes);
         ATTRIBUTE_REGISTRY.register(NETHER_PRAETORIAN, Praetorian::createPraetorianAttributes);
         ATTRIBUTE_REGISTRY.register(NETHER_PREDALIEN, Predalien::createPredalienAttributes);
@@ -546,6 +658,8 @@ public class AlienEntityTypes {
             PredalienChestburster::createPredalienChestbursterAttributes
         );
         ATTRIBUTE_REGISTRY.register(NETHER_PROWLER, Prowler::createProwlerAttributes);
+        ATTRIBUTE_REGISTRY.register(NETHER_RAZOR_CLAW, RazorClaw::createRazorClawAttributes);
+        ATTRIBUTE_REGISTRY.register(NETHER_RAVAGER, Ravager::createRavagerAttributes);
         ATTRIBUTE_REGISTRY.register(NETHER_QUEEN, Queen::createQueenAttributes);
         ATTRIBUTE_REGISTRY.register(NETHER_RUNNER, Runner::createRunnerAttributes);
         ATTRIBUTE_REGISTRY.register(NETHER_SPITTER, Spitter::createSpitterAttributes);
@@ -560,6 +674,8 @@ public class AlienEntityTypes {
             PredalienChestburster::createPredalienChestbursterAttributes
         );
         ATTRIBUTE_REGISTRY.register(PROWLER, Prowler::createProwlerAttributes);
+        ATTRIBUTE_REGISTRY.register(RAZOR_CLAW, RazorClaw::createRazorClawAttributes);
+        ATTRIBUTE_REGISTRY.register(RAVAGER, Ravager::createRavagerAttributes);
         ATTRIBUTE_REGISTRY.register(QUEEN, Queen::createQueenAttributes);
         ATTRIBUTE_REGISTRY.register(ROYAL_ABERRANT_ADOLESCENT, Adolescent::createAdolescentAttributes);
         ATTRIBUTE_REGISTRY.register(ROYAL_ABERRANT_CHESTBURSTER, Chestburster::createChestbursterAttributes);
