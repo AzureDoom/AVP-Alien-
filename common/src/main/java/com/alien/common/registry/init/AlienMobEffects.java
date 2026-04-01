@@ -1,0 +1,30 @@
+package com.alien.common.registry.init;
+
+import com.alien.Alien;
+import com.alien.common.gameplay.effect.ScourgeStatusEffect;
+import com.blib.api.common.registry.v1.BLibHolder;
+import com.blib.api.common.registry.v1.BLibRegistry;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.effect.MobEffect;
+
+import java.util.function.Supplier;
+
+public class AlienMobEffects {
+
+    private static final BLibRegistry<MobEffect> REGISTRY = Alien.MOD.registries().create(BuiltInRegistries.MOB_EFFECT);
+
+    private static final BLibHolder<MobEffect> SCOURGE = create("scourge", ScourgeStatusEffect::new);
+
+    public static Holder<MobEffect> getScourgeHolder() {
+        return SCOURGE.getBackingHolder();
+    }
+
+    private static <T extends MobEffect> BLibHolder<T> create(String name, Supplier<T> supplier) {
+        return REGISTRY.createHolder(name, supplier);
+    }
+
+    public static void initialize() {
+        REGISTRY.registerAll();
+    }
+}

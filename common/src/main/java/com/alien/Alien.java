@@ -17,6 +17,7 @@ import com.alien.common.registry.init.AlienEntitySpawns;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienFactionDataTypes;
 import com.alien.common.registry.init.AlienGameEvents;
+import com.alien.common.registry.init.AlienMobEffects;
 import com.alien.common.registry.init.AlienParticleTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.init.block.AberrantAlienChitinBlocks;
@@ -97,6 +98,7 @@ public class Alien {
         AlienCreativeModeTabs.initialize();
 
         AlienGameEvents.initialize();
+        AlienMobEffects.initialize();
         AlienParticleTypes.initialize();
 
         // Functionality

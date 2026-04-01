@@ -1,6 +1,7 @@
 package com.alien.fabric.data.lang.en_us;
 
 import com.alien.common.gameplay.hive.HiveBossBarManager;
+import com.alien.common.registry.init.AlienMobEffects;
 import com.alien.fabric.data.lang.en_us.provider.EnUsAdvancementProvider;
 import com.alien.fabric.data.lang.en_us.provider.EnUsBiomeTagProvider;
 import com.alien.fabric.data.lang.en_us.provider.EnUsBlockProvider;
@@ -38,6 +39,9 @@ public class EnglishLanguageProvider extends FabricLanguageProvider {
         builder.add("death.attack.acid", "%1$s vaporized in acid");
         builder.add("death.attack.chestbursting", "%1$s gave birth");
         builder.add("death.attack.smothering", "%1$s was smothered to death");
+
+        // Effects
+        builder.add(AlienMobEffects.getScourgeHolder().value(), "Scourge");
 
         // Entities
         EnUsEntityProvider.CONSUMER.accept(builder);

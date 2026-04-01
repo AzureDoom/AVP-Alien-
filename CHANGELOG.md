@@ -15,6 +15,7 @@
 ## ✨ What's New
 - Added raw scourge jelly item.
 - Added scourge jelly block.
+- Added scourge mob effect.
 - Added a new set of xenomorphs... the SCOURGE xenomorphs:
   - Added chrysalis.
     - Can roll around in a ball to cross distances quickly.
