@@ -16,6 +16,7 @@ public class EnUsEntityProvider {
         addEntity(builder, AlienEntityTypes.ABERRANT_ADOLESCENT, "Aberrant Adolescent");
         addEntity(builder, AlienEntityTypes.ABERRANT_BOILER, "Aberrant Boiler");
         addEntity(builder, AlienEntityTypes.ABERRANT_CHESTBURSTER, "Aberrant Chestburster");
+        addEntity(builder, AlienEntityTypes.ABERRANT_CHRYSALIS, "Aberrant Chrysalis");
         addEntity(builder, AlienEntityTypes.ABERRANT_CRUSHER, "Aberrant Crusher");
         addEntity(builder, AlienEntityTypes.ABERRANT_DRONE, "Aberrant Drone");
         addEntity(builder, AlienEntityTypes.ABERRANT_FACEHUGGER, "Aberrant Facehugger");
@@ -33,9 +34,11 @@ public class EnUsEntityProvider {
         addEntity(builder, AlienEntityTypes.ADOLESCENT, "Adolescent");
         addEntity(builder, AlienEntityTypes.BOILER, "Boiler");
         addEntity(builder, AlienEntityTypes.CHESTBURSTER, "Chestburster");
+        addEntity(builder, AlienEntityTypes.CHRYSALIS, "Chrysalis");
         addEntity(builder, AlienEntityTypes.CRUSHER, "Crusher");
         addEntity(builder, AlienEntityTypes.DRONE, "Drone");
         addEntity(builder, AlienEntityTypes.FACEHUGGER, "Facehugger");
+        addEntity(builder, AlienEntityTypes.IRRADIATED_CHRYSALIS, "Irradiated Chrysalis");
         addEntity(builder, AlienEntityTypes.IRRADIATED_CRUSHER, "Irradiated Crusher");
         addEntity(builder, AlienEntityTypes.IRRADIATED_DRONE, "Irradiated Drone");
         addEntity(builder, AlienEntityTypes.IRRADIATED_PRAETORIAN, "Irradiated Praetorian");
@@ -47,6 +50,7 @@ public class EnUsEntityProvider {
         addEntity(builder, AlienEntityTypes.NETHER_ADOLESCENT, "Nether Adolescent");
         addEntity(builder, AlienEntityTypes.NETHER_BOILER, "Nether Boiler");
         addEntity(builder, AlienEntityTypes.NETHER_CHESTBURSTER, "Nether Chestburster");
+        addEntity(builder, AlienEntityTypes.NETHER_CHRYSALIS, "Nether Chrysalis");
         addEntity(builder, AlienEntityTypes.NETHER_CRUSHER, "Nether Crusher");
         addEntity(builder, AlienEntityTypes.NETHER_DRONE, "Nether Drone");
         addEntity(builder, AlienEntityTypes.NETHER_FACEHUGGER, "Nether Facehugger");

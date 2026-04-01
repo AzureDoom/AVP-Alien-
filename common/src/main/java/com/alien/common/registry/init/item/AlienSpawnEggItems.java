@@ -28,6 +28,11 @@ public class AlienSpawnEggItems {
         AlienEntityTypes.ABERRANT_CHESTBURSTER
     );
 
+    public static final BLibHolder<SpawnEggItem> ABERRANT_CHRYSALIS_SPAWN_EGG = create(
+        "aberrant_chrysalis",
+        AlienEntityTypes.ABERRANT_CHRYSALIS
+    );
+
     public static final BLibHolder<SpawnEggItem> ABERRANT_CRUSHER_SPAWN_EGG = create("aberrant_crusher", AlienEntityTypes.ABERRANT_CRUSHER);
 
     public static final BLibHolder<SpawnEggItem> ABERRANT_DRONE_SPAWN_EGG = create("aberrant_drone", AlienEntityTypes.ABERRANT_DRONE);
@@ -78,11 +83,18 @@ public class AlienSpawnEggItems {
 
     public static final BLibHolder<SpawnEggItem> CHESTBURSTER_SPAWN_EGG = create("chestburster", AlienEntityTypes.CHESTBURSTER);
 
+    public static final BLibHolder<SpawnEggItem> CHRYSALIS_SPAWN_EGG = create("chrysalis", AlienEntityTypes.CHRYSALIS);
+
     public static final BLibHolder<SpawnEggItem> CRUSHER_SPAWN_EGG = create("crusher", AlienEntityTypes.CRUSHER);
 
     public static final BLibHolder<SpawnEggItem> DRONE_SPAWN_EGG = create("drone", AlienEntityTypes.DRONE);
 
     public static final BLibHolder<SpawnEggItem> FACEHUGGER_SPAWN_EGG = create("facehugger", AlienEntityTypes.FACEHUGGER);
+
+    public static final BLibHolder<SpawnEggItem> IRRADIATED_CHRYSALIS_SPAWN_EGG = create(
+        "irradiated_chrysalis",
+        AlienEntityTypes.IRRADIATED_CHRYSALIS
+    );
 
     public static final BLibHolder<SpawnEggItem> IRRADIATED_CRUSHER_SPAWN_EGG = create(
         "irradiated_crusher",
@@ -128,6 +140,11 @@ public class AlienSpawnEggItems {
     public static final BLibHolder<SpawnEggItem> NETHER_CHESTBURSTER_SPAWN_EGG = create(
         "nether_chestburster",
         AlienEntityTypes.NETHER_CHESTBURSTER
+    );
+
+    public static final BLibHolder<SpawnEggItem> NETHER_CHRYSALIS_SPAWN_EGG = create(
+        "nether_chrysalis",
+        AlienEntityTypes.NETHER_CHRYSALIS
     );
 
     public static final BLibHolder<SpawnEggItem> NETHER_CRUSHER_SPAWN_EGG = create("nether_crusher", AlienEntityTypes.NETHER_CRUSHER);

@@ -16,6 +16,7 @@ import com.alien.client.render.entity.AcidRenderer;
 import com.alien.client.render.entity.AdolescentRenderer;
 import com.alien.client.render.entity.BoilerRenderer;
 import com.alien.client.render.entity.ChestbursterRenderer;
+import com.alien.client.render.entity.ChrysalisRenderer;
 import com.alien.client.render.entity.CrusherRenderer;
 import com.alien.client.render.entity.DroneRenderer;
 import com.alien.client.render.entity.OvipositorRenderer;
@@ -205,6 +206,7 @@ public class AlienClient {
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_ADOLESCENT, AdolescentRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_BOILER, BoilerRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_CHESTBURSTER, ChestbursterRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_CHRYSALIS, ChrysalisRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_CRUSHER, CrusherRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_DRONE, DroneRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_FACEHUGGER, FacehuggerRenderer::new);
@@ -230,9 +232,11 @@ public class AlienClient {
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ADOLESCENT, AdolescentRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.BOILER, BoilerRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.CHESTBURSTER, ChestbursterRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.CHRYSALIS, ChrysalisRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.CRUSHER, CrusherRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.DRONE, DroneRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.FACEHUGGER, FacehuggerRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_CHRYSALIS, ChrysalisRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_CRUSHER, CrusherRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_DRONE, DroneRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_PRAETORIAN, PraetorianRenderer::new);
@@ -244,6 +248,7 @@ public class AlienClient {
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_ADOLESCENT, AdolescentRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_BOILER, BoilerRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_CHESTBURSTER, ChestbursterRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_CHRYSALIS, ChrysalisRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_CRUSHER, CrusherRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_DRONE, DroneRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_FACEHUGGER, FacehuggerRenderer::new);

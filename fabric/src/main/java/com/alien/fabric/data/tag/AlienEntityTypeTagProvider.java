@@ -29,6 +29,7 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
         addAnswersXenomorphCriesForHelp();
         addPredalienChestbursters();
         addChestbursters();
+        addChrysalises();
         addCrushers();
         addDrones();
         addFacehuggers();
@@ -64,6 +65,7 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
                 AlienEntityTypes.ABERRANT_ADOLESCENT.get(),
                 AlienEntityTypes.ABERRANT_BOILER.get(),
                 AlienEntityTypes.ABERRANT_CHESTBURSTER.get(),
+                AlienEntityTypes.ABERRANT_CHRYSALIS.get(),
                 AlienEntityTypes.ABERRANT_CRUSHER.get(),
                 AlienEntityTypes.ABERRANT_DRONE.get(),
                 AlienEntityTypes.ABERRANT_FACEHUGGER.get(),
@@ -130,6 +132,16 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
                 AlienEntityTypes.ROYAL_ABERRANT_CHESTBURSTER.get(),
                 AlienEntityTypes.ROYAL_CHESTBURSTER.get(),
                 AlienEntityTypes.ROYAL_NETHER_CHESTBURSTER.get()
+            );
+    }
+
+    private void addChrysalises() {
+        getOrCreateTagBuilder(AlienEntityTypeTags.CHRYSALISES)
+            .add(
+                AlienEntityTypes.ABERRANT_CHRYSALIS.get(),
+                AlienEntityTypes.CHRYSALIS.get(),
+                AlienEntityTypes.IRRADIATED_CHRYSALIS.get(),
+                AlienEntityTypes.NETHER_CHRYSALIS.get()
             );
     }
 
@@ -219,6 +231,7 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
     private void addIrradiatedAliens() {
         getOrCreateTagBuilder(AlienEntityTypeTags.IRRADIATED_ALIENS)
             .add(
+                AlienEntityTypes.IRRADIATED_CHRYSALIS.get(),
                 AlienEntityTypes.IRRADIATED_CRUSHER.get(),
                 AlienEntityTypes.IRRADIATED_DRONE.get(),
                 AlienEntityTypes.IRRADIATED_PRAETORIAN.get(),
@@ -236,6 +249,7 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
                 AlienEntityTypes.NETHER_ADOLESCENT.get(),
                 AlienEntityTypes.NETHER_BOILER.get(),
                 AlienEntityTypes.NETHER_CHESTBURSTER.get(),
+                AlienEntityTypes.NETHER_CHRYSALIS.get(),
                 AlienEntityTypes.NETHER_CRUSHER.get(),
                 AlienEntityTypes.NETHER_DRONE.get(),
                 AlienEntityTypes.NETHER_FACEHUGGER.get(),
@@ -262,6 +276,7 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
                 AlienEntityTypes.ADOLESCENT.get(),
                 AlienEntityTypes.BOILER.get(),
                 AlienEntityTypes.CHESTBURSTER.get(),
+                AlienEntityTypes.CHRYSALIS.get(),
                 AlienEntityTypes.CRUSHER.get(),
                 AlienEntityTypes.DRONE.get(),
                 AlienEntityTypes.FACEHUGGER.get(),
@@ -438,6 +453,7 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
 
     private void addXenomorphs() {
         getOrCreateTagBuilder(AlienEntityTypeTags.XENOMORPHS)
+            .addTag(AlienEntityTypeTags.CHRYSALISES)
             .addTag(AlienEntityTypeTags.CRUSHERS)
             .addTag(AlienEntityTypeTags.DRONES)
             .addTag(AlienEntityTypeTags.PRAETORIANS)

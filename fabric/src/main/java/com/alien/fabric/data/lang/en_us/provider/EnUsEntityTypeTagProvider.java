@@ -12,6 +12,7 @@ public class EnUsEntityTypeTagProvider {
         builder.add(AlienEntityTypeTags.ACID_IMMUNE, "Acid Immune");
         builder.add(AlienEntityTypeTags.ALIENS, "Aliens");
         builder.add(AlienEntityTypeTags.CHESTBURSTERS, "Chestbursters");
+        builder.add(AlienEntityTypeTags.CHRYSALISES, "Chrysalises");
         builder.add(AlienEntityTypeTags.DRONES, "Drones");
         builder.add(AlienEntityTypeTags.FACEHUGGERS, "Facehuggers");
         builder.add(AlienEntityTypeTags.HATED_BY_XENOMORPHS, "Hated By Xenomorphs");
