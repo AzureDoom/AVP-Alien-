@@ -13,6 +13,7 @@
   - Removed hive debugging code. The debugging code was outdated with the rewrite and has therefore been removed, including its properties in the alien properties file.
 
 ## ✨ What's New
+- Added raw scourge jelly item.
 - Added a new set of xenomorphs... the SCOURGE xenomorphs:
   - Added chrysalis.
     - Can roll around in a ball to cross distances quickly.

@@ -76,6 +76,8 @@ public class AlienItems {
 
     public static final BLibHolder<Item> RAW_ROYAL_JELLY = create("raw_royal_jelly", RoyalJellyItem::new);
 
+    public static final BLibHolder<Item> RAW_SCOURGE_JELLY = create("raw_scourge_jelly");
+
     public static final BLibHolder<Item> RESIN_BALL = create("resin_ball");
 
     public static final BLibHolder<Item> ROYALTY_POTTERY_SHERD = create("royalty_pottery_sherd");

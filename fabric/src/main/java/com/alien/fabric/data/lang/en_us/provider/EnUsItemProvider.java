@@ -61,6 +61,7 @@ public class EnUsItemProvider {
         addItem(builder, AlienItems.PLATED_CHITIN, "Plated Chitin");
         addItem(builder, AlienItems.PLATED_NETHER_CHITIN, "Plated Nether Chitin");
         addItem(builder, AlienItems.RAW_ROYAL_JELLY, "Raw Royal Jelly");
+        addItem(builder, AlienItems.RAW_SCOURGE_JELLY, "Raw Scourge Jelly");
         addItem(builder, AlienItems.POISON_JELLY, "Poison Jelly");
         addItem(builder, AlienItems.RESIN_BALL, "Resin Ball");
         addItem(builder, AlienItems.VECTOR_POTTERY_SHERD, "Vector Pottery Sherd");

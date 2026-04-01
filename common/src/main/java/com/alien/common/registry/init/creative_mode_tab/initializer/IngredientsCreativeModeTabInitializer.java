@@ -19,6 +19,7 @@ public class IngredientsCreativeModeTabInitializer {
         }
 
         CreativeModeTabUtil.accept(output, AlienItems.RAW_ROYAL_JELLY);
+        CreativeModeTabUtil.accept(output, AlienItems.RAW_SCOURGE_JELLY);
         CreativeModeTabUtil.accept(output, AlienItems.POISON_JELLY);
 
         // Decorative materials

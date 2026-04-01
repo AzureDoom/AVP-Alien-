@@ -19,7 +19,7 @@ public class HarbingerLootTable {
                 LootPool.lootPool()
                     .setRolls(ConstantValue.exactly(1))
                     .add(
-                        LootItem.lootTableItem(AlienItems.RAW_ROYAL_JELLY.get())
+                        LootItem.lootTableItem(AlienItems.RAW_SCOURGE_JELLY.get())
                             .apply(SetItemCountFunction.setCount(UniformGenerator.between(0, 1)))
                             .apply(EnchantedCountIncreaseFunction.lootingMultiplier(provider, UniformGenerator.between(0, 1)))
                     )
