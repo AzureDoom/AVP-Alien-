@@ -26,6 +26,7 @@ public class BlocksCreativeModeTabInitializer {
         }
 
         CreativeModeTabUtil.accept(output, AlienBlocks.ROYAL_JELLY_BLOCK);
+        CreativeModeTabUtil.accept(output, AlienBlocks.SCOURGE_JELLY_BLOCK);
     };
 
     private static void addBaseXenomorphBlocks(CreativeModeTab.Output output) {

@@ -16,6 +16,8 @@ public class AlienBlocks {
 
     public static final BLibHolder<Block> ROYAL_JELLY_BLOCK = create("royal_jelly_block", AlienBlockProperties.JELLY);
 
+    public static final BLibHolder<Block> SCOURGE_JELLY_BLOCK = create("scourge_jelly_block", AlienBlockProperties.JELLY);
+
     private static BLibHolder<Block> create(String path, BlockPropertyBuilder blockPropertyBuilder) {
         return create(path, () -> new Block(blockPropertyBuilder.build()));
     }

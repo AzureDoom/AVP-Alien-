@@ -170,6 +170,7 @@ public class AlienClient {
         MOD.registries().registerBlockRenderLayer(IrradiatedAlienResinBlocks.IRRADIATED_RESIN_WEB, RenderType.cutout());
 
         MOD.registries().registerBlockRenderLayer(AlienBlocks.ROYAL_JELLY_BLOCK, RenderType.translucent());
+        MOD.registries().registerBlockRenderLayer(AlienBlocks.SCOURGE_JELLY_BLOCK, RenderType.translucent());
     }
 
     private static void registerEntityHeadData() {
