@@ -41,6 +41,7 @@ public class EnglishLanguageProvider extends FabricLanguageProvider {
         builder.add("death.attack.smothering", "%1$s was smothered to death");
 
         // Effects
+        builder.add(AlienMobEffects.getMetamorphosisHolder().value(), "Metamorphosis");
         builder.add(AlienMobEffects.getScourgeHolder().value(), "Scourge");
 
         // Entities
