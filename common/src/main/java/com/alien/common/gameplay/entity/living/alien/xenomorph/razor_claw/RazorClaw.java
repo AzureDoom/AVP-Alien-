@@ -5,15 +5,22 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienEntityTypes;
+import com.alien.common.registry.init.AlienMobEffects;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class RazorClaw extends Xenomorph {
+
+    private static final int BLOOD_LOSS_DURATION_IN_TICKS = 20 * 15;
 
     public static AttributeSupplier.Builder createRazorClawAttributes() {
         return Alien.createAlienAttributes()
@@ -46,6 +53,23 @@ public class RazorClaw extends Xenomorph {
     @Override
     protected float getHealthRegenPerSecond() {
         return 0.5F;
+    }
+
+    @Override
+    public boolean doHurtTarget(@NotNull Entity entity) {
+        var result = super.doHurtTarget(entity);
+
+        if (result && entity instanceof LivingEntity livingEntity) {
+            livingEntity.addEffect(
+                new MobEffectInstance(
+                    AlienMobEffects.getBloodLossHolder(),
+                    BLOOD_LOSS_DURATION_IN_TICKS,
+                    0
+                )
+            );
+        }
+
+        return result;
     }
 
     @Override
