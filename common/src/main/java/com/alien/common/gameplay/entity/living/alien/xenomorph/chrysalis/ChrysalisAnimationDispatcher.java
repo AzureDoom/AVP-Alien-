@@ -64,7 +64,11 @@ public class ChrysalisAnimationDispatcher {
             AzAlienAnimationUtil.HEAD_TRACK_NAME,
             ChrysalisAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
-            0F, speed, 0F, 0F, false
+            0F,
+            speed,
+            0F,
+            0F,
+            false
         ).dispatchForEntity(chrysalis);
     }
 
@@ -77,7 +81,11 @@ public class ChrysalisAnimationDispatcher {
             AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
             ChrysalisAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
-            0F, speed, 0F, 0F, false
+            0F,
+            speed,
+            0F,
+            0F,
+            false
         ).dispatchForEntity(chrysalis);
     }
 
@@ -90,7 +98,11 @@ public class ChrysalisAnimationDispatcher {
             AzAlienAnimationUtil.TAIL_TRACK_NAME,
             ChrysalisAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
-            0F, speed, 0F, 0F, false
+            0F,
+            speed,
+            0F,
+            0F,
+            false
         ).dispatchForEntity(chrysalis);
     }
 }

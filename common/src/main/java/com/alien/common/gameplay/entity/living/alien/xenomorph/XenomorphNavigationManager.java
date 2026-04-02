@@ -57,7 +57,13 @@ public class XenomorphNavigationManager {
 
         // Water navigation.
         xenomorph.setPathfindingMalus(PathType.WATER, 0.0F);
-        this.waterAttackGoal = new AnimationDrivenAttackGoal(xenomorph, waterSpeedModifier, false, DEFAULT_DAMAGE_POINT_PERCENT, attackRange);
+        this.waterAttackGoal = new AnimationDrivenAttackGoal(
+            xenomorph,
+            waterSpeedModifier,
+            false,
+            DEFAULT_DAMAGE_POINT_PERCENT,
+            attackRange
+        );
         this.waterMoveControl = new WaterMoveControl(xenomorph);
         this.waterNavigation = new WaterBoundPathNavigation(xenomorph, xenomorph.level());
     }

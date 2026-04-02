@@ -64,7 +64,11 @@ public class PraetorianAnimationDispatcher {
             AzAlienAnimationUtil.HEAD_TRACK_NAME,
             PraetorianAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
-            0F, speed, 0F, 0F, false
+            0F,
+            speed,
+            0F,
+            0F,
+            false
         ).dispatchForEntity(praetorian);
     }
 
@@ -77,7 +81,11 @@ public class PraetorianAnimationDispatcher {
             AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
             PraetorianAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
-            0F, speed, 0F, 0F, false
+            0F,
+            speed,
+            0F,
+            0F,
+            false
         ).dispatchForEntity(praetorian);
     }
 
@@ -90,7 +98,11 @@ public class PraetorianAnimationDispatcher {
             AzAlienAnimationUtil.TAIL_TRACK_NAME,
             PraetorianAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
-            0F, speed, 0F, 0F, false
+            0F,
+            speed,
+            0F,
+            0F,
+            false
         ).dispatchForEntity(praetorian);
     }
 }

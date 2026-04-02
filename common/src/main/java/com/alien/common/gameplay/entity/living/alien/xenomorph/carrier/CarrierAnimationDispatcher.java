@@ -64,7 +64,11 @@ public class CarrierAnimationDispatcher {
             AzAlienAnimationUtil.HEAD_TRACK_NAME,
             CarrierAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
-            0F, speed, 0F, 0F, false
+            0F,
+            speed,
+            0F,
+            0F,
+            false
         ).dispatchForEntity(carrier);
     }
 
@@ -77,7 +81,11 @@ public class CarrierAnimationDispatcher {
             AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
             CarrierAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
-            0F, speed, 0F, 0F, false
+            0F,
+            speed,
+            0F,
+            0F,
+            false
         ).dispatchForEntity(carrier);
     }
 
@@ -90,7 +98,11 @@ public class CarrierAnimationDispatcher {
             AzAlienAnimationUtil.TAIL_TRACK_NAME,
             CarrierAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
-            0F, speed, 0F, 0F, false
+            0F,
+            speed,
+            0F,
+            0F,
+            false
         ).dispatchForEntity(carrier);
     }
 }

@@ -90,7 +90,11 @@ public class DroneAnimationDispatcher {
             AzAlienAnimationUtil.HEAD_TRACK_NAME,
             DroneAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
-            0F, speed, 0F, 0F, false
+            0F,
+            speed,
+            0F,
+            0F,
+            false
         ).dispatchForEntity(drone);
     }
 
@@ -103,7 +107,11 @@ public class DroneAnimationDispatcher {
             AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
             DroneAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
-            0F, speed, 0F, 0F, false
+            0F,
+            speed,
+            0F,
+            0F,
+            false
         ).dispatchForEntity(drone);
     }
 
@@ -116,7 +124,11 @@ public class DroneAnimationDispatcher {
             AzAlienAnimationUtil.TAIL_TRACK_NAME,
             DroneAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
-            0F, speed, 0F, 0F, false
+            0F,
+            speed,
+            0F,
+            0F,
+            false
         ).dispatchForEntity(drone);
     }
 }

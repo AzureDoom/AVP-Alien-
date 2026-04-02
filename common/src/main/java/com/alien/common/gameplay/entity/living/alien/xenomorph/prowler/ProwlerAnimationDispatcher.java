@@ -90,7 +90,11 @@ public class ProwlerAnimationDispatcher {
             AzAlienAnimationUtil.HEAD_TRACK_NAME,
             ProwlerAnimationRefs.BITEATTACK_HEAD_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
-            0F, speed, 0F, 0F, false
+            0F,
+            speed,
+            0F,
+            0F,
+            false
         ).dispatchForEntity(prowler);
     }
 
@@ -103,7 +107,11 @@ public class ProwlerAnimationDispatcher {
             AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
             ProwlerAnimationRefs.CLAWATTACKQUAD_RIGHTARM_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
-            0F, speed, 0F, 0F, false
+            0F,
+            speed,
+            0F,
+            0F,
+            false
         ).dispatchForEntity(prowler);
     }
 
@@ -116,7 +124,11 @@ public class ProwlerAnimationDispatcher {
             AzAlienAnimationUtil.TAIL_TRACK_NAME,
             ProwlerAnimationRefs.TAILATTACKQUAD_TAIL_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
-            0F, speed, 0F, 0F, false
+            0F,
+            speed,
+            0F,
+            0F,
+            false
         ).dispatchForEntity(prowler);
     }
 }

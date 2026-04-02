@@ -64,7 +64,11 @@ public class HarbingerAnimationDispatcher {
             AzAlienAnimationUtil.HEAD_TRACK_NAME,
             HarbingerAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
-            0F, speed, 0F, 0F, false
+            0F,
+            speed,
+            0F,
+            0F,
+            false
         ).dispatchForEntity(harbinger);
     }
 
@@ -77,7 +81,11 @@ public class HarbingerAnimationDispatcher {
             AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
             HarbingerAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
-            0F, speed, 0F, 0F, false
+            0F,
+            speed,
+            0F,
+            0F,
+            false
         ).dispatchForEntity(harbinger);
     }
 
@@ -90,7 +98,11 @@ public class HarbingerAnimationDispatcher {
             AzAlienAnimationUtil.TAIL_TRACK_NAME,
             HarbingerAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
-            0F, speed, 0F, 0F, false
+            0F,
+            speed,
+            0F,
+            0F,
+            false
         ).dispatchForEntity(harbinger);
     }
 }

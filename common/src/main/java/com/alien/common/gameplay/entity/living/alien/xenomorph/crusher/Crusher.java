@@ -2,7 +2,6 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.crusher;
 
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.CrusherAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphNavigationManager;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.model.resin.ResinData;

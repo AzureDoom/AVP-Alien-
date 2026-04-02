@@ -90,7 +90,11 @@ public class RunnerAnimationDispatcher {
             AzAlienAnimationUtil.HEAD_TRACK_NAME,
             RunnerAnimationRefs.BITEATTACK_HEAD_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
-            0F, speed, 0F, 0F, false
+            0F,
+            speed,
+            0F,
+            0F,
+            false
         ).dispatchForEntity(runner);
     }
 
@@ -103,7 +107,11 @@ public class RunnerAnimationDispatcher {
             AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
             RunnerAnimationRefs.ATTACKCLAWQUAD_RIGHTARM_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
-            0F, speed, 0F, 0F, false
+            0F,
+            speed,
+            0F,
+            0F,
+            false
         ).dispatchForEntity(runner);
     }
 
@@ -116,7 +124,11 @@ public class RunnerAnimationDispatcher {
             AzAlienAnimationUtil.TAIL_TRACK_NAME,
             RunnerAnimationRefs.TAILATTACKQUAD_TAIL_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
-            0F, speed, 0F, 0F, false
+            0F,
+            speed,
+            0F,
+            0F,
+            false
         ).dispatchForEntity(runner);
     }
 }

@@ -71,12 +71,18 @@ public class QueenAnimationDispatcher {
     public void backhandAttack(float speed) {
         AzCommand.compose(
             AzAlienAnimationUtil.XENO_QUEEN_LIMB_NAMES.stream()
-                .map(limbName -> AzCommand.create(
-                    limbName,
-                    "backhand." + limbName,
-                    AzPlayBehaviors.PLAY_ONCE,
-                    0F, speed, 0F, 0F, false
-                ))
+                .map(
+                    limbName -> AzCommand.create(
+                        limbName,
+                        "backhand." + limbName,
+                        AzPlayBehaviors.PLAY_ONCE,
+                        0F,
+                        speed,
+                        0F,
+                        0F,
+                        false
+                    )
+                )
                 .toList()
         ).dispatchForEntity(queen);
     }
@@ -88,12 +94,18 @@ public class QueenAnimationDispatcher {
     public void swipeDownAttack(float speed) {
         AzCommand.compose(
             AzAlienAnimationUtil.XENO_QUEEN_LIMB_NAMES.stream()
-                .map(limbName -> AzCommand.create(
-                    limbName,
-                    "swipedown." + limbName,
-                    AzPlayBehaviors.PLAY_ONCE,
-                    0F, speed, 0F, 0F, false
-                ))
+                .map(
+                    limbName -> AzCommand.create(
+                        limbName,
+                        "swipedown." + limbName,
+                        AzPlayBehaviors.PLAY_ONCE,
+                        0F,
+                        speed,
+                        0F,
+                        0F,
+                        false
+                    )
+                )
                 .toList()
         ).dispatchForEntity(queen);
     }
@@ -105,12 +117,18 @@ public class QueenAnimationDispatcher {
     public void tailStrikeAttack(float speed) {
         AzCommand.compose(
             AzAlienAnimationUtil.XENO_QUEEN_LIMB_NAMES.stream()
-                .map(limbName -> AzCommand.create(
-                    limbName,
-                    "tailstrike." + limbName,
-                    AzPlayBehaviors.PLAY_ONCE,
-                    0F, speed, 0F, 0F, false
-                ))
+                .map(
+                    limbName -> AzCommand.create(
+                        limbName,
+                        "tailstrike." + limbName,
+                        AzPlayBehaviors.PLAY_ONCE,
+                        0F,
+                        speed,
+                        0F,
+                        0F,
+                        false
+                    )
+                )
                 .toList()
         ).dispatchForEntity(queen);
     }

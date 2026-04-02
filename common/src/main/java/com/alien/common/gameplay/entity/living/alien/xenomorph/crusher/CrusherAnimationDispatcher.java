@@ -72,7 +72,11 @@ public class CrusherAnimationDispatcher {
             AzAlienAnimationUtil.HEAD_TRACK_NAME,
             CrusherAnimationRefs.BITEATTACK_HEAD_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
-            0F, speed, 0F, 0F, false
+            0F,
+            speed,
+            0F,
+            0F,
+            false
         ).dispatchForEntity(crusher);
     }
 
@@ -101,7 +105,11 @@ public class CrusherAnimationDispatcher {
             AzAlienAnimationUtil.TAIL_TRACK_NAME,
             CrusherAnimationRefs.TAILATTACK_TAIL_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
-            0F, speed, 0F, 0F, false
+            0F,
+            speed,
+            0F,
+            0F,
+            false
         ).dispatchForEntity(crusher);
     }
 
