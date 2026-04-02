@@ -19,6 +19,7 @@ import com.alien.common.registry.init.AlienFactionDataTypes;
 import com.alien.common.registry.init.AlienGameEvents;
 import com.alien.common.registry.init.AlienMobEffects;
 import com.alien.common.registry.init.AlienParticleTypes;
+import com.alien.common.registry.init.AlienPotions;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.init.block.AberrantAlienChitinBlocks;
 import com.alien.common.registry.init.block.AberrantAlienResinBlocks;
@@ -100,6 +101,9 @@ public class Alien {
         AlienGameEvents.initialize();
         AlienMobEffects.initialize();
         AlienParticleTypes.initialize();
+
+        // Depends on mob effects and items.
+        AlienPotions.initialize();
 
         // Functionality
         AlienDecoratedPotPatterns.initialize();
