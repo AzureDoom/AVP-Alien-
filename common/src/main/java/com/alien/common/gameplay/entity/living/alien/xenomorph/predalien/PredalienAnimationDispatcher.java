@@ -40,30 +40,30 @@ public class PredalienAnimationDispatcher {
     }
 
     public void idle() {
-        IDLE_ALL.dispatch(predalien);
+        IDLE_ALL.dispatchForEntity(predalien);
     }
 
     public void run() {
-        RUN_ALL.dispatch(predalien);
+        RUN_ALL.dispatchForEntity(predalien);
     }
 
     public void swim() {
-        SWIM_ALL.dispatch(predalien);
+        SWIM_ALL.dispatchForEntity(predalien);
     }
 
     public void walk() {
-        WALK_ALL.dispatch(predalien);
+        WALK_ALL.dispatchForEntity(predalien);
     }
 
     public void biteAttack() {
-        BITEATTACK_HEAD.dispatch(predalien);
+        BITEATTACK_HEAD.dispatchForEntity(predalien);
     }
 
     public void rightClawAttack() {
-        ARMATTACK_RIGHTARM.dispatch(predalien);
+        ARMATTACK_RIGHTARM.dispatchForEntity(predalien);
     }
 
     public void tailAttack() {
-        TAILATTACKQUAD_TAIL.dispatch(predalien);
+        TAILATTACKQUAD_TAIL.dispatchForEntity(predalien);
     }
 }

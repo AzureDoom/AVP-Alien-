@@ -40,30 +40,30 @@ public class RazorClawAnimationDispatcher {
     }
 
     public void idle() {
-        IDLE_ALL.dispatch(razorClaw);
+        IDLE_ALL.dispatchForEntity(razorClaw);
     }
 
     public void run() {
-        RUN_ALL.dispatch(razorClaw);
+        RUN_ALL.dispatchForEntity(razorClaw);
     }
 
     public void swim() {
-        SWIM_ALL.dispatch(razorClaw);
+        SWIM_ALL.dispatchForEntity(razorClaw);
     }
 
     public void walk() {
-        WALK_ALL.dispatch(razorClaw);
+        WALK_ALL.dispatchForEntity(razorClaw);
     }
 
     public void biteAttack() {
-        BITEATTACK_HEAD.dispatch(razorClaw);
+        BITEATTACK_HEAD.dispatchForEntity(razorClaw);
     }
 
     public void rightClawAttack() {
-        ARMATTACK_RIGHTARM.dispatch(razorClaw);
+        ARMATTACK_RIGHTARM.dispatchForEntity(razorClaw);
     }
 
     public void tailAttack() {
-        TAILATTACKQUAD_TAIL.dispatch(razorClaw);
+        TAILATTACKQUAD_TAIL.dispatchForEntity(razorClaw);
     }
 }

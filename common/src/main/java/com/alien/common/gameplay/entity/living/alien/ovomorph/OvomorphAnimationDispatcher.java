@@ -30,14 +30,14 @@ public class OvomorphAnimationDispatcher {
     }
 
     public void closeHold() {
-        CLOSE_HOLD.dispatch(ovomorph);
+        CLOSE_HOLD.dispatchForEntity(ovomorph);
     }
 
     public void open() {
-        OPEN.dispatch(ovomorph);
+        OPEN.dispatchForEntity(ovomorph);
     }
 
     public void openHold() {
-        OPEN_HOLD.dispatch(ovomorph);
+        OPEN_HOLD.dispatchForEntity(ovomorph);
     }
 }

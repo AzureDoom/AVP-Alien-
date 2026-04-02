@@ -40,30 +40,30 @@ public class CarrierAnimationDispatcher {
     }
 
     public void idle() {
-        IDLE_ALL.dispatch(carrier);
+        IDLE_ALL.dispatchForEntity(carrier);
     }
 
     public void run() {
-        RUN_ALL.dispatch(carrier);
+        RUN_ALL.dispatchForEntity(carrier);
     }
 
     public void swim() {
-        SWIM_ALL.dispatch(carrier);
+        SWIM_ALL.dispatchForEntity(carrier);
     }
 
     public void walk() {
-        WALK_ALL.dispatch(carrier);
+        WALK_ALL.dispatchForEntity(carrier);
     }
 
     public void biteAttack() {
-        BITEATTACK_HEAD.dispatch(carrier);
+        BITEATTACK_HEAD.dispatchForEntity(carrier);
     }
 
     public void rightClawAttack() {
-        ARMATTACK_RIGHTARM.dispatch(carrier);
+        ARMATTACK_RIGHTARM.dispatchForEntity(carrier);
     }
 
     public void tailAttack() {
-        TAILATTACKQUAD_TAIL.dispatch(carrier);
+        TAILATTACKQUAD_TAIL.dispatchForEntity(carrier);
     }
 }

@@ -40,30 +40,30 @@ public class ChrysalisAnimationDispatcher {
     }
 
     public void idle() {
-        IDLE_ALL.dispatch(chrysalis);
+        IDLE_ALL.dispatchForEntity(chrysalis);
     }
 
     public void run() {
-        RUN_ALL.dispatch(chrysalis);
+        RUN_ALL.dispatchForEntity(chrysalis);
     }
 
     public void swim() {
-        SWIM_ALL.dispatch(chrysalis);
+        SWIM_ALL.dispatchForEntity(chrysalis);
     }
 
     public void walk() {
-        WALK_ALL.dispatch(chrysalis);
+        WALK_ALL.dispatchForEntity(chrysalis);
     }
 
     public void biteAttack() {
-        BITEATTACK_HEAD.dispatch(chrysalis);
+        BITEATTACK_HEAD.dispatchForEntity(chrysalis);
     }
 
     public void rightClawAttack() {
-        ARMATTACK_RIGHTARM.dispatch(chrysalis);
+        ARMATTACK_RIGHTARM.dispatchForEntity(chrysalis);
     }
 
     public void tailAttack() {
-        TAILATTACKQUAD_TAIL.dispatch(chrysalis);
+        TAILATTACKQUAD_TAIL.dispatchForEntity(chrysalis);
     }
 }

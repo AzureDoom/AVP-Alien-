@@ -40,30 +40,30 @@ public class RavagerAnimationDispatcher {
     }
 
     public void idle() {
-        IDLE_ALL.dispatch(ravager);
+        IDLE_ALL.dispatchForEntity(ravager);
     }
 
     public void run() {
-        RUN_ALL.dispatch(ravager);
+        RUN_ALL.dispatchForEntity(ravager);
     }
 
     public void swim() {
-        SWIM_ALL.dispatch(ravager);
+        SWIM_ALL.dispatchForEntity(ravager);
     }
 
     public void walk() {
-        WALK_ALL.dispatch(ravager);
+        WALK_ALL.dispatchForEntity(ravager);
     }
 
     public void biteAttack() {
-        BITEATTACK_HEAD.dispatch(ravager);
+        BITEATTACK_HEAD.dispatchForEntity(ravager);
     }
 
     public void rightClawAttack() {
-        ARMATTACK_RIGHTARM.dispatch(ravager);
+        ARMATTACK_RIGHTARM.dispatchForEntity(ravager);
     }
 
     public void tailAttack() {
-        TAILATTACKQUAD_TAIL.dispatch(ravager);
+        TAILATTACKQUAD_TAIL.dispatchForEntity(ravager);
     }
 }

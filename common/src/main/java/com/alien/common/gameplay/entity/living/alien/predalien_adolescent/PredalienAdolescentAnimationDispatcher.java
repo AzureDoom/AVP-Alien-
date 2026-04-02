@@ -49,38 +49,38 @@ public class PredalienAdolescentAnimationDispatcher {
     }
 
     public void crawl() {
-        CRAWL_ALL.dispatch(predalienAdolescent);
+        CRAWL_ALL.dispatchForEntity(predalienAdolescent);
     }
 
     public void crawlHold() {
-        CRAWL_ALL_HOLD.dispatch(predalienAdolescent);
+        CRAWL_ALL_HOLD.dispatchForEntity(predalienAdolescent);
     }
 
     public void idle() {
-        IDLE_ALL.dispatch(predalienAdolescent);
+        IDLE_ALL.dispatchForEntity(predalienAdolescent);
     }
 
     public void lunge() {
-        LUNGE_ALL.dispatch(predalienAdolescent);
+        LUNGE_ALL.dispatchForEntity(predalienAdolescent);
     }
 
     public void run() {
-        RUN_ALL.dispatch(predalienAdolescent);
+        RUN_ALL.dispatchForEntity(predalienAdolescent);
     }
 
     public void swim() {
-        SWIM_ALL.dispatch(predalienAdolescent);
+        SWIM_ALL.dispatchForEntity(predalienAdolescent);
     }
 
     public void walk() {
-        WALK_ALL.dispatch(predalienAdolescent);
+        WALK_ALL.dispatchForEntity(predalienAdolescent);
     }
 
     public void biteAttack() {
-        BITEATTACK_HEAD.dispatch(predalienAdolescent);
+        BITEATTACK_HEAD.dispatchForEntity(predalienAdolescent);
     }
 
     public void rightClawAttack() {
-        ARMATTACK_RIGHTARM.dispatch(predalienAdolescent);
+        ARMATTACK_RIGHTARM.dispatchForEntity(predalienAdolescent);
     }
 }

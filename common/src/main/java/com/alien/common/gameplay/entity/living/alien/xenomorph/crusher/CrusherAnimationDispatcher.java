@@ -64,30 +64,30 @@ public class CrusherAnimationDispatcher {
     }
 
     public void biteAttack() {
-        BITEATTACK_HEAD.dispatch(crusher);
+        BITEATTACK_HEAD.dispatchForEntity(crusher);
     }
 
     public void idle() {
-        IDLE_ALL.dispatch(crusher);
+        IDLE_ALL.dispatchForEntity(crusher);
     }
 
     public void lunge() {
-        LEAP_ALL.dispatch(crusher);
+        LEAP_ALL.dispatchForEntity(crusher);
     }
 
     public void run() {
-        RUN_ALL.dispatch(crusher);
+        RUN_ALL.dispatchForEntity(crusher);
     }
 
     public void swim() {
-        SWIM_ALL.dispatch(crusher);
+        SWIM_ALL.dispatchForEntity(crusher);
     }
 
     public void tailAttack() {
-        TAILATTACK_TAIL.dispatch(crusher);
+        TAILATTACK_TAIL.dispatchForEntity(crusher);
     }
 
     public void walk() {
-        WALK_ALL.dispatch(crusher);
+        WALK_ALL.dispatchForEntity(crusher);
     }
 }

@@ -38,21 +38,15 @@ public class HiveRegistry {
         AlienVariant variant
     ) {
         var factionId = HiveIds.create();
-        var result = Alien.MOD.factions().getOrCreate(factionId, AlienFactionDataTypes.HIVE);
-
-        if (result.isErr()) {
-            throw new IllegalStateException("Failed to create hive faction: " + result.unwrapErr());
-        }
-
-        var tuple = result.unwrap();
-        var relationships = tuple.v1();
-        var factionData = tuple.v2();
+        var faction = Alien.MOD.factions().getOrCreate(factionId, AlienFactionDataTypes.HIVE);
+        var membership = faction.membership();
+        var factionData = faction.data();
 
         factionData.setCenterPos(centerPos);
         factionData.setDimension(dimension);
         factionData.setVariant(variant);
 
-        var hive = new Hive(server, factionId, relationships, factionData);
+        var hive = new Hive(server, factionId, membership, factionData);
         hives.put(factionId, hive);
 
         LOGGER.info("Created hive {} at {} in {}", factionId, centerPos, dimension.location());
@@ -135,16 +129,16 @@ public class HiveRegistry {
                 continue;
             }
 
-            var dataResult = Alien.MOD.factions().getData(factionId, AlienFactionDataTypes.HIVE);
+            var faction = Alien.MOD.factions().get(factionId);
 
-            if (dataResult.isErr()) {
-                LOGGER.warn("Failed to load hive faction data for {}: {}", factionId, dataResult.unwrapErr());
+            if (faction == null) {
+                LOGGER.warn("Failed to load hive faction data for {}", factionId);
                 continue;
             }
 
-            var relationships = Alien.MOD.factions().getRelationships(factionId);
-            var factionData = dataResult.unwrap();
-            var hive = new Hive(server, factionId, relationships, factionData);
+            var membership = faction.membership();
+            var factionData = (HiveFactionData) faction.data();
+            var hive = new Hive(server, factionId, membership, factionData);
 
             hives.put(factionId, hive);
         }

@@ -42,7 +42,7 @@ public class HiveManager implements NBTSerializable {
         hiveFactionId.ifSome(id -> {
             var hive = HiveRegistry.INSTANCE.getHive(id);
 
-            if (hive == null || !hive.getRelationships().hasMember(com.blib.api.common.faction.v1.FactionMember.entity(alien))) {
+            if (hive == null || !hive.getMembership().hasMember(com.blib.api.common.faction.v1.FactionMember.entity(alien))) {
                 hiveFactionId = Option.none();
             }
         });

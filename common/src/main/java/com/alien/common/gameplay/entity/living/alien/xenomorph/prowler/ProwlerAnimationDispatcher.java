@@ -54,42 +54,42 @@ public class ProwlerAnimationDispatcher {
     }
 
     public void crawl() {
-        CRAWL_ALL.dispatch(prowler);
+        CRAWL_ALL.dispatchForEntity(prowler);
     }
 
     public void crawlHold() {
-        CRAWL_ALL_HOLD.dispatch(prowler);
+        CRAWL_ALL_HOLD.dispatchForEntity(prowler);
     }
 
     public void idle() {
-        IDLE_ALL.dispatch(prowler);
+        IDLE_ALL.dispatchForEntity(prowler);
     }
 
     public void lunge() {
-        LUNGE_ALL.dispatch(prowler);
+        LUNGE_ALL.dispatchForEntity(prowler);
     }
 
     public void run() {
-        RUN_ALL.dispatch(prowler);
+        RUN_ALL.dispatchForEntity(prowler);
     }
 
     public void swim() {
-        SWIM_ALL.dispatch(prowler);
+        SWIM_ALL.dispatchForEntity(prowler);
     }
 
     public void walk() {
-        WALK_ALL.dispatch(prowler);
+        WALK_ALL.dispatchForEntity(prowler);
     }
 
     public void biteAttack() {
-        BITEATTACK_HEAD.dispatch(prowler);
+        BITEATTACK_HEAD.dispatchForEntity(prowler);
     }
 
     public void rightClawAttack() {
-        CLAWATTACKQUAD_RIGHTARM.dispatch(prowler);
+        CLAWATTACKQUAD_RIGHTARM.dispatchForEntity(prowler);
     }
 
     public void tailAttackQuad() {
-        TAILATTACKQUAD_TAIL.dispatch(prowler);
+        TAILATTACKQUAD_TAIL.dispatchForEntity(prowler);
     }
 }

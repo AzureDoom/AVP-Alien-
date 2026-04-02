@@ -100,22 +100,22 @@ public class FacehuggerAnimationDispatcher {
     }
 
     public void hug() {
-        HUG.dispatch(facehugger);
+        HUG.dispatchForEntity(facehugger);
     }
 
     public void idle() {
-        IDLE_AND_SWAY.dispatch(facehugger);
+        IDLE_AND_SWAY.dispatchForEntity(facehugger);
     }
 
     public void lunge() {
-        LUNGE_AND_CANCEL_BREATHING.dispatch(facehugger);
+        LUNGE_AND_CANCEL_BREATHING.dispatchForEntity(facehugger);
     }
 
     public void infertile() {
-        INFERTILE.dispatch(facehugger);
+        INFERTILE.dispatchForEntity(facehugger);
     }
 
     public void run() {
-        RUN_AND_FLAIL.dispatch(facehugger);
+        RUN_AND_FLAIL.dispatchForEntity(facehugger);
     }
 }

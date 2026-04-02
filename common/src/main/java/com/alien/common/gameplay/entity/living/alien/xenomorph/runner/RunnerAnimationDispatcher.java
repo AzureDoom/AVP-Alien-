@@ -54,42 +54,42 @@ public class RunnerAnimationDispatcher {
     }
 
     public void crawl() {
-        CRAWL_ALL.dispatch(runner);
+        CRAWL_ALL.dispatchForEntity(runner);
     }
 
     public void crawlHold() {
-        CRAWL_ALL_HOLD.dispatch(runner);
+        CRAWL_ALL_HOLD.dispatchForEntity(runner);
     }
 
     public void idle() {
-        IDLE_ALL.dispatch(runner);
+        IDLE_ALL.dispatchForEntity(runner);
     }
 
     public void lunge() {
-        LUNGE_ALL.dispatch(runner);
+        LUNGE_ALL.dispatchForEntity(runner);
     }
 
     public void run() {
-        RUN_ALL.dispatch(runner);
+        RUN_ALL.dispatchForEntity(runner);
     }
 
     public void swim() {
-        SWIM_ALL.dispatch(runner);
+        SWIM_ALL.dispatchForEntity(runner);
     }
 
     public void walk() {
-        WALK_ALL.dispatch(runner);
+        WALK_ALL.dispatchForEntity(runner);
     }
 
     public void biteAttack() {
-        BITEATTACK_HEAD.dispatch(runner);
+        BITEATTACK_HEAD.dispatchForEntity(runner);
     }
 
     public void rightClawAttack() {
-        ARMATTACK_RIGHTARM.dispatch(runner);
+        ARMATTACK_RIGHTARM.dispatchForEntity(runner);
     }
 
     public void tailAttackQuad() {
-        TAILATTACKQUAD_TAIL.dispatch(runner);
+        TAILATTACKQUAD_TAIL.dispatchForEntity(runner);
     }
 }

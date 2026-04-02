@@ -2,7 +2,7 @@ package com.alien.common.gameplay.hive.membership;
 
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.blib.api.common.faction.v1.FactionMember;
-import com.blib.api.common.faction.v1.FactionRelationships;
+import com.blib.api.common.faction.v1.FactionMembership;
 import com.blib.api.common.nbt.v1.CompoundTagUtil;
 import com.blib.api.common.nbt.v1.model.NBTSerializable;
 import com.just.core.functional.option.Option;
@@ -24,10 +24,10 @@ public class HiveLeadershipManager implements NBTSerializable {
         this.leaderIdOption = Option.none();
     }
 
-    public void tick(FactionRelationships relationships) {
+    public void tick(FactionMembership membership) {
         var leaderId = getLeaderIdOrNull();
 
-        if (leaderId != null && !relationships.hasMember(FactionMember.entity(leaderId))) {
+        if (leaderId != null && !membership.hasMember(FactionMember.entity(leaderId))) {
             setLeaderId(null);
         }
     }

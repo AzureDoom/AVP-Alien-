@@ -22,7 +22,7 @@ import com.alien.common.property.AlienProperties;
 import com.alien.common.property.AlienPropertyAccess;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.faction.v1.FactionMember;
-import com.blib.api.common.faction.v1.FactionRelationships;
+import com.blib.api.common.faction.v1.FactionMembership;
 import com.blib.api.common.spatial.v1.chunk.ChunkPosUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -40,7 +40,7 @@ public class Hive {
 
     private final ResourceLocation factionId;
 
-    private final FactionRelationships relationships;
+    private final FactionMembership membership;
 
     private final HiveFactionData factionData;
 
@@ -59,11 +59,11 @@ public class Hive {
     public Hive(
         MinecraftServer server,
         ResourceLocation factionId,
-        FactionRelationships relationships,
+        FactionMembership membership,
         HiveFactionData factionData
     ) {
         this.factionId = factionId;
-        this.relationships = relationships;
+        this.membership = membership;
         this.factionData = factionData;
         this.server = server;
         this.bossBarManager = new HiveBossBarManager(this);
@@ -115,7 +115,7 @@ public class Hive {
         var reserveManager = factionData.getReserveManager();
 
         bossBarManager.tick();
-        leadershipManager.tick(relationships);
+        leadershipManager.tick(membership);
         reserveManager.tick(
             factionData.getAgeInTicks(),
             factionData.getVariant(),
@@ -147,7 +147,7 @@ public class Hive {
             return false;
         }
 
-        relationships.addEntity(requestingEntity);
+        membership.addEntity(requestingEntity);
 
         return true;
     }
@@ -155,19 +155,19 @@ public class Hive {
     public void ping(@NotNull Entity entity) {
         if (
             !entity.isAlive()
-                || (relationships.hasMember(FactionMember.entity(entity))
+                || (membership.hasMember(FactionMember.entity(entity))
                     && !spaceManager.isEntityLeashedToHive(entity))
         ) {
             removeHiveMember(entity);
             return;
         }
 
-        relationships.addEntity(entity);
+        membership.addEntity(entity);
     }
 
     public void removeHiveMember(@NotNull Entity entity) {
         factionData.getLeadershipManager().removeLeadership(entity);
-        relationships.removeEntity(entity.getUUID());
+        membership.removeEntity(entity.getUUID());
     }
 
     public boolean isActive() {
@@ -217,7 +217,7 @@ public class Hive {
     public List<Entity> getLoadedMembers() {
         var loadedMembers = new ArrayList<Entity>();
 
-        for (var member : relationships.getMembers()) {
+        for (var member : membership.getMembers()) {
             if (member instanceof FactionMember.Entity(var uuid)) {
                 for (var level : server.getAllLevels()) {
                     var entity = level.getEntity(uuid);
@@ -253,8 +253,8 @@ public class Hive {
         return factionId;
     }
 
-    public FactionRelationships getRelationships() {
-        return relationships;
+    public FactionMembership getMembership() {
+        return membership;
     }
 
     public HiveFactionData getFactionData() {

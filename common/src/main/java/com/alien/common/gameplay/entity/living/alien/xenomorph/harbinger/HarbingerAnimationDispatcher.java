@@ -40,30 +40,30 @@ public class HarbingerAnimationDispatcher {
     }
 
     public void idle() {
-        IDLE_ALL.dispatch(harbinger);
+        IDLE_ALL.dispatchForEntity(harbinger);
     }
 
     public void run() {
-        RUN_ALL.dispatch(harbinger);
+        RUN_ALL.dispatchForEntity(harbinger);
     }
 
     public void swim() {
-        SWIM_ALL.dispatch(harbinger);
+        SWIM_ALL.dispatchForEntity(harbinger);
     }
 
     public void walk() {
-        WALK_ALL.dispatch(harbinger);
+        WALK_ALL.dispatchForEntity(harbinger);
     }
 
     public void biteAttack() {
-        BITEATTACK_HEAD.dispatch(harbinger);
+        BITEATTACK_HEAD.dispatchForEntity(harbinger);
     }
 
     public void rightClawAttack() {
-        ARMATTACK_RIGHTARM.dispatch(harbinger);
+        ARMATTACK_RIGHTARM.dispatchForEntity(harbinger);
     }
 
     public void tailAttack() {
-        TAILATTACKQUAD_TAIL.dispatch(harbinger);
+        TAILATTACKQUAD_TAIL.dispatchForEntity(harbinger);
     }
 }

@@ -45,34 +45,34 @@ public class QueenAnimationDispatcher {
     }
 
     public void idle() {
-        IDLE_ALL.dispatch(queen);
+        IDLE_ALL.dispatchForEntity(queen);
     }
 
     public void run() {
-        RUN_ALL.dispatch(queen);
+        RUN_ALL.dispatchForEntity(queen);
     }
 
     public void sitOnOvipositor() {
-        SIT_ON_OVIPOSITOR_ALL.dispatch(queen);
+        SIT_ON_OVIPOSITOR_ALL.dispatchForEntity(queen);
     }
 
     public void swim() {
-        SWIM_ALL.dispatch(queen);
+        SWIM_ALL.dispatchForEntity(queen);
     }
 
     public void walk() {
-        WALK_ALL.dispatch(queen);
+        WALK_ALL.dispatchForEntity(queen);
     }
 
     public void backhandAttack() {
-        BACKHAND_ALL.dispatch(queen);
+        BACKHAND_ALL.dispatchForEntity(queen);
     }
 
     public void swipeDownAttack() {
-        SWIPEDOWN_ALL.dispatch(queen);
+        SWIPEDOWN_ALL.dispatchForEntity(queen);
     }
 
     public void tailStrikeAttack() {
-        TAILSTRIKE_ALL.dispatch(queen);
+        TAILSTRIKE_ALL.dispatchForEntity(queen);
     }
 }

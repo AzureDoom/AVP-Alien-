@@ -48,38 +48,38 @@ public class AdolescentAnimationDispatcher {
     }
 
     public void crawl() {
-        CRAWL_ALL.dispatch(adolescent);
+        CRAWL_ALL.dispatchForEntity(adolescent);
     }
 
     public void crawlHold() {
-        CRAWL_ALL_HOLD.dispatch(adolescent);
+        CRAWL_ALL_HOLD.dispatchForEntity(adolescent);
     }
 
     public void idle() {
-        IDLE_ALL.dispatch(adolescent);
+        IDLE_ALL.dispatchForEntity(adolescent);
     }
 
     public void lunge() {
-        LUNGE_ALL.dispatch(adolescent);
+        LUNGE_ALL.dispatchForEntity(adolescent);
     }
 
     public void run() {
-        RUN_ALL.dispatch(adolescent);
+        RUN_ALL.dispatchForEntity(adolescent);
     }
 
     public void swim() {
-        SWIM_ALL.dispatch(adolescent);
+        SWIM_ALL.dispatchForEntity(adolescent);
     }
 
     public void walk() {
-        WALK_ALL.dispatch(adolescent);
+        WALK_ALL.dispatchForEntity(adolescent);
     }
 
     public void biteAttack() {
-        BITEATTACK_HEAD.dispatch(adolescent);
+        BITEATTACK_HEAD.dispatchForEntity(adolescent);
     }
 
     public void rightClawAttack() {
-        ARMATTACK_RIGHTARM.dispatch(adolescent);
+        ARMATTACK_RIGHTARM.dispatchForEntity(adolescent);
     }
 }

@@ -54,42 +54,42 @@ public class WarriorAnimationDispatcher {
     }
 
     public void crawl() {
-        CRAWL_ALL.dispatch(warrior);
+        CRAWL_ALL.dispatchForEntity(warrior);
     }
 
     public void crawlHold() {
-        CRAWL_ALL_HOLD.dispatch(warrior);
+        CRAWL_ALL_HOLD.dispatchForEntity(warrior);
     }
 
     public void idle() {
-        IDLE_ALL.dispatch(warrior);
+        IDLE_ALL.dispatchForEntity(warrior);
     }
 
     public void lunge() {
-        LUNGE_ALL.dispatch(warrior);
+        LUNGE_ALL.dispatchForEntity(warrior);
     }
 
     public void run() {
-        RUN_ALL.dispatch(warrior);
+        RUN_ALL.dispatchForEntity(warrior);
     }
 
     public void swim() {
-        SWIM_ALL.dispatch(warrior);
+        SWIM_ALL.dispatchForEntity(warrior);
     }
 
     public void walk() {
-        WALK_ALL.dispatch(warrior);
+        WALK_ALL.dispatchForEntity(warrior);
     }
 
     public void biteAttack() {
-        BITEATTACK_HEAD.dispatch(warrior);
+        BITEATTACK_HEAD.dispatchForEntity(warrior);
     }
 
     public void rightClawAttack() {
-        ARMATTACK_RIGHTARM.dispatch(warrior);
+        ARMATTACK_RIGHTARM.dispatchForEntity(warrior);
     }
 
     public void tailAttack() {
-        TAILATTACKQUAD_TAIL.dispatch(warrior);
+        TAILATTACKQUAD_TAIL.dispatchForEntity(warrior);
     }
 }

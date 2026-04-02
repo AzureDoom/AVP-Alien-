@@ -65,8 +65,8 @@ public class MergeWithNearbyHiveTask extends HiveTask {
             }
         }
 
-        var leftMemberCount = left.getRelationships().getMembers().size();
-        var rightMemberCount = right.getRelationships().getMembers().size();
+        var leftMemberCount = left.getMembership().getMembers().size();
+        var rightMemberCount = right.getMembership().getMembers().size();
 
         if (leftMemberCount > rightMemberCount) {
             return left;
@@ -78,13 +78,13 @@ public class MergeWithNearbyHiveTask extends HiveTask {
     }
 
     private void mergeLeftHiveIntoRight(Hive left, Hive right) {
-        var leftMembers = Set.copyOf(left.getRelationships().getMembers());
+        var leftMembers = Set.copyOf(left.getMembership().getMembers());
         var memberUuids = new java.util.HashSet<java.util.UUID>();
 
         for (var member : leftMembers) {
             if (member instanceof FactionMember.Entity(var uuid)) {
-                left.getRelationships().removeEntity(uuid);
-                right.getRelationships().addEntity(uuid);
+                left.getMembership().removeEntity(uuid);
+                right.getMembership().addEntity(uuid);
                 memberUuids.add(uuid);
             }
         }

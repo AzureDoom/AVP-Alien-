@@ -32,10 +32,10 @@ public class ChestbursterAnimationDispatcher {
     }
 
     public void idle() {
-        IDLE.dispatch(chestburster);
+        IDLE.dispatchForEntity(chestburster);
     }
 
     public void slowSlither() {
-        SLOW_SLITHER.dispatch(chestburster);
+        SLOW_SLITHER.dispatchForEntity(chestburster);
     }
 }

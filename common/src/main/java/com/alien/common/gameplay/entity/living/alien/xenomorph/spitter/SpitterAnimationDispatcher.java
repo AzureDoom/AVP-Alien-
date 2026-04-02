@@ -60,46 +60,46 @@ public class SpitterAnimationDispatcher {
     }
 
     public void crawl() {
-        CRAWL_ALL.dispatch(spitter);
+        CRAWL_ALL.dispatchForEntity(spitter);
     }
 
     public void crawlHold() {
-        CRAWL_ALL_HOLD.dispatch(spitter);
+        CRAWL_ALL_HOLD.dispatchForEntity(spitter);
     }
 
     public void idle() {
-        IDLE_ALL.dispatch(spitter);
+        IDLE_ALL.dispatchForEntity(spitter);
     }
 
     public void lunge() {
-        LUNGE_ALL.dispatch(spitter);
+        LUNGE_ALL.dispatchForEntity(spitter);
     }
 
     public void run() {
-        RUN_ALL.dispatch(spitter);
+        RUN_ALL.dispatchForEntity(spitter);
     }
 
     public void swim() {
-        SWIM_ALL.dispatch(spitter);
+        SWIM_ALL.dispatchForEntity(spitter);
     }
 
     public void walk() {
-        WALK_ALL.dispatch(spitter);
+        WALK_ALL.dispatchForEntity(spitter);
     }
 
     public void biteAttack() {
-        BITEATTACK_HEAD.dispatch(spitter);
+        BITEATTACK_HEAD.dispatchForEntity(spitter);
     }
 
     public void rightClawAttack() {
-        ATTACKCLAW_RIGHTARM.dispatch(spitter);
+        ATTACKCLAW_RIGHTARM.dispatchForEntity(spitter);
     }
 
     public void rightClawAttackQuad() {
-        ATTACKCLAWQUAD_RIGHTARM.dispatch(spitter);
+        ATTACKCLAWQUAD_RIGHTARM.dispatchForEntity(spitter);
     }
 
     public void tailAttack() {
-        TAILATTACKQUAD_TAIL.dispatch(spitter);
+        TAILATTACKQUAD_TAIL.dispatchForEntity(spitter);
     }
 }

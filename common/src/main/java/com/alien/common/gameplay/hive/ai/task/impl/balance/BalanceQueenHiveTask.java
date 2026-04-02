@@ -27,7 +27,7 @@ public class BalanceQueenHiveTask extends BalanceHiveTask {
                 return;
             }
 
-            if (!hive.getRelationships().hasMember(com.blib.api.common.faction.v1.FactionMember.entity(xenomorph))) {
+            if (!hive.getMembership().hasMember(com.blib.api.common.faction.v1.FactionMember.entity(xenomorph))) {
                 return;
             }
 

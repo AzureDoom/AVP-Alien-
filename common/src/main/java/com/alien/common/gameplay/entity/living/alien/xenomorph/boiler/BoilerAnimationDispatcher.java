@@ -48,27 +48,27 @@ public class BoilerAnimationDispatcher {
     }
 
     public void crawl() {
-        CRAWL.dispatch(boiler);
+        CRAWL.dispatchForEntity(boiler);
     }
 
     public void crawlHold() {
-        CRAWL_HOLD.dispatch(boiler);
+        CRAWL_HOLD.dispatchForEntity(boiler);
     }
 
     public void idle() {
-        IDLE.dispatch(boiler);
+        IDLE.dispatchForEntity(boiler);
     }
 
     public void run() {
-        RUN.dispatch(boiler);
+        RUN.dispatchForEntity(boiler);
     }
 
     public void swim() {
-        SWIM.dispatch(boiler);
+        SWIM.dispatchForEntity(boiler);
     }
 
     public void walk() {
-        WALK.dispatch(boiler);
+        WALK.dispatchForEntity(boiler);
     }
 
 }

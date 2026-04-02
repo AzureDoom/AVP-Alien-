@@ -40,30 +40,30 @@ public class PraetorianAnimationDispatcher {
     }
 
     public void idle() {
-        IDLE_ALL.dispatch(praetorian);
+        IDLE_ALL.dispatchForEntity(praetorian);
     }
 
     public void run() {
-        RUN_ALL.dispatch(praetorian);
+        RUN_ALL.dispatchForEntity(praetorian);
     }
 
     public void swim() {
-        SWIM_ALL.dispatch(praetorian);
+        SWIM_ALL.dispatchForEntity(praetorian);
     }
 
     public void walk() {
-        WALK_ALL.dispatch(praetorian);
+        WALK_ALL.dispatchForEntity(praetorian);
     }
 
     public void biteAttack() {
-        BITEATTACK_HEAD.dispatch(praetorian);
+        BITEATTACK_HEAD.dispatchForEntity(praetorian);
     }
 
     public void rightClawAttack() {
-        ARMATTACK_RIGHTARM.dispatch(praetorian);
+        ARMATTACK_RIGHTARM.dispatchForEntity(praetorian);
     }
 
     public void tailAttack() {
-        TAILATTACKQUAD_TAIL.dispatch(praetorian);
+        TAILATTACKQUAD_TAIL.dispatchForEntity(praetorian);
     }
 }

@@ -54,42 +54,42 @@ public class DroneAnimationDispatcher {
     }
 
     public void crawl() {
-        CRAWL_ALL.dispatch(drone);
+        CRAWL_ALL.dispatchForEntity(drone);
     }
 
     public void crawlHold() {
-        CRAWL_ALL_HOLD.dispatch(drone);
+        CRAWL_ALL_HOLD.dispatchForEntity(drone);
     }
 
     public void idle() {
-        IDLE_ALL.dispatch(drone);
+        IDLE_ALL.dispatchForEntity(drone);
     }
 
     public void lunge() {
-        LUNGE_ALL.dispatch(drone);
+        LUNGE_ALL.dispatchForEntity(drone);
     }
 
     public void run() {
-        RUN_ALL.dispatch(drone);
+        RUN_ALL.dispatchForEntity(drone);
     }
 
     public void swim() {
-        SWIM_ALL.dispatch(drone);
+        SWIM_ALL.dispatchForEntity(drone);
     }
 
     public void walk() {
-        WALK_ALL.dispatch(drone);
+        WALK_ALL.dispatchForEntity(drone);
     }
 
     public void biteAttack() {
-        BITEATTACK_HEAD.dispatch(drone);
+        BITEATTACK_HEAD.dispatchForEntity(drone);
     }
 
     public void rightClawAttack() {
-        ARMATTACK_RIGHTARM.dispatch(drone);
+        ARMATTACK_RIGHTARM.dispatchForEntity(drone);
     }
 
     public void tailAttack() {
-        TAILATTACKQUAD_TAIL.dispatch(drone);
+        TAILATTACKQUAD_TAIL.dispatchForEntity(drone);
     }
 }

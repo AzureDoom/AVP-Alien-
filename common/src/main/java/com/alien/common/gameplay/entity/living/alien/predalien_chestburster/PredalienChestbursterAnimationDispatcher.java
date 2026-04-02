@@ -33,10 +33,10 @@ public class PredalienChestbursterAnimationDispatcher {
     }
 
     public void idle() {
-        IDLE.dispatch(predalienChestburster);
+        IDLE.dispatchForEntity(predalienChestburster);
     }
 
     public void slowSlither() {
-        SLOW_SLITHER.dispatch(predalienChestburster);
+        SLOW_SLITHER.dispatchForEntity(predalienChestburster);
     }
 }
