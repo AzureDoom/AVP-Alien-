@@ -2,11 +2,14 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.crusher;
 
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.CrusherAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphNavigationManager;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.model.resin.ResinData;
+import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
+import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.entity.v1.ai.goal.combat.LungeAtTargetGoal;
 import net.minecraft.world.entity.EntityType;
@@ -29,10 +32,13 @@ public class Crusher extends Xenomorph {
             .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1.2F);
     }
 
+    public final DataAccessor<CrusherAttackType> attackType;
+
     private final CrusherAnimationDispatcher animationDispatcher;
 
     public Crusher(EntityType<? extends Crusher> entityType, Level level) {
         super(entityType, level);
+        this.attackType = new DataAccessor<>(this, AlienDataSyncKeys.CRUSHER_ATTACK_TYPE.get());
         this.animationDispatcher = new CrusherAnimationDispatcher(this);
     }
 
@@ -58,6 +64,16 @@ public class Crusher extends Xenomorph {
     }
 
     @Override
+    public boolean isAttacking() {
+        return attackType.get() != CrusherAttackType.NONE;
+    }
+
+    @Override
+    protected void resetAttackType() {
+        attackType.set(CrusherAttackType.NONE);
+    }
+
+    @Override
     public void runAttackAnimations() {
         var isClawAttack = random.nextBoolean();
 
@@ -67,16 +83,15 @@ public class Crusher extends Xenomorph {
             (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F
         );
 
-        if (isClawAttack) {
-            animationDispatcher.biteAttack();
-        } else {
-            animationDispatcher.tailAttack();
-        }
+        var attack = isClawAttack ? CrusherAttackType.BITE : CrusherAttackType.TAIL;
+
+        attackType.set(attack);
+        beginAttack(attack.defaultDurationInTicks());
     }
 
     private void runLungeAnimation() {
         playSound(AlienSoundEvents.ENTITY_XENOMORPH_LUNGE.get(), getSoundVolume(), (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F);
-        animationDispatcher.lunge();
+        isLunging.set(true);
     }
 
     @Override

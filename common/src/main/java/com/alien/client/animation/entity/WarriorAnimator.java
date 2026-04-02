@@ -1,7 +1,9 @@
 package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.warrior.Warrior;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.warrior.WarriorAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
@@ -15,6 +17,8 @@ public class WarriorAnimator extends AzEntityAnimator<Warrior> {
     private static final String NAME = "warrior";
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
+
+    private XenomorphAttackType previousAttackType = XenomorphAttackType.NONE;
 
     public WarriorAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -61,6 +65,31 @@ public class WarriorAnimator extends AzEntityAnimator<Warrior> {
 
     private void runPassiveAnimations(Warrior warrior) {
         var dispatcher = warrior.getAnimationDispatcher();
+
+        if (warrior.isLunging.get()) {
+            dispatcher.lunge();
+            return;
+        }
+
+        var attackType = warrior.attackType.get();
+
+        if (attackType != XenomorphAttackType.NONE) {
+            if (attackType != previousAttackType) {
+                var speed = calculateAttackSpeed(warrior, attackType);
+
+                switch (attackType) {
+                    case BITE -> dispatcher.biteAttack(speed);
+                    case CLAW -> dispatcher.rightClawAttack(speed);
+                    case TAIL -> dispatcher.tailAttack(speed);
+                }
+
+                previousAttackType = attackType;
+            }
+            return;
+        }
+
+        previousAttackType = XenomorphAttackType.NONE;
+
         var isMovingOnGround = warrior.isMovingHorizontally.get() && warrior.onGround();
         var isCrawling = warrior.getCrawlingManager().isCrawling();
         Runnable animFunction;
@@ -82,5 +111,23 @@ public class WarriorAnimator extends AzEntityAnimator<Warrior> {
         }
 
         animFunction.run();
+    }
+
+    private float calculateAttackSpeed(Warrior warrior, XenomorphAttackType attackType) {
+        var animationName = switch (attackType) {
+            case BITE -> WarriorAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME;
+            case CLAW -> WarriorAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME;
+            case TAIL -> WarriorAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME;
+            default -> null;
+        };
+
+        var durationInTicks = warrior.attackDurationInTicks.get();
+
+        if (animationName == null || durationInTicks <= 0) {
+            return 1.0f;
+        }
+
+        var animation = getAnimation(warrior, animationName);
+        return (float) (animation.length() / durationInTicks);
     }
 }

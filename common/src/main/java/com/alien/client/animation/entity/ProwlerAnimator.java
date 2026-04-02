@@ -1,7 +1,9 @@
 package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.QuadrupedAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.prowler.Prowler;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.prowler.ProwlerAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
@@ -15,6 +17,8 @@ public class ProwlerAnimator extends AzEntityAnimator<Prowler> {
     private static final String NAME = "prowler";
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
+
+    private QuadrupedAttackType previousAttackType = QuadrupedAttackType.NONE;
 
     public ProwlerAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -61,6 +65,31 @@ public class ProwlerAnimator extends AzEntityAnimator<Prowler> {
 
     private void runPassiveAnimations(Prowler prowler) {
         var dispatcher = prowler.getAnimationDispatcher();
+
+        if (prowler.isLunging.get()) {
+            dispatcher.lunge();
+            return;
+        }
+
+        var attackType = prowler.attackType.get();
+
+        if (attackType != QuadrupedAttackType.NONE) {
+            if (attackType != previousAttackType) {
+                var speed = calculateAttackSpeed(prowler, attackType);
+
+                switch (attackType) {
+                    case BITE -> dispatcher.biteAttack(speed);
+                    case CLAW -> dispatcher.rightClawAttack(speed);
+                    case TAIL_QUAD -> dispatcher.tailAttackQuad(speed);
+                }
+
+                previousAttackType = attackType;
+            }
+            return;
+        }
+
+        previousAttackType = QuadrupedAttackType.NONE;
+
         var isMovingOnGround = prowler.isMovingHorizontally.get() && prowler.onGround();
         var isCrawling = prowler.getCrawlingManager().isCrawling();
         Runnable animFunction;
@@ -82,5 +111,24 @@ public class ProwlerAnimator extends AzEntityAnimator<Prowler> {
         }
 
         animFunction.run();
+    }
+
+    private float calculateAttackSpeed(Prowler prowler, QuadrupedAttackType attackType) {
+        var animationName = switch (attackType) {
+            case BITE -> ProwlerAnimationRefs.BITEATTACK_HEAD_ANIMATION_NAME;
+            case CLAW -> ProwlerAnimationRefs.CLAWATTACKQUAD_RIGHTARM_ANIMATION_NAME;
+            case TAIL_QUAD -> ProwlerAnimationRefs.TAILATTACKQUAD_TAIL_ANIMATION_NAME;
+            default -> null;
+        };
+
+        var durationInTicks = prowler.attackDurationInTicks.get();
+
+        if (animationName == null || durationInTicks <= 0) {
+            return 1.0f;
+        }
+
+        var animation = getAnimation(prowler, animationName);
+
+        return (float) (animation.length() / durationInTicks);
     }
 }

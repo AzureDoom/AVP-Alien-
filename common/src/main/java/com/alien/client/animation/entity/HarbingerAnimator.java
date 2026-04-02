@@ -1,7 +1,9 @@
 package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.harbinger.Harbinger;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.harbinger.HarbingerAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
@@ -15,6 +17,8 @@ public class HarbingerAnimator extends AzEntityAnimator<Harbinger> {
     private static final String NAME = "harbinger";
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
+
+    private XenomorphAttackType previousAttackType = XenomorphAttackType.NONE;
 
     public HarbingerAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -61,6 +65,26 @@ public class HarbingerAnimator extends AzEntityAnimator<Harbinger> {
 
     private void runPassiveAnimations(Harbinger harbinger) {
         var dispatcher = harbinger.getAnimationDispatcher();
+
+        var attackType = harbinger.attackType.get();
+
+        if (attackType != XenomorphAttackType.NONE) {
+            if (attackType != previousAttackType) {
+                var speed = calculateAttackSpeed(harbinger, attackType);
+
+                switch (attackType) {
+                    case BITE -> dispatcher.biteAttack(speed);
+                    case CLAW -> dispatcher.rightClawAttack(speed);
+                    case TAIL -> dispatcher.tailAttack(speed);
+                }
+
+                previousAttackType = attackType;
+            }
+            return;
+        }
+
+        previousAttackType = XenomorphAttackType.NONE;
+
         var isMovingOnGround = harbinger.isMovingHorizontally.get() && harbinger.onGround();
         Runnable animFunction;
 
@@ -77,5 +101,24 @@ public class HarbingerAnimator extends AzEntityAnimator<Harbinger> {
         }
 
         animFunction.run();
+    }
+
+    private float calculateAttackSpeed(Harbinger harbinger, XenomorphAttackType attackType) {
+        var animationName = switch (attackType) {
+            case BITE -> HarbingerAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME;
+            case CLAW -> HarbingerAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME;
+            case TAIL -> HarbingerAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME;
+            default -> null;
+        };
+
+        var durationInTicks = harbinger.attackDurationInTicks.get();
+
+        if (animationName == null || durationInTicks <= 0) {
+            return 1.0f;
+        }
+
+        var animation = getAnimation(harbinger, animationName);
+
+        return (float) (animation.length() / durationInTicks);
     }
 }

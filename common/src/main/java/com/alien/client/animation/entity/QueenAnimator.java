@@ -2,6 +2,8 @@ package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.QueenAnimationRefs;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.QueenAttackType;
 import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
@@ -15,6 +17,8 @@ public class QueenAnimator extends AzEntityAnimator<Queen> {
     private static final String NAME = "queen";
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
+
+    private QueenAttackType previousAttackType = QueenAttackType.NONE;
 
     public QueenAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -74,6 +78,26 @@ public class QueenAnimator extends AzEntityAnimator<Queen> {
 
     private void runPassiveAnimations(Queen queen) {
         var dispatcher = queen.getAnimationDispatcher();
+
+        var attackType = queen.attackType.get();
+
+        if (attackType != QueenAttackType.NONE) {
+            if (attackType != previousAttackType) {
+                var speed = calculateAttackSpeed(queen, attackType);
+
+                switch (attackType) {
+                    case SWIPE_DOWN -> dispatcher.swipeDownAttack(speed);
+                    case BACKHAND -> dispatcher.backhandAttack(speed);
+                    case TAIL_STRIKE -> dispatcher.tailStrikeAttack(speed);
+                }
+
+                previousAttackType = attackType;
+            }
+            return;
+        }
+
+        previousAttackType = QueenAttackType.NONE;
+
         var isMovingOnGround = queen.isMovingHorizontally.get() && queen.onGround();
         Runnable animFunction;
 
@@ -94,5 +118,24 @@ public class QueenAnimator extends AzEntityAnimator<Queen> {
         }
 
         animFunction.run();
+    }
+
+    private float calculateAttackSpeed(Queen queen, QueenAttackType attackType) {
+        var animationName = switch (attackType) {
+            case SWIPE_DOWN -> QueenAnimationRefs.SWIPEDOWN_BODY_ANIMATION_NAME;
+            case BACKHAND -> QueenAnimationRefs.BACKHAND_BODY_ANIMATION_NAME;
+            case TAIL_STRIKE -> QueenAnimationRefs.TAILSTRIKE_BODY_ANIMATION_NAME;
+            default -> null;
+        };
+
+        var durationInTicks = queen.attackDurationInTicks.get();
+
+        if (animationName == null || durationInTicks <= 0) {
+            return 1.0f;
+        }
+
+        var animation = getAnimation(queen, animationName);
+
+        return (float) (animation.length() / durationInTicks);
     }
 }

@@ -85,11 +85,38 @@ public class DroneAnimationDispatcher {
         BITEATTACK_HEAD.dispatchForEntity(drone);
     }
 
+    public void biteAttack(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.HEAD_TRACK_NAME,
+            DroneAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME,
+            AzPlayBehaviors.PLAY_ONCE,
+            0F, speed, 0F, 0F, false
+        ).dispatchForEntity(drone);
+    }
+
     public void rightClawAttack() {
         ARMATTACK_RIGHTARM.dispatchForEntity(drone);
     }
 
+    public void rightClawAttack(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
+            DroneAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME,
+            AzPlayBehaviors.PLAY_ONCE,
+            0F, speed, 0F, 0F, false
+        ).dispatchForEntity(drone);
+    }
+
     public void tailAttack() {
         TAILATTACKQUAD_TAIL.dispatchForEntity(drone);
+    }
+
+    public void tailAttack(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.TAIL_TRACK_NAME,
+            DroneAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME,
+            AzPlayBehaviors.PLAY_ONCE,
+            0F, speed, 0F, 0F, false
+        ).dispatchForEntity(drone);
     }
 }

@@ -1,7 +1,9 @@
 package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.Carrier;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.CarrierAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
@@ -15,6 +17,8 @@ public class CarrierAnimator extends AzEntityAnimator<Carrier> {
     private static final String NAME = "carrier";
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
+
+    private XenomorphAttackType previousAttackType = XenomorphAttackType.NONE;
 
     public CarrierAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -61,6 +65,26 @@ public class CarrierAnimator extends AzEntityAnimator<Carrier> {
 
     private void runPassiveAnimations(Carrier carrier) {
         var dispatcher = carrier.getAnimationDispatcher();
+
+        var attackType = carrier.attackType.get();
+
+        if (attackType != XenomorphAttackType.NONE) {
+            if (attackType != previousAttackType) {
+                var speed = calculateAttackSpeed(carrier, attackType);
+
+                switch (attackType) {
+                    case BITE -> dispatcher.biteAttack(speed);
+                    case CLAW -> dispatcher.rightClawAttack(speed);
+                    case TAIL -> dispatcher.tailAttack(speed);
+                }
+
+                previousAttackType = attackType;
+            }
+            return;
+        }
+
+        previousAttackType = XenomorphAttackType.NONE;
+
         var isMovingOnGround = carrier.isMovingHorizontally.get() && carrier.onGround();
         Runnable animFunction;
 
@@ -77,5 +101,24 @@ public class CarrierAnimator extends AzEntityAnimator<Carrier> {
         }
 
         animFunction.run();
+    }
+
+    private float calculateAttackSpeed(Carrier carrier, XenomorphAttackType attackType) {
+        var animationName = switch (attackType) {
+            case BITE -> CarrierAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME;
+            case CLAW -> CarrierAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME;
+            case TAIL -> CarrierAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME;
+            default -> null;
+        };
+
+        var durationInTicks = carrier.attackDurationInTicks.get();
+
+        if (animationName == null || durationInTicks <= 0) {
+            return 1.0f;
+        }
+
+        var animation = getAnimation(carrier, animationName);
+
+        return (float) (animation.length() / durationInTicks);
     }
 }

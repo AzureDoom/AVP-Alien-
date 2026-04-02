@@ -2,11 +2,14 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.razor_claw;
 
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.model.resin.ResinData;
+import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienMobEffects;
 import com.alien.common.registry.init.AlienSoundEvents;
+import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
@@ -33,10 +36,13 @@ public class RazorClaw extends Xenomorph {
             .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1.2F);
     }
 
+    public final DataAccessor<XenomorphAttackType> attackType;
+
     private final RazorClawAnimationDispatcher animationDispatcher;
 
     public RazorClaw(EntityType<? extends RazorClaw> entityType, Level level) {
         super(entityType, level);
+        this.attackType = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_ATTACK_TYPE.get());
         this.animationDispatcher = new RazorClawAnimationDispatcher(this);
     }
 
@@ -73,8 +79,18 @@ public class RazorClaw extends Xenomorph {
     }
 
     @Override
+    public boolean isAttacking() {
+        return attackType.get() != XenomorphAttackType.NONE;
+    }
+
+    @Override
+    protected void resetAttackType() {
+        attackType.set(XenomorphAttackType.NONE);
+    }
+
+    @Override
     public void runAttackAnimations() {
-        var attackType = random.nextInt(0, 3);
+        var attackVariant = random.nextInt(0, 3);
 
         playSound(
             AlienSoundEvents.ENTITY_XENOMORPH_ATTACK.get(),
@@ -82,11 +98,14 @@ public class RazorClaw extends Xenomorph {
             (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F
         );
 
-        switch (attackType) {
-            case 0 -> animationDispatcher.rightClawAttack();
-            case 1 -> animationDispatcher.biteAttack();
-            default -> animationDispatcher.tailAttack();
-        }
+        var attack = switch (attackVariant) {
+            case 0 -> XenomorphAttackType.CLAW;
+            case 1 -> XenomorphAttackType.BITE;
+            default -> XenomorphAttackType.TAIL;
+        };
+
+        attackType.set(attack);
+        beginAttack(attack.defaultDurationInTicks());
     }
 
     @Override

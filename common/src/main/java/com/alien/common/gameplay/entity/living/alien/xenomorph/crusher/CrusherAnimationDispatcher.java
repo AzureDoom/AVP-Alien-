@@ -67,6 +67,15 @@ public class CrusherAnimationDispatcher {
         BITEATTACK_HEAD.dispatchForEntity(crusher);
     }
 
+    public void biteAttack(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.HEAD_TRACK_NAME,
+            CrusherAnimationRefs.BITEATTACK_HEAD_ANIMATION_NAME,
+            AzPlayBehaviors.PLAY_ONCE,
+            0F, speed, 0F, 0F, false
+        ).dispatchForEntity(crusher);
+    }
+
     public void idle() {
         IDLE_ALL.dispatchForEntity(crusher);
     }
@@ -85,6 +94,15 @@ public class CrusherAnimationDispatcher {
 
     public void tailAttack() {
         TAILATTACK_TAIL.dispatchForEntity(crusher);
+    }
+
+    public void tailAttack(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.TAIL_TRACK_NAME,
+            CrusherAnimationRefs.TAILATTACK_TAIL_ANIMATION_NAME,
+            AzPlayBehaviors.PLAY_ONCE,
+            0F, speed, 0F, 0F, false
+        ).dispatchForEntity(crusher);
     }
 
     public void walk() {

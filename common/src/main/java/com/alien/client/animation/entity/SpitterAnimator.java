@@ -1,7 +1,9 @@
 package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.spitter.Spitter;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.spitter.SpitterAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
@@ -15,6 +17,8 @@ public class SpitterAnimator extends AzEntityAnimator<Spitter> {
     private static final String NAME = "spitter";
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
+
+    private XenomorphAttackType previousAttackType = XenomorphAttackType.NONE;
 
     public SpitterAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -61,6 +65,31 @@ public class SpitterAnimator extends AzEntityAnimator<Spitter> {
 
     private void runPassiveAnimations(Spitter spitter) {
         var dispatcher = spitter.getAnimationDispatcher();
+
+        if (spitter.isLunging.get()) {
+            dispatcher.lunge();
+            return;
+        }
+
+        var attackType = spitter.attackType.get();
+
+        if (attackType != XenomorphAttackType.NONE) {
+            if (attackType != previousAttackType) {
+                var speed = calculateAttackSpeed(spitter, attackType);
+
+                switch (attackType) {
+                    case BITE -> dispatcher.biteAttack(speed);
+                    case CLAW -> dispatcher.rightClawAttack(speed);
+                    case TAIL -> dispatcher.tailAttack(speed);
+                }
+
+                previousAttackType = attackType;
+            }
+            return;
+        }
+
+        previousAttackType = XenomorphAttackType.NONE;
+
         var isMovingOnGround = spitter.isMovingHorizontally.get() && spitter.onGround();
         var isCrawling = spitter.getCrawlingManager().isCrawling();
         Runnable animFunction;
@@ -82,5 +111,24 @@ public class SpitterAnimator extends AzEntityAnimator<Spitter> {
         }
 
         animFunction.run();
+    }
+
+    private float calculateAttackSpeed(Spitter spitter, XenomorphAttackType attackType) {
+        var animationName = switch (attackType) {
+            case BITE -> SpitterAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME;
+            case CLAW -> SpitterAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME;
+            case TAIL -> SpitterAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME;
+            default -> null;
+        };
+
+        var durationInTicks = spitter.attackDurationInTicks.get();
+
+        if (animationName == null || durationInTicks <= 0) {
+            return 1.0f;
+        }
+
+        var animation = getAnimation(spitter, animationName);
+
+        return (float) (animation.length() / durationInTicks);
     }
 }

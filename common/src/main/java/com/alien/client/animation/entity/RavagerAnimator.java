@@ -1,7 +1,9 @@
 package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ravager.Ravager;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ravager.RavagerAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
@@ -15,6 +17,8 @@ public class RavagerAnimator extends AzEntityAnimator<Ravager> {
     private static final String NAME = "ravager";
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
+
+    private XenomorphAttackType previousAttackType = XenomorphAttackType.NONE;
 
     public RavagerAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -61,6 +65,26 @@ public class RavagerAnimator extends AzEntityAnimator<Ravager> {
 
     private void runPassiveAnimations(Ravager ravager) {
         var dispatcher = ravager.getAnimationDispatcher();
+
+        var attackType = ravager.attackType.get();
+
+        if (attackType != XenomorphAttackType.NONE) {
+            if (attackType != previousAttackType) {
+                var speed = calculateAttackSpeed(ravager, attackType);
+
+                switch (attackType) {
+                    case BITE -> dispatcher.biteAttack(speed);
+                    case CLAW -> dispatcher.rightClawAttack(speed);
+                    case TAIL -> dispatcher.tailAttack(speed);
+                }
+
+                previousAttackType = attackType;
+            }
+            return;
+        }
+
+        previousAttackType = XenomorphAttackType.NONE;
+
         var isMovingOnGround = ravager.isMovingHorizontally.get() && ravager.onGround();
         Runnable animFunction;
 
@@ -77,5 +101,24 @@ public class RavagerAnimator extends AzEntityAnimator<Ravager> {
         }
 
         animFunction.run();
+    }
+
+    private float calculateAttackSpeed(Ravager ravager, XenomorphAttackType attackType) {
+        var animationName = switch (attackType) {
+            case BITE -> RavagerAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME;
+            case CLAW -> RavagerAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME;
+            case TAIL -> RavagerAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME;
+            default -> null;
+        };
+
+        var durationInTicks = ravager.attackDurationInTicks.get();
+
+        if (animationName == null || durationInTicks <= 0) {
+            return 1.0f;
+        }
+
+        var animation = getAnimation(ravager, animationName);
+
+        return (float) (animation.length() / durationInTicks);
     }
 }

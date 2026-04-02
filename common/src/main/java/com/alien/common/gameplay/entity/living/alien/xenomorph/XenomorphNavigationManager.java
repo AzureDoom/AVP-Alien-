@@ -1,8 +1,8 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph;
 
+import com.alien.common.gameplay.ai.goal.AnimationDrivenAttackGoal;
 import com.alien.common.gameplay.ai.path.CrawlPathNodeEvaluator;
 import com.blib.api.common.entity.v1.ai.goal.WaterMoveControl;
-import com.blib.api.common.entity.v1.ai.goal.combat.DelayedAttackGoal;
 import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
@@ -26,18 +26,21 @@ public class XenomorphNavigationManager {
 
     private final Goal waterAttackGoal;
 
+    private static final float DEFAULT_DAMAGE_POINT_PERCENT = 0.5f;
+
     public XenomorphNavigationManager(Xenomorph xenomorph, MoveControl moveControl) {
         this(xenomorph, moveControl, 1.1, 2);
     }
 
     public XenomorphNavigationManager(Xenomorph xenomorph, MoveControl moveControl, double groundSpeedModifier, double waterSpeedModifier) {
+        var attackRange = xenomorph.getBbWidth();
         // Ground navigation.
-        this.groundAttackGoal = new DelayedAttackGoal(
+        this.groundAttackGoal = new AnimationDrivenAttackGoal(
             xenomorph,
             groundSpeedModifier,
             false,
-            xenomorph.getAttackDelayInTicks(),
-            xenomorph::runAttackAnimations
+            DEFAULT_DAMAGE_POINT_PERCENT,
+            attackRange
         );
         this.groundMoveControl = moveControl;
         this.groundNavigation = new GroundPathNavigation(xenomorph, xenomorph.level()) {
@@ -54,7 +57,7 @@ public class XenomorphNavigationManager {
 
         // Water navigation.
         xenomorph.setPathfindingMalus(PathType.WATER, 0.0F);
-        this.waterAttackGoal = new DelayedAttackGoal(xenomorph, waterSpeedModifier, false, 7, xenomorph::runAttackAnimations);
+        this.waterAttackGoal = new AnimationDrivenAttackGoal(xenomorph, waterSpeedModifier, false, DEFAULT_DAMAGE_POINT_PERCENT, attackRange);
         this.waterMoveControl = new WaterMoveControl(xenomorph);
         this.waterNavigation = new WaterBoundPathNavigation(xenomorph, xenomorph.level());
     }

@@ -48,6 +48,10 @@ import java.util.function.BiConsumer;
 
 public abstract class Xenomorph extends Alien implements ResinProducer {
 
+    public final DataAccessor<Integer> attackDurationInTicks;
+
+    public final DataAccessor<Boolean> isLunging;
+
     public final DataAccessor<Boolean> isCrawling;
 
     protected final CrawlingManager crawlingManager;
@@ -58,11 +62,15 @@ public abstract class Xenomorph extends Alien implements ResinProducer {
 
     private final ResinManager resinManager;
 
+    private int remainingAttackTicks;
+
     private boolean wasUnderwaterLastTick;
 
     public Xenomorph(EntityType<? extends Xenomorph> entityType, Level level) {
         super(entityType, level);
 
+        this.attackDurationInTicks = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_ATTACK_DURATION_IN_TICKS.get());
+        this.isLunging = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_IS_LUNGING.get());
         this.isCrawling = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_IS_CRAWLING.get());
 
         this.crawlingManager = new CrawlingManager(this, isCrawling);
@@ -90,6 +98,15 @@ public abstract class Xenomorph extends Alien implements ResinProducer {
     protected abstract @Nullable ResinData createResinData();
 
     public abstract void runAttackAnimations();
+
+    public abstract boolean isAttacking();
+
+    protected abstract void resetAttackType();
+
+    protected void beginAttack(int durationInTicks) {
+        attackDurationInTicks.set(durationInTicks);
+        remainingAttackTicks = durationInTicks;
+    }
 
     @Override
     protected void registerGoals() {
@@ -122,6 +139,19 @@ public abstract class Xenomorph extends Alien implements ResinProducer {
         resinManager.tick();
 
         updateDimensionsBasedOnWaterState();
+
+        if (!level().isClientSide && isLunging.get() && onGround()) {
+            isLunging.set(false);
+        }
+
+        if (!level().isClientSide && remainingAttackTicks > 0) {
+            remainingAttackTicks--;
+
+            if (remainingAttackTicks <= 0) {
+                resetAttackType();
+                attackDurationInTicks.set(0);
+            }
+        }
 
         if (!level().isClientSide) {
             var target = getTarget();

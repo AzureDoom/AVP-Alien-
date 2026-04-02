@@ -59,11 +59,38 @@ public class PraetorianAnimationDispatcher {
         BITEATTACK_HEAD.dispatchForEntity(praetorian);
     }
 
+    public void biteAttack(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.HEAD_TRACK_NAME,
+            PraetorianAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME,
+            AzPlayBehaviors.PLAY_ONCE,
+            0F, speed, 0F, 0F, false
+        ).dispatchForEntity(praetorian);
+    }
+
     public void rightClawAttack() {
         ARMATTACK_RIGHTARM.dispatchForEntity(praetorian);
     }
 
+    public void rightClawAttack(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
+            PraetorianAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME,
+            AzPlayBehaviors.PLAY_ONCE,
+            0F, speed, 0F, 0F, false
+        ).dispatchForEntity(praetorian);
+    }
+
     public void tailAttack() {
         TAILATTACKQUAD_TAIL.dispatchForEntity(praetorian);
+    }
+
+    public void tailAttack(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.TAIL_TRACK_NAME,
+            PraetorianAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME,
+            AzPlayBehaviors.PLAY_ONCE,
+            0F, speed, 0F, 0F, false
+        ).dispatchForEntity(praetorian);
     }
 }

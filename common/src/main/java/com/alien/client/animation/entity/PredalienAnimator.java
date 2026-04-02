@@ -1,7 +1,9 @@
 package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.predalien.Predalien;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.predalien.PredalienAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
@@ -15,6 +17,8 @@ public class PredalienAnimator extends AzEntityAnimator<Predalien> {
     private static final String NAME = "predalien";
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
+
+    private XenomorphAttackType previousAttackType = XenomorphAttackType.NONE;
 
     public PredalienAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -61,6 +65,26 @@ public class PredalienAnimator extends AzEntityAnimator<Predalien> {
 
     private void runPassiveAnimations(Predalien predalien) {
         var dispatcher = predalien.getAnimationDispatcher();
+
+        var attackType = predalien.attackType.get();
+
+        if (attackType != XenomorphAttackType.NONE) {
+            if (attackType != previousAttackType) {
+                var speed = calculateAttackSpeed(predalien, attackType);
+
+                switch (attackType) {
+                    case BITE -> dispatcher.biteAttack(speed);
+                    case CLAW -> dispatcher.rightClawAttack(speed);
+                    case TAIL -> dispatcher.tailAttack(speed);
+                }
+
+                previousAttackType = attackType;
+            }
+            return;
+        }
+
+        previousAttackType = XenomorphAttackType.NONE;
+
         var isMovingOnGround = predalien.isMovingHorizontally.get() && predalien.onGround();
         Runnable animFunction;
 
@@ -79,5 +103,24 @@ public class PredalienAnimator extends AzEntityAnimator<Predalien> {
         }
 
         animFunction.run();
+    }
+
+    private float calculateAttackSpeed(Predalien predalien, XenomorphAttackType attackType) {
+        var animationName = switch (attackType) {
+            case BITE -> PredalienAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME;
+            case CLAW -> PredalienAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME;
+            case TAIL -> PredalienAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME;
+            default -> null;
+        };
+
+        var durationInTicks = predalien.attackDurationInTicks.get();
+
+        if (animationName == null || durationInTicks <= 0) {
+            return 1.0f;
+        }
+
+        var animation = getAnimation(predalien, animationName);
+
+        return (float) (animation.length() / durationInTicks);
     }
 }

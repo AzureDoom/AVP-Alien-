@@ -59,11 +59,38 @@ public class RavagerAnimationDispatcher {
         BITEATTACK_HEAD.dispatchForEntity(ravager);
     }
 
+    public void biteAttack(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.HEAD_TRACK_NAME,
+            RavagerAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME,
+            AzPlayBehaviors.PLAY_ONCE,
+            0F, speed, 0F, 0F, false
+        ).dispatchForEntity(ravager);
+    }
+
     public void rightClawAttack() {
         ARMATTACK_RIGHTARM.dispatchForEntity(ravager);
     }
 
+    public void rightClawAttack(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
+            RavagerAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME,
+            AzPlayBehaviors.PLAY_ONCE,
+            0F, speed, 0F, 0F, false
+        ).dispatchForEntity(ravager);
+    }
+
     public void tailAttack() {
         TAILATTACKQUAD_TAIL.dispatchForEntity(ravager);
+    }
+
+    public void tailAttack(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.TAIL_TRACK_NAME,
+            RavagerAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME,
+            AzPlayBehaviors.PLAY_ONCE,
+            0F, speed, 0F, 0F, false
+        ).dispatchForEntity(ravager);
     }
 }

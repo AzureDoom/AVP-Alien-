@@ -1,7 +1,9 @@
 package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.razor_claw.RazorClaw;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.razor_claw.RazorClawAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
@@ -15,6 +17,8 @@ public class RazorClawAnimator extends AzEntityAnimator<RazorClaw> {
     private static final String NAME = "razor_claw";
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
+
+    private XenomorphAttackType previousAttackType = XenomorphAttackType.NONE;
 
     public RazorClawAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -61,6 +65,26 @@ public class RazorClawAnimator extends AzEntityAnimator<RazorClaw> {
 
     private void runPassiveAnimations(RazorClaw razorClaw) {
         var dispatcher = razorClaw.getAnimationDispatcher();
+
+        var attackType = razorClaw.attackType.get();
+
+        if (attackType != XenomorphAttackType.NONE) {
+            if (attackType != previousAttackType) {
+                var speed = calculateAttackSpeed(razorClaw, attackType);
+
+                switch (attackType) {
+                    case BITE -> dispatcher.biteAttack(speed);
+                    case CLAW -> dispatcher.rightClawAttack(speed);
+                    case TAIL -> dispatcher.tailAttack(speed);
+                }
+
+                previousAttackType = attackType;
+            }
+            return;
+        }
+
+        previousAttackType = XenomorphAttackType.NONE;
+
         var isMovingOnGround = razorClaw.isMovingHorizontally.get() && razorClaw.onGround();
         Runnable animFunction;
 
@@ -77,5 +101,24 @@ public class RazorClawAnimator extends AzEntityAnimator<RazorClaw> {
         }
 
         animFunction.run();
+    }
+
+    private float calculateAttackSpeed(RazorClaw razorClaw, XenomorphAttackType attackType) {
+        var animationName = switch (attackType) {
+            case BITE -> RazorClawAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME;
+            case CLAW -> RazorClawAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME;
+            case TAIL -> RazorClawAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME;
+            default -> null;
+        };
+
+        var durationInTicks = razorClaw.attackDurationInTicks.get();
+
+        if (animationName == null || durationInTicks <= 0) {
+            return 1.0f;
+        }
+
+        var animation = getAnimation(razorClaw, animationName);
+
+        return (float) (animation.length() / durationInTicks);
     }
 }

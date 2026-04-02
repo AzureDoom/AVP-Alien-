@@ -1,7 +1,9 @@
 package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.QuadrupedAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.RunnerAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
@@ -15,6 +17,8 @@ public class RunnerAnimator extends AzEntityAnimator<Runner> {
     private static final String NAME = "runner";
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
+
+    private QuadrupedAttackType previousAttackType = QuadrupedAttackType.NONE;
 
     public RunnerAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -61,6 +65,31 @@ public class RunnerAnimator extends AzEntityAnimator<Runner> {
 
     private void runPassiveAnimations(Runner runner) {
         var dispatcher = runner.getAnimationDispatcher();
+
+        if (runner.isLunging.get()) {
+            dispatcher.lunge();
+            return;
+        }
+
+        var attackType = runner.attackType.get();
+
+        if (attackType != QuadrupedAttackType.NONE) {
+            if (attackType != previousAttackType) {
+                var speed = calculateAttackSpeed(runner, attackType);
+
+                switch (attackType) {
+                    case BITE -> dispatcher.biteAttack(speed);
+                    case CLAW -> dispatcher.rightClawAttack(speed);
+                    case TAIL_QUAD -> dispatcher.tailAttackQuad(speed);
+                }
+
+                previousAttackType = attackType;
+            }
+            return;
+        }
+
+        previousAttackType = QuadrupedAttackType.NONE;
+
         var isMovingOnGround = runner.isMovingHorizontally.get() && runner.onGround();
         var isCrawling = runner.getCrawlingManager().isCrawling();
         Runnable animFunction;
@@ -82,5 +111,24 @@ public class RunnerAnimator extends AzEntityAnimator<Runner> {
         }
 
         animFunction.run();
+    }
+
+    private float calculateAttackSpeed(Runner runner, QuadrupedAttackType attackType) {
+        var animationName = switch (attackType) {
+            case BITE -> RunnerAnimationRefs.BITEATTACK_HEAD_ANIMATION_NAME;
+            case CLAW -> RunnerAnimationRefs.ATTACKCLAWQUAD_RIGHTARM_ANIMATION_NAME;
+            case TAIL_QUAD -> RunnerAnimationRefs.TAILATTACKQUAD_TAIL_ANIMATION_NAME;
+            default -> null;
+        };
+
+        var durationInTicks = runner.attackDurationInTicks.get();
+
+        if (animationName == null || durationInTicks <= 0) {
+            return 1.0f;
+        }
+
+        var animation = getAnimation(runner, animationName);
+
+        return (float) (animation.length() / durationInTicks);
     }
 }

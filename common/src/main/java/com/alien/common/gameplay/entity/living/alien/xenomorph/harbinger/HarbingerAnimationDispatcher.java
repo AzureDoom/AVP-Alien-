@@ -59,11 +59,38 @@ public class HarbingerAnimationDispatcher {
         BITEATTACK_HEAD.dispatchForEntity(harbinger);
     }
 
+    public void biteAttack(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.HEAD_TRACK_NAME,
+            HarbingerAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME,
+            AzPlayBehaviors.PLAY_ONCE,
+            0F, speed, 0F, 0F, false
+        ).dispatchForEntity(harbinger);
+    }
+
     public void rightClawAttack() {
         ARMATTACK_RIGHTARM.dispatchForEntity(harbinger);
     }
 
+    public void rightClawAttack(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
+            HarbingerAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME,
+            AzPlayBehaviors.PLAY_ONCE,
+            0F, speed, 0F, 0F, false
+        ).dispatchForEntity(harbinger);
+    }
+
     public void tailAttack() {
         TAILATTACKQUAD_TAIL.dispatchForEntity(harbinger);
+    }
+
+    public void tailAttack(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.TAIL_TRACK_NAME,
+            HarbingerAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME,
+            AzPlayBehaviors.PLAY_ONCE,
+            0F, speed, 0F, 0F, false
+        ).dispatchForEntity(harbinger);
     }
 }

@@ -121,6 +121,14 @@ public class Boiler extends Xenomorph {
     protected void addDigToTargetGoal() {}
 
     @Override
+    public boolean isAttacking() {
+        return false;
+    }
+
+    @Override
+    protected void resetAttackType() {}
+
+    @Override
     public void runAttackAnimations() {}
 
     @Override

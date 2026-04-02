@@ -2,6 +2,8 @@ package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.Crusher;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.CrusherAnimationRefs;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.CrusherAttackType;
 import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
@@ -15,6 +17,8 @@ public class CrusherAnimator extends AzEntityAnimator<Crusher> {
     private static final String NAME = "crusher";
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
+
+    private CrusherAttackType previousAttackType = CrusherAttackType.NONE;
 
     public CrusherAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -61,6 +65,30 @@ public class CrusherAnimator extends AzEntityAnimator<Crusher> {
 
     private void runPassiveAnimations(Crusher crusher) {
         var dispatcher = crusher.getAnimationDispatcher();
+
+        if (crusher.isLunging.get()) {
+            dispatcher.lunge();
+            return;
+        }
+
+        var attackType = crusher.attackType.get();
+
+        if (attackType != CrusherAttackType.NONE) {
+            if (attackType != previousAttackType) {
+                var speed = calculateAttackSpeed(crusher, attackType);
+
+                switch (attackType) {
+                    case BITE -> dispatcher.biteAttack(speed);
+                    case TAIL -> dispatcher.tailAttack(speed);
+                }
+
+                previousAttackType = attackType;
+            }
+            return;
+        }
+
+        previousAttackType = CrusherAttackType.NONE;
+
         var isMovingOnGround = crusher.isMovingHorizontally.get() && crusher.onGround();
         Runnable animFunction;
 
@@ -79,5 +107,23 @@ public class CrusherAnimator extends AzEntityAnimator<Crusher> {
         }
 
         animFunction.run();
+    }
+
+    private float calculateAttackSpeed(Crusher crusher, CrusherAttackType attackType) {
+        var animationName = switch (attackType) {
+            case BITE -> CrusherAnimationRefs.BITEATTACK_HEAD_ANIMATION_NAME;
+            case TAIL -> CrusherAnimationRefs.TAILATTACK_TAIL_ANIMATION_NAME;
+            default -> null;
+        };
+
+        var durationInTicks = crusher.attackDurationInTicks.get();
+
+        if (animationName == null || durationInTicks <= 0) {
+            return 1.0f;
+        }
+
+        var animation = getAnimation(crusher, animationName);
+
+        return (float) (animation.length() / durationInTicks);
     }
 }

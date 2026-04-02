@@ -85,11 +85,38 @@ public class RunnerAnimationDispatcher {
         BITEATTACK_HEAD.dispatchForEntity(runner);
     }
 
+    public void biteAttack(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.HEAD_TRACK_NAME,
+            RunnerAnimationRefs.BITEATTACK_HEAD_ANIMATION_NAME,
+            AzPlayBehaviors.PLAY_ONCE,
+            0F, speed, 0F, 0F, false
+        ).dispatchForEntity(runner);
+    }
+
     public void rightClawAttack() {
         ARMATTACK_RIGHTARM.dispatchForEntity(runner);
     }
 
+    public void rightClawAttack(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
+            RunnerAnimationRefs.ATTACKCLAWQUAD_RIGHTARM_ANIMATION_NAME,
+            AzPlayBehaviors.PLAY_ONCE,
+            0F, speed, 0F, 0F, false
+        ).dispatchForEntity(runner);
+    }
+
     public void tailAttackQuad() {
         TAILATTACKQUAD_TAIL.dispatchForEntity(runner);
+    }
+
+    public void tailAttackQuad(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.TAIL_TRACK_NAME,
+            RunnerAnimationRefs.TAILATTACKQUAD_TAIL_ANIMATION_NAME,
+            AzPlayBehaviors.PLAY_ONCE,
+            0F, speed, 0F, 0F, false
+        ).dispatchForEntity(runner);
     }
 }

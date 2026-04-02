@@ -91,8 +91,26 @@ public class SpitterAnimationDispatcher {
         BITEATTACK_HEAD.dispatchForEntity(spitter);
     }
 
+    public void biteAttack(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.HEAD_TRACK_NAME,
+            SpitterAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME,
+            AzPlayBehaviors.PLAY_ONCE,
+            0F, speed, 0F, 0F, false
+        ).dispatchForEntity(spitter);
+    }
+
     public void rightClawAttack() {
         ATTACKCLAW_RIGHTARM.dispatchForEntity(spitter);
+    }
+
+    public void rightClawAttack(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
+            SpitterAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME,
+            AzPlayBehaviors.PLAY_ONCE,
+            0F, speed, 0F, 0F, false
+        ).dispatchForEntity(spitter);
     }
 
     public void rightClawAttackQuad() {
@@ -101,5 +119,14 @@ public class SpitterAnimationDispatcher {
 
     public void tailAttack() {
         TAILATTACKQUAD_TAIL.dispatchForEntity(spitter);
+    }
+
+    public void tailAttack(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.TAIL_TRACK_NAME,
+            SpitterAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME,
+            AzPlayBehaviors.PLAY_ONCE,
+            0F, speed, 0F, 0F, false
+        ).dispatchForEntity(spitter);
     }
 }

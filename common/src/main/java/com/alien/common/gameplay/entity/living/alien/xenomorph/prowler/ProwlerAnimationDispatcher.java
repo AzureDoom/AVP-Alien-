@@ -85,11 +85,38 @@ public class ProwlerAnimationDispatcher {
         BITEATTACK_HEAD.dispatchForEntity(prowler);
     }
 
+    public void biteAttack(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.HEAD_TRACK_NAME,
+            ProwlerAnimationRefs.BITEATTACK_HEAD_ANIMATION_NAME,
+            AzPlayBehaviors.PLAY_ONCE,
+            0F, speed, 0F, 0F, false
+        ).dispatchForEntity(prowler);
+    }
+
     public void rightClawAttack() {
         CLAWATTACKQUAD_RIGHTARM.dispatchForEntity(prowler);
     }
 
+    public void rightClawAttack(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
+            ProwlerAnimationRefs.CLAWATTACKQUAD_RIGHTARM_ANIMATION_NAME,
+            AzPlayBehaviors.PLAY_ONCE,
+            0F, speed, 0F, 0F, false
+        ).dispatchForEntity(prowler);
+    }
+
     public void tailAttackQuad() {
         TAILATTACKQUAD_TAIL.dispatchForEntity(prowler);
+    }
+
+    public void tailAttackQuad(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.TAIL_TRACK_NAME,
+            ProwlerAnimationRefs.TAILATTACKQUAD_TAIL_ANIMATION_NAME,
+            AzPlayBehaviors.PLAY_ONCE,
+            0F, speed, 0F, 0F, false
+        ).dispatchForEntity(prowler);
     }
 }

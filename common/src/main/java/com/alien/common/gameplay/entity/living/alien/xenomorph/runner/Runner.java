@@ -6,13 +6,16 @@ import com.alien.common.gameplay.ai.PickUpEggGoal;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.EggCarrier;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.EggPickupManager;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.QuadrupedAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphNavigationManager;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.model.resin.ResinData;
+import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
+import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.entity.v1.EntityUtil;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.entity.v1.ai.goal.combat.LungeAtTargetGoal;
@@ -41,12 +44,15 @@ public class Runner extends Xenomorph implements EggCarrier {
             .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1F);
     }
 
+    public final DataAccessor<QuadrupedAttackType> attackType;
+
     private final RunnerAnimationDispatcher animationDispatcher;
 
     private final EggPickupManager eggPickupManager;
 
     public Runner(EntityType<? extends Runner> entityType, Level level) {
         super(entityType, level);
+        this.attackType = new DataAccessor<>(this, AlienDataSyncKeys.QUADRUPED_ATTACK_TYPE.get());
         this.animationDispatcher = new RunnerAnimationDispatcher(this);
         this.eggPickupManager = new EggPickupManager(this);
     }
@@ -94,8 +100,18 @@ public class Runner extends Xenomorph implements EggCarrier {
     }
 
     @Override
+    public boolean isAttacking() {
+        return attackType.get() != QuadrupedAttackType.NONE;
+    }
+
+    @Override
+    protected void resetAttackType() {
+        attackType.set(QuadrupedAttackType.NONE);
+    }
+
+    @Override
     public void runAttackAnimations() {
-        var attackType = random.nextInt(0, 3);
+        var attackVariant = random.nextInt(0, 3);
 
         playSound(
             AlienSoundEvents.ENTITY_XENOMORPH_ATTACK.get(),
@@ -103,16 +119,19 @@ public class Runner extends Xenomorph implements EggCarrier {
             (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F
         );
 
-        switch (attackType) {
-            case 0 -> animationDispatcher.rightClawAttack();
-            case 1 -> animationDispatcher.biteAttack();
-            default -> animationDispatcher.tailAttackQuad();
-        }
+        var attack = switch (attackVariant) {
+            case 0 -> QuadrupedAttackType.CLAW;
+            case 1 -> QuadrupedAttackType.BITE;
+            default -> QuadrupedAttackType.TAIL_QUAD;
+        };
+
+        attackType.set(attack);
+        beginAttack(attack.defaultDurationInTicks());
     }
 
     private void runLungeAnimation() {
         playSound(AlienSoundEvents.ENTITY_XENOMORPH_LUNGE.get(), getSoundVolume(), (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F);
-        animationDispatcher.lunge();
+        isLunging.set(true);
     }
 
     @Override

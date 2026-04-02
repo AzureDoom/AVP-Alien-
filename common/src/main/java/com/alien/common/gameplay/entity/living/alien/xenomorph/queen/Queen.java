@@ -5,15 +5,18 @@ import com.alien.common.gameplay.ai.goal.DigToTargetGoal;
 import com.alien.common.gameplay.ai.goal.QueenLayEggGoal;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.QueenAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphNavigationManager;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
 import com.alien.common.gameplay.level.saveddata.QueenSpawnChunkData;
 import com.alien.common.gameplay.level.saveddata.StrainLeakData;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.model.resin.ResinData;
+import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
+import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.entity.v1.EntityUtil;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.entity.v1.PlayerUtil;
@@ -51,12 +54,15 @@ public class Queen extends Xenomorph {
             .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 0.9F);
     }
 
+    public final DataAccessor<QueenAttackType> attackType;
+
     private final QueenAnimationDispatcher animationDispatcher;
 
     private final OvipositorManager ovipositorManager;
 
     public Queen(EntityType<? extends Queen> entityType, Level level) {
         super(entityType, level);
+        this.attackType = new DataAccessor<>(this, AlienDataSyncKeys.QUEEN_ATTACK_TYPE.get());
         this.animationDispatcher = new QueenAnimationDispatcher(this);
         this.ovipositorManager = new OvipositorManager(this);
     }
@@ -191,8 +197,18 @@ public class Queen extends Xenomorph {
     }
 
     @Override
+    public boolean isAttacking() {
+        return attackType.get() != QueenAttackType.NONE;
+    }
+
+    @Override
+    protected void resetAttackType() {
+        attackType.set(QueenAttackType.NONE);
+    }
+
+    @Override
     public void runAttackAnimations() {
-        var attackType = random.nextInt(0, 3);
+        var attackVariant = random.nextInt(0, 3);
 
         playSound(
             AlienSoundEvents.ENTITY_XENOMORPH_ATTACK.get(),
@@ -200,11 +216,14 @@ public class Queen extends Xenomorph {
             (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F
         );
 
-        switch (attackType) {
-            case 0 -> animationDispatcher.swipeDownAttack();
-            case 1 -> animationDispatcher.backhandAttack();
-            default -> animationDispatcher.tailStrikeAttack();
-        }
+        var attack = switch (attackVariant) {
+            case 0 -> QueenAttackType.SWIPE_DOWN;
+            case 1 -> QueenAttackType.BACKHAND;
+            default -> QueenAttackType.TAIL_STRIKE;
+        };
+
+        attackType.set(attack);
+        beginAttack(attack.defaultDurationInTicks());
     }
 
     @Override
