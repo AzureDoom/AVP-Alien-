@@ -45,6 +45,8 @@ public class SpawnEggsCreativeModeTabInitializer {
 
         CreativeModeTabUtil.accept(output, AlienSpawnEggItems.BOILER_SPAWN_EGG);
         CreativeModeTabUtil.accept(output, AlienSpawnEggItems.SPITTER_SPAWN_EGG);
+
+        CreativeModeTabUtil.accept(output, AlienSpawnEggItems.RAZOR_CLAW_SPAWN_EGG);
     }
 
     private static void addNetherXenomorphSpawnEggs(CreativeModeTab.Output output) {
@@ -73,6 +75,8 @@ public class SpawnEggsCreativeModeTabInitializer {
 
         CreativeModeTabUtil.accept(output, AlienSpawnEggItems.NETHER_BOILER_SPAWN_EGG);
         CreativeModeTabUtil.accept(output, AlienSpawnEggItems.NETHER_SPITTER_SPAWN_EGG);
+
+        CreativeModeTabUtil.accept(output, AlienSpawnEggItems.NETHER_RAZOR_CLAW_SPAWN_EGG);
     }
 
     private static void addAberrantXenomorphSpawnEggs(CreativeModeTab.Output output) {
@@ -101,6 +105,8 @@ public class SpawnEggsCreativeModeTabInitializer {
 
         CreativeModeTabUtil.accept(output, AlienSpawnEggItems.ABERRANT_BOILER_SPAWN_EGG);
         CreativeModeTabUtil.accept(output, AlienSpawnEggItems.ABERRANT_SPITTER_SPAWN_EGG);
+
+        CreativeModeTabUtil.accept(output, AlienSpawnEggItems.ABERRANT_RAZOR_CLAW_SPAWN_EGG);
     }
 
     private static void addIrradiatedXenomorphSpawnEggs(CreativeModeTab.Output output) {
@@ -116,5 +122,7 @@ public class SpawnEggsCreativeModeTabInitializer {
         if (AVPPredator.MOD.isLoaded()) {
             CreativeModeTabUtil.accept(output, AlienSpawnEggItems.IRRADIATED_PREDALIEN_SPAWN_EGG);
         }
+
+        CreativeModeTabUtil.accept(output, AlienSpawnEggItems.IRRADIATED_RAZOR_CLAW_SPAWN_EGG);
     }
 }
