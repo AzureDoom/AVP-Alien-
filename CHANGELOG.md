@@ -47,6 +47,7 @@
 ## ♻️ Changes
 - Updated praetorian model, textures and animations.
 - Updated predalien model, textures and animations.
+- Updated warrior model and textures.
 - Updated chitin models and textures.
 - Updated plated chitin models and textures.
 - Only ovomorphs and boilers now respond to vibrations, rather than all aliens.
