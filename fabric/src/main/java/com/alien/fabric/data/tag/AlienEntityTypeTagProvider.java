@@ -2,6 +2,7 @@ package com.alien.fabric.data.tag;
 
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
+import com.alien.compatibility.avp_human.AVPHuman;
 import com.alien.fabric.compatibility.stellaris.common.registry.tag.StellarisEntityTypeTags;
 import com.human.common.registry.tag.HumanEntityTypeTags;
 import mods.cybercat.gigeresque.common.tags.GigTags;
@@ -61,7 +62,10 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
 
         // Compatibility
         addCompatibilityTags();
-        addRadiationResistant();
+
+        if (AVPHuman.MOD.isLoaded()) {
+            addRadiationResistant();
+        }
     }
 
     private void addAberrantAliens() {

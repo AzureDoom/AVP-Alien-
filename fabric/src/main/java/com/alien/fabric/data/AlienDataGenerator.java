@@ -1,5 +1,6 @@
 package com.alien.fabric.data;
 
+import com.alien.compatibility.avp_human.AVPHuman;
 import com.alien.fabric.data.advancement.AdvancementProvider;
 import com.alien.fabric.data.damage_type.DamageTypeBootstrapper;
 import com.alien.fabric.data.damage_type.DamageTypeProvider;
@@ -61,7 +62,10 @@ public class AlienDataGenerator implements DataGeneratorEntrypoint {
         pack.addProvider(AlienJukeboxSongsProvider::new);
 
         // Custom Providers
-        pack.addProvider(GeneBonusDataSubProvider::new);
+        if (AVPHuman.MOD.isLoaded()) {
+            pack.addProvider(GeneBonusDataSubProvider::new);
+        }
+
         pack.addProvider(GrowthStageSubProvider::new);
         pack.addProvider(InfectionSubProvider::new);
     }
