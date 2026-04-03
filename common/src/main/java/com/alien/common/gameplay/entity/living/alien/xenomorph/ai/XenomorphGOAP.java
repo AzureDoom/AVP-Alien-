@@ -9,8 +9,6 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.dig.DigSensors
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.idle.IdleActions;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.idle.IdleGoals;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.idle.IdleSensors;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.swim.SwimActions;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.swim.SwimSensors;
 import com.alien.common.util.AlienPredicates;
 import com.blib.api.common.goap.v1.GOAPSensors;
 import com.just.goap.Agent;
@@ -23,7 +21,6 @@ public class XenomorphGOAP {
         return graphBuilder
             .apply(XenomorphGOAP::addSensorsPackage)
             .apply(XenomorphGOAP::addCombatPackage)
-            .apply(XenomorphGOAP::addSwimPackage)
             .apply(XenomorphGOAP::addDigPackage)
             .apply(XenomorphGOAP::addIdlePackage);
     }
@@ -68,14 +65,6 @@ public class XenomorphGOAP {
         graphBuilder.addSensor(GOAPSensors.NEAREST_ATTACKABLE_TARGET);
         graphBuilder.addSensor(GOAPSensors.HAS_ATTACK_TARGET);
         graphBuilder.addSensor(CombatSensors.IS_TARGET_IN_MELEE_RANGE);
-
-        return graphBuilder;
-    }
-
-    private static <T extends Xenomorph> Graph.Builder<T> addSwimPackage(Graph.Builder<T> graphBuilder) {
-        graphBuilder.addAction(SwimActions.SWIM_TO_LAND);
-
-        graphBuilder.addSensor(SwimSensors.NEEDS_WATER_TO_LAND_TRANSITION);
 
         return graphBuilder;
     }

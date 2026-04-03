@@ -16,6 +16,7 @@ import com.blib.api.common.pathfinding.v1.evaluator.TerrainEvaluatorConfig;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigator;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorConfig;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
+import com.blib.api.common.pathfinding.v1.terrain.TerrainClassifiers;
 import com.blib.api.common.pathfinding.v1.terrain.TerrainType;
 import com.just.goap.Agent;
 import com.just.goap.graph.Graph;
@@ -52,9 +53,17 @@ public class Warrior extends Xenomorph implements GOAPUser<Warrior>, PathNavigat
         getXenomorphData().setParallelDigCount(1);
     }
 
+    private static final float WATER_SPEED_DIVISOR = 4.0F;
+
     private PathNavigator createPathNavigator(Level level) {
         var evaluatorConfig = TerrainEvaluatorConfig.builder()
             .addTerrain(TerrainType.GROUND, 1.0f)
+            .addTerrainFromSpeedRatio(
+                TerrainType.WATER,
+                () -> (float) getAttributeValue(Attributes.MOVEMENT_SPEED),
+                () -> (float) getAttributeValue(Attributes.MOVEMENT_SPEED) / WATER_SPEED_DIVISOR
+            )
+            .withTerrainClassifier(TerrainClassifiers.GROUND_AND_WATER)
             .withEntityDimensions(1, 2)
             .withMaxFallDistance(14)
             .withCanOpenDoors(true)

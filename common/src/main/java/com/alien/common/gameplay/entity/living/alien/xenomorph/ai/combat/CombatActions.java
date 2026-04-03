@@ -3,7 +3,6 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.action.MeleeAttackAction;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.dig.DigSensors;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.swim.SwimSensors;
 import com.blib.api.common.goap.v1.GOAPSensors;
 import com.blib.api.common.goap.v1.action.ActionMasks;
 import com.blib.api.common.goap.v1.action.BLibAction;
@@ -30,7 +29,6 @@ public class CombatActions {
         .addMasks(ActionMasks.MOVE)
         .addPrecondition(GOAPSensors.HAS_ATTACK_TARGET.key(), Expressions.Boolean.isTrue())
         .addPrecondition(CombatSensors.IS_TARGET_IN_MELEE_RANGE.key(), Expressions.Boolean.isFalse())
-        .addPrecondition(SwimSensors.NEEDS_WATER_TO_LAND_TRANSITION.key(), Expressions.Boolean.isFalse())
         .addPrecondition(DigSensors.IS_PATH_TO_TARGET_BLOCKED.key(), Expressions.Boolean.isFalse())
         .addEffect(CombatSensors.IS_TARGET_IN_MELEE_RANGE.key().asDerived(), true)
         .withPerformCallback(CombatActions::performMoveToTarget)
