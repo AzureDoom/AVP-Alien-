@@ -111,6 +111,10 @@ public class AlienGrowthStageProvider {
         );
 
         biConsumer.accept(
+            "ovomorph_to_royal_ovomorph",
+            new GrowthStage(AlienEntityTypes.OVOMORPH.get(), AlienEntityTypes.ROYAL_OVOMORPH.get(), metamorphosis)
+        );
+        biConsumer.accept(
             "drone_to_warrior",
             new GrowthStage(AlienEntityTypes.DRONE.get(), AlienEntityTypes.WARRIOR.get(), metamorphosis)
         );

@@ -6,6 +6,7 @@ import com.alien.common.gameplay.entity.living.alien.ovomorph.ai.OvomorphGOAP;
 import com.alien.common.model.alien.HatchState;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienDataSyncKeys;
+import com.alien.common.gameplay.entity.living.alien.GrowthManager;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
@@ -58,6 +59,8 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
 
     public final DataAccessor<Boolean> isRooted;
 
+    private final GrowthManager growthManager;
+
     private final OvomorphAnimationDispatcher animationDispatcher;
 
     private final VibrationSystemManager vibrationSystemManager;
@@ -75,6 +78,7 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
         this.maxSpawnCount = new DataAccessor<>(this, AlienDataSyncKeys.OVOMORPH_MAXIMUM_SPAWN_COUNT.get());
         this.isRooted = new DataAccessor<>(this, AlienDataSyncKeys.OVOMORPH_IS_ROOTED.get());
 
+        this.growthManager = new GrowthManager(this);
         this.animationDispatcher = new OvomorphAnimationDispatcher(this);
         this.hatchManager = new HatchManager(this, 3 * 20, 3 * 20);
         this.wantsPickup = false;
@@ -99,6 +103,7 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
     @Override
     public void tick() {
         super.tick();
+        growthManager.tick();
         hatchManager.tick();
         vibrationSystemManager.tick();
 

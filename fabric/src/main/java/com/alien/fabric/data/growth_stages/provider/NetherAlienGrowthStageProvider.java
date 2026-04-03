@@ -111,6 +111,10 @@ public class NetherAlienGrowthStageProvider {
         );
 
         biConsumer.accept(
+            "nether_ovomorph_to_royal_nether_ovomorph",
+            new GrowthStage(AlienEntityTypes.NETHER_OVOMORPH.get(), AlienEntityTypes.ROYAL_NETHER_OVOMORPH.get(), metamorphosis)
+        );
+        biConsumer.accept(
             "nether_drone_to_nether_warrior",
             new GrowthStage(AlienEntityTypes.NETHER_DRONE.get(), AlienEntityTypes.NETHER_WARRIOR.get(), metamorphosis)
         );

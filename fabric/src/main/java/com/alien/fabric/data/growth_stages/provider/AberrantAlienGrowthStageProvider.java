@@ -111,6 +111,10 @@ public class AberrantAlienGrowthStageProvider {
         );
 
         biConsumer.accept(
+            "aberrant_ovomorph_to_royal_aberrant_ovomorph",
+            new GrowthStage(AlienEntityTypes.ABERRANT_OVOMORPH.get(), AlienEntityTypes.ROYAL_ABERRANT_OVOMORPH.get(), metamorphosis)
+        );
+        biConsumer.accept(
             "aberrant_drone_to_aberrant_warrior",
             new GrowthStage(AlienEntityTypes.ABERRANT_DRONE.get(), AlienEntityTypes.ABERRANT_WARRIOR.get(), metamorphosis)
         );
