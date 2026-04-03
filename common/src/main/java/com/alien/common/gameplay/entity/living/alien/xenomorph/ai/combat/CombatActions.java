@@ -140,13 +140,20 @@ public class CombatActions {
 
     private static boolean breakBlocksInVolume(Xenomorph xenomorph, BlockPos feetPos) {
         var entityHeight = (int) Math.ceil(xenomorph.getBbHeight());
+        var parallelDigCount = xenomorph.getXenomorphData().getParallelDigCount();
         var allCleared = true;
+        var brokenThisCycle = 0;
 
         for (int dy = 0; dy < entityHeight; dy++) {
             var checkPos = feetPos.above(dy);
             var state = xenomorph.level().getBlockState(checkPos);
 
             if (!state.isSolid()) {
+                continue;
+            }
+
+            if (brokenThisCycle >= parallelDigCount) {
+                allCleared = false;
                 continue;
             }
 
@@ -162,6 +169,8 @@ public class CombatActions {
             if (result != BlockBreakProgressManager.Result.DESTROYED) {
                 allCleared = false;
             }
+
+            brokenThisCycle++;
         }
 
         return allCleared;
