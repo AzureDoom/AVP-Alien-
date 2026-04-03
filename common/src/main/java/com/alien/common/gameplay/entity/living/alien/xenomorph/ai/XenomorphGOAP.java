@@ -11,6 +11,7 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.idle.IdleGoals
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.idle.IdleSensors;
 import com.alien.common.util.AlienPredicates;
 import com.blib.api.common.goap.v1.GOAPSensors;
+import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
 import com.just.goap.Agent;
 import com.just.goap.graph.Graph;
 import com.just.goap.plan.ReplanPolicies;
@@ -29,7 +30,15 @@ public class XenomorphGOAP {
         return agentBuilder.withReplanPolicy(
             ReplanPolicies.anyOf(
                 ReplanPolicies.ifNoActivePlans(),
-                ReplanPolicies.custom(context -> context.agent().getActor().tickCount % 20 == 0),
+                ReplanPolicies.custom(context -> {
+                    var actor = context.agent().getActor();
+
+                    if (actor instanceof PathNavigatorUser user && user.getPathNavigator().isWaitingForBlockBreak()) {
+                        return false;
+                    }
+
+                    return actor.tickCount % 20 == 0;
+                }),
                 ReplanPolicies.custom(context -> {
                     var isOnFire = context.worldState().getOrDefault(GOAPSensors.IS_ON_FIRE.key(), false);
                     var wasOnFire = context.previousWorldState().getOrDefault(GOAPSensors.IS_ON_FIRE.key(), false);

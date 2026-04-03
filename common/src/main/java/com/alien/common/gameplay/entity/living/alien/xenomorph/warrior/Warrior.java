@@ -4,6 +4,7 @@ import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.warrior.ai.WarriorGOAP;
+import com.alien.common.registry.tag.AlienBlockTags;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienDataSyncKeys;
@@ -16,6 +17,7 @@ import com.blib.api.common.pathfinding.v1.evaluator.TerrainEvaluatorConfig;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigator;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorConfig;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
+import com.blib.api.common.pathfinding.v1.terrain.BlockBreakabilityEvaluators;
 import com.blib.api.common.pathfinding.v1.terrain.TerrainClassifiers;
 import com.blib.api.common.pathfinding.v1.terrain.TerrainType;
 import com.just.goap.Agent;
@@ -55,6 +57,8 @@ public class Warrior extends Xenomorph implements GOAPUser<Warrior>, PathNavigat
 
     private static final float WATER_SPEED_DIVISOR = 4.0F;
 
+    private static final float MAX_BREAKABLE_DESTROY_TIME = 6.0F;
+
     private PathNavigator createPathNavigator(Level level) {
         var evaluatorConfig = TerrainEvaluatorConfig.builder()
             .addTerrain(TerrainType.GROUND, 1.0f)
@@ -63,7 +67,14 @@ public class Warrior extends Xenomorph implements GOAPUser<Warrior>, PathNavigat
                 () -> (float) getAttributeValue(Attributes.MOVEMENT_SPEED),
                 () -> (float) getAttributeValue(Attributes.MOVEMENT_SPEED) / WATER_SPEED_DIVISOR
             )
+            .addTerrain(TerrainType.BREAKABLE, 2.0f)
             .withTerrainClassifier(TerrainClassifiers.GROUND_AND_WATER)
+            .withBreakabilityEvaluator(
+                BlockBreakabilityEvaluators.withExcludedTag(
+                    BlockBreakabilityEvaluators.defaultEvaluator(MAX_BREAKABLE_DESTROY_TIME),
+                    AlienBlockTags.XENOMORPH_IMMUNE
+                )
+            )
             .withEntityDimensions(1, 2)
             .withMaxFallDistance(14)
             .withCanOpenDoors(true)
