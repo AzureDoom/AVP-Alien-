@@ -3,8 +3,9 @@
   "requirements": [
     {
       "type": "mob_effect",
-      "effect": "avp_alien:metamorphosis"
+      "effect": "avp_alien:scourge",
+      "min_amplifier": 1
     }
   ],
-  "to": "avp_alien:warrior"
+  "to": "avp_alien:razor_claw"
 }

@@ -89,11 +89,6 @@ public class PredalienChestburster extends Alien {
         growthManager.save(compoundTag);
     }
 
-    @Override
-    public Integer getMaxJellyToGrowth() {
-        return 1;
-    }
-
     public PredalienChestbursterAnimationDispatcher getAnimationDispatcher() {
         return animationDispatcher;
     }

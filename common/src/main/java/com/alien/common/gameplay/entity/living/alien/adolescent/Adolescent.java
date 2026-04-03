@@ -109,11 +109,6 @@ public class Adolescent extends Alien {
         compoundTag.putBoolean(NBT_HAS_DORSAL_TUBES, hasDorsalTubes.get());
     }
 
-    @Override
-    public Integer getMaxJellyToGrowth() {
-        return 1;
-    }
-
     public AdolescentAnimationDispatcher getAnimationDispatcher() {
         return animationDispatcher;
     }

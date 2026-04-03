@@ -1,6 +1,7 @@
 package com.alien.common.gameplay.entity.living.alien;
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.boiler.Boiler;
+import com.alien.common.model.lifecycle.growth.GrowthRequirement;
 import com.alien.common.model.lifecycle.growth.GrowthStage;
 import com.alien.common.registry.GrowthStageRegistry;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
@@ -19,12 +20,15 @@ import net.minecraft.world.entity.EntityType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
 public class GrowthManager implements NBTSerializable {
 
     private static final String GROWTH_TIME_IN_TICKS_TAG_KEY = "growthTimeInTicks";
+
+    private static final int EFFECT_GROWTH_WINDOW_IN_TICKS = 20 * 10;
 
     private static final Set<String> TRANSITION_NBT_KEY_BLACKLIST = Util.make(() -> {
         var set = new HashSet<>(EntityTransitionUtil.DEFAULT_NBT_KEY_BLACKLIST);
@@ -40,7 +44,7 @@ public class GrowthManager implements NBTSerializable {
 
     private int growthTimeInTicks;
 
-    private int growthRetryTimeInTicks = 0;
+    private int growthRetryTimeInTicks;
 
     private boolean readyToGrow;
 
@@ -56,31 +60,23 @@ public class GrowthManager implements NBTSerializable {
     }
 
     public void tick() {
-        if (
-            entity.level().isClientSide
-                || canNeverGrow()
-        ) {
+        if (entity.level().isClientSide || canNeverGrow()) {
             return;
         }
 
-        var growthStage = getNextGrowthStage();
+        var matchingStage = findMatchingGrowthStage();
 
-        if (growthStage == null) {
+        if (matchingStage == null) {
             return;
         }
 
-        var canBypassGrowthTime = entity.getMaxJellyToGrowth() != null && entity.getJellyCount() >= entity.getMaxJellyToGrowth();
-
-        if (canBypassGrowthTime) {
-            // If we can bypass growing over time thanks to royal jelly, then do so.
-            this.readyToGrow = true;
+        if (matchingStage.hasRequirements()) {
+            tickEffectBasedGrowth(matchingStage);
         } else if (growOverTime) {
-            // Otherwise if we can't bypass growth time, tick the entity's growth progress.
-            growOverTime();
+            tickTimeBasedGrowth(matchingStage);
         }
 
         if (!readyToGrow) {
-            // If the entity isn't ready to grow, then don't continue any further.
             return;
         }
 
@@ -90,90 +86,105 @@ public class GrowthManager implements NBTSerializable {
             return;
         }
 
-        // Growth attempts can fail for a lot of reasons. This switch covers every possible reason.
-        switch (grow()) {
-            case GrowthResult.AlreadyFullyGrown $ -> {/* NO-OP */}
-            case GrowthResult.CanNotGrow $ -> {/* NO-OP */}
-            case GrowthResult.Success $ -> {/* NO-OP */}
+        switch (grow(matchingStage)) {
+            case GrowthResult.AlreadyFullyGrown ignored -> {/* NO-OP */}
+            case GrowthResult.CanNotGrow ignored -> {/* NO-OP */}
+            case GrowthResult.Success ignored -> {/* NO-OP */}
             case GrowthResult.FailedTransitionResult failedTransitionResult -> {
-                switch (failedTransitionResult.result) {
-                    case EntityTransitionUtil.EntityTransitionResult.ClientSide $1 -> {/* NO-OP */}
-                    case EntityTransitionUtil.EntityTransitionResult.EntityCreation $1 -> {/* NO-OP */}
-                    case EntityTransitionUtil.EntityTransitionResult.Obstructed $1 ->
-                        // If the entity failed to grow, then retry in 10 seconds.
-                        // TODO: Add particles here maybe if the alien can't grow up, to indicate "frustration"?
-                        // Apply a buffer time period before we retry growing.
-                        this.growthRetryTimeInTicks = 20 * 10;
-                    case EntityTransitionUtil.EntityTransitionResult.Success<?> $1 -> {/* NO-OP */ }
+                if (failedTransitionResult.result instanceof EntityTransitionUtil.EntityTransitionResult.Obstructed) {
+                    this.growthRetryTimeInTicks = 20 * 10;
                 }
             }
         }
     }
 
-    private @Nullable GrowthStage getNextGrowthStage() {
+    private @Nullable GrowthStage findMatchingGrowthStage() {
         var hostType = entity.getHostType().unwrapOr(null);
-        return GrowthStageRegistry.getOrNull(hostType, entity.getType());
+        var candidates = GrowthStageRegistry.getCandidates(hostType, entity.getType());
+
+        for (var candidate : candidates) {
+            if (!candidate.hasRequirements()) {
+                return candidate;
+            }
+
+            if (allRequirementsMet(candidate.requirements())) {
+                return candidate;
+            }
+        }
+
+        return null;
     }
 
-    private void growOverTime() {
+    private boolean allRequirementsMet(List<GrowthRequirement> requirements) {
+        for (var requirement : requirements) {
+            if (!requirement.test(entity)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void tickEffectBasedGrowth(GrowthStage stage) {
+        var allInWindow = true;
+
+        for (var requirement : stage.requirements()) {
+            if (requirement instanceof GrowthRequirement.MobEffectRequirement effectRequirement) {
+                if (!effectRequirement.isInGrowthWindow(entity, EFFECT_GROWTH_WINDOW_IN_TICKS)) {
+                    allInWindow = false;
+                    break;
+                }
+            }
+        }
+
+        this.readyToGrow = allInWindow;
+    }
+
+    private void tickTimeBasedGrowth(GrowthStage stage) {
         this.growthTimeInTicks++;
 
-        var growthStage = getNextGrowthStage();
-
-        if (growthStage == null) {
-            return;
+        if (growthTimeInTicks >= stage.growthTimeInTicks()) {
+            this.readyToGrow = true;
         }
-
-        var requiredGrowthTimeInTicks = growthStage.growthTimeInTicks();
-        var growthTimeReductionMultiplier = 1F;
-
-        if (growthTimeInTicks < requiredGrowthTimeInTicks * growthTimeReductionMultiplier) {
-            return;
-        }
-
-        this.readyToGrow = true;
     }
 
     public GrowthResult grow() {
-        // Reset growth time at this point.
-        this.growthTimeInTicks = 0;
-        var growthStage = getNextGrowthStage();
+        var stage = findMatchingGrowthStage();
 
-        if (growthStage == null) {
+        if (stage == null) {
             return GrowthResult.AlreadyFullyGrown.INSTANCE;
-        } else if (canNeverGrow()) {
+        }
+
+        return grow(stage);
+    }
+
+    public GrowthResult grow(GrowthStage growthStage) {
+        this.growthTimeInTicks = 0;
+        this.readyToGrow = false;
+
+        if (canNeverGrow()) {
             return GrowthResult.CanNotGrow.INSTANCE;
         }
 
         var nextFormType = growthStage.to();
-
         var canBecomeBoiler = canBecomeBoiler(nextFormType);
-
-        Entity nextForm;
 
         if (canBecomeBoiler) {
             nextFormType = Boiler.getType(entity.getVariant());
         }
 
+        removeRequirementEffects(growthStage);
+
         var transitionResult = EntityTransitionUtil.transitionInto(entity, nextFormType, TRANSITION_NBT_KEY_BLACKLIST);
 
-        nextForm = switch (transitionResult) {
-            case EntityTransitionUtil.EntityTransitionResult.ClientSide ignored -> null;
-            case EntityTransitionUtil.EntityTransitionResult.EntityCreation ignored -> null;
-            case EntityTransitionUtil.EntityTransitionResult.Obstructed ignored -> null;
-            case EntityTransitionUtil.EntityTransitionResult.Success<?> success -> success.newEntity();
-        };
+        Entity nextForm = null;
+
+        if (transitionResult instanceof EntityTransitionUtil.EntityTransitionResult.Success<?> success) {
+            nextForm = success.newEntity();
+        }
 
         if (nextForm == null) {
             return new GrowthResult.FailedTransitionResult(transitionResult);
-        }
-
-        if (nextForm instanceof Alien alien) {
-            var jellyCountToSubtract = entity.getMaxJellyToGrowth() == null
-                ? 0
-                : entity.getMaxJellyToGrowth();
-
-            alien.setJellyCount(entity.getJellyCount() - jellyCountToSubtract);
         }
 
         if (onGrowUpCallback != null) {
@@ -184,8 +195,15 @@ public class GrowthManager implements NBTSerializable {
     }
 
     private boolean canNeverGrow() {
-        return entity.isPoisoned()
-            || entity.isIrradiated();
+        return entity.isPoisoned() || entity.isIrradiated();
+    }
+
+    private void removeRequirementEffects(GrowthStage stage) {
+        for (var requirement : stage.requirements()) {
+            if (requirement instanceof GrowthRequirement.MobEffectRequirement effectRequirement) {
+                entity.removeEffect(effectRequirement.effect());
+            }
+        }
     }
 
     private boolean canBecomeBoiler(EntityType<?> nextFormType) {
@@ -200,8 +218,7 @@ public class GrowthManager implements NBTSerializable {
         var isCurrentlyAdolescent = entity.getType().is(AlienEntityTypeTags.ADOLESCENTS);
         var willGrowIntoAdult = nextFormType.is(AlienEntityTypeTags.XENOMORPHS);
 
-        return isCurrentlyAdolescent
-            && willGrowIntoAdult;
+        return isCurrentlyAdolescent && willGrowIntoAdult;
     }
 
     private boolean shouldBecomeBoilerFromAcidVolatility() {
@@ -233,11 +250,8 @@ public class GrowthManager implements NBTSerializable {
             case FATAL -> true;
             case STABLE, UNSTABLE -> false;
             case VOLATILE -> {
-                // Ex. -2.75 -> 2.75
                 var totalGeneIntegrity = Math.abs(GeneIntegrityUtil.getTotalGeneticIntegrity(geneCarrier));
-                // Ex. 2.75 - 2 = 0.75
                 var chance = totalGeneIntegrity - Math.floor(totalGeneIntegrity);
-                // Ex. 0.75 means 75% chance to be a boiler.
                 yield entity.getRandom().nextDouble() < chance;
             }
         };

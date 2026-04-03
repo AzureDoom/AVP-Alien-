@@ -3,8 +3,8 @@
   "requirements": [
     {
       "type": "mob_effect",
-      "effect": "avp_alien:metamorphosis"
+      "effect": "avp_alien:scourge"
     }
   ],
-  "to": "avp_alien:queen"
+  "to": "avp_alien:harbinger"
 }

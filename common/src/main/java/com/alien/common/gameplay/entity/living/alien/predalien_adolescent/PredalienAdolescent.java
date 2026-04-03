@@ -90,11 +90,6 @@ public class PredalienAdolescent extends Alien {
         growthManager.save(compoundTag);
     }
 
-    @Override
-    public Integer getMaxJellyToGrowth() {
-        return 1;
-    }
-
     public PredalienAdolescentAnimationDispatcher getAnimationDispatcher() {
         return animationDispatcher;
     }

@@ -96,11 +96,6 @@ public class Praetorian extends Xenomorph {
         return false;
     }
 
-    @Override
-    public Integer getMaxJellyToGrowth() {
-        return 9;
-    }
-
     public PraetorianAnimationDispatcher getAnimationDispatcher() {
         return animationDispatcher;
     }

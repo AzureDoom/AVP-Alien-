@@ -60,8 +60,6 @@ public abstract class Alien extends Monster implements DataUser {
 
     private static final String NBT_HOST_TYPE = "hostType";
 
-    private static final String NBT_JELLY_COUNT = "jellyCount";
-
     public final DataAccessor<Boolean> hasTarget;
 
     public final DataAccessor<Boolean> isPoisoned;
@@ -73,8 +71,6 @@ public abstract class Alien extends Monster implements DataUser {
     protected final MovementAnalyzer movementAnalyzer;
 
     private Option<EntityType<?>> hostTypeOption;
-
-    private int jellyCount;
 
     private int lastHurtTimeInTicks;
 
@@ -89,7 +85,6 @@ public abstract class Alien extends Monster implements DataUser {
         this.movementAnalyzer = new MovementAnalyzer(this);
 
         this.hostTypeOption = Option.ofNullable(getDefaultHostType(entityType));
-        this.jellyCount = 0;
         this.lastHurtTimeInTicks = 0;
     }
 
@@ -176,14 +171,6 @@ public abstract class Alien extends Monster implements DataUser {
             setPathfindingMalus(PathType.DANGER_FIRE, PathType.DANGER_FIRE.getMalus());
             setPathfindingMalus(PathType.DAMAGE_FIRE, PathType.DAMAGE_FIRE.getMalus());
         }
-    }
-
-    public int getJellyCount() {
-        return jellyCount;
-    }
-
-    public void setJellyCount(int jellyCount) {
-        this.jellyCount = Math.max(jellyCount, 0);
     }
 
     public boolean isPoisoned() {
@@ -520,10 +507,6 @@ public abstract class Alien extends Monster implements DataUser {
         super.readAdditionalSaveData(compoundTag);
         hiveManager.load(compoundTag);
 
-        if (compoundTag.contains(NBT_JELLY_COUNT)) {
-            setJellyCount(compoundTag.getInt(NBT_JELLY_COUNT));
-        }
-
         if (compoundTag.contains(NBT_HOST_TYPE)) {
             var resourceLocationString = compoundTag.getString(NBT_HOST_TYPE);
             var resourceLocation = ResourceLocation.parse(resourceLocationString);
@@ -537,7 +520,6 @@ public abstract class Alien extends Monster implements DataUser {
     public void addAdditionalSaveData(@NotNull CompoundTag compoundTag) {
         super.addAdditionalSaveData(compoundTag);
         hiveManager.save(compoundTag);
-        compoundTag.putInt(NBT_JELLY_COUNT, getJellyCount());
 
         hostTypeOption.ifSome(hostType -> {
             var resourceLocation = BuiltInRegistries.ENTITY_TYPE.getKey(hostTypeOption.unwrap());
@@ -559,10 +541,6 @@ public abstract class Alien extends Monster implements DataUser {
 
     public int getLastHurtTimeInTicks() {
         return lastHurtTimeInTicks;
-    }
-
-    public @Nullable Integer getMaxJellyToGrowth() {
-        return null;
     }
 
     public MovementAnalyzer getMovementAnalyzer() {

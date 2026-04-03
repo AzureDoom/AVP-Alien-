@@ -94,11 +94,6 @@ public class Carrier extends Xenomorph {
         return false;
     }
 
-    @Override
-    public Integer getMaxJellyToGrowth() {
-        return 9;
-    }
-
     public CarrierAnimationDispatcher getAnimationDispatcher() {
         return animationDispatcher;
     }

@@ -89,11 +89,6 @@ public class Chestburster extends Alien {
         growthManager.save(compoundTag);
     }
 
-    @Override
-    public Integer getMaxJellyToGrowth() {
-        return 1;
-    }
-
     public ChestbursterAnimationDispatcher getAnimationDispatcher() {
         return animationDispatcher;
     }

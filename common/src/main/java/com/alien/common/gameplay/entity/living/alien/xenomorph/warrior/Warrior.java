@@ -96,11 +96,6 @@ public class Warrior extends Xenomorph {
         isLunging.set(true);
     }
 
-    @Override
-    public Integer getMaxJellyToGrowth() {
-        return 4;
-    }
-
     public WarriorAnimationDispatcher getAnimationDispatcher() {
         return animationDispatcher;
     }

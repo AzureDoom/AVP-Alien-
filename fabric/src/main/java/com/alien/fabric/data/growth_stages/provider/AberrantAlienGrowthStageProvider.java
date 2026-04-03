@@ -1,7 +1,9 @@
 package com.alien.fabric.data.growth_stages.provider;
 
+import com.alien.common.model.lifecycle.growth.GrowthRequirement;
 import com.alien.common.model.lifecycle.growth.GrowthStage;
 import com.alien.common.registry.init.AlienEntityTypes;
+import com.alien.common.registry.init.AlienMobEffects;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.fabric.data.growth_stages.GrowthConstants;
 import net.minecraft.world.entity.EntityType;
@@ -14,6 +16,8 @@ public class AberrantAlienGrowthStageProvider {
     public static void provide(BiConsumer<String, GrowthStage> biConsumer) {
         provideBaseAberrantGrowthStages(biConsumer);
         provideRunnerAberrantGrowthStages(biConsumer);
+        provideAberrantMetamorphosisStages(biConsumer);
+        provideAberrantScourgeStages(biConsumer);
 
         biConsumer.accept(
             "royal_aberrant_chestburster_to_royal_aberrant_adolescent",
@@ -87,30 +91,6 @@ public class AberrantAlienGrowthStageProvider {
                 GrowthConstants.ADOLESCENT_GROWTH_TIME_IN_TICKS
             )
         );
-        biConsumer.accept(
-            "aberrant_drone_to_aberrant_warrior",
-            new GrowthStage(
-                AlienEntityTypes.ABERRANT_DRONE.get(),
-                AlienEntityTypes.ABERRANT_WARRIOR.get(),
-                GrowthConstants.DRONE_GROWTH_TIME_IN_TICKS
-            )
-        );
-        biConsumer.accept(
-            "aberrant_warrior_to_aberrant_praetorian",
-            new GrowthStage(
-                AlienEntityTypes.ABERRANT_WARRIOR.get(),
-                AlienEntityTypes.ABERRANT_PRAETORIAN.get(),
-                GrowthConstants.WARRIOR_GROWTH_TIME_IN_TICKS
-            )
-        );
-        biConsumer.accept(
-            "aberrant_praetorian_to_aberrant_queen",
-            new GrowthStage(
-                AlienEntityTypes.ABERRANT_PRAETORIAN.get(),
-                AlienEntityTypes.ABERRANT_QUEEN.get(),
-                GrowthConstants.PRAETORIAN_GROWTH_TIME_IN_TICKS
-            )
-        );
     }
 
     private static void provideRunnerAberrantGrowthStages(BiConsumer<String, GrowthStage> biConsumer) {
@@ -123,30 +103,66 @@ public class AberrantAlienGrowthStageProvider {
                 GrowthConstants.ADOLESCENT_GROWTH_TIME_IN_TICKS / 2
             )
         );
+    }
+
+    private static void provideAberrantMetamorphosisStages(BiConsumer<String, GrowthStage> biConsumer) {
+        List<GrowthRequirement> metamorphosis = List.of(
+            new GrowthRequirement.MobEffectRequirement(AlienMobEffects.getMetamorphosisHolder(), 0)
+        );
+
+        biConsumer.accept(
+            "aberrant_drone_to_aberrant_warrior",
+            new GrowthStage(AlienEntityTypes.ABERRANT_DRONE.get(), AlienEntityTypes.ABERRANT_WARRIOR.get(), metamorphosis)
+        );
+        biConsumer.accept(
+            "aberrant_warrior_to_aberrant_praetorian",
+            new GrowthStage(AlienEntityTypes.ABERRANT_WARRIOR.get(), AlienEntityTypes.ABERRANT_PRAETORIAN.get(), metamorphosis)
+        );
+        biConsumer.accept(
+            "aberrant_praetorian_to_aberrant_queen",
+            new GrowthStage(AlienEntityTypes.ABERRANT_PRAETORIAN.get(), AlienEntityTypes.ABERRANT_QUEEN.get(), metamorphosis)
+        );
         biConsumer.accept(
             "aberrant_runner_to_aberrant_prowler",
-            new GrowthStage(
-                AlienEntityTypes.ABERRANT_RUNNER.get(),
-                AlienEntityTypes.ABERRANT_PROWLER.get(),
-                GrowthConstants.DRONE_GROWTH_TIME_IN_TICKS / 2
-            )
+            new GrowthStage(AlienEntityTypes.ABERRANT_RUNNER.get(), AlienEntityTypes.ABERRANT_PROWLER.get(), metamorphosis)
         );
         biConsumer.accept(
             "aberrant_prowler_to_aberrant_crusher",
-            new GrowthStage(
-                AlienEntityTypes.ABERRANT_PROWLER.get(),
-                AlienEntityTypes.ABERRANT_CRUSHER.get(),
-                GrowthConstants.WARRIOR_GROWTH_TIME_IN_TICKS / 2
-            )
+            new GrowthStage(AlienEntityTypes.ABERRANT_PROWLER.get(), AlienEntityTypes.ABERRANT_CRUSHER.get(), metamorphosis)
         );
         biConsumer.accept(
             "aberrant_crusher_to_aberrant_queen",
-            new GrowthStage(
-                AlienEntityTypes.ABERRANT_CRUSHER.get(),
-                AlienEntityTypes.ABERRANT_QUEEN.get(),
-                GrowthConstants.PRAETORIAN_GROWTH_TIME_IN_TICKS / 2
-            )
+            new GrowthStage(AlienEntityTypes.ABERRANT_CRUSHER.get(), AlienEntityTypes.ABERRANT_QUEEN.get(), metamorphosis)
         );
     }
 
+    private static void provideAberrantScourgeStages(BiConsumer<String, GrowthStage> biConsumer) {
+        List<GrowthRequirement> scourge = List.of(
+            new GrowthRequirement.MobEffectRequirement(AlienMobEffects.getScourgeHolder(), 0)
+        );
+        List<GrowthRequirement> scourgeII = List.of(
+            new GrowthRequirement.MobEffectRequirement(AlienMobEffects.getScourgeHolder(), 1)
+        );
+
+        biConsumer.accept(
+            "aberrant_drone_to_aberrant_razor_claw",
+            new GrowthStage(AlienEntityTypes.ABERRANT_DRONE.get(), AlienEntityTypes.ABERRANT_RAZOR_CLAW.get(), scourgeII)
+        );
+        biConsumer.accept(
+            "aberrant_drone_to_aberrant_carrier",
+            new GrowthStage(AlienEntityTypes.ABERRANT_DRONE.get(), AlienEntityTypes.ABERRANT_CARRIER.get(), scourge)
+        );
+        biConsumer.accept(
+            "aberrant_prowler_to_aberrant_chrysalis",
+            new GrowthStage(AlienEntityTypes.ABERRANT_PROWLER.get(), AlienEntityTypes.ABERRANT_CHRYSALIS.get(), scourge)
+        );
+        biConsumer.accept(
+            "aberrant_praetorian_to_aberrant_harbinger",
+            new GrowthStage(AlienEntityTypes.ABERRANT_PRAETORIAN.get(), AlienEntityTypes.ABERRANT_HARBINGER.get(), scourge)
+        );
+        biConsumer.accept(
+            "aberrant_warrior_to_aberrant_ravager",
+            new GrowthStage(AlienEntityTypes.ABERRANT_WARRIOR.get(), AlienEntityTypes.ABERRANT_RAVAGER.get(), scourge)
+        );
+    }
 }

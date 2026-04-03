@@ -96,11 +96,6 @@ public class Spitter extends Xenomorph {
         return 0.5F;
     }
 
-    @Override
-    public Integer getMaxJellyToGrowth() {
-        return null;
-    }
-
     public SpitterAnimationDispatcher getAnimationDispatcher() {
         return animationDispatcher;
     }

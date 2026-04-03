@@ -261,11 +261,6 @@ public class Queen extends Xenomorph {
         super.checkDespawn();
     }
 
-    @Override
-    public Integer getMaxJellyToGrowth() {
-        return null;
-    }
-
     public QueenAnimationDispatcher getAnimationDispatcher() {
         return animationDispatcher;
     }

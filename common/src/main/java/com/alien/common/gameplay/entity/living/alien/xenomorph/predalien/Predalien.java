@@ -96,11 +96,6 @@ public class Predalien extends Xenomorph {
         return false;
     }
 
-    @Override
-    public Integer getMaxJellyToGrowth() {
-        return 9;
-    }
-
     public PredalienAnimationDispatcher getAnimationDispatcher() {
         return animationDispatcher;
     }

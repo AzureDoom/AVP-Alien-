@@ -1,7 +1,9 @@
 package com.alien.fabric.data.growth_stages.provider;
 
+import com.alien.common.model.lifecycle.growth.GrowthRequirement;
 import com.alien.common.model.lifecycle.growth.GrowthStage;
 import com.alien.common.registry.init.AlienEntityTypes;
+import com.alien.common.registry.init.AlienMobEffects;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.fabric.data.growth_stages.GrowthConstants;
 import net.minecraft.world.entity.EntityType;
@@ -13,7 +15,9 @@ public class NetherAlienGrowthStageProvider {
 
     public static void provide(BiConsumer<String, GrowthStage> biConsumer) {
         provideBaseNetherGrowthStages(biConsumer);
-        providerRunnerNetherGrowthStages(biConsumer);
+        provideRunnerNetherGrowthStages(biConsumer);
+        provideNetherMetamorphosisStages(biConsumer);
+        provideNetherScourgeStages(biConsumer);
 
         biConsumer.accept(
             "royal_nether_chestburster_to_royal_nether_adolescent",
@@ -87,33 +91,9 @@ public class NetherAlienGrowthStageProvider {
                 GrowthConstants.ADOLESCENT_GROWTH_TIME_IN_TICKS
             )
         );
-        biConsumer.accept(
-            "nether_drone_to_nether_warrior",
-            new GrowthStage(
-                AlienEntityTypes.NETHER_DRONE.get(),
-                AlienEntityTypes.NETHER_WARRIOR.get(),
-                GrowthConstants.DRONE_GROWTH_TIME_IN_TICKS
-            )
-        );
-        biConsumer.accept(
-            "nether_warrior_to_nether_praetorian",
-            new GrowthStage(
-                AlienEntityTypes.NETHER_WARRIOR.get(),
-                AlienEntityTypes.NETHER_PRAETORIAN.get(),
-                GrowthConstants.WARRIOR_GROWTH_TIME_IN_TICKS
-            )
-        );
-        biConsumer.accept(
-            "nether_praetorian_to_nether_queen",
-            new GrowthStage(
-                AlienEntityTypes.NETHER_PRAETORIAN.get(),
-                AlienEntityTypes.NETHER_QUEEN.get(),
-                GrowthConstants.PRAETORIAN_GROWTH_TIME_IN_TICKS
-            )
-        );
     }
 
-    private static void providerRunnerNetherGrowthStages(BiConsumer<String, GrowthStage> biConsumer) {
+    private static void provideRunnerNetherGrowthStages(BiConsumer<String, GrowthStage> biConsumer) {
         biConsumer.accept(
             "nether_adolescent_to_nether_runner",
             new GrowthStage(
@@ -123,29 +103,66 @@ public class NetherAlienGrowthStageProvider {
                 GrowthConstants.ADOLESCENT_GROWTH_TIME_IN_TICKS / 2
             )
         );
+    }
+
+    private static void provideNetherMetamorphosisStages(BiConsumer<String, GrowthStage> biConsumer) {
+        List<GrowthRequirement> metamorphosis = List.of(
+            new GrowthRequirement.MobEffectRequirement(AlienMobEffects.getMetamorphosisHolder(), 0)
+        );
+
+        biConsumer.accept(
+            "nether_drone_to_nether_warrior",
+            new GrowthStage(AlienEntityTypes.NETHER_DRONE.get(), AlienEntityTypes.NETHER_WARRIOR.get(), metamorphosis)
+        );
+        biConsumer.accept(
+            "nether_warrior_to_nether_praetorian",
+            new GrowthStage(AlienEntityTypes.NETHER_WARRIOR.get(), AlienEntityTypes.NETHER_PRAETORIAN.get(), metamorphosis)
+        );
+        biConsumer.accept(
+            "nether_praetorian_to_nether_queen",
+            new GrowthStage(AlienEntityTypes.NETHER_PRAETORIAN.get(), AlienEntityTypes.NETHER_QUEEN.get(), metamorphosis)
+        );
         biConsumer.accept(
             "nether_runner_to_nether_prowler",
-            new GrowthStage(
-                AlienEntityTypes.NETHER_RUNNER.get(),
-                AlienEntityTypes.NETHER_PROWLER.get(),
-                GrowthConstants.DRONE_GROWTH_TIME_IN_TICKS / 2
-            )
+            new GrowthStage(AlienEntityTypes.NETHER_RUNNER.get(), AlienEntityTypes.NETHER_PROWLER.get(), metamorphosis)
         );
         biConsumer.accept(
             "nether_prowler_to_nether_crusher",
-            new GrowthStage(
-                AlienEntityTypes.NETHER_PROWLER.get(),
-                AlienEntityTypes.NETHER_CRUSHER.get(),
-                GrowthConstants.WARRIOR_GROWTH_TIME_IN_TICKS / 2
-            )
+            new GrowthStage(AlienEntityTypes.NETHER_PROWLER.get(), AlienEntityTypes.NETHER_CRUSHER.get(), metamorphosis)
         );
         biConsumer.accept(
             "nether_crusher_to_nether_queen",
-            new GrowthStage(
-                AlienEntityTypes.NETHER_CRUSHER.get(),
-                AlienEntityTypes.NETHER_QUEEN.get(),
-                GrowthConstants.PRAETORIAN_GROWTH_TIME_IN_TICKS / 2
-            )
+            new GrowthStage(AlienEntityTypes.NETHER_CRUSHER.get(), AlienEntityTypes.NETHER_QUEEN.get(), metamorphosis)
+        );
+    }
+
+    private static void provideNetherScourgeStages(BiConsumer<String, GrowthStage> biConsumer) {
+        List<GrowthRequirement> scourge = List.of(
+            new GrowthRequirement.MobEffectRequirement(AlienMobEffects.getScourgeHolder(), 0)
+        );
+        List<GrowthRequirement> scourgeII = List.of(
+            new GrowthRequirement.MobEffectRequirement(AlienMobEffects.getScourgeHolder(), 1)
+        );
+
+        biConsumer.accept(
+            "nether_drone_to_nether_razor_claw",
+            new GrowthStage(AlienEntityTypes.NETHER_DRONE.get(), AlienEntityTypes.NETHER_RAZOR_CLAW.get(), scourgeII)
+        );
+        biConsumer.accept(
+            "nether_drone_to_nether_carrier",
+            new GrowthStage(AlienEntityTypes.NETHER_DRONE.get(), AlienEntityTypes.NETHER_CARRIER.get(), scourge)
+        );
+        biConsumer.accept(
+            "nether_prowler_to_nether_chrysalis",
+            new GrowthStage(AlienEntityTypes.NETHER_PROWLER.get(), AlienEntityTypes.NETHER_CHRYSALIS.get(), scourge)
+        );
+        biConsumer.accept(
+            "nether_praetorian_to_nether_harbinger",
+            new GrowthStage(AlienEntityTypes.NETHER_PRAETORIAN.get(), AlienEntityTypes.NETHER_HARBINGER.get(), scourge)
+        );
+        biConsumer.accept(
+            "nether_warrior_to_nether_ravager",
+            new GrowthStage(AlienEntityTypes.NETHER_WARRIOR.get(), AlienEntityTypes.NETHER_RAVAGER.get(), scourge)
         );
     }
 }

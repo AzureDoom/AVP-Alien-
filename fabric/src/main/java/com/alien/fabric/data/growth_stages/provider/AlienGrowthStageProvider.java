@@ -1,7 +1,9 @@
 package com.alien.fabric.data.growth_stages.provider;
 
+import com.alien.common.model.lifecycle.growth.GrowthRequirement;
 import com.alien.common.model.lifecycle.growth.GrowthStage;
 import com.alien.common.registry.init.AlienEntityTypes;
+import com.alien.common.registry.init.AlienMobEffects;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.fabric.data.growth_stages.GrowthConstants;
 import net.minecraft.world.entity.EntityType;
@@ -12,8 +14,10 @@ import java.util.function.BiConsumer;
 public class AlienGrowthStageProvider {
 
     public static void provide(BiConsumer<String, GrowthStage> biConsumer) {
-        providerBaseGrowthStages(biConsumer);
-        providerRunnerGrowthStages(biConsumer);
+        provideBaseGrowthStages(biConsumer);
+        provideRunnerGrowthStages(biConsumer);
+        provideMetamorphosisStages(biConsumer);
+        provideScourgeStages(biConsumer);
 
         biConsumer.accept(
             "royal_chestburster_to_royal_adolescent",
@@ -70,7 +74,7 @@ public class AlienGrowthStageProvider {
         );
     }
 
-    private static void providerBaseGrowthStages(BiConsumer<String, GrowthStage> biConsumer) {
+    private static void provideBaseGrowthStages(BiConsumer<String, GrowthStage> biConsumer) {
         biConsumer.accept(
             "chestburster_to_adolescent",
             new GrowthStage(
@@ -87,25 +91,9 @@ public class AlienGrowthStageProvider {
                 GrowthConstants.ADOLESCENT_GROWTH_TIME_IN_TICKS
             )
         );
-        biConsumer.accept(
-            "drone_to_warrior",
-            new GrowthStage(AlienEntityTypes.DRONE.get(), AlienEntityTypes.WARRIOR.get(), GrowthConstants.DRONE_GROWTH_TIME_IN_TICKS)
-        );
-        biConsumer.accept(
-            "warrior_to_praetorian",
-            new GrowthStage(AlienEntityTypes.WARRIOR.get(), AlienEntityTypes.PRAETORIAN.get(), GrowthConstants.WARRIOR_GROWTH_TIME_IN_TICKS)
-        );
-        biConsumer.accept(
-            "praetorian_to_queen",
-            new GrowthStage(
-                AlienEntityTypes.PRAETORIAN.get(),
-                AlienEntityTypes.QUEEN.get(),
-                GrowthConstants.PRAETORIAN_GROWTH_TIME_IN_TICKS
-            )
-        );
     }
 
-    private static void providerRunnerGrowthStages(BiConsumer<String, GrowthStage> biConsumer) {
+    private static void provideRunnerGrowthStages(BiConsumer<String, GrowthStage> biConsumer) {
         biConsumer.accept(
             "adolescent_to_runner",
             new GrowthStage(
@@ -115,29 +103,66 @@ public class AlienGrowthStageProvider {
                 GrowthConstants.ADOLESCENT_GROWTH_TIME_IN_TICKS / 2
             )
         );
+    }
+
+    private static void provideMetamorphosisStages(BiConsumer<String, GrowthStage> biConsumer) {
+        List<GrowthRequirement> metamorphosis = List.of(
+            new GrowthRequirement.MobEffectRequirement(AlienMobEffects.getMetamorphosisHolder(), 0)
+        );
+
+        biConsumer.accept(
+            "drone_to_warrior",
+            new GrowthStage(AlienEntityTypes.DRONE.get(), AlienEntityTypes.WARRIOR.get(), metamorphosis)
+        );
+        biConsumer.accept(
+            "warrior_to_praetorian",
+            new GrowthStage(AlienEntityTypes.WARRIOR.get(), AlienEntityTypes.PRAETORIAN.get(), metamorphosis)
+        );
+        biConsumer.accept(
+            "praetorian_to_queen",
+            new GrowthStage(AlienEntityTypes.PRAETORIAN.get(), AlienEntityTypes.QUEEN.get(), metamorphosis)
+        );
         biConsumer.accept(
             "runner_to_prowler",
-            new GrowthStage(
-                AlienEntityTypes.RUNNER.get(),
-                AlienEntityTypes.PROWLER.get(),
-                GrowthConstants.DRONE_GROWTH_TIME_IN_TICKS / 2
-            )
+            new GrowthStage(AlienEntityTypes.RUNNER.get(), AlienEntityTypes.PROWLER.get(), metamorphosis)
         );
         biConsumer.accept(
             "prowler_to_crusher",
-            new GrowthStage(
-                AlienEntityTypes.PROWLER.get(),
-                AlienEntityTypes.CRUSHER.get(),
-                GrowthConstants.WARRIOR_GROWTH_TIME_IN_TICKS / 2
-            )
+            new GrowthStage(AlienEntityTypes.PROWLER.get(), AlienEntityTypes.CRUSHER.get(), metamorphosis)
         );
         biConsumer.accept(
             "crusher_to_queen",
-            new GrowthStage(
-                AlienEntityTypes.CRUSHER.get(),
-                AlienEntityTypes.QUEEN.get(),
-                GrowthConstants.PRAETORIAN_GROWTH_TIME_IN_TICKS / 2
-            )
+            new GrowthStage(AlienEntityTypes.CRUSHER.get(), AlienEntityTypes.QUEEN.get(), metamorphosis)
+        );
+    }
+
+    private static void provideScourgeStages(BiConsumer<String, GrowthStage> biConsumer) {
+        List<GrowthRequirement> scourge = List.of(
+            new GrowthRequirement.MobEffectRequirement(AlienMobEffects.getScourgeHolder(), 0)
+        );
+        List<GrowthRequirement> scourgeII = List.of(
+            new GrowthRequirement.MobEffectRequirement(AlienMobEffects.getScourgeHolder(), 1)
+        );
+
+        biConsumer.accept(
+            "drone_to_razor_claw",
+            new GrowthStage(AlienEntityTypes.DRONE.get(), AlienEntityTypes.RAZOR_CLAW.get(), scourgeII)
+        );
+        biConsumer.accept(
+            "drone_to_carrier",
+            new GrowthStage(AlienEntityTypes.DRONE.get(), AlienEntityTypes.CARRIER.get(), scourge)
+        );
+        biConsumer.accept(
+            "prowler_to_chrysalis",
+            new GrowthStage(AlienEntityTypes.PROWLER.get(), AlienEntityTypes.CHRYSALIS.get(), scourge)
+        );
+        biConsumer.accept(
+            "praetorian_to_harbinger",
+            new GrowthStage(AlienEntityTypes.PRAETORIAN.get(), AlienEntityTypes.HARBINGER.get(), scourge)
+        );
+        biConsumer.accept(
+            "warrior_to_ravager",
+            new GrowthStage(AlienEntityTypes.WARRIOR.get(), AlienEntityTypes.RAVAGER.get(), scourge)
         );
     }
 }

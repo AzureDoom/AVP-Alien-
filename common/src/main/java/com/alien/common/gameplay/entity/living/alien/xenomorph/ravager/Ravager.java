@@ -94,11 +94,6 @@ public class Ravager extends Xenomorph {
         return false;
     }
 
-    @Override
-    public Integer getMaxJellyToGrowth() {
-        return 9;
-    }
-
     public RavagerAnimationDispatcher getAnimationDispatcher() {
         return animationDispatcher;
     }

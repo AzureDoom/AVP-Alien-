@@ -145,11 +145,6 @@ public class Drone extends Xenomorph implements EggCarrier {
     }
 
     @Override
-    public Integer getMaxJellyToGrowth() {
-        return 2;
-    }
-
-    @Override
     public EggPickupManager getEggPickupManager() {
         return eggPickupManager;
     }

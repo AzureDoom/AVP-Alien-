@@ -136,11 +136,6 @@ public class Boiler extends Xenomorph {
         return 0.5F;
     }
 
-    @Override
-    public Integer getMaxJellyToGrowth() {
-        return null;
-    }
-
     public BoilerAnimationDispatcher getAnimationDispatcher() {
         return animationDispatcher;
     }

@@ -146,11 +146,6 @@ public class Runner extends Xenomorph implements EggCarrier {
     }
 
     @Override
-    public Integer getMaxJellyToGrowth() {
-        return 2;
-    }
-
-    @Override
     protected @NotNull XenomorphNavigationManager createNavigationManager() {
         return new XenomorphNavigationManager(this, moveControl, 1.2, 2);
     }

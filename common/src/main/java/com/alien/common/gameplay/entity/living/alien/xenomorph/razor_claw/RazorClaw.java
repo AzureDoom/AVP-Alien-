@@ -118,11 +118,6 @@ public class RazorClaw extends Xenomorph {
         return false;
     }
 
-    @Override
-    public Integer getMaxJellyToGrowth() {
-        return 9;
-    }
-
     public RazorClawAnimationDispatcher getAnimationDispatcher() {
         return animationDispatcher;
     }

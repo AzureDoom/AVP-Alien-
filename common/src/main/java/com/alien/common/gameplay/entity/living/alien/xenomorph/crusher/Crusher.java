@@ -98,11 +98,6 @@ public class Crusher extends Xenomorph {
         return 0.5F;
     }
 
-    @Override
-    public Integer getMaxJellyToGrowth() {
-        return 2;
-    }
-
     public CrusherAnimationDispatcher getAnimationDispatcher() {
         return animationDispatcher;
     }
