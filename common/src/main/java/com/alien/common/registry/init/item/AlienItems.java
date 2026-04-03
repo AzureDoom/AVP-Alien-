@@ -2,7 +2,6 @@ package com.alien.common.registry.init.item;
 
 import com.alien.Alien;
 import com.alien.common.gameplay.item.PoisonJellyItem;
-import com.alien.common.gameplay.item.RoyalJellyItem;
 import com.alien.common.registry.key.AlienJukeboxSongKeys;
 import com.blib.api.common.registry.v1.BLibHolder;
 import com.blib.api.common.registry.v1.BLibRegistry;
@@ -74,7 +73,7 @@ public class AlienItems {
 
     public static final BLibHolder<Item> POISON_JELLY = create("poison_jelly", PoisonJellyItem::new);
 
-    public static final BLibHolder<Item> RAW_ROYAL_JELLY = create("raw_royal_jelly", RoyalJellyItem::new);
+    public static final BLibHolder<Item> RAW_ROYAL_JELLY = create("raw_royal_jelly");
 
     public static final BLibHolder<Item> RAW_SCOURGE_JELLY = create("raw_scourge_jelly");
 
