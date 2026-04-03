@@ -65,14 +65,12 @@ public class QueenLayEggGoal extends Goal {
         // Reset egg lay cooldown since it's (almost) guaranteed that the queen is about to lay an egg.
         this.eggLayCooldownInTicks = MAX_EGG_LAY_COOLDOWN_IN_TICKS;
         var level = queen.level();
-        // Egg has a 5% chance of being royal.
-        var isRoyal = queen.getRandom().nextInt(100) < 5;
         var variant = shouldBeAberrant()
             // If the queen has weak genetic integrity, then it can become aberrant.
             ? AlienVariant.ABERRANT
             // Otherwise just use the queen's current variant type.
             : queen.getVariant();
-        var ovomorphType = Ovomorph.getType(variant, isRoyal);
+        var ovomorphType = Ovomorph.getType(variant, false);
 
         var ovomorph = ovomorphType == null
             ? null
