@@ -20,6 +20,30 @@ public class AlienPotions {
 
     private static final int THREE_MINUTES_IN_TICKS = 20 * 60 * 3;
 
+    public static final BLibHolder<Potion> BLOOD_LOSS = REGISTRY.createHolder(
+        "blood_loss",
+        () -> new Potion(
+            "blood_loss",
+            new MobEffectInstance(AlienMobEffects.getBloodLossHolder(), ONE_MINUTE_IN_TICKS)
+        )
+    );
+
+    public static final BLibHolder<Potion> LONG_BLOOD_LOSS = REGISTRY.createHolder(
+        "long_blood_loss",
+        () -> new Potion(
+            "blood_loss",
+            new MobEffectInstance(AlienMobEffects.getBloodLossHolder(), THREE_MINUTES_IN_TICKS)
+        )
+    );
+
+    public static final BLibHolder<Potion> STRONG_BLOOD_LOSS = REGISTRY.createHolder(
+        "strong_blood_loss",
+        () -> new Potion(
+            "blood_loss",
+            new MobEffectInstance(AlienMobEffects.getBloodLossHolder(), THIRTY_SECONDS_IN_TICKS, 1)
+        )
+    );
+
     public static final BLibHolder<Potion> METAMORPHOSIS = REGISTRY.createHolder(
         "metamorphosis",
         () -> new Potion(
@@ -70,6 +94,27 @@ public class AlienPotions {
 
     private static void registerBrewingRecipes() {
         var brewingRegistry = Alien.MOD.registries().createBrewingRegistry();
+
+        // Awkward + Chitin -> Blood Loss
+        brewingRegistry.registerMix(
+            Potions.AWKWARD,
+            AlienItems.CHITIN,
+            BLOOD_LOSS
+        );
+
+        // Blood Loss + Redstone -> Long Blood Loss
+        brewingRegistry.registerMix(
+            BLOOD_LOSS,
+            () -> Items.REDSTONE,
+            LONG_BLOOD_LOSS
+        );
+
+        // Blood Loss + Glowstone -> Strong Blood Loss
+        brewingRegistry.registerMix(
+            BLOOD_LOSS,
+            () -> Items.GLOWSTONE_DUST,
+            STRONG_BLOOD_LOSS
+        );
 
         // Awkward + Raw Royal Jelly -> Metamorphosis
         brewingRegistry.registerMix(

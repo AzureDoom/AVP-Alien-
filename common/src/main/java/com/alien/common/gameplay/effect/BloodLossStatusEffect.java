@@ -11,7 +11,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 
 public class BloodLossStatusEffect extends MobEffect {
 
-    private static final int RED_PARTICLE_COLOR = 0xCC0000;
+    private static final int RED_PARTICLE_COLOR = 0x660000;
 
     private static final ResourceLocation MODIFIER_ID = AlienResources.location("blood_loss_max_health_reduction");
 

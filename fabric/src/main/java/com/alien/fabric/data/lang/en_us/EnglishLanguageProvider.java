@@ -46,6 +46,10 @@ public class EnglishLanguageProvider extends FabricLanguageProvider {
         builder.add(AlienMobEffects.getScourgeHolder().value(), "Scourge");
 
         // Potions
+        builder.add("item.minecraft.potion.effect.blood_loss", "Potion of Blood Loss");
+        builder.add("item.minecraft.splash_potion.effect.blood_loss", "Splash Potion of Blood Loss");
+        builder.add("item.minecraft.lingering_potion.effect.blood_loss", "Lingering Potion of Blood Loss");
+        builder.add("item.minecraft.tipped_arrow.effect.blood_loss", "Arrow of Blood Loss");
         builder.add("item.minecraft.potion.effect.metamorphosis", "Potion of Metamorphosis");
         builder.add("item.minecraft.splash_potion.effect.metamorphosis", "Splash Potion of Metamorphosis");
         builder.add("item.minecraft.lingering_potion.effect.metamorphosis", "Lingering Potion of Metamorphosis");

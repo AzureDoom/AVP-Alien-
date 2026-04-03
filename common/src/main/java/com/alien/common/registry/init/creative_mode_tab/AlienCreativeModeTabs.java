@@ -2,14 +2,17 @@ package com.alien.common.registry.init.creative_mode_tab;
 
 import com.alien.Alien;
 import com.alien.common.registry.init.block.AlienResinBlocks;
+import com.alien.common.registry.init.AlienPotions;
 import com.alien.common.registry.init.creative_mode_tab.initializer.BlocksCreativeModeTabInitializer;
 import com.alien.common.registry.init.creative_mode_tab.initializer.CombatCreativeModeTabInitializer;
+import com.alien.common.registry.init.creative_mode_tab.initializer.FoodAndDrinksCreativeModeTabInitializer;
 import com.alien.common.registry.init.creative_mode_tab.initializer.IngredientsCreativeModeTabInitializer;
 import com.alien.common.registry.init.creative_mode_tab.initializer.SpawnEggsCreativeModeTabInitializer;
 import com.alien.common.registry.init.creative_mode_tab.initializer.ToolsAndUtilitiesCreativeModeTabInitializer;
 import com.alien.common.registry.init.item.AlienArmorItems;
 import com.alien.common.registry.init.item.AlienItems;
 import com.alien.common.registry.init.item.AlienSpawnEggItems;
+import net.minecraft.world.item.Items;
 import com.alien.common.registry.key.AlienCreativeModeTabKeys;
 import com.blib.api.common.registry.v1.BLibHolder;
 import com.blib.api.common.registry.v1.BLibRegistry;
@@ -50,6 +53,12 @@ public class AlienCreativeModeTabs {
         AlienCreativeModeTabKeys.SPAWN_EGGS_KEY,
         () -> new ItemStack(AlienSpawnEggItems.QUEEN_SPAWN_EGG.get()),
         SpawnEggsCreativeModeTabInitializer.OUTPUT_CONSUMER
+    );
+
+    public static final BLibHolder<CreativeModeTab> FOOD_AND_DRINKS = create(
+        AlienCreativeModeTabKeys.FOOD_AND_DRINKS_KEY,
+        () -> new ItemStack(Items.POTION),
+        FoodAndDrinksCreativeModeTabInitializer.OUTPUT_CONSUMER
     );
 
     public static final BLibHolder<CreativeModeTab> TOOLS_AND_UTILITIES = create(

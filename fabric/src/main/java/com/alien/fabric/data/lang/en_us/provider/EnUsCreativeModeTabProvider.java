@@ -12,6 +12,7 @@ public class EnUsCreativeModeTabProvider {
         builder.add(AlienCreativeModeTabKeys.COMBAT_KEY, "Combat (AVP: Alien)");
         builder.add(AlienCreativeModeTabKeys.INGREDIENTS_KEY, "Ingredients (AVP: Alien)");
         builder.add(AlienCreativeModeTabKeys.SPAWN_EGGS_KEY, "Spawn Eggs (AVP: Alien)");
+        builder.add(AlienCreativeModeTabKeys.FOOD_AND_DRINKS_KEY, "Food & Drinks (AVP: Alien)");
         builder.add(AlienCreativeModeTabKeys.TOOLS_AND_UTILITIES_KEY, "Tools & Utilities (AVP: Alien)");
     };
 }
