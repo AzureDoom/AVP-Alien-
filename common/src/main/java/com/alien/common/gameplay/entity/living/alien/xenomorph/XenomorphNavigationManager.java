@@ -3,6 +3,7 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph;
 import com.alien.common.gameplay.ai.goal.AnimationDrivenAttackGoal;
 import com.alien.common.gameplay.ai.path.CrawlPathNodeEvaluator;
 import com.blib.api.common.entity.v1.ai.goal.WaterMoveControl;
+import com.blib.api.common.goap.v1.GOAPUser;
 import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
@@ -68,16 +69,26 @@ public class XenomorphNavigationManager {
         this.waterNavigation = new WaterBoundPathNavigation(xenomorph, xenomorph.level());
     }
 
+    public GroundPathNavigation getGroundNavigation() {
+        return groundNavigation;
+    }
+
     public void switchToGround(Xenomorph xenomorph, int priority, GoalSelector goalSelector) {
-        goalSelector.removeGoal(waterAttackGoal);
-        goalSelector.addGoal(priority, groundAttackGoal);
+        if (!(xenomorph instanceof GOAPUser<?>)) {
+            goalSelector.removeGoal(waterAttackGoal);
+            goalSelector.addGoal(priority, groundAttackGoal);
+        }
+
         xenomorph.setMoveControl(groundMoveControl);
         xenomorph.setNavigation(groundNavigation);
     }
 
     public void switchToWater(Xenomorph xenomorph, int priority, GoalSelector goalSelector) {
-        goalSelector.removeGoal(groundAttackGoal);
-        goalSelector.addGoal(priority, waterAttackGoal);
+        if (!(xenomorph instanceof GOAPUser<?>)) {
+            goalSelector.removeGoal(groundAttackGoal);
+            goalSelector.addGoal(priority, waterAttackGoal);
+        }
+
         xenomorph.setMoveControl(waterMoveControl);
         xenomorph.setNavigation(waterNavigation);
     }

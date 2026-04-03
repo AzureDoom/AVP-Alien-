@@ -3,6 +3,7 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.warrior;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.warrior.ai.WarriorGOAP;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienDataSyncKeys;
@@ -10,14 +11,16 @@ import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
-import com.blib.api.common.entity.v1.ai.goal.combat.LungeAtTargetGoal;
+import com.blib.api.common.goap.v1.GOAPUser;
+import com.just.goap.Agent;
+import com.just.goap.graph.Graph;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-public class Warrior extends Xenomorph {
+public class Warrior extends Xenomorph implements GOAPUser<Warrior> {
 
     public static AttributeSupplier.Builder createWarriorAttributes() {
         return Alien.createAlienAttributes()
@@ -38,6 +41,17 @@ public class Warrior extends Xenomorph {
         super(entityType, level);
         this.attackType = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_ATTACK_TYPE.get());
         this.animationDispatcher = new WarriorAnimationDispatcher(this);
+        getXenomorphData().setParallelDigCount(1);
+    }
+
+    @Override
+    public Agent.Builder<Warrior> blib$applyGOAPAgentProperties(Agent.Builder<Warrior> agentBuilder) {
+        return WarriorGOAP.applyAgentProperties(agentBuilder);
+    }
+
+    @Override
+    public @Nullable Graph<Warrior> blib$getGOAPGraphOrNull() {
+        return WarriorGOAP.GRAPH;
     }
 
     @Override
@@ -67,8 +81,7 @@ public class Warrior extends Xenomorph {
 
     @Override
     protected void registerGoals() {
-        super.registerGoals();
-        goalSelector.addGoal(3, new LungeAtTargetGoal(this, 0.1F, 20 * 5, 6, 15).setOnLungeCallback(this::runLungeAnimation));
+        // GOAP handles all AI for the warrior.
     }
 
     @Override
@@ -91,9 +104,16 @@ public class Warrior extends Xenomorph {
         beginAttack(attack.defaultDurationInTicks());
     }
 
-    private void runLungeAnimation() {
-        playSound(AlienSoundEvents.ENTITY_XENOMORPH_LUNGE.get(), getSoundVolume(), (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F);
-        isLunging.set(true);
+    @Override
+    public void runDigAnimation() {
+        playSound(
+            AlienSoundEvents.ENTITY_XENOMORPH_ATTACK.get(),
+            getSoundVolume(),
+            (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F
+        );
+
+        attackType.set(XenomorphAttackType.CLAW);
+        beginAttack(XenomorphAttackType.CLAW.defaultDurationInTicks());
     }
 
     public WarriorAnimationDispatcher getAnimationDispatcher() {

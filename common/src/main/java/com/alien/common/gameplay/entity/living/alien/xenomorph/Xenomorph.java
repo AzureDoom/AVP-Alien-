@@ -14,7 +14,10 @@ import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.util.AlienPredicates;
 import com.alien.common.util.XenomorphGrowthUtil;
 import com.blib.api.common.data_sync.v1.DataAccessor;
+import com.blib.api.common.entity.v1.EntitySenseCache;
+import com.blib.api.common.entity.v1.EntitySenseCacheUser;
 import com.blib.api.common.entity.v1.ai.goal.StrollAroundInWaterGoal;
+import com.blib.api.common.goap.v1.GOAPUser;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -46,7 +49,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
-public abstract class Xenomorph extends Alien implements ResinProducer {
+public abstract class Xenomorph extends Alien implements ResinProducer, EntitySenseCacheUser {
 
     public final DataAccessor<Integer> attackDurationInTicks;
 
@@ -61,6 +64,10 @@ public abstract class Xenomorph extends Alien implements ResinProducer {
     private final GrowthManager growthManager;
 
     private final ResinManager resinManager;
+
+    private final XenomorphData xenomorphData;
+
+    private final EntitySenseCache entitySenseCache;
 
     private int remainingAttackTicks;
 
@@ -78,6 +85,18 @@ public abstract class Xenomorph extends Alien implements ResinProducer {
             .setGrowOverTime(false);
         this.navigationManager = createNavigationManager();
         this.resinManager = new ResinManager(this, createResinData());
+        this.xenomorphData = new XenomorphData(getRandom());
+        this.entitySenseCache = EntitySenseCache.builder(this)
+            .withScanRadius(40)
+            .addTrackedTag(AlienEntityTypeTags.XENOMORPHS)
+            .withRefreshPolicy(cache -> {
+                var ticksSinceRefresh = cache.getEntity().tickCount - cache.getLastSenseTick();
+                var wasRecentlyHurt = getLastHurtByMobTimestamp() > 0
+                    && tickCount - getLastHurtByMobTimestamp() < 10;
+
+                return ticksSinceRefresh > 20 || (wasRecentlyHurt && ticksSinceRefresh > 10);
+            })
+            .build();
         this.wasUnderwaterLastTick = false;
 
         isCrawling.onChange($ -> refreshDimensions());
@@ -87,10 +106,6 @@ public abstract class Xenomorph extends Alien implements ResinProducer {
         return new XenomorphNavigationManager(this, moveControl);
     }
 
-    protected int getAttackDelayInTicks() {
-        return 5;
-    }
-
     protected boolean canTargetInitially(LivingEntity target) {
         return true;
     }
@@ -98,6 +113,10 @@ public abstract class Xenomorph extends Alien implements ResinProducer {
     protected abstract @Nullable ResinData createResinData();
 
     public abstract void runAttackAnimations();
+
+    public void runDigAnimation() {
+        runAttackAnimations();
+    }
 
     public abstract boolean isAttacking();
 
@@ -137,6 +156,7 @@ public abstract class Xenomorph extends Alien implements ResinProducer {
         crawlingManager.tick();
         growthManager.tick();
         resinManager.tick();
+        xenomorphData.tick();
 
         updateDimensionsBasedOnWaterState();
 
@@ -159,6 +179,10 @@ public abstract class Xenomorph extends Alien implements ResinProducer {
             if (target != null && !AlienPredicates.canContinueTargeting(this, target)) {
                 // If the target is no longer valid, stop targeting them.
                 setTarget(null);
+            }
+
+            if (this instanceof GOAPUser<?>) {
+                tryAlertNearbyXenomorphs();
             }
         }
     }
@@ -258,6 +282,25 @@ public abstract class Xenomorph extends Alien implements ResinProducer {
         super.setTarget(livingEntity);
     }
 
+    private void tryAlertNearbyXenomorphs() {
+        var attacker = getLastHurtByMob();
+        var hurtTimestamp = getLastHurtByMobTimestamp();
+
+        if (attacker == null || hurtTimestamp == xenomorphData.getLastAlertedHurtTimestamp()) {
+            return;
+        }
+
+        xenomorphData.setLastAlertedHurtTimestamp(hurtTimestamp);
+
+        var nearbyXenomorphs = entitySenseCache.getByTag(AlienEntityTypeTags.XENOMORPHS);
+
+        for (var entity : nearbyXenomorphs) {
+            if (entity instanceof Xenomorph xenomorph && xenomorph != this && xenomorph.getTarget() == null) {
+                xenomorph.setTarget(attacker);
+            }
+        }
+    }
+
     // Fixes a bug where xenomorphs would try to retaliate attack infected hosts that hurt them.
     // TODO: Remove this once GOAP AI is introduced and this edge case has been handled in the new AI.
     @Override
@@ -303,6 +346,7 @@ public abstract class Xenomorph extends Alien implements ResinProducer {
         crawlingManager.load(compoundTag);
         growthManager.load(compoundTag);
         resinManager.load(compoundTag);
+        xenomorphData.load(compoundTag);
     }
 
     @Override
@@ -311,6 +355,7 @@ public abstract class Xenomorph extends Alien implements ResinProducer {
         crawlingManager.save(compoundTag);
         growthManager.save(compoundTag);
         resinManager.save(compoundTag);
+        xenomorphData.save(compoundTag);
     }
 
     public GrowthManager getGrowthManager() {
@@ -320,6 +365,19 @@ public abstract class Xenomorph extends Alien implements ResinProducer {
     @Override
     public ResinManager getResinManager() {
         return resinManager;
+    }
+
+    public XenomorphData getXenomorphData() {
+        return xenomorphData;
+    }
+
+    @Override
+    public EntitySenseCache getEntitySenseCache() {
+        return entitySenseCache;
+    }
+
+    public XenomorphNavigationManager getNavigationManager() {
+        return navigationManager;
     }
 
     public CrawlingManager getCrawlingManager() {
