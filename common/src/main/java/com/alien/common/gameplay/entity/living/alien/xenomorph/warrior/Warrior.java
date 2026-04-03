@@ -12,6 +12,11 @@ import com.alien.common.registry.init.AlienSoundEvents;
 import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.goap.v1.GOAPUser;
+import com.blib.api.common.pathfinding.v1.evaluator.TerrainEvaluatorConfig;
+import com.blib.api.common.pathfinding.v1.navigator.PathNavigator;
+import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorConfig;
+import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
+import com.blib.api.common.pathfinding.v1.terrain.TerrainType;
 import com.just.goap.Agent;
 import com.just.goap.graph.Graph;
 import net.minecraft.world.entity.EntityType;
@@ -20,7 +25,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-public class Warrior extends Xenomorph implements GOAPUser<Warrior> {
+public class Warrior extends Xenomorph implements GOAPUser<Warrior>, PathNavigatorUser {
 
     public static AttributeSupplier.Builder createWarriorAttributes() {
         return Alien.createAlienAttributes()
@@ -37,11 +42,27 @@ public class Warrior extends Xenomorph implements GOAPUser<Warrior> {
 
     private final WarriorAnimationDispatcher animationDispatcher;
 
+    private final PathNavigator pathNavigator;
+
     public Warrior(EntityType<? extends Warrior> entityType, Level level) {
         super(entityType, level);
         this.attackType = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_ATTACK_TYPE.get());
         this.animationDispatcher = new WarriorAnimationDispatcher(this);
+        this.pathNavigator = createPathNavigator(level);
         getXenomorphData().setParallelDigCount(1);
+    }
+
+    private PathNavigator createPathNavigator(Level level) {
+        var evaluatorConfig = TerrainEvaluatorConfig.builder()
+            .addTerrain(TerrainType.GROUND, 1.0f)
+            .withEntityDimensions(1, 2)
+            .withMaxFallDistance(14)
+            .withCanOpenDoors(true)
+            .build();
+
+        var navigatorConfig = PathNavigatorConfig.builder(evaluatorConfig).build();
+
+        return new PathNavigator(level, navigatorConfig);
     }
 
     @Override
@@ -52,6 +73,11 @@ public class Warrior extends Xenomorph implements GOAPUser<Warrior> {
     @Override
     public @Nullable Graph<Warrior> blib$getGOAPGraphOrNull() {
         return WarriorGOAP.GRAPH;
+    }
+
+    @Override
+    public PathNavigator getPathNavigator() {
+        return pathNavigator;
     }
 
     @Override

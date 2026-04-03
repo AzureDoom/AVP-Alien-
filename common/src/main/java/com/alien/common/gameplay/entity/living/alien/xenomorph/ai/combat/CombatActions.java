@@ -8,6 +8,8 @@ import com.blib.api.common.goap.v1.GOAPSensors;
 import com.blib.api.common.goap.v1.action.ActionMasks;
 import com.blib.api.common.goap.v1.action.BLibAction;
 import com.blib.api.common.goap.v1.action.impl.MoveToPosAction;
+import com.blib.api.common.goap.v1.action.impl.NeoMoveToPosAction;
+import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
 import com.just.core.functional.option.Option;
 import com.just.goap.StateKey;
 import com.just.goap.action.Action;
@@ -32,7 +34,7 @@ public class CombatActions {
         .addPrecondition(DigSensors.IS_PATH_TO_TARGET_BLOCKED.key(), Expressions.Boolean.isFalse())
         .addEffect(CombatSensors.IS_TARGET_IN_MELEE_RANGE.key().asDerived(), true)
         .withPerformCallback(CombatActions::performMoveToTarget)
-        .withFinishCallback(MoveToPosAction::onFinish)
+        .withFinishCallback(CombatActions::finishMoveToTarget)
         .build();
 
     public static final Action<Xenomorph> MELEE_ATTACK = BLibAction.<Xenomorph>builder("MeleeAttackAction")
@@ -46,7 +48,6 @@ public class CombatActions {
     private static Action.Signal performMoveToTarget(Action.Context<? extends Xenomorph> context) {
         var xenomorph = context.getActor();
         var worldState = context.getWorldState();
-        var blackboard = context.getBlackboard(Blackboard.Scope.ACTION);
         var attackTargetOption = worldState.getOrDefault(GOAPSensors.NEAREST_ATTACKABLE_TARGET.key(), Option.none());
 
         if (attackTargetOption.isNone()) {
@@ -55,6 +56,37 @@ public class CombatActions {
 
         var attackTarget = attackTargetOption.unwrap();
         xenomorph.getLookControl().setLookAt(attackTarget);
+
+        if (xenomorph instanceof PathNavigatorUser) {
+            return performWithBLibNav(context, attackTarget);
+        }
+
+        return performWithVanillaNav(context, attackTarget);
+    }
+
+    private static void finishMoveToTarget(Action.Context<? extends Xenomorph> context) {
+        if (context.getActor() instanceof PathNavigatorUser) {
+            NeoMoveToPosAction.onFinish(context);
+        } else {
+            MoveToPosAction.onFinish(context);
+        }
+    }
+
+    private static Action.Signal performWithBLibNav(Action.Context<? extends Xenomorph> context, net.minecraft.world.entity.LivingEntity attackTarget) {
+        var result = NeoMoveToPosAction.perform(context, attackTarget.position(), 1.1);
+
+        return switch (result) {
+            case FINISHED, MOVING -> Action.Signal.CONTINUE;
+            case NO_PATH -> {
+                context.getActor().getXenomorphData().setLastPathFailureTick(context.getActor().tickCount);
+                yield Action.Signal.ABORT;
+            }
+        };
+    }
+
+    private static Action.Signal performWithVanillaNav(Action.Context<? extends Xenomorph> context, net.minecraft.world.entity.LivingEntity attackTarget) {
+        var xenomorph = context.getActor();
+        var blackboard = context.getBlackboard(Blackboard.Scope.ACTION);
 
         var currentDistance = xenomorph.distanceToSqr(attackTarget);
         var lastDistance = blackboard.getOrDefault(KEY_LAST_DISTANCE_TO_TARGET, Double.MAX_VALUE);
