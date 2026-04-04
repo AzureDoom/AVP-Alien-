@@ -19,16 +19,19 @@ import com.blib.api.common.pathfinding.v1.evaluator.TerrainEvaluatorConfig;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigator;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorConfig;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
+import com.blib.api.common.pathfinding.v1.physics.ClimbingMoveControl;
 import com.blib.api.common.pathfinding.v1.search.SearchConfig;
 import com.blib.api.common.pathfinding.v1.terrain.BlockBreakabilityEvaluators;
 import com.blib.api.common.pathfinding.v1.terrain.TerrainClassifiers;
 import com.blib.api.common.pathfinding.v1.terrain.TerrainType;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphNavigationManager;
 import com.just.goap.Agent;
 import com.just.goap.graph.Graph;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class Warrior extends Xenomorph implements GOAPUser<Warrior>, PathNavigatorUser {
@@ -100,6 +103,11 @@ public class Warrior extends Xenomorph implements GOAPUser<Warrior>, PathNavigat
         var classificationCache = TerrainCacheRegistry.getOrCreate(level, evaluatorConfig.getTerrainClassifier());
 
         return new PathNavigator(level, navigatorConfig, classificationCache);
+    }
+
+    @Override
+    protected @NotNull XenomorphNavigationManager createNavigationManager() {
+        return new XenomorphNavigationManager(this, new ClimbingMoveControl(this));
     }
 
     @Override
