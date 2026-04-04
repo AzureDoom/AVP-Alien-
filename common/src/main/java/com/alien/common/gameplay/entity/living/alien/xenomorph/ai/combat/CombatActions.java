@@ -57,11 +57,12 @@ public class CombatActions {
         }
 
         var attackTarget = attackTargetOption.unwrap();
-        xenomorph.getLookControl().setLookAt(attackTarget);
 
         if (xenomorph instanceof PathNavigatorUser) {
             return performWithBLibNav(context, attackTarget);
         }
+
+        xenomorph.getLookControl().setLookAt(attackTarget);
 
         return performWithVanillaNav(context, attackTarget);
     }
