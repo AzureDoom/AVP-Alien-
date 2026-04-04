@@ -14,6 +14,7 @@ import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.goap.v1.GOAPUser;
 import com.blib.api.common.pathfinding.v1.cache.TerrainCacheRegistry;
+import com.blib.api.common.pathfinding.v1.evaluator.Posture;
 import com.blib.api.common.pathfinding.v1.evaluator.TerrainEvaluatorConfig;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigator;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorConfig;
@@ -59,6 +60,12 @@ public class Warrior extends Xenomorph implements GOAPUser<Warrior>, PathNavigat
 
     private static final float MAX_BREAKABLE_DESTROY_TIME = 6.0F;
 
+    private static final Posture STANDING = new Posture("default", 1, 2);
+
+    private static final Posture CRAWLING = new Posture("crawling", 1, 1);
+
+    private static final float CRAWL_TRANSITION_COST = 0.5f;
+
     private PathNavigator createPathNavigator(Level level) {
         var evaluatorConfig = TerrainEvaluatorConfig.builder()
             .addTerrain(TerrainType.GROUND, 1.0f)
@@ -71,7 +78,8 @@ public class Warrior extends Xenomorph implements GOAPUser<Warrior>, PathNavigat
                     AlienBlockTags.XENOMORPH_IMMUNE
                 )
             )
-            .withEntityDimensions(1, 2)
+            .addPosture(STANDING)
+            .addPosture(CRAWLING, CRAWL_TRANSITION_COST)
             .withMaxFallDistance(14)
             .withCanOpenDoors(true)
             .build();
@@ -80,6 +88,8 @@ public class Warrior extends Xenomorph implements GOAPUser<Warrior>, PathNavigat
 
         var navigatorConfig = PathNavigatorConfig.builder(evaluatorConfig)
             .withSearchConfig(SearchConfig.fromFollowRange(followRange))
+            .onPostureEnter(0, () -> isCrawling.set(false))
+            .onPostureEnter(1, () -> isCrawling.set(true))
             .build();
 
         var classificationCache = TerrainCacheRegistry.getOrCreate(level, evaluatorConfig.getTerrainClassifier());

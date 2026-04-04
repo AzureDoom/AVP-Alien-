@@ -18,6 +18,7 @@ import com.blib.api.common.entity.v1.EntitySenseCache;
 import com.blib.api.common.entity.v1.EntitySenseCacheUser;
 import com.blib.api.common.entity.v1.ai.goal.StrollAroundInWaterGoal;
 import com.blib.api.common.goap.v1.GOAPUser;
+import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -153,7 +154,11 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
     @Override
     public void tick() {
         super.tick();
-        crawlingManager.tick();
+
+        if (!(this instanceof PathNavigatorUser)) {
+            crawlingManager.tick();
+        }
+
         growthManager.tick();
         resinManager.tick();
         xenomorphData.tick();

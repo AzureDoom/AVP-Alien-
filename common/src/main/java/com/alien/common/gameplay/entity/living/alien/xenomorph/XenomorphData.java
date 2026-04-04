@@ -26,6 +26,10 @@ public class XenomorphData implements NBTSerializable {
 
     private int parallelDigCount = 2;
 
+    private int lastCrawlTick;
+
+    private net.minecraft.core.BlockPos lastCrawlPos;
+
     public XenomorphData(RandomSource random) {
         this.random = random;
         this.ticksUntilBored = random.nextIntBetweenInclusive(MIN_IDLE_TIME_IN_TICKS, MAX_IDLE_TIME_IN_TICKS);
@@ -69,6 +73,22 @@ public class XenomorphData implements NBTSerializable {
 
     public void clearPathFailure() {
         this.lastPathFailureTick = 0;
+    }
+
+    public int getLastCrawlTick() {
+        return lastCrawlTick;
+    }
+
+    public void setLastCrawlTick(int tick) {
+        this.lastCrawlTick = tick;
+    }
+
+    public @org.jetbrains.annotations.Nullable net.minecraft.core.BlockPos getLastCrawlPos() {
+        return lastCrawlPos;
+    }
+
+    public void setLastCrawlPos(net.minecraft.core.BlockPos pos) {
+        this.lastCrawlPos = pos;
     }
 
     public int getParallelDigCount() {

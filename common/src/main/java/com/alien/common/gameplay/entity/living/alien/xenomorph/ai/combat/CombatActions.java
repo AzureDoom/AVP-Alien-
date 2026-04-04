@@ -124,6 +124,21 @@ public class CombatActions {
         return predictedPos;
     }
 
+    private static int getPostureHeight(Xenomorph xenomorph) {
+        if (xenomorph instanceof PathNavigatorUser navigatorUser) {
+            var path = navigatorUser.getPathNavigator().getCurrentPath();
+
+            if (path != null && !path.isDone()) {
+                var postureIndex = path.getCurrentNode().getPostureIndex();
+                var config = navigatorUser.getPathNavigator().getConfig().getEvaluatorConfig();
+
+                return config.getEntityHeight(postureIndex);
+            }
+        }
+
+        return (int) Math.ceil(xenomorph.getBbHeight());
+    }
+
     private static final double BLOCK_BREAK_REACH_DISTANCE_SQUARED = 2.5 * 2.5;
 
     private static Action.Signal handleBlockBreak(Action.Context<? extends Xenomorph> context) {
@@ -167,7 +182,7 @@ public class CombatActions {
     }
 
     private static boolean breakBlocksInVolume(Xenomorph xenomorph, BlockPos feetPos) {
-        var entityHeight = (int) Math.ceil(xenomorph.getBbHeight());
+        var entityHeight = getPostureHeight(xenomorph);
         var parallelDigCount = xenomorph.getXenomorphData().getParallelDigCount();
         var allCleared = true;
         var brokenThisCycle = 0;
