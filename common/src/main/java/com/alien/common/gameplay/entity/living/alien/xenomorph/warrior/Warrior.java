@@ -13,10 +13,12 @@ import com.alien.common.registry.init.AlienSoundEvents;
 import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.goap.v1.GOAPUser;
+import com.blib.api.common.pathfinding.v1.cache.TerrainCacheRegistry;
 import com.blib.api.common.pathfinding.v1.evaluator.TerrainEvaluatorConfig;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigator;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorConfig;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
+import com.blib.api.common.pathfinding.v1.search.SearchConfig;
 import com.blib.api.common.pathfinding.v1.terrain.BlockBreakabilityEvaluators;
 import com.blib.api.common.pathfinding.v1.terrain.TerrainClassifiers;
 import com.blib.api.common.pathfinding.v1.terrain.TerrainType;
@@ -55,19 +57,13 @@ public class Warrior extends Xenomorph implements GOAPUser<Warrior>, PathNavigat
         getXenomorphData().setParallelDigCount(1);
     }
 
-    private static final float WATER_SPEED_DIVISOR = 4.0F;
-
     private static final float MAX_BREAKABLE_DESTROY_TIME = 6.0F;
 
     private PathNavigator createPathNavigator(Level level) {
         var evaluatorConfig = TerrainEvaluatorConfig.builder()
             .addTerrain(TerrainType.GROUND, 1.0f)
-            .addTerrainFromSpeedRatio(
-                TerrainType.WATER,
-                () -> (float) getAttributeValue(Attributes.MOVEMENT_SPEED),
-                () -> (float) getAttributeValue(Attributes.MOVEMENT_SPEED) / WATER_SPEED_DIVISOR
-            )
-            .addTerrain(TerrainType.BREAKABLE, 2.0f)
+            .addTerrain(TerrainType.WATER, 4.0f)
+            .addTerrain(TerrainType.BREAKABLE, 8.0f)
             .withTerrainClassifier(TerrainClassifiers.GROUND_AND_WATER)
             .withBreakabilityEvaluator(
                 BlockBreakabilityEvaluators.withExcludedTag(
@@ -80,9 +76,15 @@ public class Warrior extends Xenomorph implements GOAPUser<Warrior>, PathNavigat
             .withCanOpenDoors(true)
             .build();
 
-        var navigatorConfig = PathNavigatorConfig.builder(evaluatorConfig).build();
+        var followRange = (float) getAttributeValue(Attributes.FOLLOW_RANGE);
 
-        return new PathNavigator(level, navigatorConfig);
+        var navigatorConfig = PathNavigatorConfig.builder(evaluatorConfig)
+            .withSearchConfig(SearchConfig.fromFollowRange(followRange))
+            .build();
+
+        var classificationCache = TerrainCacheRegistry.getOrCreate(level, evaluatorConfig.getTerrainClassifier());
+
+        return new PathNavigator(level, navigatorConfig, classificationCache);
     }
 
     @Override

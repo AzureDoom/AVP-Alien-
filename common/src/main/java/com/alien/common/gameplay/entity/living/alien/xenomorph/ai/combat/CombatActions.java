@@ -1,13 +1,11 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat;
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
-import net.minecraft.core.BlockPos;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.action.MeleeAttackAction;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.dig.DigSensors;
 import com.blib.api.common.block.v1.BlockBreakProgressManager;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
+import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import com.blib.api.common.goap.v1.GOAPSensors;
 import com.blib.api.common.goap.v1.action.ActionMasks;
@@ -22,8 +20,6 @@ import com.just.goap.condition.expression.Expressions;
 import com.just.goap.state.Blackboard;
 
 public class CombatActions {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(CombatActions.class);
 
     private static final StateKey<Double> KEY_LAST_DISTANCE_TO_TARGET = StateKey.sensed("move_last_distance");
 
@@ -83,13 +79,10 @@ public class CombatActions {
     private static Action.Signal performWithBLibNav(Action.Context<? extends Xenomorph> context, net.minecraft.world.entity.LivingEntity attackTarget) {
         var result = NeoMoveToPosAction.perform(context, attackTarget.position(), 1.1);
 
-        LOGGER.info("[BLibNav] NeoMoveToPosAction result: {}", result);
-
         return switch (result) {
             case FINISHED, MOVING -> Action.Signal.CONTINUE;
             case WAITING_FOR_BLOCK_BREAK -> handleBlockBreak(context);
             case NO_PATH -> {
-                LOGGER.info("[BLibNav] NO_PATH — setting path failure tick");
                 context.getActor().getXenomorphData().setLastPathFailureTick(context.getActor().tickCount);
                 yield Action.Signal.ABORT;
             }
