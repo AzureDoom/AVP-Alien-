@@ -77,8 +77,12 @@ public class CombatActions {
 
     private static final float BLOCK_BREAKING_SPEED = 50F;
 
+    private static final double MAX_PREDICTION_DISTANCE_SQUARED = 32.0 * 32.0;
+
     private static Action.Signal performWithBLibNav(Action.Context<? extends Xenomorph> context, net.minecraft.world.entity.LivingEntity attackTarget) {
-        var result = NeoMoveToPosAction.perform(context, attackTarget.position(), 1.1);
+        var xenomorph = context.getActor();
+        var interceptPos = computeInterceptPoint(xenomorph, attackTarget);
+        var result = NeoMoveToPosAction.perform(context, interceptPos, 1.1);
 
         return switch (result) {
             case FINISHED, MOVING -> Action.Signal.CONTINUE;
@@ -88,6 +92,36 @@ public class CombatActions {
                 yield Action.Signal.ABORT;
             }
         };
+    }
+
+    private static net.minecraft.world.phys.Vec3 computeInterceptPoint(Xenomorph xenomorph, net.minecraft.world.entity.LivingEntity target) {
+        var targetPos = target.position();
+        var targetVelocity = target.getDeltaMovement();
+
+        var horizontalVelocity = new net.minecraft.world.phys.Vec3(targetVelocity.x, 0, targetVelocity.z);
+        var horizontalSpeed = horizontalVelocity.length();
+
+        if (horizontalSpeed < 0.01) {
+            return targetPos;
+        }
+
+        var distance = xenomorph.distanceTo(target);
+        var xenomorphSpeed = xenomorph.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED);
+
+        if (xenomorphSpeed < 0.01) {
+            return targetPos;
+        }
+
+        var estimatedTicksToArrive = distance / xenomorphSpeed;
+        var predictedPos = targetPos.add(horizontalVelocity.scale(estimatedTicksToArrive));
+
+        if (predictedPos.distanceToSqr(targetPos) > MAX_PREDICTION_DISTANCE_SQUARED) {
+            var direction = predictedPos.subtract(targetPos).normalize();
+
+            predictedPos = targetPos.add(direction.scale(32.0));
+        }
+
+        return predictedPos;
     }
 
     private static final double BLOCK_BREAK_REACH_DISTANCE_SQUARED = 2.5 * 2.5;
