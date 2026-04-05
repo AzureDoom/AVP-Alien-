@@ -65,6 +65,10 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
 
     private final DataAccessor<Float> climbingYawOld;
 
+    private final DataAccessor<Long> debugCurrentWaypoint;
+
+    private final DataAccessor<Long> debugTargetPos;
+
     protected final CrawlingManager crawlingManager;
 
     private final XenomorphNavigationManager navigationManager;
@@ -90,6 +94,8 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         this.climbingSurface = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_CLIMBING_SURFACE.get());
         this.climbingYaw = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_CLIMBING_YAW.get());
         this.climbingYawOld = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_CLIMBING_YAW_OLD.get());
+        this.debugCurrentWaypoint = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_DEBUG_CURRENT_WAYPOINT.get());
+        this.debugTargetPos = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_DEBUG_TARGET_POS.get());
 
         this.crawlingManager = new CrawlingManager(this, isCrawling);
         this.growthManager = new GrowthManager(this, XenomorphGrowthUtil.GROW_UP_CALLBACK)
@@ -423,6 +429,26 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
     @Override
     public void setClimbingYawOld(float yaw) {
         climbingYawOld.set(yaw);
+    }
+
+    @Override
+    public long getDebugCurrentWaypoint() {
+        return debugCurrentWaypoint.get();
+    }
+
+    @Override
+    public void setDebugCurrentWaypoint(long packed) {
+        debugCurrentWaypoint.set(packed);
+    }
+
+    @Override
+    public long getDebugTargetPos() {
+        return debugTargetPos.get();
+    }
+
+    @Override
+    public void setDebugTargetPos(long packed) {
+        debugTargetPos.set(packed);
     }
 
     public CrawlingManager getCrawlingManager() {

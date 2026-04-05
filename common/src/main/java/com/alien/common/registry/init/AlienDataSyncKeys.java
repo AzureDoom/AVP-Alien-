@@ -164,6 +164,18 @@ public class AlienDataSyncKeys {
             .build(0f)
     );
 
+    public static final BLibHolder<DataSyncKey<Long>> XENOMORPH_DEBUG_CURRENT_WAYPOINT = create(
+        "xenomorph_debug_current_waypoint",
+        builder -> builder.networkSynchronized(StreamCodecs.LONG)
+            .build(0L)
+    );
+
+    public static final BLibHolder<DataSyncKey<Long>> XENOMORPH_DEBUG_TARGET_POS = create(
+        "xenomorph_debug_target_pos",
+        builder -> builder.networkSynchronized(StreamCodecs.LONG)
+            .build(0L)
+    );
+
     public static final BLibHolder<DataSyncKey<Float>> XENOMORPH_CLIMBING_YAW_OLD = create(
         "xenomorph_climbing_yaw_old",
         builder -> builder.networkSynchronized(StreamCodecs.FLOAT)
