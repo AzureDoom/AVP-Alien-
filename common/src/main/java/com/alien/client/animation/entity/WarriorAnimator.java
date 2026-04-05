@@ -90,14 +90,15 @@ public class WarriorAnimator extends AzEntityAnimator<Warrior> {
 
         previousAttackType = XenomorphAttackType.NONE;
 
-        var isMovingOnGround = warrior.isMovingHorizontally.get() && warrior.onGround();
+        var isClimbing = warrior.getClimbingSurfaceDirection() > 0;
+        var isMoving = warrior.isMovingHorizontally.get() && (warrior.onGround() || isClimbing);
         var isCrawling = warrior.getCrawlingManager().isCrawling();
         Runnable animFunction;
 
         if (warrior.isUnderWater()) {
             // TODO: idle swim
             animFunction = dispatcher::swim;
-        } else if (isMovingOnGround) {
+        } else if (isMoving) {
             if (isCrawling) {
                 animFunction = dispatcher::crawl;
             } else if (warrior.hasTarget.get()) {
