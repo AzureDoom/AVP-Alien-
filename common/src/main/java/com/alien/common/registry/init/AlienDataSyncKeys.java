@@ -152,6 +152,24 @@ public class AlienDataSyncKeys {
             .build(false)
     );
 
+    public static final BLibHolder<DataSyncKey<Integer>> XENOMORPH_CLIMBING_SURFACE = create(
+        "xenomorph_climbing_surface",
+        builder -> builder.networkSynchronized(StreamCodecs.INT)
+            .build(0)
+    );
+
+    public static final BLibHolder<DataSyncKey<Float>> XENOMORPH_CLIMBING_YAW = create(
+        "xenomorph_climbing_yaw",
+        builder -> builder.networkSynchronized(StreamCodecs.FLOAT)
+            .build(0f)
+    );
+
+    public static final BLibHolder<DataSyncKey<Float>> XENOMORPH_CLIMBING_YAW_OLD = create(
+        "xenomorph_climbing_yaw_old",
+        builder -> builder.networkSynchronized(StreamCodecs.FLOAT)
+            .build(0f)
+    );
+
     private static <T> BLibHolder<DataSyncKey<T>> create(String path, Function<DataSyncKey.Builder<T>, DataSyncKey<T>> factory) {
         var resourceLocation = AlienResources.location(path);
         return REGISTRY.createHolder(path, () -> factory.apply(new DataSyncKey.Builder<>(resourceLocation)));

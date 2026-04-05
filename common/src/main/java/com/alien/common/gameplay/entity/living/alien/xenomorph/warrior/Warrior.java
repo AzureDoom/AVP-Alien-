@@ -84,6 +84,7 @@ public class Warrior extends Xenomorph implements GOAPUser<Warrior>, PathNavigat
             )
             .addPosture(STANDING)
             .addPosture(CRAWLING, CRAWL_TRANSITION_COST)
+            .withClimbingPostureIndex(1)
             .withMaxFallDistance(14)
             .withCanOpenDoors(true)
             .build();
@@ -94,10 +95,6 @@ public class Warrior extends Xenomorph implements GOAPUser<Warrior>, PathNavigat
             .withSearchConfig(SearchConfig.fromFollowRange(followRange))
             .onPostureEnter(0, () -> isCrawling.set(false))
             .onPostureEnter(1, () -> isCrawling.set(true))
-            .onSurfaceDirectionChange((from, to) -> {
-                // TODO: Integrate with crawling-port orientation/physics system.
-                // Direction ordinals: 0=DOWN, 1=UP, 2=NORTH, 3=SOUTH, 4=WEST, 5=EAST
-            })
             .build();
 
         var classificationCache = TerrainCacheRegistry.getOrCreate(level, evaluatorConfig.getTerrainClassifier());

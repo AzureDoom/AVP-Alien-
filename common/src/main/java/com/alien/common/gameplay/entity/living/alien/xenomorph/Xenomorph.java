@@ -19,6 +19,7 @@ import com.blib.api.common.entity.v1.EntitySenseCacheUser;
 import com.blib.api.common.entity.v1.ai.goal.StrollAroundInWaterGoal;
 import com.blib.api.common.goap.v1.GOAPUser;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
+import com.blib.api.common.pathfinding.v1.physics.ClimbingOrientationProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -50,13 +51,19 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
-public abstract class Xenomorph extends Alien implements ResinProducer, EntitySenseCacheUser {
+public abstract class Xenomorph extends Alien implements ResinProducer, EntitySenseCacheUser, ClimbingOrientationProvider {
 
     public final DataAccessor<Integer> attackDurationInTicks;
 
     public final DataAccessor<Boolean> isLunging;
 
     public final DataAccessor<Boolean> isCrawling;
+
+    public final DataAccessor<Integer> climbingSurface;
+
+    private final DataAccessor<Float> climbingYaw;
+
+    private final DataAccessor<Float> climbingYawOld;
 
     protected final CrawlingManager crawlingManager;
 
@@ -80,6 +87,9 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         this.attackDurationInTicks = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_ATTACK_DURATION_IN_TICKS.get());
         this.isLunging = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_IS_LUNGING.get());
         this.isCrawling = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_IS_CRAWLING.get());
+        this.climbingSurface = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_CLIMBING_SURFACE.get());
+        this.climbingYaw = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_CLIMBING_YAW.get());
+        this.climbingYawOld = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_CLIMBING_YAW_OLD.get());
 
         this.crawlingManager = new CrawlingManager(this, isCrawling);
         this.growthManager = new GrowthManager(this, XenomorphGrowthUtil.GROW_UP_CALLBACK)
@@ -383,6 +393,36 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
 
     public XenomorphNavigationManager getNavigationManager() {
         return navigationManager;
+    }
+
+    @Override
+    public int getClimbingSurfaceDirection() {
+        return climbingSurface.get();
+    }
+
+    @Override
+    public void setClimbingSurfaceDirection(int surfaceDirection) {
+        climbingSurface.set(surfaceDirection);
+    }
+
+    @Override
+    public float getClimbingYaw() {
+        return climbingYaw.get();
+    }
+
+    @Override
+    public void setClimbingYaw(float yaw) {
+        climbingYaw.set(yaw);
+    }
+
+    @Override
+    public float getClimbingYawOld() {
+        return climbingYawOld.get();
+    }
+
+    @Override
+    public void setClimbingYawOld(float yaw) {
+        climbingYawOld.set(yaw);
     }
 
     public CrawlingManager getCrawlingManager() {
