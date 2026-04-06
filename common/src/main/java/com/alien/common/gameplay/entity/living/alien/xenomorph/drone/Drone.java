@@ -7,7 +7,6 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.VentBuilder;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.VentData;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphNavigationManager;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.ai.DroneGOAP;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienDataSyncKeys;
@@ -25,7 +24,6 @@ import com.blib.api.common.pathfinding.v1.evaluator.TerrainEvaluatorConfig;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigator;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorConfig;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
-import com.blib.api.common.pathfinding.v1.physics.ClimbingMoveControl;
 import com.blib.api.common.pathfinding.v1.search.SearchConfig;
 import com.blib.api.common.pathfinding.v1.terrain.BlockBreakabilityEvaluators;
 import com.blib.api.common.pathfinding.v1.terrain.TerrainClassifiers;
@@ -117,11 +115,6 @@ public class Drone extends Xenomorph implements EggCarrier, GOAPUser<Drone>, Pat
         var classificationCache = TerrainCacheRegistry.getOrCreate(level, evaluatorConfig.getTerrainClassifier());
 
         return new PathNavigator(level, navigatorConfig, classificationCache);
-    }
-
-    @Override
-    protected @NotNull XenomorphNavigationManager createNavigationManager() {
-        return new XenomorphNavigationManager(this, new ClimbingMoveControl(this));
     }
 
     @Override

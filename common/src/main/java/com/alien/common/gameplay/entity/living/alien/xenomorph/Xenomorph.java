@@ -65,8 +65,6 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
 
     protected final CrawlingManager crawlingManager;
 
-    private final XenomorphNavigationManager navigationManager;
-
     private final GrowthManager growthManager;
 
     private final ResinManager resinManager;
@@ -96,7 +94,6 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         this.crawlingManager = new CrawlingManager(this, isCrawling);
         this.growthManager = new GrowthManager(this, XenomorphGrowthUtil.GROW_UP_CALLBACK)
             .setGrowOverTime(false);
-        this.navigationManager = createNavigationManager();
         this.resinManager = new ResinManager(this);
         this.xenomorphData = new XenomorphData(getRandom());
         this.entitySenseCache = EntitySenseCache.builder(this)
@@ -113,10 +110,6 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         this.wasUnderwaterLastTick = false;
 
         isCrawling.onChange($ -> refreshDimensions());
-    }
-
-    protected @NotNull XenomorphNavigationManager createNavigationManager() {
-        return new XenomorphNavigationManager(this, moveControl);
     }
 
     public abstract void runAttackAnimations();
@@ -191,19 +184,6 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
             setDeltaMovement(getDeltaMovement().scale(0.9));
         } else {
             super.travel(vec3);
-        }
-    }
-
-    @Override
-    public void updateSwimming() {
-        if (!level().isClientSide) {
-            if (isEffectiveAi() && isUnderWater()) {
-                navigationManager.switchToWater(this);
-                setSwimming(true);
-            } else {
-                navigationManager.switchToGround(this);
-                setSwimming(false);
-            }
         }
     }
 
@@ -364,10 +344,6 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         return entitySenseCache;
     }
 
-    public XenomorphNavigationManager getNavigationManager() {
-        return navigationManager;
-    }
-
     @Override
     public int getClimbingSurfaceDirection() {
         return climbingSurface.get();
@@ -425,13 +401,5 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
 
     public CrawlingManager getCrawlingManager() {
         return crawlingManager;
-    }
-
-    public void setMoveControl(MoveControl moveControl) {
-        this.moveControl = moveControl;
-    }
-
-    public void setNavigation(PathNavigation navigation) {
-        this.navigation = navigation;
     }
 }
