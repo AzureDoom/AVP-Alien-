@@ -6,7 +6,6 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackTy
 import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphNavigationManager;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.warrior.ai.WarriorGOAP;
 import com.alien.common.model.alien.variant.AlienVariant;
-import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
@@ -130,11 +129,6 @@ public class Warrior extends Xenomorph implements GOAPUser<Warrior>, PathNavigat
     @Override
     protected float getHealthRegenPerSecond() {
         return 0.5F;
-    }
-
-    @Override
-    protected @Nullable ResinData createResinData() {
-        return new ResinData(0, 32, 1, 20);
     }
 
     @Override

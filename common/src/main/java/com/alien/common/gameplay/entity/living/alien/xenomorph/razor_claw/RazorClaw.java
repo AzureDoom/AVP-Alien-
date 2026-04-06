@@ -5,7 +5,6 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.razor_claw.ai.RazorClawGOAP;
 import com.alien.common.model.alien.variant.AlienVariant;
-import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienMobEffects;
@@ -115,11 +114,6 @@ public class RazorClaw extends Xenomorph implements GOAPUser<RazorClaw>, PathNav
     @Override
     public @Nullable EntityType<? extends Alien> getTypeForVariant(AlienVariant alienVariant) {
         return getType(alienVariant);
-    }
-
-    @Override
-    protected @Nullable ResinData createResinData() {
-        return new ResinData(0, 64, 1, 20);
     }
 
     @Override

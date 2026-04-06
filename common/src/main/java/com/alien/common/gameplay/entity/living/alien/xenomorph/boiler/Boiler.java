@@ -4,7 +4,6 @@ import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.boiler.ai.BoilerGOAP;
 import com.alien.common.model.alien.variant.AlienVariant;
-import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.tag.AlienBlockTags;
 import com.alien.common.util.AcidBleedUtil;
@@ -130,11 +129,6 @@ public class Boiler extends Xenomorph implements GOAPUser<Boiler>, PathNavigator
     @Override
     public @Nullable EntityType<? extends Alien> getTypeForVariant(AlienVariant alienVariant) {
         return getType(alienVariant);
-    }
-
-    @Override
-    protected @Nullable ResinData createResinData() {
-        return null;
     }
 
     @Override

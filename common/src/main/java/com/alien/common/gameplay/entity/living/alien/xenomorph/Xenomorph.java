@@ -6,7 +6,6 @@ import com.alien.common.gameplay.entity.CrawlingManager;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.GrowthManager;
 import com.alien.common.gameplay.entity.living.alien.ResinManager;
-import com.alien.common.model.resin.ResinData;
 import com.alien.common.model.resin.ResinProducer;
 import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienSoundEvents;
@@ -104,7 +103,7 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         this.growthManager = new GrowthManager(this, XenomorphGrowthUtil.GROW_UP_CALLBACK)
             .setGrowOverTime(false);
         this.navigationManager = createNavigationManager();
-        this.resinManager = new ResinManager(this, createResinData());
+        this.resinManager = new ResinManager(this);
         this.xenomorphData = new XenomorphData(getRandom());
         this.entitySenseCache = EntitySenseCache.builder(this)
             .withScanRadius(40)
@@ -129,8 +128,6 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
     protected boolean canTargetInitially(LivingEntity target) {
         return true;
     }
-
-    protected abstract @Nullable ResinData createResinData();
 
     public abstract void runAttackAnimations();
 

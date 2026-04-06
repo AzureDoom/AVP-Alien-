@@ -7,6 +7,9 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg.EggSensors
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.lunge.LungeActions;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.lunge.LungeConfig;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.lunge.LungeSensors;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.resin.ResinActions;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.resin.ResinGoals;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.resin.ResinSensors;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.vent.VentActions;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.vent.VentGoals;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.vent.VentSensors;
@@ -23,6 +26,7 @@ public class DroneGOAP {
         .apply(DroneGOAP::addLungePackage)
         .apply(DroneGOAP::addEggPackage)
         .apply(DroneGOAP::addVentPackage)
+        .apply(DroneGOAP::addResinPackage)
         .build();
 
     public static Agent.Builder<Drone> applyAgentProperties(Agent.Builder<Drone> agentBuilder) {
@@ -57,6 +61,16 @@ public class DroneGOAP {
         graphBuilder.addAction(VentActions.CREATE_VENT);
 
         graphBuilder.addSensor(VentSensors.CAN_CREATE_VENT);
+
+        return graphBuilder;
+    }
+
+    private static Graph.Builder<Drone> addResinPackage(Graph.Builder<Drone> graphBuilder) {
+        graphBuilder.addGoal(ResinGoals.SPREAD_RESIN);
+
+        graphBuilder.addAction(ResinActions.SPREAD_RESIN);
+
+        graphBuilder.addSensor(ResinSensors.CAN_SPREAD_RESIN);
 
         return graphBuilder;
     }

@@ -2,14 +2,11 @@ package com.alien.common.gameplay.entity.living.alien;
 
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.level.gameevent.listener.ResinSpreadListener;
-import com.alien.common.model.resin.ReadableResinData;
 import com.alien.common.model.resin.ResinData;
 import com.blib.api.common.nbt.v1.model.NBTSerializable;
 import com.just.core.functional.option.Option;
-import com.mojang.serialization.Dynamic;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.Level;
@@ -19,32 +16,32 @@ import net.minecraft.world.level.gameevent.DynamicGameEventListener;
 import net.minecraft.world.level.gameevent.EntityPositionSource;
 import net.minecraft.world.level.gameevent.GameEventListener;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
 
 public class ResinManager implements GameEventListener.Provider<ResinSpreadListener>, NBTSerializable {
 
-    private static final String NBT_RESIN_DATA = "resinData";
+    private static final String NBT_LAST_SPREAD_TICK = "lastSpreadTick";
+
+    private static final int SPREAD_COOLDOWN_IN_TICKS = 15 * 20;
+
+    private static final int SPREAD_CHARGE = 16;
 
     private final Alien alien;
-
-    private final @Nullable ReadableResinData baseResinData;
 
     private final DynamicGameEventListener<ResinSpreadListener> dynamicResinSpreadListener;
 
     private final ResinSpreadListener resinSpreadListener;
 
-    private @Nullable ResinData resinData;
+    private final ResinData resinData;
 
-    private int ticksSinceLastResinProduction = 0;
+    private long lastSpreadTick;
 
     private int ticksSinceAttemptedNodePlacement = 0;
 
-    public ResinManager(Alien alien, @Nullable ResinData resinData) {
+    public ResinManager(Alien alien) {
         this.alien = alien;
-        this.baseResinData = resinData;
-        this.resinData = resinData;
+        this.resinData = new ResinData(0, SPREAD_CHARGE, 0, 0);
         var positionSource = new EntityPositionSource(alien, 0F);
         var spreadType = new ResinSpreadListener.SpreaderType.Entity(alien);
         this.resinSpreadListener = new ResinSpreadListener(positionSource, spreadType);
@@ -57,65 +54,58 @@ public class ResinManager implements GameEventListener.Provider<ResinSpreadListe
     }
 
     public void tick() {
-        var level = alien.level();
-
-        if (
-            level.isClientSide
-                || baseResinData == null
-                || resinData == null
-        ) {
+        if (alien.level().isClientSide) {
             return;
         }
 
-        ticksSinceLastResinProduction++;
         ticksSinceAttemptedNodePlacement = Math.max(0, ticksSinceAttemptedNodePlacement - 1);
+    }
 
-        if (ticksSinceLastResinProduction < resinData.tickRate()) {
-            return;
-        }
+    public boolean canSpreadResin() {
+        return alien.tickCount - lastSpreadTick >= SPREAD_COOLDOWN_IN_TICKS
+            && !isNodePlacementOnCooldown()
+            && canSpreadResinAtAlienPosition();
+    }
 
-        var factor = resinData.tickRate() == 0
-            ? 0
-            : ticksSinceLastResinProduction / resinData.tickRate();
-        var accumulatedResin = factor * resinData.resinPerTick();
-        resinData.addResin(accumulatedResin);
-
-        ticksSinceLastResinProduction = 0;
-
-        if (
-            // If we haven't reached full resin capacity...
-            resinData.resin() < resinData.resinMax()
-                // OR the resin node placement cooldown is still active...
-                || ticksSinceAttemptedNodePlacement > 0
-                // OR we can't spread resin at the alien's current position...
-                || !canSpreadResinAtAlienPosition()
-        ) {
-            // Then return, we can't spread resin, yet.
-            return;
-        }
+    public void spreadResin() {
+        // Set the charge so the nearest resin node listener can consume it.
+        resinData.setResin(SPREAD_CHARGE);
 
         var alienVariantType = AlienVariantTypes.getFor(alien);
 
         // Signal to the nearest resin node that we want to spread resin.
         alien.gameEvent(alienVariantType.resinSpreadEvent());
 
+        lastSpreadTick = alien.tickCount;
+
         // If the alien still has resin even after signalling a resin spread event, that means there was no resin node
         // to intercept the event. So we try to place a resin node down here.
-        if (resinData.resin() >= resinData.resinMax()) {
+        if (resinData.resin() > 0) {
+            var level = alien.level();
             // Try and find a suitable resin node block location.
             var suitableResinNodeBlockPosOption = findSuitableResinNodeBlockPos(level, alienVariantType.resinReplaceableTag());
 
             if (suitableResinNodeBlockPosOption.isNone()) {
                 // Could not find a suitable resin node block position, so reset the node place cooldown and return.
                 ticksSinceAttemptedNodePlacement = 20 * 10;
+                resinData.setResin(0);
                 return;
             }
 
             // If the resin holder still has more resin, then we place a resin node manually.
             var resinNodeBlockState = alienVariantType.resinNode().get().defaultBlockState();
             // Place the resin node block at the suitable position.
-            alien.level().setBlockAndUpdate(suitableResinNodeBlockPosOption.unwrap(), resinNodeBlockState);
+            level.setBlockAndUpdate(suitableResinNodeBlockPosOption.unwrap(), resinNodeBlockState);
+            resinData.setResin(0);
         }
+    }
+
+    public ResinData resinData() {
+        return resinData;
+    }
+
+    private boolean isNodePlacementOnCooldown() {
+        return ticksSinceAttemptedNodePlacement > 0;
     }
 
     private boolean canSpreadResinAtAlienPosition() {
@@ -187,36 +177,15 @@ public class ResinManager implements GameEventListener.Provider<ResinSpreadListe
         }
     }
 
-    public @Nullable ReadableResinData baseResinData() {
-        return baseResinData;
-    }
-
-    public @Nullable ResinData resinData() {
-        return resinData;
-    }
-
     @Override
     public void load(CompoundTag compoundTag) {
-        if (compoundTag.contains(NBT_RESIN_DATA)) {
-            ResinData.CODEC.parse(
-                new Dynamic<>(NbtOps.INSTANCE, compoundTag.getCompound(NBT_RESIN_DATA))
-            )
-                .resultOrPartial(
-                    com.alien.Alien.LOGGER::error
-                )
-                .ifPresent(resinData -> this.resinData = resinData);
+        if (compoundTag.contains(NBT_LAST_SPREAD_TICK)) {
+            this.lastSpreadTick = compoundTag.getLong(NBT_LAST_SPREAD_TICK);
         }
     }
 
     @Override
     public void save(CompoundTag compoundTag) {
-        if (resinData != null) {
-            ResinData.CODEC.encodeStart(NbtOps.INSTANCE, resinData)
-                .resultOrPartial(
-                    com.alien.Alien.LOGGER::error
-                )
-                .ifPresent(tag -> compoundTag.put(NBT_RESIN_DATA, tag));
-
-        }
+        compoundTag.putLong(NBT_LAST_SPREAD_TICK, lastSpreadTick);
     }
 }
