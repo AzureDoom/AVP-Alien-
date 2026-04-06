@@ -25,10 +25,12 @@ import com.blib.api.common.pathfinding.v1.terrain.TerrainClassifiers;
 import com.blib.api.common.pathfinding.v1.terrain.TerrainType;
 import com.just.goap.Agent;
 import com.just.goap.graph.Graph;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class Spitter extends Xenomorph implements GOAPUser<Spitter>, PathNavigatorUser {
@@ -52,12 +54,15 @@ public class Spitter extends Xenomorph implements GOAPUser<Spitter>, PathNavigat
 
     private final SpitterAnimationDispatcher animationDispatcher;
 
+    private final SpitterData spitterData;
+
     private final PathNavigator pathNavigator;
 
     public Spitter(EntityType<? extends Spitter> entityType, Level level) {
         super(entityType, level);
         this.attackType = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_ATTACK_TYPE.get());
         this.animationDispatcher = new SpitterAnimationDispatcher(this);
+        this.spitterData = new SpitterData();
         this.pathNavigator = createPathNavigator(level);
         getXenomorphData().setParallelDigCount(1);
     }
@@ -153,6 +158,22 @@ public class Spitter extends Xenomorph implements GOAPUser<Spitter>, PathNavigat
     @Override
     protected float getHealthRegenPerSecond() {
         return 0.5F;
+    }
+
+    public SpitterData getSpitterData() {
+        return spitterData;
+    }
+
+    @Override
+    public void readAdditionalSaveData(@NotNull CompoundTag compoundTag) {
+        super.readAdditionalSaveData(compoundTag);
+        spitterData.load(compoundTag);
+    }
+
+    @Override
+    public void addAdditionalSaveData(@NotNull CompoundTag compoundTag) {
+        super.addAdditionalSaveData(compoundTag);
+        spitterData.save(compoundTag);
     }
 
     public SpitterAnimationDispatcher getAnimationDispatcher() {

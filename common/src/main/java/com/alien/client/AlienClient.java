@@ -13,6 +13,7 @@ import com.alien.client.render.armor.PlatedChitinArmorRenderer;
 import com.alien.client.render.armor.PlatedIrradiatedChitinArmorRenderer;
 import com.alien.client.render.armor.PlatedNetherChitinArmorRenderer;
 import com.alien.client.render.entity.AcidRenderer;
+import com.alien.client.render.entity.AcidSpitRenderer;
 import com.alien.client.render.entity.AdolescentRenderer;
 import com.alien.client.render.entity.BoilerRenderer;
 import com.alien.client.render.entity.CarrierRenderer;
@@ -238,6 +239,7 @@ public class AlienClient {
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_SPITTER, SpitterRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_WARRIOR, WarriorRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ACID, AcidRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ACID_SPIT, AcidSpitRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ADOLESCENT, AdolescentRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.BOILER, BoilerRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.CHESTBURSTER, ChestbursterRenderer::new);

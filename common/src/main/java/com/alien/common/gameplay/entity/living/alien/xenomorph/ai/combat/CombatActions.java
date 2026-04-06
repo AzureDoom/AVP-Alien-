@@ -46,7 +46,7 @@ public class CombatActions {
         .withPerformCallback(MeleeAttackAction::perform)
         .build();
 
-    private static Action.Signal performMoveToTarget(Action.Context<? extends Xenomorph> context) {
+    public static Action.Signal performMoveToTarget(Action.Context<? extends Xenomorph> context) {
         var xenomorph = context.getActor();
         var worldState = context.getWorldState();
         var attackTargetOption = worldState.getOrDefault(GOAPSensors.NEAREST_ATTACKABLE_TARGET.key(), Option.none());
@@ -66,7 +66,7 @@ public class CombatActions {
         return performWithVanillaNav(context, attackTarget);
     }
 
-    private static void finishMoveToTarget(Action.Context<? extends Xenomorph> context) {
+    public static void finishMoveToTarget(Action.Context<? extends Xenomorph> context) {
         if (context.getActor() instanceof PathNavigatorUser) {
             NeoMoveToPosAction.onFinish(context);
         } else {

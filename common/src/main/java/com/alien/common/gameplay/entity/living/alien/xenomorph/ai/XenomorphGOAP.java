@@ -60,7 +60,7 @@ public class XenomorphGOAP {
         );
     }
 
-    private static <T extends Xenomorph> Graph.Builder<T> addSensorsPackage(Graph.Builder<T> graphBuilder) {
+    public static <T extends Xenomorph> Graph.Builder<T> addSensorsPackage(Graph.Builder<T> graphBuilder) {
         graphBuilder.addSensor(GOAPSensors.IS_ON_GROUND);
         graphBuilder.addSensor(GOAPSensors.IS_ON_FIRE);
         graphBuilder.addSensor(GOAPSensors.HEALTH_RATIO);
@@ -68,7 +68,7 @@ public class XenomorphGOAP {
         return graphBuilder;
     }
 
-    private static <T extends Xenomorph> Graph.Builder<T> addCombatPackage(Graph.Builder<T> graphBuilder) {
+    public static <T extends Xenomorph> Graph.Builder<T> addCombatPackage(Graph.Builder<T> graphBuilder) {
         graphBuilder.addGoal(CombatGoals.KILL_TARGET);
 
         graphBuilder.addAction(CombatActions.MOVE_TO_TARGET);
@@ -85,7 +85,7 @@ public class XenomorphGOAP {
         return graphBuilder;
     }
 
-    private static <T extends Xenomorph> Graph.Builder<T> addDigPackage(Graph.Builder<T> graphBuilder) {
+    public static <T extends Xenomorph> Graph.Builder<T> addDigPackage(Graph.Builder<T> graphBuilder) {
         graphBuilder.addAction(DigActions.DIG_TO_TARGET);
 
         graphBuilder.addSensor(DigSensors.IS_PATH_TO_TARGET_BLOCKED);
@@ -93,7 +93,7 @@ public class XenomorphGOAP {
         return graphBuilder;
     }
 
-    private static <T extends Xenomorph> Graph.Builder<T> addIdlePackage(Graph.Builder<T> graphBuilder) {
+    public static <T extends Xenomorph> Graph.Builder<T> addIdlePackage(Graph.Builder<T> graphBuilder) {
         graphBuilder.addGoal(IdleGoals.SATISFY_BOREDOM);
 
         graphBuilder.addAction(IdleActions.WANDER);

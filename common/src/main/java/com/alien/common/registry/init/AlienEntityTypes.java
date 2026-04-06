@@ -24,6 +24,7 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.razor_claw.RazorC
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.spitter.Spitter;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.warrior.Warrior;
+import com.alien.common.gameplay.entity.projectile.AcidSpit;
 import com.blib.api.common.entity.v1.SilencedEntityTypeBuilder;
 import com.blib.api.common.registry.v1.BLibHolder;
 import com.blib.api.common.registry.v1.BLibRegistry;
@@ -169,6 +170,12 @@ public class AlienEntityTypes {
         "acid",
         EntityType.Builder.of(Acid::new, MobCategory.MISC)
             .sized(0.66F, 0.05F)
+    );
+
+    public static final BLibHolder<EntityType<AcidSpit>> ACID_SPIT = create(
+        "acid_spit",
+        EntityType.Builder.<AcidSpit>of(AcidSpit::new, MobCategory.MISC)
+            .sized(0.25F, 0.25F)
     );
 
     public static final BLibHolder<EntityType<Adolescent>> ADOLESCENT = create(
