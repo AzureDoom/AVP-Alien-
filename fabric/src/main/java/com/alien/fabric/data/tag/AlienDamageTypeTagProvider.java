@@ -50,16 +50,27 @@ public class AlienDamageTypeTagProvider extends FabricTagProvider<DamageType> {
                 AlienDamageTypeKeys.CHESTBURSTING
             );
 
-        getOrCreateTagBuilder(DamageTypeTags.NO_KNOCKBACK)
+        getOrCreateTagBuilder(AlienDamageTypesTags.ACID)
             .add(
                 AlienDamageTypeKeys.ACID,
+                AlienDamageTypeKeys.ACID_SPIT
+            );
+
+        getOrCreateTagBuilder(DamageTypeTags.NO_KNOCKBACK)
+            .addTag(AlienDamageTypesTags.ACID)
+            .add(
                 AlienDamageTypeKeys.CHESTBURSTING,
                 AlienDamageTypeKeys.SMOTHERING
             );
 
-        getOrCreateTagBuilder(AlienDamageTypesTags.DOES_NOT_HURT_ALIENS)
+        getOrCreateTagBuilder(DamageTypeTags.IS_PROJECTILE)
             .add(
-                AlienDamageTypeKeys.ACID,
+                AlienDamageTypeKeys.ACID_SPIT
+            );
+
+        getOrCreateTagBuilder(AlienDamageTypesTags.DOES_NOT_HURT_ALIENS)
+            .addTag(AlienDamageTypesTags.ACID)
+            .add(
                 DamageTypes.DROWN,
                 DamageTypes.FREEZE,
                 DamageTypes.IN_WALL

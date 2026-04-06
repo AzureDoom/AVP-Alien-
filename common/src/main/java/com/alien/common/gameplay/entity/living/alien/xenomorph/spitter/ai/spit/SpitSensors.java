@@ -1,6 +1,7 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.spitter.ai.spit;
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.spitter.Spitter;
+import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.goap.v1.GOAPSensors;
 import com.just.core.functional.option.Option;
 import com.just.goap.StateKey;
@@ -25,6 +26,11 @@ public class SpitSensors {
             }
 
             var target = attackTargetOption.unwrap();
+
+            if (target.getType().is(AlienEntityTypeTags.ACID_IMMUNE)) {
+                return false;
+            }
+
             var distanceSquared = spitter.distanceToSqr(target);
             var minSquared = MIN_SPIT_RANGE_IN_BLOCKS * MIN_SPIT_RANGE_IN_BLOCKS;
             var maxSquared = MAX_SPIT_RANGE_IN_BLOCKS * MAX_SPIT_RANGE_IN_BLOCKS;

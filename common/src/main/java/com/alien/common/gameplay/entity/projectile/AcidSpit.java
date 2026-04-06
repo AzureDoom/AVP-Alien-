@@ -3,7 +3,9 @@ package com.alien.common.gameplay.entity.projectile;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienParticleTypes;
+import com.alien.common.registry.key.AlienDamageTypeKeys;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -74,8 +76,14 @@ public class AcidSpit extends ThrowableProjectile {
         }
 
         var target = result.getEntity();
+        var registry = level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
+        var damageSource = new net.minecraft.world.damagesource.DamageSource(
+            registry.getHolderOrThrow(AlienDamageTypeKeys.ACID_SPIT),
+            this,
+            getOwnerAsLiving()
+        );
 
-        target.hurt(damageSources().mobProjectile(this, getOwnerAsLiving()), DAMAGE);
+        target.hurt(damageSource, DAMAGE);
         spawnAcidAtPosition(target.position());
         discard();
     }
