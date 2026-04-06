@@ -90,14 +90,15 @@ public class ProwlerAnimator extends AzEntityAnimator<Prowler> {
 
         previousAttackType = QuadrupedAttackType.NONE;
 
-        var isMovingOnGround = prowler.isMovingHorizontally.get() && prowler.onGround();
+        var isClimbing = prowler.getClimbingSurfaceDirection() > 0;
+        var isMoving = prowler.isMovingHorizontally.get() && (prowler.onGround() || isClimbing);
         var isCrawling = prowler.getCrawlingManager().isCrawling();
         Runnable animFunction;
 
         if (prowler.isUnderWater()) {
             // TODO: idle swim
             animFunction = dispatcher::swim;
-        } else if (isMovingOnGround) {
+        } else if (isMoving) {
             if (isCrawling) {
                 animFunction = dispatcher::crawl;
             } else if (prowler.hasTarget.get()) {
