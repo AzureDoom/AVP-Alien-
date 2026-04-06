@@ -10,7 +10,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.ClipContext;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
 
 import java.util.ArrayList;
@@ -26,7 +25,6 @@ public class DigToTargetAction {
     private static final float BREAKING_SPEED = 50F;
 
     private static final double REACH_DISTANCE = 4.0;
-
 
     public static Action.Signal perform(Action.Context<? extends Xenomorph> context) {
         var xenomorph = context.getActor();
@@ -85,14 +83,15 @@ public class DigToTargetAction {
 
             var soundType = blockState.getSoundType();
 
-            xenomorph.level().playSound(
-                null,
-                blockPos,
-                soundType.getHitSound(),
-                SoundSource.BLOCKS,
-                (soundType.getVolume() + 1.0F) / 8.0F,
-                soundType.getPitch() * 0.5F
-            );
+            xenomorph.level()
+                .playSound(
+                    null,
+                    blockPos,
+                    soundType.getHitSound(),
+                    SoundSource.BLOCKS,
+                    (soundType.getVolume() + 1.0F) / 8.0F,
+                    soundType.getPitch() * 0.5F
+                );
 
             if (xenomorph.level().getBlockState(blockPos).isAir()) {
                 blocksToRemove.add(blockPos);

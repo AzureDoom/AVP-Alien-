@@ -2,11 +2,11 @@ package com.alien.common.gameplay.entity.living.alien.ovomorph;
 
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.entity.living.alien.Alien;
+import com.alien.common.gameplay.entity.living.alien.GrowthManager;
 import com.alien.common.gameplay.entity.living.alien.ovomorph.ai.OvomorphGOAP;
 import com.alien.common.model.alien.HatchState;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienDataSyncKeys;
-import com.alien.common.gameplay.entity.living.alien.GrowthManager;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienEntityTypeTags;

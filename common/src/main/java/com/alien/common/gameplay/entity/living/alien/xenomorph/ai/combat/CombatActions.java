@@ -4,9 +4,6 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.action.MeleeAttackAction;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.dig.DigSensors;
 import com.blib.api.common.block.v1.BlockBreakProgressManager;
-import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
-import net.minecraft.core.BlockPos;
-import net.minecraft.sounds.SoundSource;
 import com.blib.api.common.goap.v1.GOAPSensors;
 import com.blib.api.common.goap.v1.action.ActionMasks;
 import com.blib.api.common.goap.v1.action.BLibAction;
@@ -18,6 +15,8 @@ import com.just.goap.StateKey;
 import com.just.goap.action.Action;
 import com.just.goap.condition.expression.Expressions;
 import com.just.goap.state.Blackboard;
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundSource;
 
 public class CombatActions {
 
@@ -79,7 +78,10 @@ public class CombatActions {
 
     private static final double MAX_PREDICTION_DISTANCE_SQUARED = 32.0 * 32.0;
 
-    private static Action.Signal performWithBLibNav(Action.Context<? extends Xenomorph> context, net.minecraft.world.entity.LivingEntity attackTarget) {
+    private static Action.Signal performWithBLibNav(
+        Action.Context<? extends Xenomorph> context,
+        net.minecraft.world.entity.LivingEntity attackTarget
+    ) {
         var xenomorph = context.getActor();
         var interceptPos = computeInterceptPoint(xenomorph, attackTarget);
         var result = NeoMoveToPosAction.perform(context, interceptPos, 1.1);
@@ -94,7 +96,10 @@ public class CombatActions {
         };
     }
 
-    private static net.minecraft.world.phys.Vec3 computeInterceptPoint(Xenomorph xenomorph, net.minecraft.world.entity.LivingEntity target) {
+    private static net.minecraft.world.phys.Vec3 computeInterceptPoint(
+        Xenomorph xenomorph,
+        net.minecraft.world.entity.LivingEntity target
+    ) {
         var targetPos = target.position();
         var targetVelocity = target.getDeltaMovement();
 
@@ -202,10 +207,15 @@ public class CombatActions {
 
             var soundType = state.getSoundType();
 
-            xenomorph.level().playSound(
-                null, checkPos, soundType.getHitSound(), SoundSource.BLOCKS,
-                (soundType.getVolume() + 1.0F) / 8.0F, soundType.getPitch() * 0.5F
-            );
+            xenomorph.level()
+                .playSound(
+                    null,
+                    checkPos,
+                    soundType.getHitSound(),
+                    SoundSource.BLOCKS,
+                    (soundType.getVolume() + 1.0F) / 8.0F,
+                    soundType.getPitch() * 0.5F
+                );
 
             var result = BlockBreakProgressManager.damage(xenomorph.level(), checkPos, BLOCK_BREAKING_SPEED);
 
@@ -219,7 +229,10 @@ public class CombatActions {
         return allCleared;
     }
 
-    private static Action.Signal performWithVanillaNav(Action.Context<? extends Xenomorph> context, net.minecraft.world.entity.LivingEntity attackTarget) {
+    private static Action.Signal performWithVanillaNav(
+        Action.Context<? extends Xenomorph> context,
+        net.minecraft.world.entity.LivingEntity attackTarget
+    ) {
         var xenomorph = context.getActor();
         var blackboard = context.getBlackboard(Blackboard.Scope.ACTION);
 

@@ -90,14 +90,15 @@ public class DroneAnimator extends AzEntityAnimator<Drone> {
 
         previousAttackType = XenomorphAttackType.NONE;
 
-        var isMovingOnGround = drone.isMovingHorizontally.get() && drone.onGround();
+        var isClimbing = drone.getClimbingSurfaceDirection() > 0;
+        var isMoving = drone.isMovingHorizontally.get() && (drone.onGround() || isClimbing);
         var isCrawling = drone.getCrawlingManager().isCrawling();
         Runnable animFunction;
 
         if (drone.isUnderWater()) {
             // TODO: idle swim
             animFunction = dispatcher::swim;
-        } else if (isMovingOnGround) {
+        } else if (isMoving) {
             if (isCrawling) {
                 animFunction = dispatcher::crawl;
             } else if (drone.hasTarget.get()) {

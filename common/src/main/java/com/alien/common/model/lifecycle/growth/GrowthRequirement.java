@@ -23,7 +23,10 @@ public sealed interface GrowthRequirement {
 
     boolean test(LivingEntity entity);
 
-    record MobEffectRequirement(Holder<MobEffect> effect, int minAmplifier) implements GrowthRequirement {
+    record MobEffectRequirement(
+        Holder<MobEffect> effect,
+        int minAmplifier
+    ) implements GrowthRequirement {
 
         public static final MapCodec<MobEffectRequirement> CODEC = RecordCodecBuilder.mapCodec(
             instance -> instance.group(

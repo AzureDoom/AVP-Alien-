@@ -2,7 +2,6 @@ package com.alien.common.registry.init.creative_mode_tab;
 
 import com.alien.Alien;
 import com.alien.common.registry.init.block.AlienResinBlocks;
-import com.alien.common.registry.init.AlienPotions;
 import com.alien.common.registry.init.creative_mode_tab.initializer.BlocksCreativeModeTabInitializer;
 import com.alien.common.registry.init.creative_mode_tab.initializer.CombatCreativeModeTabInitializer;
 import com.alien.common.registry.init.creative_mode_tab.initializer.FoodAndDrinksCreativeModeTabInitializer;
@@ -12,7 +11,6 @@ import com.alien.common.registry.init.creative_mode_tab.initializer.ToolsAndUtil
 import com.alien.common.registry.init.item.AlienArmorItems;
 import com.alien.common.registry.init.item.AlienItems;
 import com.alien.common.registry.init.item.AlienSpawnEggItems;
-import net.minecraft.world.item.Items;
 import com.alien.common.registry.key.AlienCreativeModeTabKeys;
 import com.blib.api.common.registry.v1.BLibHolder;
 import com.blib.api.common.registry.v1.BLibRegistry;
@@ -21,6 +19,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;

@@ -1,4 +1,4 @@
-package com.alien.common.gameplay.entity.living.alien.xenomorph.warrior.ai.lunge.action;
+package com.alien.common.gameplay.entity.living.alien.xenomorph.ai.lunge.action;
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.registry.init.AlienSoundEvents;
