@@ -90,14 +90,15 @@ public class RunnerAnimator extends AzEntityAnimator<Runner> {
 
         previousAttackType = QuadrupedAttackType.NONE;
 
-        var isMovingOnGround = runner.isMovingHorizontally.get() && runner.onGround();
+        var isClimbing = runner.getClimbingSurfaceDirection() > 0;
+        var isMoving = runner.isMovingHorizontally.get() && (runner.onGround() || isClimbing);
         var isCrawling = runner.getCrawlingManager().isCrawling();
         Runnable animFunction;
 
         if (runner.isUnderWater()) {
             // TODO: idle swim
             animFunction = dispatcher::swim;
-        } else if (isMovingOnGround) {
+        } else if (isMoving) {
             if (isCrawling) {
                 animFunction = dispatcher::crawl;
             } else if (runner.hasTarget.get()) {
