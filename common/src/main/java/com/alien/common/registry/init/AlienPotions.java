@@ -171,6 +171,20 @@ public class AlienPotions {
             AlienItems.NETHER_CHITIN,
             Potions.LONG_FIRE_RESISTANCE
         );
+
+        // Awkward + Nether Resin Ball -> Fire Resistance
+        brewingRegistry.registerMix(
+            Potions.AWKWARD,
+            AlienItems.NETHER_RESIN_BALL,
+            Potions.FIRE_RESISTANCE
+        );
+
+        // Fire Resistance + Nether Resin Ball -> Long Fire Resistance
+        brewingRegistry.registerMix(
+            Potions.FIRE_RESISTANCE,
+            AlienItems.NETHER_RESIN_BALL,
+            Potions.LONG_FIRE_RESISTANCE
+        );
     }
 
     public static void initialize() {
