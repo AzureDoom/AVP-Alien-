@@ -3,20 +3,35 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.praetorian;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.praetorian.ai.PraetorianGOAP;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
+import com.alien.common.registry.tag.AlienBlockTags;
 import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
+import com.blib.api.common.goap.v1.GOAPUser;
+import com.blib.api.common.pathfinding.v1.cache.TerrainCacheRegistry;
+import com.blib.api.common.pathfinding.v1.evaluator.Posture;
+import com.blib.api.common.pathfinding.v1.evaluator.TerrainEvaluatorConfig;
+import com.blib.api.common.pathfinding.v1.navigator.PathNavigator;
+import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorConfig;
+import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
+import com.blib.api.common.pathfinding.v1.search.SearchConfig;
+import com.blib.api.common.pathfinding.v1.terrain.BlockBreakabilityEvaluators;
+import com.blib.api.common.pathfinding.v1.terrain.TerrainClassifiers;
+import com.blib.api.common.pathfinding.v1.terrain.TerrainType;
+import com.just.goap.Agent;
+import com.just.goap.graph.Graph;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-public class Praetorian extends Xenomorph {
+public class Praetorian extends Xenomorph implements GOAPUser<Praetorian>, PathNavigatorUser {
 
     public static AttributeSupplier.Builder createPraetorianAttributes() {
         return Alien.createAlienAttributes()
@@ -29,14 +44,65 @@ public class Praetorian extends Xenomorph {
             .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1.2F);
     }
 
+    private static final float MAX_BREAKABLE_DESTROY_TIME = 6.0F;
+
+    private static final Posture STANDING = new Posture("default", 1, 4);
+
     public final DataAccessor<XenomorphAttackType> attackType;
 
     private final PraetorianAnimationDispatcher animationDispatcher;
+
+    private final PathNavigator pathNavigator;
 
     public Praetorian(EntityType<? extends Praetorian> entityType, Level level) {
         super(entityType, level);
         this.attackType = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_ATTACK_TYPE.get());
         this.animationDispatcher = new PraetorianAnimationDispatcher(this);
+        this.pathNavigator = createPathNavigator(level);
+        getXenomorphData().setParallelDigCount(2);
+    }
+
+    private PathNavigator createPathNavigator(Level level) {
+        var evaluatorConfig = TerrainEvaluatorConfig.builder()
+            .addTerrain(TerrainType.GROUND, 1.0f)
+            .addTerrain(TerrainType.WATER, 4.0f)
+            .addTerrain(TerrainType.BREAKABLE, 8.0f)
+            .withTerrainClassifier(TerrainClassifiers.GROUND_AND_WATER)
+            .withBreakabilityEvaluator(
+                BlockBreakabilityEvaluators.withExcludedTag(
+                    BlockBreakabilityEvaluators.defaultEvaluator(MAX_BREAKABLE_DESTROY_TIME),
+                    AlienBlockTags.XENOMORPH_IMMUNE
+                )
+            )
+            .addPosture(STANDING)
+            .withMaxFallDistance(14)
+            .withCanOpenDoors(true)
+            .build();
+
+        var followRange = (float) getAttributeValue(Attributes.FOLLOW_RANGE);
+
+        var navigatorConfig = PathNavigatorConfig.builder(evaluatorConfig)
+            .withSearchConfig(SearchConfig.fromFollowRange(followRange))
+            .build();
+
+        var classificationCache = TerrainCacheRegistry.getOrCreate(level, evaluatorConfig.getTerrainClassifier());
+
+        return new PathNavigator(level, navigatorConfig, classificationCache);
+    }
+
+    @Override
+    public Agent.Builder<Praetorian> blib$applyGOAPAgentProperties(Agent.Builder<Praetorian> agentBuilder) {
+        return PraetorianGOAP.applyAgentProperties(agentBuilder);
+    }
+
+    @Override
+    public @Nullable Graph<Praetorian> blib$getGOAPGraphOrNull() {
+        return PraetorianGOAP.GRAPH;
+    }
+
+    @Override
+    public PathNavigator getPathNavigator() {
+        return pathNavigator;
     }
 
     @Override
@@ -47,6 +113,11 @@ public class Praetorian extends Xenomorph {
     @Override
     protected @Nullable ResinData createResinData() {
         return new ResinData(0, 64, 1, 20);
+    }
+
+    @Override
+    protected void registerGoals() {
+        // GOAP handles all AI for the praetorian.
     }
 
     @Override
@@ -84,13 +155,11 @@ public class Praetorian extends Xenomorph {
         beginAttack(attack.defaultDurationInTicks());
     }
 
-    // Praetorians are too large to be pushed by fluids.
     @Override
     public boolean isPushedByFluid() {
         return false;
     }
 
-    // Praetorians are too large to be pushed.
     @Override
     public boolean isPushable() {
         return false;
