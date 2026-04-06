@@ -1,12 +1,10 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.queen;
 
 import com.alien.common.data.AlienVariantTypes;
-import com.alien.common.gameplay.ai.goal.DigToTargetGoal;
-import com.alien.common.gameplay.ai.goal.QueenLayEggGoal;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphNavigationManager;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.ai.QueenGOAP;
 import com.alien.common.gameplay.level.saveddata.QueenSpawnChunkData;
 import com.alien.common.gameplay.level.saveddata.StrainLeakData;
 import com.alien.common.model.alien.variant.AlienVariant;
@@ -14,11 +12,24 @@ import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
+import com.alien.common.registry.tag.AlienBlockTags;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.data_sync.v1.DataAccessor;
-import com.blib.api.common.entity.v1.EntityUtil;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.entity.v1.PlayerUtil;
+import com.blib.api.common.goap.v1.GOAPUser;
+import com.blib.api.common.pathfinding.v1.cache.TerrainCacheRegistry;
+import com.blib.api.common.pathfinding.v1.evaluator.Posture;
+import com.blib.api.common.pathfinding.v1.evaluator.TerrainEvaluatorConfig;
+import com.blib.api.common.pathfinding.v1.navigator.PathNavigator;
+import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorConfig;
+import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
+import com.blib.api.common.pathfinding.v1.search.SearchConfig;
+import com.blib.api.common.pathfinding.v1.terrain.BlockBreakabilityEvaluators;
+import com.blib.api.common.pathfinding.v1.terrain.TerrainClassifiers;
+import com.blib.api.common.pathfinding.v1.terrain.TerrainType;
+import com.just.goap.Agent;
+import com.just.goap.graph.Graph;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -40,7 +51,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-public class Queen extends Xenomorph {
+public class Queen extends Xenomorph implements GOAPUser<Queen>, PathNavigatorUser {
 
     public static AttributeSupplier.Builder createQueenAttributes() {
         return Alien.createAlienAttributes()
@@ -53,22 +64,71 @@ public class Queen extends Xenomorph {
             .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 0.9F);
     }
 
+    private static final float MAX_BREAKABLE_DESTROY_TIME = 6.0F;
+
+    private static final Posture STANDING = new Posture("default", 2, 4);
+
     public final DataAccessor<QueenAttackType> attackType;
 
     private final QueenAnimationDispatcher animationDispatcher;
 
     private final OvipositorManager ovipositorManager;
 
+    private final QueenData queenData;
+
+    private final PathNavigator pathNavigator;
+
     public Queen(EntityType<? extends Queen> entityType, Level level) {
         super(entityType, level);
         this.attackType = new DataAccessor<>(this, AlienDataSyncKeys.QUEEN_ATTACK_TYPE.get());
         this.animationDispatcher = new QueenAnimationDispatcher(this);
         this.ovipositorManager = new OvipositorManager(this);
+        this.queenData = new QueenData();
+        this.pathNavigator = createPathNavigator(level);
+        getXenomorphData().setParallelDigCount(4);
+    }
+
+    private PathNavigator createPathNavigator(Level level) {
+        var evaluatorConfig = TerrainEvaluatorConfig.builder()
+            .addTerrain(TerrainType.GROUND, 1.0f)
+            .addTerrain(TerrainType.WATER, 4.0f)
+            .addTerrain(TerrainType.BREAKABLE, 8.0f)
+            .withTerrainClassifier(TerrainClassifiers.GROUND_AND_WATER)
+            .withBreakabilityEvaluator(
+                BlockBreakabilityEvaluators.withExcludedTag(
+                    BlockBreakabilityEvaluators.defaultEvaluator(MAX_BREAKABLE_DESTROY_TIME),
+                    AlienBlockTags.XENOMORPH_IMMUNE
+                )
+            )
+            .addPosture(STANDING)
+            .withMaxFallDistance(14)
+            .withCanOpenDoors(false)
+            .build();
+
+        var followRange = (float) getAttributeValue(Attributes.FOLLOW_RANGE);
+
+        var navigatorConfig = PathNavigatorConfig.builder(evaluatorConfig)
+            .withSearchConfig(SearchConfig.fromFollowRange(followRange))
+            .build();
+
+        var classificationCache = TerrainCacheRegistry.getOrCreate(level, evaluatorConfig.getTerrainClassifier());
+
+        return new PathNavigator(level, navigatorConfig, classificationCache);
     }
 
     @Override
-    protected @NotNull XenomorphNavigationManager createNavigationManager() {
-        return new XenomorphNavigationManager(this, moveControl, 1.6, 1.6);
+    public Agent.Builder<Queen> blib$applyGOAPAgentProperties(Agent.Builder<Queen> agentBuilder) {
+        return QueenGOAP.applyAgentProperties(agentBuilder);
+    }
+
+    @Override
+    public @Nullable Graph<Queen> blib$getGOAPGraphOrNull() {
+        return QueenGOAP.GRAPH;
+    }
+
+    @Override
+    public PathNavigator getPathNavigator() {
+        return pathNavigator;
     }
 
     @Override
@@ -85,6 +145,7 @@ public class Queen extends Xenomorph {
     public void tick() {
         super.tick();
         ovipositorManager.tick();
+        queenData.tick();
     }
 
     @Override
@@ -95,7 +156,7 @@ public class Queen extends Xenomorph {
     @Override
     protected void positionRider(@NotNull Entity passenger, @NotNull MoveFunction callback) {
         if (passenger.getType() == AlienEntityTypes.OVIPOSITOR.get()) {
-            var relativePos = EntityUtil.getRelativePosition(this, 3, 0.01, 5.25);
+            var relativePos = com.blib.api.common.entity.v1.EntityUtil.getRelativePosition(this, 3, 0.01, 5.25);
             callback.accept(passenger, relativePos.x, relativePos.y, relativePos.z);
             return;
         }
@@ -161,13 +222,7 @@ public class Queen extends Xenomorph {
 
     @Override
     protected void registerGoals() {
-        super.registerGoals();
-        goalSelector.addGoal(5, new QueenLayEggGoal(this));
-    }
-
-    @Override
-    protected void addDigToTargetGoal() {
-        goalSelector.addGoal(5, new DigToTargetGoal(this, 32, 4, () -> !Objects.requireNonNull(ovipositorManager).hasOvipositor()));
+        // GOAP handles all AI for the queen.
     }
 
     @Override
@@ -228,37 +283,26 @@ public class Queen extends Xenomorph {
     @Override
     protected void doPush(@NotNull Entity entity) {
         if (
-            // If queen does not have an ovipositor...
             !ovipositorManager.hasOvipositor()
-                // OR the queen does have an ovipositor and the entity to push is NOT an alien...
                 || !entity.getType().is(AlienEntityTypeTags.ALIENS)
         ) {
-            // Then push the entity.
             super.doPush(entity);
         }
     }
 
-    // Queens are too large to be pushed by fluids.
     @Override
     public boolean isPushedByFluid() {
         return false;
     }
 
-    // Queens are too large to be pushed.
     @Override
     public boolean isPushable() {
         return false;
     }
 
-    // Queens should never despawn no matter what.
     @Override
     public boolean isPersistenceRequired() {
         return true;
-    }
-
-    @Override
-    public void checkDespawn() {
-        super.checkDespawn();
     }
 
     public QueenAnimationDispatcher getAnimationDispatcher() {
@@ -269,16 +313,22 @@ public class Queen extends Xenomorph {
         return ovipositorManager;
     }
 
+    public QueenData getQueenData() {
+        return queenData;
+    }
+
     @Override
     public void readAdditionalSaveData(@NotNull CompoundTag compoundTag) {
         super.readAdditionalSaveData(compoundTag);
         ovipositorManager.load(compoundTag);
+        queenData.load(compoundTag);
     }
 
     @Override
     public void addAdditionalSaveData(@NotNull CompoundTag compoundTag) {
         super.addAdditionalSaveData(compoundTag);
         ovipositorManager.save(compoundTag);
+        queenData.save(compoundTag);
     }
 
     public static EntityType<? extends Alien> getType(AlienVariant alienVariant) {
