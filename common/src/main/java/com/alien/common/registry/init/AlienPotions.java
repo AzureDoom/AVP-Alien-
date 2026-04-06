@@ -157,6 +157,20 @@ public class AlienPotions {
             () -> Items.GLOWSTONE_DUST,
             STRONG_SCOURGE
         );
+
+        // Awkward + Nether Chitin -> Fire Resistance
+        brewingRegistry.registerMix(
+            Potions.AWKWARD,
+            AlienItems.NETHER_CHITIN,
+            Potions.FIRE_RESISTANCE
+        );
+
+        // Fire Resistance + Nether Chitin -> Long Fire Resistance
+        brewingRegistry.registerMix(
+            Potions.FIRE_RESISTANCE,
+            AlienItems.NETHER_CHITIN,
+            Potions.LONG_FIRE_RESISTANCE
+        );
     }
 
     public static void initialize() {
