@@ -20,7 +20,7 @@ public class ResinActions {
 
         xenomorph.getResinManager().spreadResin();
 
-        return Action.Signal.FINISHED;
+        return Action.Signal.CONTINUE;
     }
 
     private ResinActions() {

@@ -108,10 +108,7 @@ public class Crusher extends Xenomorph implements GOAPUser<Crusher>, PathNavigat
         return getType(alienVariant);
     }
 
-    @Override
-    protected void registerGoals() {
-        // GOAP handles all AI for the crusher.
-    }
+
 
     @Override
     public boolean isAttacking() {

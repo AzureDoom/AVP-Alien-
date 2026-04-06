@@ -109,10 +109,7 @@ public class Harbinger extends Xenomorph implements GOAPUser<Harbinger>, PathNav
         return getType(alienVariant);
     }
 
-    @Override
-    protected void registerGoals() {
-        // GOAP handles all AI for the harbinger.
-    }
+
 
     @Override
     protected float getHealthRegenPerSecond() {

@@ -214,10 +214,7 @@ public class Queen extends Xenomorph implements GOAPUser<Queen>, PathNavigatorUs
             .ifSome(queenSpawnChunkData -> queenSpawnChunkData.getSpawnCooldown().reset());
     }
 
-    @Override
-    protected void registerGoals() {
-        // GOAP handles all AI for the queen.
-    }
+
 
     @Override
     public float maxUpStep() {

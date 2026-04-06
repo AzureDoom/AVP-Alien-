@@ -114,10 +114,7 @@ public class Spitter extends Xenomorph implements GOAPUser<Spitter>, PathNavigat
         return getType(alienVariant);
     }
 
-    @Override
-    protected void registerGoals() {
-        // GOAP handles all AI for the spitter.
-    }
+
 
     @Override
     public boolean isAttacking() {

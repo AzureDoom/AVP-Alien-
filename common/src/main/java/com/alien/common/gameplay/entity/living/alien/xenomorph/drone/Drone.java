@@ -144,10 +144,7 @@ public class Drone extends Xenomorph implements EggCarrier, GOAPUser<Drone>, Pat
         return getType(alienVariant);
     }
 
-    @Override
-    protected void registerGoals() {
-        // GOAP handles all AI for the drone.
-    }
+
 
     @Override
     public void tick() {

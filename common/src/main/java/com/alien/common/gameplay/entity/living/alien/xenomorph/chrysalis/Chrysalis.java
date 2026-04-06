@@ -109,10 +109,7 @@ public class Chrysalis extends Xenomorph implements GOAPUser<Chrysalis>, PathNav
         return getType(alienVariant);
     }
 
-    @Override
-    protected void registerGoals() {
-        // GOAP handles all AI for the chrysalis.
-    }
+
 
     @Override
     protected float getHealthRegenPerSecond() {

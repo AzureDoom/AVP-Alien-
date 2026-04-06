@@ -141,10 +141,7 @@ public class Warrior extends Xenomorph implements GOAPUser<Warrior>, PathNavigat
         attackType.set(XenomorphAttackType.NONE);
     }
 
-    @Override
-    protected void registerGoals() {
-        // GOAP handles all AI for the warrior.
-    }
+
 
     @Override
     public void runAttackAnimations() {

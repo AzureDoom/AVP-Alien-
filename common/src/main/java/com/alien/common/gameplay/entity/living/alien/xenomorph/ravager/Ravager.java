@@ -109,10 +109,7 @@ public class Ravager extends Xenomorph implements GOAPUser<Ravager>, PathNavigat
         return getType(alienVariant);
     }
 
-    @Override
-    protected void registerGoals() {
-        // GOAP handles all AI for the ravager.
-    }
+
 
     @Override
     protected float getHealthRegenPerSecond() {

@@ -131,16 +131,7 @@ public class Boiler extends Xenomorph implements GOAPUser<Boiler>, PathNavigator
         return getType(alienVariant);
     }
 
-    @Override
-    protected void registerGoals() {
-        // GOAP handles all AI for the boiler.
-    }
 
-    @Override
-    protected boolean canTargetInitially(LivingEntity target) {
-        return target.distanceToSqr(this) <= 4 * 4
-            && super.canTargetInitially(target);
-    }
 
     @Override
     public boolean doHurtTarget(@NotNull Entity entity) {

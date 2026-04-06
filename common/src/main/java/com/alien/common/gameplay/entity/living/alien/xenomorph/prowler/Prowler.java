@@ -119,10 +119,7 @@ public class Prowler extends Xenomorph implements GOAPUser<Prowler>, PathNavigat
         return getType(alienVariant);
     }
 
-    @Override
-    protected void registerGoals() {
-        // GOAP handles all AI for the prowler.
-    }
+
 
     @Override
     public boolean isAttacking() {

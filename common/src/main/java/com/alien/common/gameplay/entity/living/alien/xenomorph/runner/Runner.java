@@ -137,10 +137,7 @@ public class Runner extends Xenomorph implements EggCarrier, GOAPUser<Runner>, P
         return getType(alienVariant);
     }
 
-    @Override
-    protected void registerGoals() {
-        // GOAP handles all AI for the runner.
-    }
+
 
     @Override
     public void tick() {

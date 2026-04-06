@@ -109,10 +109,7 @@ public class Praetorian extends Xenomorph implements GOAPUser<Praetorian>, PathN
         return getType(alienVariant);
     }
 
-    @Override
-    protected void registerGoals() {
-        // GOAP handles all AI for the praetorian.
-    }
+
 
     @Override
     protected float getHealthRegenPerSecond() {

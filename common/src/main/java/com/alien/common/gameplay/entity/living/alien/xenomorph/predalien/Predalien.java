@@ -109,10 +109,7 @@ public class Predalien extends Xenomorph implements GOAPUser<Predalien>, PathNav
         return getType(alienVariant);
     }
 
-    @Override
-    protected void registerGoals() {
-        // GOAP handles all AI for the predalien.
-    }
+
 
     @Override
     protected float getHealthRegenPerSecond() {

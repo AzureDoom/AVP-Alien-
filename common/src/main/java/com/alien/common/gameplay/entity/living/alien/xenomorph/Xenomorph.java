@@ -1,7 +1,5 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph;
 
-import com.alien.common.gameplay.ai.goal.DigToTargetGoal;
-import com.alien.common.gameplay.ai.goal.XenoFloatGoal;
 import com.alien.common.gameplay.entity.CrawlingManager;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.GrowthManager;
@@ -15,7 +13,6 @@ import com.alien.common.util.XenomorphGrowthUtil;
 import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.entity.v1.EntitySenseCache;
 import com.blib.api.common.entity.v1.EntitySenseCacheUser;
-import com.blib.api.common.entity.v1.ai.goal.StrollAroundInWaterGoal;
 import com.blib.api.common.goap.v1.GOAPUser;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
 import com.blib.api.common.pathfinding.v1.physics.ClimbingOrientationProvider;
@@ -34,9 +31,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.control.MoveControl;
-import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
-import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.Minecart;
@@ -125,10 +119,6 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         return new XenomorphNavigationManager(this, moveControl);
     }
 
-    protected boolean canTargetInitially(LivingEntity target) {
-        return true;
-    }
-
     public abstract void runAttackAnimations();
 
     public void runDigAnimation() {
@@ -142,29 +132,6 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
     protected void beginAttack(int durationInTicks) {
         attackDurationInTicks.set(durationInTicks);
         remainingAttackTicks = durationInTicks;
-    }
-
-    @Override
-    protected void registerGoals() {
-        goalSelector.addGoal(1, new XenoFloatGoal(this));
-        addDigToTargetGoal();
-        goalSelector.addGoal(7, new StrollAroundInWaterGoal(this, 0.5));
-        goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 0.5));
-        targetSelector.addGoal(1, (new HurtByTargetGoal(this)).setAlertOthers(Xenomorph.class));
-        targetSelector.addGoal(
-            2,
-            new NearestAttackableTargetGoal<>(
-                this,
-                LivingEntity.class,
-                false,
-                target -> AlienPredicates.canTarget(this, target)
-                    && canTargetInitially(target)
-            )
-        );
-    }
-
-    protected void addDigToTargetGoal() {
-        goalSelector.addGoal(5, new DigToTargetGoal(this, 32, 2, () -> true));
     }
 
     @Override
@@ -231,10 +198,10 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
     public void updateSwimming() {
         if (!level().isClientSide) {
             if (isEffectiveAi() && isUnderWater()) {
-                navigationManager.switchToWater(this, 4, goalSelector);
+                navigationManager.switchToWater(this);
                 setSwimming(true);
             } else {
-                navigationManager.switchToGround(this, 4, goalSelector);
+                navigationManager.switchToGround(this);
                 setSwimming(false);
             }
         }

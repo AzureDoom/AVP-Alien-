@@ -116,10 +116,7 @@ public class RazorClaw extends Xenomorph implements GOAPUser<RazorClaw>, PathNav
         return getType(alienVariant);
     }
 
-    @Override
-    protected void registerGoals() {
-        // GOAP handles all AI for the razor claw.
-    }
+
 
     @Override
     protected float getHealthRegenPerSecond() {

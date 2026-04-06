@@ -109,10 +109,7 @@ public class Carrier extends Xenomorph implements GOAPUser<Carrier>, PathNavigat
         return getType(alienVariant);
     }
 
-    @Override
-    protected void registerGoals() {
-        // GOAP handles all AI for the carrier.
-    }
+
 
     @Override
     protected float getHealthRegenPerSecond() {
