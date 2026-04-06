@@ -185,6 +185,20 @@ public class AlienPotions {
             AlienItems.NETHER_RESIN_BALL,
             Potions.LONG_FIRE_RESISTANCE
         );
+
+        // Awkward + Aberrant Chitin -> Weakness
+        brewingRegistry.registerMix(
+            Potions.AWKWARD,
+            AlienItems.ABERRANT_CHITIN,
+            Potions.WEAKNESS
+        );
+
+        // Weakness + Aberrant Chitin -> Long Weakness
+        brewingRegistry.registerMix(
+            Potions.WEAKNESS,
+            AlienItems.ABERRANT_CHITIN,
+            Potions.LONG_WEAKNESS
+        );
     }
 
     public static void initialize() {
