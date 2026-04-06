@@ -1,14 +1,28 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.boiler;
 
-import com.alien.common.gameplay.ai.InvestigateVibrationGoal;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.boiler.ai.BoilerGOAP;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienEntityTypes;
+import com.alien.common.registry.tag.AlienBlockTags;
 import com.alien.common.util.AcidBleedUtil;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.entity.v1.vibration.VibrationSystemManager;
+import com.blib.api.common.goap.v1.GOAPUser;
+import com.blib.api.common.pathfinding.v1.cache.TerrainCacheRegistry;
+import com.blib.api.common.pathfinding.v1.evaluator.Posture;
+import com.blib.api.common.pathfinding.v1.evaluator.TerrainEvaluatorConfig;
+import com.blib.api.common.pathfinding.v1.navigator.PathNavigator;
+import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorConfig;
+import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
+import com.blib.api.common.pathfinding.v1.search.SearchConfig;
+import com.blib.api.common.pathfinding.v1.terrain.BlockBreakabilityEvaluators;
+import com.blib.api.common.pathfinding.v1.terrain.TerrainClassifiers;
+import com.blib.api.common.pathfinding.v1.terrain.TerrainType;
+import com.just.goap.Agent;
+import com.just.goap.graph.Graph;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -25,7 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-public class Boiler extends Xenomorph {
+public class Boiler extends Xenomorph implements GOAPUser<Boiler>, PathNavigatorUser {
 
     public static AttributeSupplier.Builder createBoilerAttributes() {
         return Alien.createAlienAttributes()
@@ -38,20 +52,74 @@ public class Boiler extends Xenomorph {
             .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1F);
     }
 
+    private static final float MAX_BREAKABLE_DESTROY_TIME = 6.0F;
+
+    private static final Posture STANDING = new Posture("default", 1, 2);
+
     private final BoilerAnimationDispatcher animationDispatcher;
 
     private final VibrationSystemManager vibrationSystemManager;
+
+    private final BoilerData boilerData;
+
+    private final PathNavigator pathNavigator;
 
     public Boiler(EntityType<? extends Boiler> entityType, Level level) {
         super(entityType, level);
         this.animationDispatcher = new BoilerAnimationDispatcher(this);
         this.vibrationSystemManager = new VibrationSystemManager(this, 2.5F, 32);
+        this.boilerData = new BoilerData();
+        this.pathNavigator = createPathNavigator(level);
+    }
+
+    private PathNavigator createPathNavigator(Level level) {
+        var evaluatorConfig = TerrainEvaluatorConfig.builder()
+            .addTerrain(TerrainType.GROUND, 1.0f)
+            .addTerrain(TerrainType.WATER, 4.0f)
+            .addTerrain(TerrainType.BREAKABLE, 8.0f)
+            .withTerrainClassifier(TerrainClassifiers.GROUND_AND_WATER)
+            .withBreakabilityEvaluator(
+                BlockBreakabilityEvaluators.withExcludedTag(
+                    BlockBreakabilityEvaluators.defaultEvaluator(MAX_BREAKABLE_DESTROY_TIME),
+                    AlienBlockTags.XENOMORPH_IMMUNE
+                )
+            )
+            .addPosture(STANDING)
+            .withMaxFallDistance(14)
+            .withCanOpenDoors(true)
+            .build();
+
+        var followRange = (float) getAttributeValue(Attributes.FOLLOW_RANGE);
+
+        var navigatorConfig = PathNavigatorConfig.builder(evaluatorConfig)
+            .withSearchConfig(SearchConfig.fromFollowRange(followRange))
+            .build();
+
+        var classificationCache = TerrainCacheRegistry.getOrCreate(level, evaluatorConfig.getTerrainClassifier());
+
+        return new PathNavigator(level, navigatorConfig, classificationCache);
+    }
+
+    @Override
+    public Agent.Builder<Boiler> blib$applyGOAPAgentProperties(Agent.Builder<Boiler> agentBuilder) {
+        return BoilerGOAP.applyAgentProperties(agentBuilder);
+    }
+
+    @Override
+    public @Nullable Graph<Boiler> blib$getGOAPGraphOrNull() {
+        return BoilerGOAP.GRAPH;
+    }
+
+    @Override
+    public PathNavigator getPathNavigator() {
+        return pathNavigator;
     }
 
     @Override
     public void tick() {
         super.tick();
         vibrationSystemManager.tick();
+        boilerData.tick();
     }
 
     @Override
@@ -71,8 +139,7 @@ public class Boiler extends Xenomorph {
 
     @Override
     protected void registerGoals() {
-        super.registerGoals();
-        goalSelector.addGoal(3, new InvestigateVibrationGoal(this));
+        // GOAP handles all AI for the boiler.
     }
 
     @Override
@@ -85,12 +152,9 @@ public class Boiler extends Xenomorph {
     public boolean doHurtTarget(@NotNull Entity entity) {
         var radius = 2F;
         level().explode(this, getX(), getY(), getZ(), radius, Level.ExplosionInteraction.MOB);
-        // TODO:
-        // this.spawnLingeringCloud();
         triggerOnDeathMobEffects(RemovalReason.KILLED);
         discard();
 
-        // TODO: Redo the way acid strength is determined here, it isn't the greatest.
         getBlockArea(blockPosition(), (int) radius, (int) radius, (int) radius)
             .stream()
             .filter(blockPos -> {
@@ -102,7 +166,6 @@ public class Boiler extends Xenomorph {
         return true;
     }
 
-    // TODO: Move this to a util class.
     private List<BlockPos> getBlockArea(BlockPos center, int radiusX, int radiusY, int radiusZ) {
         var positions = new ArrayList<BlockPos>();
 
@@ -116,9 +179,6 @@ public class Boiler extends Xenomorph {
 
         return positions;
     }
-
-    @Override
-    protected void addDigToTargetGoal() {}
 
     @Override
     public boolean isAttacking() {
@@ -142,6 +202,10 @@ public class Boiler extends Xenomorph {
 
     public VibrationSystemManager getVibrationSystemManager() {
         return vibrationSystemManager;
+    }
+
+    public BoilerData getBoilerData() {
+        return boilerData;
     }
 
     public static EntityType<? extends Alien> getType(AlienVariant alienVariant) {

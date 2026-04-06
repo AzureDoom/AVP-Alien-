@@ -26,6 +26,13 @@ public class XenomorphGOAP {
             .apply(XenomorphGOAP::addIdlePackage);
     }
 
+    public static <T extends Xenomorph> Graph.Builder<T> applyBaseGraphWithoutDig(Graph.Builder<T> graphBuilder) {
+        return graphBuilder
+            .apply(XenomorphGOAP::addSensorsPackage)
+            .apply(XenomorphGOAP::addCombatPackage)
+            .apply(XenomorphGOAP::addIdlePackage);
+    }
+
     public static <T extends Xenomorph> Agent.Builder<T> applyBaseAgentProperties(Agent.Builder<T> agentBuilder) {
         return agentBuilder.withReplanPolicy(
             ReplanPolicies.anyOf(
