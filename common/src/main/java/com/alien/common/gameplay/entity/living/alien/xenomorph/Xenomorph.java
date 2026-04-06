@@ -20,6 +20,7 @@ import com.blib.api.common.entity.v1.ai.goal.StrollAroundInWaterGoal;
 import com.blib.api.common.goap.v1.GOAPUser;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
 import com.blib.api.common.pathfinding.v1.physics.ClimbingOrientationProvider;
+import com.blib.api.common.pathfinding.v1.physics.ClimbingRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -84,6 +85,8 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
     private int remainingAttackTicks;
 
     private boolean wasUnderwaterLastTick;
+
+    private final ClimbingRenderState climbingRenderState = new ClimbingRenderState();
 
     public Xenomorph(EntityType<? extends Xenomorph> entityType, Level level) {
         super(entityType, level);
@@ -449,6 +452,11 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
     @Override
     public void setDebugTargetPos(long packed) {
         debugTargetPos.set(packed);
+    }
+
+    @Override
+    public ClimbingRenderState getClimbingRenderState() {
+        return climbingRenderState;
     }
 
     public CrawlingManager getCrawlingManager() {
