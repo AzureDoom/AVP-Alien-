@@ -14,7 +14,6 @@ import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.goap.v1.GOAPUser;
 import com.blib.api.common.pathfinding.v1.cache.TerrainCacheRegistry;
-import com.blib.api.common.pathfinding.v1.evaluator.Posture;
 import com.blib.api.common.pathfinding.v1.evaluator.TerrainEvaluatorConfig;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigator;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorConfig;
@@ -40,8 +39,6 @@ public class RazorClaw extends Xenomorph implements GOAPUser<RazorClaw>, PathNav
     private static final int BLOOD_LOSS_DURATION_IN_TICKS = 20 * 15;
 
     private static final float MAX_BREAKABLE_DESTROY_TIME = 6.0F;
-
-    private static final Posture STANDING = new Posture("default", 1, 4);
 
     public static AttributeSupplier.Builder createRazorClawAttributes() {
         return Alien.createAlienAttributes()
@@ -80,7 +77,7 @@ public class RazorClaw extends Xenomorph implements GOAPUser<RazorClaw>, PathNav
                     AlienBlockTags.XENOMORPH_IMMUNE
                 )
             )
-            .addPosture(STANDING)
+            .withEntitySize(1, 4)
             .withMaxFallDistance(14)
             .withCanOpenDoors(false)
             .build();

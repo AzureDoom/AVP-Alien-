@@ -90,8 +90,7 @@ public class RunnerAnimator extends AzEntityAnimator<Runner> {
 
         previousAttackType = QuadrupedAttackType.NONE;
 
-        var isClimbing = runner.getClimbingSurfaceDirection() > 0;
-        var isMoving = runner.isMovingHorizontally.get() && (runner.onGround() || isClimbing);
+        var isMoving = runner.isMovingHorizontally.get() && runner.onGround();
         var isCrawling = runner.getCrawlingManager().isCrawling();
         Runnable animFunction;
 

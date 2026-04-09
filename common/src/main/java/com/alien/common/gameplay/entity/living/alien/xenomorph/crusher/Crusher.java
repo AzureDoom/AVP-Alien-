@@ -12,7 +12,6 @@ import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.goap.v1.GOAPUser;
 import com.blib.api.common.pathfinding.v1.cache.TerrainCacheRegistry;
-import com.blib.api.common.pathfinding.v1.evaluator.Posture;
 import com.blib.api.common.pathfinding.v1.evaluator.TerrainEvaluatorConfig;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigator;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorConfig;
@@ -44,8 +43,6 @@ public class Crusher extends Xenomorph implements GOAPUser<Crusher>, PathNavigat
 
     private static final float MAX_BREAKABLE_DESTROY_TIME = 6.0F;
 
-    private static final Posture STANDING = new Posture("default", 2, 2);
-
     public final DataAccessor<CrusherAttackType> attackType;
 
     private final CrusherAnimationDispatcher animationDispatcher;
@@ -72,7 +69,7 @@ public class Crusher extends Xenomorph implements GOAPUser<Crusher>, PathNavigat
                     AlienBlockTags.XENOMORPH_IMMUNE
                 )
             )
-            .addPosture(STANDING)
+            .withEntitySize(2, 2)
             .withMaxFallDistance(14)
             .withCanOpenDoors(false)
             .build();

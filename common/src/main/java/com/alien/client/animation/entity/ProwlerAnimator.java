@@ -90,8 +90,7 @@ public class ProwlerAnimator extends AzEntityAnimator<Prowler> {
 
         previousAttackType = QuadrupedAttackType.NONE;
 
-        var isClimbing = prowler.getClimbingSurfaceDirection() > 0;
-        var isMoving = prowler.isMovingHorizontally.get() && (prowler.onGround() || isClimbing);
+        var isMoving = prowler.isMovingHorizontally.get() && prowler.onGround();
         var isCrawling = prowler.getCrawlingManager().isCrawling();
         Runnable animFunction;
 

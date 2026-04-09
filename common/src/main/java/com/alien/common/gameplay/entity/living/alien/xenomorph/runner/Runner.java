@@ -19,7 +19,6 @@ import com.blib.api.common.entity.v1.EntityUtil;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.goap.v1.GOAPUser;
 import com.blib.api.common.pathfinding.v1.cache.TerrainCacheRegistry;
-import com.blib.api.common.pathfinding.v1.evaluator.Posture;
 import com.blib.api.common.pathfinding.v1.evaluator.TerrainEvaluatorConfig;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigator;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorConfig;
@@ -58,8 +57,6 @@ public class Runner extends Xenomorph implements EggCarrier, GOAPUser<Runner>, P
 
     private static final float MAX_BREAKABLE_DESTROY_TIME = 6.0F;
 
-    private static final Posture STANDING = new Posture("default", 1, 1);
-
     public final DataAccessor<QuadrupedAttackType> attackType;
 
     private final RunnerAnimationDispatcher animationDispatcher;
@@ -83,7 +80,6 @@ public class Runner extends Xenomorph implements EggCarrier, GOAPUser<Runner>, P
     private PathNavigator createPathNavigator(Level level) {
         var evaluatorConfig = TerrainEvaluatorConfig.builder()
             .addTerrain(TerrainType.GROUND, 1.0f)
-            .addTerrain(TerrainType.CLIMBABLE, 1.0f)
             .addTerrain(TerrainType.WATER, 4.0f)
             .addTerrain(TerrainType.BREAKABLE, 8.0f)
             .withTerrainClassifier(TerrainClassifiers.GROUND_AND_WATER)
@@ -93,8 +89,7 @@ public class Runner extends Xenomorph implements EggCarrier, GOAPUser<Runner>, P
                     AlienBlockTags.XENOMORPH_IMMUNE
                 )
             )
-            .addPosture(STANDING)
-            .withClimbingPostureIndex(0)
+            .withEntitySize(1, 1)
             .withMaxFallDistance(14)
             .withCanOpenDoors(true)
             .build();

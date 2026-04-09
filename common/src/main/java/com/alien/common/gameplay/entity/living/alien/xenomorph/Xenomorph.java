@@ -14,9 +14,6 @@ import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.entity.v1.EntitySenseCache;
 import com.blib.api.common.entity.v1.EntitySenseCacheUser;
 import com.blib.api.common.goap.v1.GOAPUser;
-import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
-import com.blib.api.common.pathfinding.v1.physics.ClimbingOrientationProvider;
-import com.blib.api.common.pathfinding.v1.physics.ClimbingRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -30,8 +27,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.Pose;
-import net.minecraft.world.entity.ai.control.MoveControl;
-import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.Minecart;
 import net.minecraft.world.level.Level;
@@ -45,23 +40,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
-public abstract class Xenomorph extends Alien implements ResinProducer, EntitySenseCacheUser, ClimbingOrientationProvider {
+public abstract class Xenomorph extends Alien implements ResinProducer, EntitySenseCacheUser {
 
     public final DataAccessor<Integer> attackDurationInTicks;
 
     public final DataAccessor<Boolean> isLunging;
 
     public final DataAccessor<Boolean> isCrawling;
-
-    public final DataAccessor<Integer> climbingSurface;
-
-    private final DataAccessor<Float> climbingYaw;
-
-    private final DataAccessor<Float> climbingYawOld;
-
-    private final DataAccessor<Long> debugCurrentWaypoint;
-
-    private final DataAccessor<Long> debugTargetPos;
 
     protected final CrawlingManager crawlingManager;
 
@@ -77,19 +62,12 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
 
     private boolean wasUnderwaterLastTick;
 
-    private final ClimbingRenderState climbingRenderState = new ClimbingRenderState();
-
     public Xenomorph(EntityType<? extends Xenomorph> entityType, Level level) {
         super(entityType, level);
 
         this.attackDurationInTicks = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_ATTACK_DURATION_IN_TICKS.get());
         this.isLunging = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_IS_LUNGING.get());
         this.isCrawling = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_IS_CRAWLING.get());
-        this.climbingSurface = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_CLIMBING_SURFACE.get());
-        this.climbingYaw = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_CLIMBING_YAW.get());
-        this.climbingYawOld = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_CLIMBING_YAW_OLD.get());
-        this.debugCurrentWaypoint = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_DEBUG_CURRENT_WAYPOINT.get());
-        this.debugTargetPos = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_DEBUG_TARGET_POS.get());
 
         this.crawlingManager = new CrawlingManager(this, isCrawling);
         this.growthManager = new GrowthManager(this, XenomorphGrowthUtil.GROW_UP_CALLBACK)
@@ -131,9 +109,7 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
     public void tick() {
         super.tick();
 
-        if (!(this instanceof PathNavigatorUser)) {
-            crawlingManager.tick();
-        }
+        crawlingManager.tick();
 
         growthManager.tick();
         resinManager.tick();
@@ -342,61 +318,6 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
     @Override
     public EntitySenseCache getEntitySenseCache() {
         return entitySenseCache;
-    }
-
-    @Override
-    public int getClimbingSurfaceDirection() {
-        return climbingSurface.get();
-    }
-
-    @Override
-    public void setClimbingSurfaceDirection(int surfaceDirection) {
-        climbingSurface.set(surfaceDirection);
-    }
-
-    @Override
-    public float getClimbingYaw() {
-        return climbingYaw.get();
-    }
-
-    @Override
-    public void setClimbingYaw(float yaw) {
-        climbingYaw.set(yaw);
-    }
-
-    @Override
-    public float getClimbingYawOld() {
-        return climbingYawOld.get();
-    }
-
-    @Override
-    public void setClimbingYawOld(float yaw) {
-        climbingYawOld.set(yaw);
-    }
-
-    @Override
-    public long getDebugCurrentWaypoint() {
-        return debugCurrentWaypoint.get();
-    }
-
-    @Override
-    public void setDebugCurrentWaypoint(long packed) {
-        debugCurrentWaypoint.set(packed);
-    }
-
-    @Override
-    public long getDebugTargetPos() {
-        return debugTargetPos.get();
-    }
-
-    @Override
-    public void setDebugTargetPos(long packed) {
-        debugTargetPos.set(packed);
-    }
-
-    @Override
-    public ClimbingRenderState getClimbingRenderState() {
-        return climbingRenderState;
     }
 
     public CrawlingManager getCrawlingManager() {

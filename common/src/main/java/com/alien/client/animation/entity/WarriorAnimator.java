@@ -90,8 +90,7 @@ public class WarriorAnimator extends AzEntityAnimator<Warrior> {
 
         previousAttackType = XenomorphAttackType.NONE;
 
-        var isClimbing = warrior.getClimbingSurfaceDirection() > 0;
-        var isMoving = warrior.isMovingHorizontally.get() && (warrior.onGround() || isClimbing);
+        var isMoving = warrior.isMovingHorizontally.get() && warrior.onGround();
         var isCrawling = warrior.getCrawlingManager().isCrawling();
         Runnable animFunction;
 

@@ -90,8 +90,7 @@ public class DroneAnimator extends AzEntityAnimator<Drone> {
 
         previousAttackType = XenomorphAttackType.NONE;
 
-        var isClimbing = drone.getClimbingSurfaceDirection() > 0;
-        var isMoving = drone.isMovingHorizontally.get() && (drone.onGround() || isClimbing);
+        var isMoving = drone.isMovingHorizontally.get() && drone.onGround();
         var isCrawling = drone.getCrawlingManager().isCrawling();
         Runnable animFunction;
 

@@ -13,7 +13,6 @@ import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.goap.v1.GOAPUser;
 import com.blib.api.common.pathfinding.v1.cache.TerrainCacheRegistry;
-import com.blib.api.common.pathfinding.v1.evaluator.Posture;
 import com.blib.api.common.pathfinding.v1.evaluator.TerrainEvaluatorConfig;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigator;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorConfig;
@@ -47,8 +46,6 @@ public class Spitter extends Xenomorph implements GOAPUser<Spitter>, PathNavigat
 
     private static final float MAX_BREAKABLE_DESTROY_TIME = 6.0F;
 
-    private static final Posture STANDING = new Posture("default", 1, 3);
-
     public final DataAccessor<XenomorphAttackType> attackType;
 
     private final SpitterAnimationDispatcher animationDispatcher;
@@ -78,7 +75,7 @@ public class Spitter extends Xenomorph implements GOAPUser<Spitter>, PathNavigat
                     AlienBlockTags.XENOMORPH_IMMUNE
                 )
             )
-            .addPosture(STANDING)
+            .withEntitySize(1, 3)
             .withMaxFallDistance(14)
             .withCanOpenDoors(true)
             .build();
