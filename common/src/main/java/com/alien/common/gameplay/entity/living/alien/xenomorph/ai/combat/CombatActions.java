@@ -83,6 +83,11 @@ public class CombatActions {
         net.minecraft.world.entity.LivingEntity attackTarget
     ) {
         var xenomorph = context.getActor();
+
+        if (xenomorph instanceof PathNavigatorUser navigatorUser) {
+            navigatorUser.getPathNavigator().setExcludedTerrains(null);
+        }
+
         var interceptPos = computeInterceptPoint(xenomorph, attackTarget);
         var result = NeoMoveToPosAction.perform(context, interceptPos, 1.1);
 
