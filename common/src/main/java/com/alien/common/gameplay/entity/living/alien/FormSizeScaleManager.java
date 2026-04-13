@@ -83,7 +83,7 @@ public class FormSizeScaleManager implements NBTSerializable {
 
         if (Math.abs(modifierValue) > 0.001) {
             scaleInstance.addTransientModifier(
-                new AttributeModifier(FORM_SIZE_SCALE_MODIFIER, modifierValue, AttributeModifier.Operation.ADD_VALUE)
+                new AttributeModifier(FORM_SIZE_SCALE_MODIFIER, modifierValue, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
             );
         }
     }

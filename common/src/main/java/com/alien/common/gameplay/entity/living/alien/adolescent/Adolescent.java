@@ -32,7 +32,8 @@ public class Adolescent extends Alien {
             .add(Attributes.FOLLOW_RANGE, 16F)
             .add(Attributes.KNOCKBACK_RESISTANCE, 0F)
             .add(Attributes.MAX_HEALTH, PlayerStatConstants.BASE_HEALTH * 0.5F)
-            .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1.025F);
+            .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1.025F)
+            .add(Attributes.SCALE, 0.7F);
     }
 
     private static final String NBT_HAS_DORSAL_TUBES = "hasDorsalTubes";

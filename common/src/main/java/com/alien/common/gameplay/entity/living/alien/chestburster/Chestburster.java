@@ -29,7 +29,8 @@ public class Chestburster extends Alien {
             .add(Attributes.FOLLOW_RANGE, 16F)
             .add(Attributes.KNOCKBACK_RESISTANCE, 0F)
             .add(Attributes.MAX_HEALTH, PlayerStatConstants.BASE_HEALTH * 0.25F)
-            .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1.05F);
+            .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1.05F)
+            .add(Attributes.SCALE, 0.4F);
     }
 
     private final ChestbursterAnimationDispatcher animationDispatcher;
