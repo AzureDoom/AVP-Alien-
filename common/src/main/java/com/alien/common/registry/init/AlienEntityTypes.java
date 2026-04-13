@@ -51,9 +51,9 @@ public class AlienEntityTypes {
     public static final float ACID_SPIT_HEIGHT = 0.25F;
 
     // Adolescent
-    public static final float ADOLESCENT_WIDTH = 0.5F;
+    public static final float ADOLESCENT_WIDTH = 0.7F;
 
-    public static final float ADOLESCENT_HEIGHT = 0.5F;
+    public static final float ADOLESCENT_HEIGHT = 0.7F;
 
     // Boiler
     public static final float BOILER_WIDTH = 0.8F;
