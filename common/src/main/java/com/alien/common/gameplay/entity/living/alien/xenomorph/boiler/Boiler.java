@@ -25,7 +25,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
@@ -127,8 +126,6 @@ public class Boiler extends Xenomorph implements GOAPUser<Boiler>, PathNavigator
     public @Nullable EntityType<? extends Alien> getTypeForVariant(AlienVariant alienVariant) {
         return getType(alienVariant);
     }
-
-
 
     @Override
     public boolean doHurtTarget(@NotNull Entity entity) {

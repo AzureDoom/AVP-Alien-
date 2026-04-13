@@ -125,8 +125,6 @@ public class Drone extends Xenomorph implements EggCarrier, GOAPUser<Drone>, Pat
         return getType(alienVariant);
     }
 
-
-
     @Override
     public void tick() {
         super.tick();

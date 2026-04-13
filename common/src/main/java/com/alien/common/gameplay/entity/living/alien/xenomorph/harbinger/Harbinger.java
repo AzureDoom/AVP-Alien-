@@ -106,8 +106,6 @@ public class Harbinger extends Xenomorph implements GOAPUser<Harbinger>, PathNav
         return getType(alienVariant);
     }
 
-
-
     @Override
     protected float getHealthRegenPerSecond() {
         return 0.5F;

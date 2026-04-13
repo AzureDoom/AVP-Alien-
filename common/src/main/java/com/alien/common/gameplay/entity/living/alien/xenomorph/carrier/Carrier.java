@@ -106,8 +106,6 @@ public class Carrier extends Xenomorph implements GOAPUser<Carrier>, PathNavigat
         return getType(alienVariant);
     }
 
-
-
     @Override
     protected float getHealthRegenPerSecond() {
         return 0.5F;

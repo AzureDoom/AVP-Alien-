@@ -125,8 +125,6 @@ public class Runner extends Xenomorph implements EggCarrier, GOAPUser<Runner>, P
         return getType(alienVariant);
     }
 
-
-
     @Override
     public void tick() {
         super.tick();

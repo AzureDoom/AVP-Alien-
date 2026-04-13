@@ -106,8 +106,6 @@ public class Praetorian extends Xenomorph implements GOAPUser<Praetorian>, PathN
         return getType(alienVariant);
     }
 
-
-
     @Override
     protected float getHealthRegenPerSecond() {
         return 0.5F;

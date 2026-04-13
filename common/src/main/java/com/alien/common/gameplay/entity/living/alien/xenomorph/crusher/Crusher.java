@@ -105,8 +105,6 @@ public class Crusher extends Xenomorph implements GOAPUser<Crusher>, PathNavigat
         return getType(alienVariant);
     }
 
-
-
     @Override
     public boolean isAttacking() {
         return attackType.get() != CrusherAttackType.NONE;

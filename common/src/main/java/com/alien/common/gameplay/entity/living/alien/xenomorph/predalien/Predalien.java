@@ -106,8 +106,6 @@ public class Predalien extends Xenomorph implements GOAPUser<Predalien>, PathNav
         return getType(alienVariant);
     }
 
-
-
     @Override
     protected float getHealthRegenPerSecond() {
         return 0.5F;

@@ -27,7 +27,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class Prowler extends Xenomorph implements GOAPUser<Prowler>, PathNavigatorUser {
@@ -106,8 +105,6 @@ public class Prowler extends Xenomorph implements GOAPUser<Prowler>, PathNavigat
     public @Nullable EntityType<? extends Alien> getTypeForVariant(AlienVariant alienVariant) {
         return getType(alienVariant);
     }
-
-
 
     @Override
     public boolean isAttacking() {

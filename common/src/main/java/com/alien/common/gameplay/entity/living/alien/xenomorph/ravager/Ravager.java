@@ -106,8 +106,6 @@ public class Ravager extends Xenomorph implements GOAPUser<Ravager>, PathNavigat
         return getType(alienVariant);
     }
 
-
-
     @Override
     protected float getHealthRegenPerSecond() {
         return 0.5F;

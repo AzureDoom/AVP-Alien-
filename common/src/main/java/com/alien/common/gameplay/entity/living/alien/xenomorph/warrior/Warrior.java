@@ -27,7 +27,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class Warrior extends Xenomorph implements GOAPUser<Warrior>, PathNavigatorUser {
@@ -121,8 +120,6 @@ public class Warrior extends Xenomorph implements GOAPUser<Warrior>, PathNavigat
     protected void resetAttackType() {
         attackType.set(XenomorphAttackType.NONE);
     }
-
-
 
     @Override
     public void runAttackAnimations() {

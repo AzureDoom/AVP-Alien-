@@ -111,8 +111,6 @@ public class Spitter extends Xenomorph implements GOAPUser<Spitter>, PathNavigat
         return getType(alienVariant);
     }
 
-
-
     @Override
     public boolean isAttacking() {
         return attackType.get() != XenomorphAttackType.NONE;

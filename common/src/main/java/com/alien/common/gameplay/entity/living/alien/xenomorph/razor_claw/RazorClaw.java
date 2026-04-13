@@ -113,8 +113,6 @@ public class RazorClaw extends Xenomorph implements GOAPUser<RazorClaw>, PathNav
         return getType(alienVariant);
     }
 
-
-
     @Override
     protected float getHealthRegenPerSecond() {
         return 0.5F;

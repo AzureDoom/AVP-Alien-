@@ -211,8 +211,6 @@ public class Queen extends Xenomorph implements GOAPUser<Queen>, PathNavigatorUs
             .ifSome(queenSpawnChunkData -> queenSpawnChunkData.getSpawnCooldown().reset());
     }
 
-
-
     @Override
     public float maxUpStep() {
         return 2.5F;

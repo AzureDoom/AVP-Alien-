@@ -106,8 +106,6 @@ public class Chrysalis extends Xenomorph implements GOAPUser<Chrysalis>, PathNav
         return getType(alienVariant);
     }
 
-
-
     @Override
     protected float getHealthRegenPerSecond() {
         return 0.5F;
