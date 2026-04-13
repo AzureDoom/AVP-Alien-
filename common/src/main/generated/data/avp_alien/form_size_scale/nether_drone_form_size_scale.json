@@ -1,0 +1,6 @@
+{
+  "endScale": 1.0,
+  "entityType": "avp_alien:nether_drone",
+  "maturationTimeInTicks": 1200,
+  "startScale": 0.9
+}
