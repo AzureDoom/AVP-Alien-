@@ -66,9 +66,69 @@ public class AberrantAlienFormSizeScaleProvider {
         );
 
         biConsumer.accept(
+            "aberrant_drone_form_size_scale",
+            new FormSizeScale(
+                AlienEntityTypes.ABERRANT_DRONE.get(),
+                FormSizeScaleConstants.DRONE_START_SCALE,
+                FormSizeScaleConstants.DRONE_END_SCALE,
+                FormSizeScaleConstants.DRONE_MATURATION_TIME_IN_TICKS
+            )
+        );
+
+        biConsumer.accept(
+            "aberrant_carrier_form_size_scale",
+            new FormSizeScale(
+                AlienEntityTypes.ABERRANT_CARRIER.get(),
+                FormSizeScaleConstants.PRAETORIAN_START_SCALE,
+                FormSizeScaleConstants.PRAETORIAN_END_SCALE,
+                FormSizeScaleConstants.PRAETORIAN_MATURATION_TIME_IN_TICKS
+            )
+        );
+
+        biConsumer.accept(
+            "aberrant_chrysalis_form_size_scale",
+            new FormSizeScale(
+                AlienEntityTypes.ABERRANT_CHRYSALIS.get(),
+                FormSizeScaleConstants.PRAETORIAN_START_SCALE,
+                FormSizeScaleConstants.PRAETORIAN_END_SCALE,
+                FormSizeScaleConstants.PRAETORIAN_MATURATION_TIME_IN_TICKS
+            )
+        );
+
+        biConsumer.accept(
+            "aberrant_predalien_form_size_scale",
+            new FormSizeScale(
+                AlienEntityTypes.ABERRANT_PREDALIEN.get(),
+                FormSizeScaleConstants.PRAETORIAN_START_SCALE,
+                FormSizeScaleConstants.PRAETORIAN_END_SCALE,
+                FormSizeScaleConstants.PRAETORIAN_MATURATION_TIME_IN_TICKS
+            )
+        );
+
+        biConsumer.accept(
             "aberrant_praetorian_form_size_scale",
             new FormSizeScale(
                 AlienEntityTypes.ABERRANT_PRAETORIAN.get(),
+                FormSizeScaleConstants.PRAETORIAN_START_SCALE,
+                FormSizeScaleConstants.PRAETORIAN_END_SCALE,
+                FormSizeScaleConstants.PRAETORIAN_MATURATION_TIME_IN_TICKS
+            )
+        );
+
+        biConsumer.accept(
+            "aberrant_ravager_form_size_scale",
+            new FormSizeScale(
+                AlienEntityTypes.ABERRANT_RAVAGER.get(),
+                FormSizeScaleConstants.PRAETORIAN_START_SCALE,
+                FormSizeScaleConstants.PRAETORIAN_END_SCALE,
+                FormSizeScaleConstants.PRAETORIAN_MATURATION_TIME_IN_TICKS
+            )
+        );
+
+        biConsumer.accept(
+            "aberrant_razor_claw_form_size_scale",
+            new FormSizeScale(
+                AlienEntityTypes.ABERRANT_RAZOR_CLAW.get(),
                 FormSizeScaleConstants.PRAETORIAN_START_SCALE,
                 FormSizeScaleConstants.PRAETORIAN_END_SCALE,
                 FormSizeScaleConstants.PRAETORIAN_MATURATION_TIME_IN_TICKS

@@ -11,6 +11,13 @@ public class FormSizeScaleConstants {
 
     public static final int CHESTBURSTER_MATURATION_TIME_IN_TICKS = (int) TimeUnit.MINUTES.toSeconds(3) * 20;
 
+    // Drones start at 90% of full size and grow to 100% over 1 minute.
+    public static final float DRONE_START_SCALE = 0.9F;
+
+    public static final float DRONE_END_SCALE = 1.0F;
+
+    public static final int DRONE_MATURATION_TIME_IN_TICKS = (int) TimeUnit.MINUTES.toSeconds(1) * 20;
+
     // Adolescents grow from 100% to 125% scale over 3 minutes.
     public static final float ADOLESCENT_START_SCALE = 1.0F;
 
