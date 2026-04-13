@@ -42,7 +42,7 @@ public class AdolescentRenderer extends AzEntityRenderer<Adolescent> {
         int packedLight
     ) {
         var scale = 0.7F;
-        shadowRadius = DEFAULT_SHADOW_SIZE * scale;
+        shadowRadius = DEFAULT_SHADOW_SIZE * scale * entity.getScale();
 
         poseStack.pushPose();
         poseStack.scale(scale, scale, scale);

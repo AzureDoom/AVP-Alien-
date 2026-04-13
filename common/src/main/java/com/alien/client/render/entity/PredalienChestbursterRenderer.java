@@ -42,7 +42,7 @@ public class PredalienChestbursterRenderer extends AzEntityRenderer<PredalienChe
         int packedLight
     ) {
         var scale = 0.4F;
-        shadowRadius = DEFAULT_SHADOW_SIZE * scale;
+        shadowRadius = DEFAULT_SHADOW_SIZE * scale * entity.getScale();
 
         poseStack.pushPose();
         poseStack.scale(scale, scale, scale);

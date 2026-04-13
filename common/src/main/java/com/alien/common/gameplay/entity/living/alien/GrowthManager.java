@@ -33,6 +33,7 @@ public class GrowthManager implements NBTSerializable {
     private static final Set<String> TRANSITION_NBT_KEY_BLACKLIST = Util.make(() -> {
         var set = new HashSet<>(EntityTransitionUtil.DEFAULT_NBT_KEY_BLACKLIST);
         set.add(GROWTH_TIME_IN_TICKS_TAG_KEY);
+        set.add(FormSizeScaleManager.FORM_SCALE_ELAPSED_TICKS_TAG);
         return set;
     });
 
@@ -77,6 +78,10 @@ public class GrowthManager implements NBTSerializable {
         }
 
         if (!readyToGrow) {
+            return;
+        }
+
+        if (!entity.getFormSizeScaleManager().hasReachedTargetScale()) {
             return;
         }
 

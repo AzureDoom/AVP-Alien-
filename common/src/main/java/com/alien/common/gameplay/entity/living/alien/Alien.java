@@ -70,6 +70,8 @@ public abstract class Alien extends Monster implements DataUser {
 
     protected final MovementAnalyzer movementAnalyzer;
 
+    private final FormSizeScaleManager formSizeScaleManager;
+
     private Option<EntityType<?>> hostTypeOption;
 
     private int lastHurtTimeInTicks;
@@ -83,6 +85,7 @@ public abstract class Alien extends Monster implements DataUser {
 
         this.hiveManager = new HiveManager(this);
         this.movementAnalyzer = new MovementAnalyzer(this);
+        this.formSizeScaleManager = new FormSizeScaleManager(this);
 
         this.hostTypeOption = Option.ofNullable(getDefaultHostType(entityType));
         this.lastHurtTimeInTicks = 0;
@@ -241,6 +244,7 @@ public abstract class Alien extends Monster implements DataUser {
     public void tick() {
         super.tick();
         hiveManager.tick();
+        formSizeScaleManager.tick();
 
         if (!level().isClientSide) {
             movementAnalyzer.tick();
@@ -506,6 +510,7 @@ public abstract class Alien extends Monster implements DataUser {
     public void readAdditionalSaveData(@NotNull CompoundTag compoundTag) {
         super.readAdditionalSaveData(compoundTag);
         hiveManager.load(compoundTag);
+        formSizeScaleManager.load(compoundTag);
 
         if (compoundTag.contains(NBT_HOST_TYPE)) {
             var resourceLocationString = compoundTag.getString(NBT_HOST_TYPE);
@@ -520,11 +525,16 @@ public abstract class Alien extends Monster implements DataUser {
     public void addAdditionalSaveData(@NotNull CompoundTag compoundTag) {
         super.addAdditionalSaveData(compoundTag);
         hiveManager.save(compoundTag);
+        formSizeScaleManager.save(compoundTag);
 
         hostTypeOption.ifSome(hostType -> {
             var resourceLocation = BuiltInRegistries.ENTITY_TYPE.getKey(hostTypeOption.unwrap());
             compoundTag.putString(NBT_HOST_TYPE, resourceLocation.toString());
         });
+    }
+
+    public FormSizeScaleManager getFormSizeScaleManager() {
+        return formSizeScaleManager;
     }
 
     public GeneManagerProxy getGeneManager() {
