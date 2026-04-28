@@ -2,6 +2,12 @@ plugins {
     id 'blib-multiloader-root'
 }
 
+allprojects {
+    repositories {
+        mavenLocal()
+    }
+}
+
 blib {
     version = project.blib_version
     recipeViewer = 'rei'

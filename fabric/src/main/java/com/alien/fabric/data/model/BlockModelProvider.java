@@ -123,7 +123,8 @@ public class BlockModelProvider extends FabricModelProvider {
             .stairs(AlienChitinBlocks.POLISHED_CHITIN_STAIRS.get())
             .wall(AlienChitinBlocks.POLISHED_CHITIN_WALL.get());
 
-        generators.createTrivialCube(AlienBlocks.ROYAL_JELLY_BLOCK.get());
+        generators.createNonTemplateModelBlock(AlienBlocks.ROYAL_JELLY_BLOCK.get());
+        generators.createNonTemplateModelBlock(AlienBlocks.SCOURGE_JELLY_BLOCK.get());
 
         generators.family(AberrantAlienResinBlocks.ABERRANT_RESIN_BRICKS.get())
             .slab(AberrantAlienResinBlocks.ABERRANT_RESIN_BRICK_SLAB.get())
