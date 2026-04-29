@@ -18,7 +18,7 @@ public class RunnerAnimator extends AzEntityAnimator<Runner> {
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
 
-    private QuadrupedAttackType previousAttackType = QuadrupedAttackType.NONE;
+    private int previousAttackId = Integer.MIN_VALUE;
 
     public RunnerAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -72,9 +72,10 @@ public class RunnerAnimator extends AzEntityAnimator<Runner> {
         }
 
         var attackType = runner.attackType.get();
+        var attackId = runner.attackId.get();
 
         if (attackType != QuadrupedAttackType.NONE) {
-            if (attackType != previousAttackType) {
+            if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(runner, attackType);
 
                 switch (attackType) {
@@ -83,12 +84,10 @@ public class RunnerAnimator extends AzEntityAnimator<Runner> {
                     case TAIL_QUAD -> dispatcher.tailAttackQuad(speed);
                 }
 
-                previousAttackType = attackType;
+                previousAttackId = attackId;
             }
             return;
         }
-
-        previousAttackType = QuadrupedAttackType.NONE;
 
         var isMoving = runner.isMovingHorizontally.get() && runner.onGround();
         var isCrawling = runner.getCrawlingManager().isCrawling();

@@ -18,7 +18,7 @@ public class RazorClawAnimator extends AzEntityAnimator<RazorClaw> {
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
 
-    private XenomorphAttackType previousAttackType = XenomorphAttackType.NONE;
+    private int previousAttackId = Integer.MIN_VALUE;
 
     public RazorClawAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -67,9 +67,10 @@ public class RazorClawAnimator extends AzEntityAnimator<RazorClaw> {
         var dispatcher = razorClaw.getAnimationDispatcher();
 
         var attackType = razorClaw.attackType.get();
+        var attackId = razorClaw.attackId.get();
 
         if (attackType != XenomorphAttackType.NONE) {
-            if (attackType != previousAttackType) {
+            if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(razorClaw, attackType);
 
                 switch (attackType) {
@@ -78,12 +79,10 @@ public class RazorClawAnimator extends AzEntityAnimator<RazorClaw> {
                     case TAIL -> dispatcher.tailAttack(speed);
                 }
 
-                previousAttackType = attackType;
+                previousAttackId = attackId;
             }
             return;
         }
-
-        previousAttackType = XenomorphAttackType.NONE;
 
         var isMovingOnGround = razorClaw.isMovingHorizontally.get() && razorClaw.onGround();
         Runnable animFunction;

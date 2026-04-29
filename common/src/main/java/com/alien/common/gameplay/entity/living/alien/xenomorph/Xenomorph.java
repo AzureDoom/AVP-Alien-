@@ -44,6 +44,8 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
 
     public final DataAccessor<Integer> attackDurationInTicks;
 
+    public final DataAccessor<Integer> attackId;
+
     public final DataAccessor<Boolean> isLunging;
 
     public final DataAccessor<Boolean> isCrawling;
@@ -66,6 +68,7 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         super(entityType, level);
 
         this.attackDurationInTicks = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_ATTACK_DURATION_IN_TICKS.get());
+        this.attackId = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_ATTACK_ID.get());
         this.isLunging = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_IS_LUNGING.get());
         this.isCrawling = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_IS_CRAWLING.get());
 
@@ -102,6 +105,7 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
 
     protected void beginAttack(int durationInTicks) {
         attackDurationInTicks.set(durationInTicks);
+        attackId.set(attackId.get() + 1);
         remainingAttackTicks = durationInTicks;
     }
 

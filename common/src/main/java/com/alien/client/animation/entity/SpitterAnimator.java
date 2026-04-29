@@ -18,7 +18,7 @@ public class SpitterAnimator extends AzEntityAnimator<Spitter> {
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
 
-    private XenomorphAttackType previousAttackType = XenomorphAttackType.NONE;
+    private int previousAttackId = Integer.MIN_VALUE;
 
     public SpitterAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -72,9 +72,10 @@ public class SpitterAnimator extends AzEntityAnimator<Spitter> {
         }
 
         var attackType = spitter.attackType.get();
+        var attackId = spitter.attackId.get();
 
         if (attackType != XenomorphAttackType.NONE) {
-            if (attackType != previousAttackType) {
+            if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(spitter, attackType);
 
                 switch (attackType) {
@@ -83,12 +84,10 @@ public class SpitterAnimator extends AzEntityAnimator<Spitter> {
                     case TAIL -> dispatcher.tailAttack(speed);
                 }
 
-                previousAttackType = attackType;
+                previousAttackId = attackId;
             }
             return;
         }
-
-        previousAttackType = XenomorphAttackType.NONE;
 
         var isMovingOnGround = spitter.isMovingHorizontally.get() && spitter.onGround();
         var isCrawling = spitter.getCrawlingManager().isCrawling();

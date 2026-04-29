@@ -18,7 +18,7 @@ public class CrusherAnimator extends AzEntityAnimator<Crusher> {
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
 
-    private CrusherAttackType previousAttackType = CrusherAttackType.NONE;
+    private int previousAttackId = Integer.MIN_VALUE;
 
     public CrusherAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -72,9 +72,10 @@ public class CrusherAnimator extends AzEntityAnimator<Crusher> {
         }
 
         var attackType = crusher.attackType.get();
+        var attackId = crusher.attackId.get();
 
         if (attackType != CrusherAttackType.NONE) {
-            if (attackType != previousAttackType) {
+            if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(crusher, attackType);
 
                 switch (attackType) {
@@ -82,12 +83,10 @@ public class CrusherAnimator extends AzEntityAnimator<Crusher> {
                     case TAIL -> dispatcher.tailAttack(speed);
                 }
 
-                previousAttackType = attackType;
+                previousAttackId = attackId;
             }
             return;
         }
-
-        previousAttackType = CrusherAttackType.NONE;
 
         var isMovingOnGround = crusher.isMovingHorizontally.get() && crusher.onGround();
         Runnable animFunction;

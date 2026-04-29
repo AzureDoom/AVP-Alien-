@@ -18,7 +18,7 @@ public class RavagerAnimator extends AzEntityAnimator<Ravager> {
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
 
-    private XenomorphAttackType previousAttackType = XenomorphAttackType.NONE;
+    private int previousAttackId = Integer.MIN_VALUE;
 
     public RavagerAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -67,9 +67,10 @@ public class RavagerAnimator extends AzEntityAnimator<Ravager> {
         var dispatcher = ravager.getAnimationDispatcher();
 
         var attackType = ravager.attackType.get();
+        var attackId = ravager.attackId.get();
 
         if (attackType != XenomorphAttackType.NONE) {
-            if (attackType != previousAttackType) {
+            if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(ravager, attackType);
 
                 switch (attackType) {
@@ -78,12 +79,10 @@ public class RavagerAnimator extends AzEntityAnimator<Ravager> {
                     case TAIL -> dispatcher.tailAttack(speed);
                 }
 
-                previousAttackType = attackType;
+                previousAttackId = attackId;
             }
             return;
         }
-
-        previousAttackType = XenomorphAttackType.NONE;
 
         var isMovingOnGround = ravager.isMovingHorizontally.get() && ravager.onGround();
         Runnable animFunction;

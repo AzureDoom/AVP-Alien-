@@ -18,7 +18,7 @@ public class WarriorAnimator extends AzEntityAnimator<Warrior> {
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
 
-    private XenomorphAttackType previousAttackType = XenomorphAttackType.NONE;
+    private int previousAttackId = Integer.MIN_VALUE;
 
     public WarriorAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -72,9 +72,10 @@ public class WarriorAnimator extends AzEntityAnimator<Warrior> {
         }
 
         var attackType = warrior.attackType.get();
+        var attackId = warrior.attackId.get();
 
         if (attackType != XenomorphAttackType.NONE) {
-            if (attackType != previousAttackType) {
+            if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(warrior, attackType);
 
                 switch (attackType) {
@@ -83,12 +84,10 @@ public class WarriorAnimator extends AzEntityAnimator<Warrior> {
                     case TAIL -> dispatcher.tailAttack(speed);
                 }
 
-                previousAttackType = attackType;
+                previousAttackId = attackId;
             }
             return;
         }
-
-        previousAttackType = XenomorphAttackType.NONE;
 
         var isMoving = warrior.isMovingHorizontally.get() && warrior.onGround();
         var isCrawling = warrior.getCrawlingManager().isCrawling();

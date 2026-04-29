@@ -18,7 +18,7 @@ public class QueenAnimator extends AzEntityAnimator<Queen> {
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
 
-    private QueenAttackType previousAttackType = QueenAttackType.NONE;
+    private int previousAttackId = Integer.MIN_VALUE;
 
     public QueenAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -80,9 +80,10 @@ public class QueenAnimator extends AzEntityAnimator<Queen> {
         var dispatcher = queen.getAnimationDispatcher();
 
         var attackType = queen.attackType.get();
+        var attackId = queen.attackId.get();
 
         if (attackType != QueenAttackType.NONE) {
-            if (attackType != previousAttackType) {
+            if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(queen, attackType);
 
                 switch (attackType) {
@@ -91,12 +92,10 @@ public class QueenAnimator extends AzEntityAnimator<Queen> {
                     case TAIL_STRIKE -> dispatcher.tailStrikeAttack(speed);
                 }
 
-                previousAttackType = attackType;
+                previousAttackId = attackId;
             }
             return;
         }
-
-        previousAttackType = QueenAttackType.NONE;
 
         var isMovingOnGround = queen.isMovingHorizontally.get() && queen.onGround();
         Runnable animFunction;

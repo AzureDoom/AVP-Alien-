@@ -116,6 +116,12 @@ public class AlienDataSyncKeys {
             .build(0)
     );
 
+    public static final BLibHolder<DataSyncKey<Integer>> XENOMORPH_ATTACK_ID = create(
+        "xenomorph_attack_id",
+        builder -> builder.networkSynchronized(StreamCodecs.INT)
+            .build(0)
+    );
+
     public static final BLibHolder<DataSyncKey<CrusherAttackType>> CRUSHER_ATTACK_TYPE = create(
         "crusher_attack_type",
         builder -> builder.networkSynchronized(CrusherAttackType.CODEC)

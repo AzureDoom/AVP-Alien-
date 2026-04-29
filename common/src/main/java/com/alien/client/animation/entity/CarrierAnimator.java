@@ -18,7 +18,7 @@ public class CarrierAnimator extends AzEntityAnimator<Carrier> {
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
 
-    private XenomorphAttackType previousAttackType = XenomorphAttackType.NONE;
+    private int previousAttackId = Integer.MIN_VALUE;
 
     public CarrierAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -67,9 +67,10 @@ public class CarrierAnimator extends AzEntityAnimator<Carrier> {
         var dispatcher = carrier.getAnimationDispatcher();
 
         var attackType = carrier.attackType.get();
+        var attackId = carrier.attackId.get();
 
         if (attackType != XenomorphAttackType.NONE) {
-            if (attackType != previousAttackType) {
+            if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(carrier, attackType);
 
                 switch (attackType) {
@@ -78,12 +79,10 @@ public class CarrierAnimator extends AzEntityAnimator<Carrier> {
                     case TAIL -> dispatcher.tailAttack(speed);
                 }
 
-                previousAttackType = attackType;
+                previousAttackId = attackId;
             }
             return;
         }
-
-        previousAttackType = XenomorphAttackType.NONE;
 
         var isMovingOnGround = carrier.isMovingHorizontally.get() && carrier.onGround();
         Runnable animFunction;

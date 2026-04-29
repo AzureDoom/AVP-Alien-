@@ -18,7 +18,7 @@ public class HarbingerAnimator extends AzEntityAnimator<Harbinger> {
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
 
-    private XenomorphAttackType previousAttackType = XenomorphAttackType.NONE;
+    private int previousAttackId = Integer.MIN_VALUE;
 
     public HarbingerAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -67,9 +67,10 @@ public class HarbingerAnimator extends AzEntityAnimator<Harbinger> {
         var dispatcher = harbinger.getAnimationDispatcher();
 
         var attackType = harbinger.attackType.get();
+        var attackId = harbinger.attackId.get();
 
         if (attackType != XenomorphAttackType.NONE) {
-            if (attackType != previousAttackType) {
+            if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(harbinger, attackType);
 
                 switch (attackType) {
@@ -78,12 +79,10 @@ public class HarbingerAnimator extends AzEntityAnimator<Harbinger> {
                     case TAIL -> dispatcher.tailAttack(speed);
                 }
 
-                previousAttackType = attackType;
+                previousAttackId = attackId;
             }
             return;
         }
-
-        previousAttackType = XenomorphAttackType.NONE;
 
         var isMovingOnGround = harbinger.isMovingHorizontally.get() && harbinger.onGround();
         Runnable animFunction;

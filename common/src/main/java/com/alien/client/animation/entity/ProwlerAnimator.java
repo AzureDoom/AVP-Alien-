@@ -18,7 +18,7 @@ public class ProwlerAnimator extends AzEntityAnimator<Prowler> {
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
 
-    private QuadrupedAttackType previousAttackType = QuadrupedAttackType.NONE;
+    private int previousAttackId = Integer.MIN_VALUE;
 
     public ProwlerAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -72,9 +72,10 @@ public class ProwlerAnimator extends AzEntityAnimator<Prowler> {
         }
 
         var attackType = prowler.attackType.get();
+        var attackId = prowler.attackId.get();
 
         if (attackType != QuadrupedAttackType.NONE) {
-            if (attackType != previousAttackType) {
+            if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(prowler, attackType);
 
                 switch (attackType) {
@@ -83,12 +84,10 @@ public class ProwlerAnimator extends AzEntityAnimator<Prowler> {
                     case TAIL_QUAD -> dispatcher.tailAttackQuad(speed);
                 }
 
-                previousAttackType = attackType;
+                previousAttackId = attackId;
             }
             return;
         }
-
-        previousAttackType = QuadrupedAttackType.NONE;
 
         var isMoving = prowler.isMovingHorizontally.get() && prowler.onGround();
         var isCrawling = prowler.getCrawlingManager().isCrawling();

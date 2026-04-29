@@ -18,7 +18,7 @@ public class PraetorianAnimator extends AzEntityAnimator<Praetorian> {
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
 
-    private XenomorphAttackType previousAttackType = XenomorphAttackType.NONE;
+    private int previousAttackId = Integer.MIN_VALUE;
 
     public PraetorianAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -67,9 +67,10 @@ public class PraetorianAnimator extends AzEntityAnimator<Praetorian> {
         var dispatcher = praetorian.getAnimationDispatcher();
 
         var attackType = praetorian.attackType.get();
+        var attackId = praetorian.attackId.get();
 
         if (attackType != XenomorphAttackType.NONE) {
-            if (attackType != previousAttackType) {
+            if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(praetorian, attackType);
 
                 switch (attackType) {
@@ -78,12 +79,10 @@ public class PraetorianAnimator extends AzEntityAnimator<Praetorian> {
                     case TAIL -> dispatcher.tailAttack(speed);
                 }
 
-                previousAttackType = attackType;
+                previousAttackId = attackId;
             }
             return;
         }
-
-        previousAttackType = XenomorphAttackType.NONE;
 
         var isMovingOnGround = praetorian.isMovingHorizontally.get() && praetorian.onGround();
         Runnable animFunction;

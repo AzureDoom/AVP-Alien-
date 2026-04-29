@@ -18,7 +18,7 @@ public class ChrysalisAnimator extends AzEntityAnimator<Chrysalis> {
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
 
-    private XenomorphAttackType previousAttackType = XenomorphAttackType.NONE;
+    private int previousAttackId = Integer.MIN_VALUE;
 
     public ChrysalisAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -49,9 +49,10 @@ public class ChrysalisAnimator extends AzEntityAnimator<Chrysalis> {
         var dispatcher = chrysalis.getAnimationDispatcher();
 
         var attackType = chrysalis.attackType.get();
+        var attackId = chrysalis.attackId.get();
 
         if (attackType != XenomorphAttackType.NONE) {
-            if (attackType != previousAttackType) {
+            if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(chrysalis, attackType);
 
                 switch (attackType) {
@@ -60,12 +61,10 @@ public class ChrysalisAnimator extends AzEntityAnimator<Chrysalis> {
                     case TAIL -> dispatcher.tailAttack(speed);
                 }
 
-                previousAttackType = attackType;
+                previousAttackId = attackId;
             }
             return;
         }
-
-        previousAttackType = XenomorphAttackType.NONE;
 
         var isMovingOnGround = chrysalis.isMovingHorizontally.get() && chrysalis.onGround();
         Runnable animFunction;

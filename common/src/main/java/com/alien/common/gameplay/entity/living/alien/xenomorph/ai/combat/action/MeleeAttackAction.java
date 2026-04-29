@@ -13,6 +13,8 @@ public class MeleeAttackAction {
 
     private static final StateKey<Boolean> KEY_ATTACK_STARTED = StateKey.sensed("melee_attack_started");
 
+    private static final StateKey<Boolean> KEY_DAMAGE_DEALT = StateKey.sensed("melee_attack_damage_dealt");
+
     private static final StateKey<Integer> KEY_ELAPSED_ATTACK_TICKS = StateKey.sensed("elapsed_attack_ticks");
 
     private static final StateKey<Integer> KEY_ATTACK_DURATION = StateKey.sensed("attack_duration");
@@ -41,6 +43,7 @@ public class MeleeAttackAction {
             blackboard.set(KEY_ATTACK_DURATION, duration);
             blackboard.set(KEY_ELAPSED_ATTACK_TICKS, 0);
             blackboard.set(KEY_ATTACK_STARTED, true);
+            blackboard.set(KEY_DAMAGE_DEALT, false);
             return Action.Signal.CONTINUE;
         }
 
@@ -50,8 +53,9 @@ public class MeleeAttackAction {
         blackboard.set(KEY_ELAPSED_ATTACK_TICKS, elapsedTicks);
 
         var damageTickThreshold = (int) (duration * DAMAGE_POINT_PERCENT);
+        var damageDealt = blackboard.getOrDefault(KEY_DAMAGE_DEALT, false);
 
-        if (elapsedTicks >= damageTickThreshold) {
+        if (!damageDealt && elapsedTicks >= damageTickThreshold) {
             var attackRange = xenomorph.getBbWidth() + 1.0;
 
             if (xenomorph.distanceTo(attackTarget) <= attackRange && xenomorph.getSensing().hasLineOfSight(attackTarget)) {
@@ -59,7 +63,11 @@ public class MeleeAttackAction {
                 xenomorph.doHurtTarget(attackTarget);
             }
 
-            return Action.Signal.CONTINUE;
+            blackboard.set(KEY_DAMAGE_DEALT, true);
+        }
+
+        if (elapsedTicks >= duration) {
+            blackboard.set(KEY_ATTACK_STARTED, false);
         }
 
         return Action.Signal.CONTINUE;

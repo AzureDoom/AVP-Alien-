@@ -18,7 +18,7 @@ public class PredalienAnimator extends AzEntityAnimator<Predalien> {
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
 
-    private XenomorphAttackType previousAttackType = XenomorphAttackType.NONE;
+    private int previousAttackId = Integer.MIN_VALUE;
 
     public PredalienAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -67,9 +67,10 @@ public class PredalienAnimator extends AzEntityAnimator<Predalien> {
         var dispatcher = predalien.getAnimationDispatcher();
 
         var attackType = predalien.attackType.get();
+        var attackId = predalien.attackId.get();
 
         if (attackType != XenomorphAttackType.NONE) {
-            if (attackType != previousAttackType) {
+            if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(predalien, attackType);
 
                 switch (attackType) {
@@ -78,12 +79,10 @@ public class PredalienAnimator extends AzEntityAnimator<Predalien> {
                     case TAIL -> dispatcher.tailAttack(speed);
                 }
 
-                previousAttackType = attackType;
+                previousAttackId = attackId;
             }
             return;
         }
-
-        previousAttackType = XenomorphAttackType.NONE;
 
         var isMovingOnGround = predalien.isMovingHorizontally.get() && predalien.onGround();
         Runnable animFunction;

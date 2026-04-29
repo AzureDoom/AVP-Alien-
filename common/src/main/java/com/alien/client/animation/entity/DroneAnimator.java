@@ -18,7 +18,7 @@ public class DroneAnimator extends AzEntityAnimator<Drone> {
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
 
-    private XenomorphAttackType previousAttackType = XenomorphAttackType.NONE;
+    private int previousAttackId = Integer.MIN_VALUE;
 
     public DroneAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -72,9 +72,10 @@ public class DroneAnimator extends AzEntityAnimator<Drone> {
         }
 
         var attackType = drone.attackType.get();
+        var attackId = drone.attackId.get();
 
         if (attackType != XenomorphAttackType.NONE) {
-            if (attackType != previousAttackType) {
+            if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(drone, attackType);
 
                 switch (attackType) {
@@ -83,12 +84,10 @@ public class DroneAnimator extends AzEntityAnimator<Drone> {
                     case TAIL -> dispatcher.tailAttack(speed);
                 }
 
-                previousAttackType = attackType;
+                previousAttackId = attackId;
             }
             return;
         }
-
-        previousAttackType = XenomorphAttackType.NONE;
 
         var isMoving = drone.isMovingHorizontally.get() && drone.onGround();
         var isCrawling = drone.getCrawlingManager().isCrawling();
