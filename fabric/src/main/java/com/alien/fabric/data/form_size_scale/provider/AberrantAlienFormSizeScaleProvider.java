@@ -66,9 +66,29 @@ public class AberrantAlienFormSizeScaleProvider {
         );
 
         biConsumer.accept(
+            "aberrant_burster_form_size_scale",
+            new FormSizeScale(
+                AlienEntityTypes.ABERRANT_BURSTER.get(),
+                FormSizeScaleConstants.DRONE_START_SCALE,
+                FormSizeScaleConstants.DRONE_END_SCALE,
+                FormSizeScaleConstants.DRONE_PHASES
+            )
+        );
+
+        biConsumer.accept(
             "aberrant_drone_form_size_scale",
             new FormSizeScale(
                 AlienEntityTypes.ABERRANT_DRONE.get(),
+                FormSizeScaleConstants.DRONE_START_SCALE,
+                FormSizeScaleConstants.DRONE_END_SCALE,
+                FormSizeScaleConstants.DRONE_PHASES
+            )
+        );
+
+        biConsumer.accept(
+            "aberrant_runner_form_size_scale",
+            new FormSizeScale(
+                AlienEntityTypes.ABERRANT_RUNNER.get(),
                 FormSizeScaleConstants.DRONE_START_SCALE,
                 FormSizeScaleConstants.DRONE_END_SCALE,
                 FormSizeScaleConstants.DRONE_PHASES

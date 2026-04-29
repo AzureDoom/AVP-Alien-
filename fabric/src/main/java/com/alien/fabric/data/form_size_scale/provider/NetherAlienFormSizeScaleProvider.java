@@ -66,9 +66,29 @@ public class NetherAlienFormSizeScaleProvider {
         );
 
         biConsumer.accept(
+            "nether_burster_form_size_scale",
+            new FormSizeScale(
+                AlienEntityTypes.NETHER_BURSTER.get(),
+                FormSizeScaleConstants.DRONE_START_SCALE,
+                FormSizeScaleConstants.DRONE_END_SCALE,
+                FormSizeScaleConstants.DRONE_PHASES
+            )
+        );
+
+        biConsumer.accept(
             "nether_drone_form_size_scale",
             new FormSizeScale(
                 AlienEntityTypes.NETHER_DRONE.get(),
+                FormSizeScaleConstants.DRONE_START_SCALE,
+                FormSizeScaleConstants.DRONE_END_SCALE,
+                FormSizeScaleConstants.DRONE_PHASES
+            )
+        );
+
+        biConsumer.accept(
+            "nether_runner_form_size_scale",
+            new FormSizeScale(
+                AlienEntityTypes.NETHER_RUNNER.get(),
                 FormSizeScaleConstants.DRONE_START_SCALE,
                 FormSizeScaleConstants.DRONE_END_SCALE,
                 FormSizeScaleConstants.DRONE_PHASES

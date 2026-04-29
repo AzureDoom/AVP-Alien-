@@ -1,51 +1,70 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.burster;
 
 import com.alien.common.util.AzAlienAnimationUtil;
-import com.blib.api.client.animation.v1.AzAnimationUtil;
 import com.blib.api.client.animation.v1.command.AzCommand;
 import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
 
 public class BursterAnimationDispatcher {
 
-    private static final AzCommand ARMATTACK_RIGHTARM = AzCommand.create(
-        AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
-        BursterAnimationRefs.ATTACKCLAWQUAD_RIGHTARM_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
+    private static final AzCommand IDLE = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        BursterAnimationRefs.IDLE_ANIMATION_NAME,
+        AzPlayBehaviors.LOOP
     );
 
-    private static final AzCommand BITEATTACK_HEAD = AzCommand.create(
-        AzAlienAnimationUtil.HEAD_TRACK_NAME,
-        BursterAnimationRefs.BITEATTACK_HEAD_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
+    private static final AzCommand WALK = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        BursterAnimationRefs.WALK_ANIMATION_NAME,
+        AzPlayBehaviors.LOOP
     );
 
-    private static final AzCommand TAILATTACKQUAD_TAIL = AzCommand.create(
-        AzAlienAnimationUtil.TAIL_TRACK_NAME,
-        BursterAnimationRefs.TAILATTACKQUAD_TAIL_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
+    private static final AzCommand RUN = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        BursterAnimationRefs.RUN_ANIMATION_NAME,
+        AzPlayBehaviors.LOOP
     );
 
-    private static final AzCommand CRAWL_ALL = AzAnimationUtil.compose(AzAlienAnimationUtil.XENO_LIMB_NAMES, "crawl");
+    private static final AzCommand CRAWL = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        BursterAnimationRefs.CRAWL_ANIMATION_NAME,
+        AzPlayBehaviors.LOOP
+    );
 
-    private static final AzCommand CRAWL_ALL_HOLD = AzAnimationUtil.compose(
-        AzAlienAnimationUtil.XENO_LIMB_NAMES,
-        "crawl",
+    private static final AzCommand CRAWL_HOLD = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        BursterAnimationRefs.CRAWL_ANIMATION_NAME,
         AzPlayBehaviors.HOLD_ON_LAST_FRAME
     );
 
-    private static final AzCommand IDLE_ALL = AzAnimationUtil.compose(AzAlienAnimationUtil.XENO_LIMB_NAMES, "idle");
-
-    private static final AzCommand LUNGE_ALL = AzAnimationUtil.compose(
-        AzAlienAnimationUtil.XENO_LIMB_NAMES,
-        "lunge",
+    private static final AzCommand LUNGE = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        BursterAnimationRefs.LUNGE_ANIMATION_NAME,
         AzPlayBehaviors.PLAY_ONCE
     );
 
-    private static final AzCommand RUN_ALL = AzAnimationUtil.compose(AzAlienAnimationUtil.XENO_LIMB_NAMES, "sprint");
+    private static final AzCommand SWIM = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        BursterAnimationRefs.SWIM_ANIMATION_NAME,
+        AzPlayBehaviors.LOOP
+    );
 
-    private static final AzCommand SWIM_ALL = AzAnimationUtil.compose(AzAlienAnimationUtil.XENO_LIMB_NAMES, "swim");
+    private static final AzCommand FULLATTACKARM = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        BursterAnimationRefs.FULLATTACKARM_ANIMATION_NAME,
+        AzPlayBehaviors.PLAY_ONCE
+    );
 
-    private static final AzCommand WALK_ALL = AzAnimationUtil.compose(AzAlienAnimationUtil.XENO_LIMB_NAMES, "walk");
+    private static final AzCommand FULLATTACKBITE = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        BursterAnimationRefs.FULLATTACKBITE_ANIMATION_NAME,
+        AzPlayBehaviors.PLAY_ONCE
+    );
+
+    private static final AzCommand FULLATTACKTAIL = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        BursterAnimationRefs.FULLATTACKTAIL_ANIMATION_NAME,
+        AzPlayBehaviors.PLAY_ONCE
+    );
 
     private final Burster burster;
 
@@ -53,42 +72,59 @@ public class BursterAnimationDispatcher {
         this.burster = burster;
     }
 
-    public void crawl() {
-        CRAWL_ALL.dispatchForEntity(burster);
-    }
-
-    public void crawlHold() {
-        CRAWL_ALL_HOLD.dispatchForEntity(burster);
-    }
-
     public void idle() {
-        IDLE_ALL.dispatchForEntity(burster);
-    }
-
-    public void lunge() {
-        LUNGE_ALL.dispatchForEntity(burster);
-    }
-
-    public void run() {
-        RUN_ALL.dispatchForEntity(burster);
-    }
-
-    public void swim() {
-        SWIM_ALL.dispatchForEntity(burster);
+        IDLE.dispatchForEntity(burster);
     }
 
     public void walk() {
-        WALK_ALL.dispatchForEntity(burster);
+        WALK.dispatchForEntity(burster);
+    }
+
+    public void run() {
+        RUN.dispatchForEntity(burster);
+    }
+
+    public void crawl() {
+        CRAWL.dispatchForEntity(burster);
+    }
+
+    public void crawlHold() {
+        CRAWL_HOLD.dispatchForEntity(burster);
+    }
+
+    public void lunge() {
+        LUNGE.dispatchForEntity(burster);
+    }
+
+    public void swim() {
+        SWIM.dispatchForEntity(burster);
+    }
+
+    public void clawAttack() {
+        FULLATTACKARM.dispatchForEntity(burster);
+    }
+
+    public void clawAttack(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.BODY_TRACK_NAME,
+            BursterAnimationRefs.FULLATTACKARM_ANIMATION_NAME,
+            AzPlayBehaviors.PLAY_ONCE,
+            0F,
+            speed,
+            0F,
+            0F,
+            false
+        ).dispatchForEntity(burster);
     }
 
     public void biteAttack() {
-        BITEATTACK_HEAD.dispatchForEntity(burster);
+        FULLATTACKBITE.dispatchForEntity(burster);
     }
 
     public void biteAttack(float speed) {
         AzCommand.create(
-            AzAlienAnimationUtil.HEAD_TRACK_NAME,
-            BursterAnimationRefs.BITEATTACK_HEAD_ANIMATION_NAME,
+            AzAlienAnimationUtil.BODY_TRACK_NAME,
+            BursterAnimationRefs.FULLATTACKBITE_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
             0F,
             speed,
@@ -98,31 +134,14 @@ public class BursterAnimationDispatcher {
         ).dispatchForEntity(burster);
     }
 
-    public void rightClawAttack() {
-        ARMATTACK_RIGHTARM.dispatchForEntity(burster);
+    public void tailAttack() {
+        FULLATTACKTAIL.dispatchForEntity(burster);
     }
 
-    public void rightClawAttack(float speed) {
+    public void tailAttack(float speed) {
         AzCommand.create(
-            AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
-            BursterAnimationRefs.ATTACKCLAWQUAD_RIGHTARM_ANIMATION_NAME,
-            AzPlayBehaviors.PLAY_ONCE,
-            0F,
-            speed,
-            0F,
-            0F,
-            false
-        ).dispatchForEntity(burster);
-    }
-
-    public void tailAttackQuad() {
-        TAILATTACKQUAD_TAIL.dispatchForEntity(burster);
-    }
-
-    public void tailAttackQuad(float speed) {
-        AzCommand.create(
-            AzAlienAnimationUtil.TAIL_TRACK_NAME,
-            BursterAnimationRefs.TAILATTACKQUAD_TAIL_ANIMATION_NAME,
+            AzAlienAnimationUtil.BODY_TRACK_NAME,
+            BursterAnimationRefs.FULLATTACKTAIL_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
             0F,
             speed,

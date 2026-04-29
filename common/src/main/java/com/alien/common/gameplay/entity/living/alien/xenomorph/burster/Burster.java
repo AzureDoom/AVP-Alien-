@@ -3,7 +3,7 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.burster;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.EggCarrier;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.EggPickupManager;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.QuadrupedAttackType;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.VentBuilder;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.VentData;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
@@ -57,7 +57,7 @@ public class Burster extends Xenomorph implements EggCarrier, GOAPUser<Burster>,
 
     private static final float MAX_BREAKABLE_DESTROY_TIME = 6.0F;
 
-    public final DataAccessor<QuadrupedAttackType> attackType;
+    public final DataAccessor<XenomorphAttackType> attackType;
 
     private final BursterAnimationDispatcher animationDispatcher;
 
@@ -69,7 +69,7 @@ public class Burster extends Xenomorph implements EggCarrier, GOAPUser<Burster>,
 
     public Burster(EntityType<? extends Burster> entityType, Level level) {
         super(entityType, level);
-        this.attackType = new DataAccessor<>(this, AlienDataSyncKeys.QUADRUPED_ATTACK_TYPE.get());
+        this.attackType = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_ATTACK_TYPE.get());
         this.animationDispatcher = new BursterAnimationDispatcher(this);
         this.eggPickupManager = new EggPickupManager(this);
         this.ventData = new VentData();
@@ -150,12 +150,12 @@ public class Burster extends Xenomorph implements EggCarrier, GOAPUser<Burster>,
 
     @Override
     public boolean isAttacking() {
-        return attackType.get() != QuadrupedAttackType.NONE;
+        return attackType.get() != XenomorphAttackType.NONE;
     }
 
     @Override
     protected void resetAttackType() {
-        attackType.set(QuadrupedAttackType.NONE);
+        attackType.set(XenomorphAttackType.NONE);
     }
 
     @Override
@@ -169,9 +169,9 @@ public class Burster extends Xenomorph implements EggCarrier, GOAPUser<Burster>,
         );
 
         var attack = switch (attackVariant) {
-            case 0 -> QuadrupedAttackType.CLAW;
-            case 1 -> QuadrupedAttackType.BITE;
-            default -> QuadrupedAttackType.TAIL_QUAD;
+            case 0 -> XenomorphAttackType.CLAW;
+            case 1 -> XenomorphAttackType.BITE;
+            default -> XenomorphAttackType.TAIL;
         };
 
         attackType.set(attack);

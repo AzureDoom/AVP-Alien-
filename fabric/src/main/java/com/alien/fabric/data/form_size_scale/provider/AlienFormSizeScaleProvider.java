@@ -11,7 +11,9 @@ public class AlienFormSizeScaleProvider {
     public static void provide(BiConsumer<String, FormSizeScale> biConsumer) {
         provideChestbursterScales(biConsumer);
         provideAdolescentScales(biConsumer);
+        provideBursterScales(biConsumer);
         provideDroneScales(biConsumer);
+        provideRunnerScales(biConsumer);
         provideCarrierScales(biConsumer);
         provideChrysalisScales(biConsumer);
         providePredalienScales(biConsumer);
@@ -81,6 +83,27 @@ public class AlienFormSizeScaleProvider {
         );
     }
 
+    private static void provideBursterScales(BiConsumer<String, FormSizeScale> biConsumer) {
+        biConsumer.accept(
+            "burster_form_size_scale",
+            new FormSizeScale(
+                AlienEntityTypes.BURSTER.get(),
+                FormSizeScaleConstants.DRONE_START_SCALE,
+                FormSizeScaleConstants.DRONE_END_SCALE,
+                FormSizeScaleConstants.DRONE_PHASES
+            )
+        );
+        biConsumer.accept(
+            "irradiated_burster_form_size_scale",
+            new FormSizeScale(
+                AlienEntityTypes.IRRADIATED_BURSTER.get(),
+                FormSizeScaleConstants.DRONE_START_SCALE,
+                FormSizeScaleConstants.DRONE_END_SCALE,
+                FormSizeScaleConstants.DRONE_PHASES
+            )
+        );
+    }
+
     private static void provideDroneScales(BiConsumer<String, FormSizeScale> biConsumer) {
         biConsumer.accept(
             "drone_form_size_scale",
@@ -95,6 +118,27 @@ public class AlienFormSizeScaleProvider {
             "irradiated_drone_form_size_scale",
             new FormSizeScale(
                 AlienEntityTypes.IRRADIATED_DRONE.get(),
+                FormSizeScaleConstants.DRONE_START_SCALE,
+                FormSizeScaleConstants.DRONE_END_SCALE,
+                FormSizeScaleConstants.DRONE_PHASES
+            )
+        );
+    }
+
+    private static void provideRunnerScales(BiConsumer<String, FormSizeScale> biConsumer) {
+        biConsumer.accept(
+            "runner_form_size_scale",
+            new FormSizeScale(
+                AlienEntityTypes.RUNNER.get(),
+                FormSizeScaleConstants.DRONE_START_SCALE,
+                FormSizeScaleConstants.DRONE_END_SCALE,
+                FormSizeScaleConstants.DRONE_PHASES
+            )
+        );
+        biConsumer.accept(
+            "irradiated_runner_form_size_scale",
+            new FormSizeScale(
+                AlienEntityTypes.IRRADIATED_RUNNER.get(),
                 FormSizeScaleConstants.DRONE_START_SCALE,
                 FormSizeScaleConstants.DRONE_END_SCALE,
                 FormSizeScaleConstants.DRONE_PHASES

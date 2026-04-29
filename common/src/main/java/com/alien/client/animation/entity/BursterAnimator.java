@@ -1,7 +1,7 @@
 package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.QuadrupedAttackType;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.burster.Burster;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.burster.BursterAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
@@ -28,24 +28,6 @@ public class BursterAnimator extends AzEntityAnimator<Burster> {
     public void registerTracks(AzAnimationTrackContainer<Burster> animationTrackContainer) {
         animationTrackContainer.add(
             AzAnimationTrack.builder(this, AzAlienAnimationUtil.BODY_TRACK_NAME)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.HEAD_TRACK_NAME)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_ARM_TRACK_NAME)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_LEG_TRACK_NAME)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_LEG_TRACK_NAME)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.TAIL_TRACK_NAME)
                 .setTransitionLength(5)
                 .build()
         );
@@ -74,14 +56,14 @@ public class BursterAnimator extends AzEntityAnimator<Burster> {
         var attackType = burster.attackType.get();
         var attackId = burster.attackId.get();
 
-        if (attackType != QuadrupedAttackType.NONE) {
+        if (attackType != XenomorphAttackType.NONE) {
             if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(burster, attackType);
 
                 switch (attackType) {
                     case BITE -> dispatcher.biteAttack(speed);
-                    case CLAW -> dispatcher.rightClawAttack(speed);
-                    case TAIL_QUAD -> dispatcher.tailAttackQuad(speed);
+                    case CLAW -> dispatcher.clawAttack(speed);
+                    case TAIL -> dispatcher.tailAttack(speed);
                 }
 
                 previousAttackId = attackId;
@@ -110,11 +92,11 @@ public class BursterAnimator extends AzEntityAnimator<Burster> {
         animFunction.run();
     }
 
-    private float calculateAttackSpeed(Burster burster, QuadrupedAttackType attackType) {
+    private float calculateAttackSpeed(Burster burster, XenomorphAttackType attackType) {
         var animationName = switch (attackType) {
-            case BITE -> BursterAnimationRefs.BITEATTACK_HEAD_ANIMATION_NAME;
-            case CLAW -> BursterAnimationRefs.ATTACKCLAWQUAD_RIGHTARM_ANIMATION_NAME;
-            case TAIL_QUAD -> BursterAnimationRefs.TAILATTACKQUAD_TAIL_ANIMATION_NAME;
+            case BITE -> BursterAnimationRefs.FULLATTACKBITE_ANIMATION_NAME;
+            case CLAW -> BursterAnimationRefs.FULLATTACKARM_ANIMATION_NAME;
+            case TAIL -> BursterAnimationRefs.FULLATTACKTAIL_ANIMATION_NAME;
             default -> null;
         };
 
