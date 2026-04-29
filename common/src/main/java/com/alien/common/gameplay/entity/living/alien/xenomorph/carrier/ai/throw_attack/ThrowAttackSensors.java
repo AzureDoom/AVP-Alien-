@@ -22,12 +22,21 @@ public class ThrowAttackSensors {
         carrier -> carrier.getRidingFacehuggerCount() > 0
     );
 
+    public static final Sensor.Mono<Carrier, Boolean> IS_THROW_COOLDOWN_READY = Sensors.map(
+        StateKey.sensed("is_throw_cooldown_ready"),
+        carrier -> carrier.getCarrierData().isThrowCooldownReady()
+    );
+
     public static final Compose2<Carrier, Option<LivingEntity>, Boolean, Boolean> CAN_THROW_FACEHUGGER = Sensors.compose(
         GOAPSensors.NEAREST_ATTACKABLE_TARGET.key(),
         HAS_RIDING_FACEHUGGER.key(),
         StateKey.sensed("can_throw_facehugger"),
         (carrier, attackTargetOption, hasRidingFacehugger) -> {
-            if (!hasRidingFacehugger || attackTargetOption.isNone()) {
+            if (
+                !hasRidingFacehugger
+                    || !carrier.getCarrierData().isThrowCooldownReady()
+                    || attackTargetOption.isNone()
+            ) {
                 return false;
             }
 

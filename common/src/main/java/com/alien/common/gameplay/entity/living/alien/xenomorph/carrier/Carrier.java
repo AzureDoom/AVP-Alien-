@@ -25,6 +25,7 @@ import com.blib.api.common.pathfinding.v1.terrain.TerrainClassifiers;
 import com.blib.api.common.pathfinding.v1.terrain.TerrainType;
 import com.just.goap.Agent;
 import com.just.goap.graph.Graph;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -54,12 +55,15 @@ public class Carrier extends Xenomorph implements GOAPUser<Carrier>, PathNavigat
 
     private final CarrierAnimationDispatcher animationDispatcher;
 
+    private final CarrierData carrierData;
+
     private final PathNavigator pathNavigator;
 
     public Carrier(EntityType<? extends Carrier> entityType, Level level) {
         super(entityType, level);
         this.attackType = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_ATTACK_TYPE.get());
         this.animationDispatcher = new CarrierAnimationDispatcher(this);
+        this.carrierData = new CarrierData();
         this.pathNavigator = createPathNavigator(level);
         getXenomorphData().setParallelDigCount(2);
     }
@@ -115,6 +119,12 @@ public class Carrier extends Xenomorph implements GOAPUser<Carrier>, PathNavigat
     @Override
     protected float getHealthRegenPerSecond() {
         return 0.5F;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        carrierData.tick();
     }
 
     @Override
@@ -209,6 +219,22 @@ public class Carrier extends Xenomorph implements GOAPUser<Carrier>, PathNavigat
         return (int) getPassengers().stream()
             .filter(p -> p.getType().is(AlienEntityTypeTags.FACEHUGGERS))
             .count();
+    }
+
+    public CarrierData getCarrierData() {
+        return carrierData;
+    }
+
+    @Override
+    public void readAdditionalSaveData(@NotNull CompoundTag compoundTag) {
+        super.readAdditionalSaveData(compoundTag);
+        carrierData.load(compoundTag);
+    }
+
+    @Override
+    public void addAdditionalSaveData(@NotNull CompoundTag compoundTag) {
+        super.addAdditionalSaveData(compoundTag);
+        carrierData.save(compoundTag);
     }
 
     @Override
