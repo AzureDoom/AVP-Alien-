@@ -1,13 +1,8 @@
 package com.alien.common.gameplay.block.jelly;
 
-import com.alien.common.registry.init.block.AlienBlocks;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.BlockParticleOption;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityEvent;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
@@ -62,11 +57,11 @@ public class JellyBlock extends Block {
         }
 
         // TODO: Jelly block slide sfx
-//        entity.playSound(SoundEvents.HONEY_BLOCK_SLIDE, 1.0F, 1.0F);
+        // entity.playSound(SoundEvents.HONEY_BLOCK_SLIDE, 1.0F, 1.0F);
 
         if (!level.isClientSide) {
             // TODO: Jelly block jump particles
-//            level.broadcastEntityEvent(entity, EntityEvent.HONEY_JUMP);
+            // level.broadcastEntityEvent(entity, EntityEvent.HONEY_JUMP);
         }
 
         if (entity.causeFallDamage(fallDistance, 0.2F, level.damageSources().fall())) {
@@ -115,12 +110,12 @@ public class JellyBlock extends Block {
         if (doesEntityDoSlideEffects(entity)) {
             if (level.random.nextInt(5) == 0) {
                 // TODO: Jelly block slide sfx
-//                entity.playSound(SoundEvents.HONEY_BLOCK_SLIDE, 1.0F, 1.0F);
+                // entity.playSound(SoundEvents.HONEY_BLOCK_SLIDE, 1.0F, 1.0F);
             }
 
             if (!level.isClientSide && level.random.nextInt(5) == 0) {
                 // TODO: Jelly block slide particles
-//                level.broadcastEntityEvent(entity, EntityEvent.HONEY_SLIDE);
+                // level.broadcastEntityEvent(entity, EntityEvent.HONEY_SLIDE);
             }
         }
     }

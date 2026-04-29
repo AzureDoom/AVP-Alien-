@@ -9,6 +9,7 @@ import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienBlockTags;
+import com.blib.api.common.block.v1.BlockBreakProgressManager;
 import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.goap.v1.GOAPUser;
@@ -47,7 +48,11 @@ public class Chrysalis extends Xenomorph implements GOAPUser<Chrysalis>, PathNav
 
     public static final float ROLL_STRAFE_SPEED_RATIO = 1.5F;
 
-    public static final int ROLL_SMASHED_STUN_TICKS = 36;
+    public static final int ROLL_SMASHED_STUN_TICKS_MIN = 28;
+
+    public static final int ROLL_SMASHED_STUN_TICKS_MAX = 44;
+
+    public static final float ROLL_SMASH_WALL_DAMAGE = 60F;
 
     public static AttributeSupplier.Builder createChrysalisAttributes() {
         return Alien.createAlienAttributes()
@@ -71,6 +76,8 @@ public class Chrysalis extends Xenomorph implements GOAPUser<Chrysalis>, PathNav
     public final DataAccessor<Boolean> rollWasSmashed;
 
     public final DataAccessor<Boolean> isStunned;
+
+    public final DataAccessor<Integer> stunDurationTicks;
 
     private int rollTicksRemaining;
 
@@ -96,6 +103,7 @@ public class Chrysalis extends Xenomorph implements GOAPUser<Chrysalis>, PathNav
         this.rollCooldownTicks = new DataAccessor<>(this, AlienDataSyncKeys.CHRYSALIS_ROLL_COOLDOWN_TICKS.get());
         this.rollWasSmashed = new DataAccessor<>(this, AlienDataSyncKeys.CHRYSALIS_ROLL_WAS_SMASHED.get());
         this.isStunned = new DataAccessor<>(this, AlienDataSyncKeys.CHRYSALIS_IS_STUNNED.get());
+        this.stunDurationTicks = new DataAccessor<>(this, AlienDataSyncKeys.CHRYSALIS_STUN_DURATION_TICKS.get());
         this.animationDispatcher = new ChrysalisAnimationDispatcher(this);
         this.pathNavigator = createPathNavigator(level);
         getXenomorphData().setParallelDigCount(2);
@@ -233,10 +241,59 @@ public class Chrysalis extends Xenomorph implements GOAPUser<Chrysalis>, PathNav
         setDeltaMovement(getDeltaMovement().scale(0.2));
 
         if (smashed) {
-            stunTicksRemaining = ROLL_SMASHED_STUN_TICKS;
+            var stunDuration = random.nextIntBetweenInclusive(ROLL_SMASHED_STUN_TICKS_MIN, ROLL_SMASHED_STUN_TICKS_MAX);
+            stunTicksRemaining = stunDuration;
+            stunDurationTicks.set(stunDuration);
             isStunned.set(true);
             getNavigation().stop();
+            damageWallOnSmash();
         }
+    }
+
+    private void damageWallOnSmash() {
+        var yawRad = rollYaw.get() * Mth.DEG_TO_RAD;
+        var forwardX = -Mth.sin(yawRad);
+        var forwardZ = Mth.cos(yawRad);
+        var rightX = Mth.cos(yawRad);
+        var rightZ = Mth.sin(yawRad);
+
+        var feetY = blockPosition().getY();
+        var heightBlocks = Math.max(1, (int) Math.ceil(getBbHeight()));
+        var centerX = getX() + forwardX;
+        var centerZ = getZ() + forwardZ;
+
+        for (var dy = 0; dy < heightBlocks; dy++) {
+            var y = feetY + dy;
+
+            for (var dr = -1; dr <= 1; dr++) {
+                var px = centerX + rightX * dr;
+                var pz = centerZ + rightZ * dr;
+                var pos = BlockPos.containing(px, y, pz);
+
+                if (!level().getBlockState(pos).isAir()) {
+                    BlockBreakProgressManager.damage(level(), pos, ROLL_SMASH_WALL_DAMAGE);
+                }
+            }
+        }
+    }
+
+    private static final double ROLL_WALL_PROBE_DISTANCE = 0.5;
+
+    private boolean hasWallAhead(double forwardX, double forwardZ) {
+        var probeX = getX() + forwardX * (getBbWidth() / 2 + ROLL_WALL_PROBE_DISTANCE);
+        var probeZ = getZ() + forwardZ * (getBbWidth() / 2 + ROLL_WALL_PROBE_DISTANCE);
+        var heightBlocks = Math.max(1, (int) Math.ceil(getBbHeight()));
+        var feetY = blockPosition().getY();
+
+        for (var dy = 0; dy < heightBlocks; dy++) {
+            var pos = BlockPos.containing(probeX, feetY + dy, probeZ);
+
+            if (!level().getBlockState(pos).getCollisionShape(level(), pos).isEmpty()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public boolean isRollCooldownReady() {
@@ -321,7 +378,7 @@ public class Chrysalis extends Xenomorph implements GOAPUser<Chrysalis>, PathNav
             return;
         }
 
-        if (horizontalCollision) {
+        if (horizontalCollision || hasWallAhead(forwardX, forwardZ)) {
             endRoll(true);
             return;
         }

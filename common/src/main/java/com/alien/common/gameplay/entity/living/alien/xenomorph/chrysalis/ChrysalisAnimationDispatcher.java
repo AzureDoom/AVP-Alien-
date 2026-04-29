@@ -110,6 +110,19 @@ public class ChrysalisAnimationDispatcher {
         ROLL_SMASHED.dispatchForEntity(chrysalis);
     }
 
+    public void rollSmashed(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.BODY_TRACK_NAME,
+            ChrysalisAnimationRefs.ROLL_SMASHED_ANIMATION_NAME,
+            AzPlayBehaviors.HOLD_ON_LAST_FRAME,
+            0F,
+            speed,
+            0F,
+            0F,
+            false
+        ).dispatchForEntity(chrysalis);
+    }
+
     public void biteAttack() {
         BITEATTACK.dispatchForEntity(chrysalis);
     }

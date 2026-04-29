@@ -66,7 +66,8 @@ public class ChrysalisAnimator extends AzEntityAnimator<Chrysalis> {
 
         if (wasRolling) {
             if (chrysalis.rollWasSmashed.get()) {
-                dispatcher.rollSmashed();
+                var speed = calculateStunSpeed(chrysalis);
+                dispatcher.rollSmashed(speed);
             } else {
                 dispatcher.rollStop();
             }
@@ -113,6 +114,18 @@ public class ChrysalisAnimator extends AzEntityAnimator<Chrysalis> {
         }
 
         animFunction.run();
+    }
+
+    private float calculateStunSpeed(Chrysalis chrysalis) {
+        var durationInTicks = chrysalis.stunDurationTicks.get();
+
+        if (durationInTicks <= 0) {
+            return 1.0f;
+        }
+
+        var animation = getAnimation(chrysalis, ChrysalisAnimationRefs.ROLL_SMASHED_ANIMATION_NAME);
+
+        return (float) (animation.length() / durationInTicks);
     }
 
     private float calculateAttackSpeed(Chrysalis chrysalis, XenomorphAttackType attackType) {

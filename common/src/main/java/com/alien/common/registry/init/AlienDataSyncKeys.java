@@ -153,6 +153,12 @@ public class AlienDataSyncKeys {
             .build(false)
     );
 
+    public static final BLibHolder<DataSyncKey<Integer>> CHRYSALIS_STUN_DURATION_TICKS = create(
+        "chrysalis_stun_duration_ticks",
+        builder -> builder.networkSynchronized(StreamCodecs.INT)
+            .build(0)
+    );
+
     public static final BLibHolder<DataSyncKey<CrusherAttackType>> CRUSHER_ATTACK_TYPE = create(
         "crusher_attack_type",
         builder -> builder.networkSynchronized(CrusherAttackType.CODEC)
