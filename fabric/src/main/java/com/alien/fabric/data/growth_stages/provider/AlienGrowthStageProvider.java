@@ -15,7 +15,6 @@ public class AlienGrowthStageProvider {
 
     public static void provide(BiConsumer<String, GrowthStage> biConsumer) {
         provideBaseGrowthStages(biConsumer);
-        provideBursterGrowthStages(biConsumer);
         provideRunnerGrowthStages(biConsumer);
         provideMetamorphosisStages(biConsumer);
         provideScourgeStages(biConsumer);
@@ -94,18 +93,6 @@ public class AlienGrowthStageProvider {
         );
     }
 
-    private static void provideBursterGrowthStages(BiConsumer<String, GrowthStage> biConsumer) {
-        biConsumer.accept(
-            "adolescent_to_burster",
-            new GrowthStage(
-                AlienEntityTypeTags.BURSTER_HOSTS,
-                AlienEntityTypes.ADOLESCENT.get(),
-                AlienEntityTypes.BURSTER.get(),
-                GrowthConstants.ADOLESCENT_GROWTH_TIME_IN_TICKS / 2
-            )
-        );
-    }
-
     private static void provideRunnerGrowthStages(BiConsumer<String, GrowthStage> biConsumer) {
         biConsumer.accept(
             "adolescent_to_runner",
@@ -140,10 +127,6 @@ public class AlienGrowthStageProvider {
             new GrowthStage(AlienEntityTypes.PRAETORIAN.get(), AlienEntityTypes.QUEEN.get(), metamorphosis)
         );
         biConsumer.accept(
-            "burster_to_prowler",
-            new GrowthStage(AlienEntityTypes.BURSTER.get(), AlienEntityTypes.PROWLER.get(), metamorphosis)
-        );
-        biConsumer.accept(
             "runner_to_prowler",
             new GrowthStage(AlienEntityTypes.RUNNER.get(), AlienEntityTypes.PROWLER.get(), metamorphosis)
         );
@@ -172,6 +155,10 @@ public class AlienGrowthStageProvider {
         biConsumer.accept(
             "drone_to_carrier",
             new GrowthStage(AlienEntityTypes.DRONE.get(), AlienEntityTypes.CARRIER.get(), scourge)
+        );
+        biConsumer.accept(
+            "runner_to_burster",
+            new GrowthStage(AlienEntityTypes.RUNNER.get(), AlienEntityTypes.BURSTER.get(), scourge)
         );
         biConsumer.accept(
             "prowler_to_chrysalis",

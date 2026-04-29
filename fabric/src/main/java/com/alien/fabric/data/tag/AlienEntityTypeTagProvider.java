@@ -40,7 +40,6 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
         addHiveAliens();
         addHiveLayerSpawns();
         addScourgeAliens();
-        addBursterHosts();
         addRunnerHosts();
         addHosts();
         addIrradiatedAliens();
@@ -252,7 +251,6 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
 
     private void addHosts() {
         getOrCreateTagBuilder(AlienEntityTypeTags.HOSTS)
-            .addTag(AlienEntityTypeTags.BURSTER_HOSTS)
             .addTag(AlienEntityTypeTags.RUNNER_HOSTS)
             .addOptionalTag(EntityTypeTags.ILLAGER)
             .add(
@@ -476,32 +474,12 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
 
     private void addScourgeAliens() {
         getOrCreateTagBuilder(AlienEntityTypeTags.SCOURGE_ALIENS)
+            .addTag(AlienEntityTypeTags.BURSTERS)
             .addTag(AlienEntityTypeTags.CARRIERS)
             .addTag(AlienEntityTypeTags.CHRYSALISES)
             .addTag(AlienEntityTypeTags.HARBINGERS)
             .addTag(AlienEntityTypeTags.RAVAGERS)
             .addTag(AlienEntityTypeTags.RAZOR_CLAWS);
-    }
-
-    private void addBursterHosts() {
-        getOrCreateTagBuilder(AlienEntityTypeTags.BURSTER_HOSTS)
-            .add(
-                EntityType.CAMEL,
-                EntityType.COW,
-                EntityType.DONKEY,
-                EntityType.FOX,
-                EntityType.GOAT,
-                EntityType.HORSE,
-                EntityType.MOOSHROOM,
-                EntityType.MULE,
-                EntityType.PANDA,
-                EntityType.PIG,
-                EntityType.POLAR_BEAR,
-                EntityType.RAVAGER,
-                EntityType.SHEEP,
-                EntityType.SNIFFER,
-                EntityType.WOLF
-            );
     }
 
     private void addBursters() {

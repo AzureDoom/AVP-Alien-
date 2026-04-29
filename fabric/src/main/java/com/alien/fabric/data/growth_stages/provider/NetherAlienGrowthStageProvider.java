@@ -15,7 +15,6 @@ public class NetherAlienGrowthStageProvider {
 
     public static void provide(BiConsumer<String, GrowthStage> biConsumer) {
         provideBaseNetherGrowthStages(biConsumer);
-        provideBursterNetherGrowthStages(biConsumer);
         provideRunnerNetherGrowthStages(biConsumer);
         provideNetherMetamorphosisStages(biConsumer);
         provideNetherScourgeStages(biConsumer);
@@ -94,18 +93,6 @@ public class NetherAlienGrowthStageProvider {
         );
     }
 
-    private static void provideBursterNetherGrowthStages(BiConsumer<String, GrowthStage> biConsumer) {
-        biConsumer.accept(
-            "nether_adolescent_to_nether_burster",
-            new GrowthStage(
-                AlienEntityTypeTags.BURSTER_HOSTS,
-                AlienEntityTypes.NETHER_ADOLESCENT.get(),
-                AlienEntityTypes.NETHER_BURSTER.get(),
-                GrowthConstants.ADOLESCENT_GROWTH_TIME_IN_TICKS / 2
-            )
-        );
-    }
-
     private static void provideRunnerNetherGrowthStages(BiConsumer<String, GrowthStage> biConsumer) {
         biConsumer.accept(
             "nether_adolescent_to_nether_runner",
@@ -140,10 +127,6 @@ public class NetherAlienGrowthStageProvider {
             new GrowthStage(AlienEntityTypes.NETHER_PRAETORIAN.get(), AlienEntityTypes.NETHER_QUEEN.get(), metamorphosis)
         );
         biConsumer.accept(
-            "nether_burster_to_nether_prowler",
-            new GrowthStage(AlienEntityTypes.NETHER_BURSTER.get(), AlienEntityTypes.NETHER_PROWLER.get(), metamorphosis)
-        );
-        biConsumer.accept(
             "nether_runner_to_nether_prowler",
             new GrowthStage(AlienEntityTypes.NETHER_RUNNER.get(), AlienEntityTypes.NETHER_PROWLER.get(), metamorphosis)
         );
@@ -172,6 +155,10 @@ public class NetherAlienGrowthStageProvider {
         biConsumer.accept(
             "nether_drone_to_nether_carrier",
             new GrowthStage(AlienEntityTypes.NETHER_DRONE.get(), AlienEntityTypes.NETHER_CARRIER.get(), scourge)
+        );
+        biConsumer.accept(
+            "nether_runner_to_nether_burster",
+            new GrowthStage(AlienEntityTypes.NETHER_RUNNER.get(), AlienEntityTypes.NETHER_BURSTER.get(), scourge)
         );
         biConsumer.accept(
             "nether_prowler_to_nether_chrysalis",

@@ -15,7 +15,6 @@ public class AberrantAlienGrowthStageProvider {
 
     public static void provide(BiConsumer<String, GrowthStage> biConsumer) {
         provideBaseAberrantGrowthStages(biConsumer);
-        provideBursterAberrantGrowthStages(biConsumer);
         provideRunnerAberrantGrowthStages(biConsumer);
         provideAberrantMetamorphosisStages(biConsumer);
         provideAberrantScourgeStages(biConsumer);
@@ -94,18 +93,6 @@ public class AberrantAlienGrowthStageProvider {
         );
     }
 
-    private static void provideBursterAberrantGrowthStages(BiConsumer<String, GrowthStage> biConsumer) {
-        biConsumer.accept(
-            "aberrant_adolescent_to_aberrant_burster",
-            new GrowthStage(
-                AlienEntityTypeTags.BURSTER_HOSTS,
-                AlienEntityTypes.ABERRANT_ADOLESCENT.get(),
-                AlienEntityTypes.ABERRANT_BURSTER.get(),
-                GrowthConstants.ADOLESCENT_GROWTH_TIME_IN_TICKS / 2
-            )
-        );
-    }
-
     private static void provideRunnerAberrantGrowthStages(BiConsumer<String, GrowthStage> biConsumer) {
         biConsumer.accept(
             "aberrant_adolescent_to_aberrant_runner",
@@ -140,10 +127,6 @@ public class AberrantAlienGrowthStageProvider {
             new GrowthStage(AlienEntityTypes.ABERRANT_PRAETORIAN.get(), AlienEntityTypes.ABERRANT_QUEEN.get(), metamorphosis)
         );
         biConsumer.accept(
-            "aberrant_burster_to_aberrant_prowler",
-            new GrowthStage(AlienEntityTypes.ABERRANT_BURSTER.get(), AlienEntityTypes.ABERRANT_PROWLER.get(), metamorphosis)
-        );
-        biConsumer.accept(
             "aberrant_runner_to_aberrant_prowler",
             new GrowthStage(AlienEntityTypes.ABERRANT_RUNNER.get(), AlienEntityTypes.ABERRANT_PROWLER.get(), metamorphosis)
         );
@@ -172,6 +155,10 @@ public class AberrantAlienGrowthStageProvider {
         biConsumer.accept(
             "aberrant_drone_to_aberrant_carrier",
             new GrowthStage(AlienEntityTypes.ABERRANT_DRONE.get(), AlienEntityTypes.ABERRANT_CARRIER.get(), scourge)
+        );
+        biConsumer.accept(
+            "aberrant_runner_to_aberrant_burster",
+            new GrowthStage(AlienEntityTypes.ABERRANT_RUNNER.get(), AlienEntityTypes.ABERRANT_BURSTER.get(), scourge)
         );
         biConsumer.accept(
             "aberrant_prowler_to_aberrant_chrysalis",

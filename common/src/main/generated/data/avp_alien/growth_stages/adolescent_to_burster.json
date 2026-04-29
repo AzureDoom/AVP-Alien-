@@ -1,6 +1,0 @@
-{
-  "from": "avp_alien:adolescent",
-  "growthTimeInTicks": 3000,
-  "hostTypePredicate": "#avp_alien:burster_hosts",
-  "to": "avp_alien:burster"
-}

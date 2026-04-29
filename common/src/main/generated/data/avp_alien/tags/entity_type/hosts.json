@@ -1,6 +1,5 @@
 {
   "values": [
-    "#avp_alien:burster_hosts",
     "#avp_alien:runner_hosts",
     {
       "id": "#minecraft:illager",
