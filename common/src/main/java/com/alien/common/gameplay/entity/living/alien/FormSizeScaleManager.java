@@ -28,6 +28,12 @@ public class FormSizeScaleManager implements NBTSerializable {
         this.entity = entity;
         this.elapsedTicks = 0;
         this.dataCacheDirty = true;
+
+        var data = getData();
+
+        if (data != null) {
+            applyScaleModifier(data);
+        }
     }
 
     public void tick() {
