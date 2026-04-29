@@ -23,15 +23,29 @@ import com.blib.api.common.pathfinding.v1.terrain.TerrainClassifiers;
 import com.blib.api.common.pathfinding.v1.terrain.TerrainType;
 import com.just.goap.Agent;
 import com.just.goap.graph.Graph;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseFireBlock;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 public class Chrysalis extends Xenomorph implements GOAPUser<Chrysalis>, PathNavigatorUser {
 
     private static final float MAX_BREAKABLE_DESTROY_TIME = 6.0F;
+
+    public static final int ROLL_DURATION_TICKS = 100;
+
+    public static final int ROLL_COOLDOWN_TICKS = 600;
+
+    public static final float ROLL_SPEED_MULTIPLIER = 1.5F;
+
+    public static final float ROLL_STRAFE_SPEED_RATIO = 1.5F;
 
     public static AttributeSupplier.Builder createChrysalisAttributes() {
         return Alien.createAlienAttributes()
@@ -46,6 +60,24 @@ public class Chrysalis extends Xenomorph implements GOAPUser<Chrysalis>, PathNav
 
     public final DataAccessor<XenomorphAttackType> attackType;
 
+    public final DataAccessor<Boolean> isRolling;
+
+    public final DataAccessor<Float> rollYaw;
+
+    public final DataAccessor<Integer> rollCooldownTicks;
+
+    public final DataAccessor<Boolean> rollWasSmashed;
+
+    private int rollTicksRemaining;
+
+    private double previousRollDistanceSqr = -1.0;
+
+    private int rollMovingAwayTicks = 0;
+
+    private @Nullable BlockPos lastRollFirePos = null;
+
+    private static final int ROLL_MOVING_AWAY_TICK_LIMIT = 5;
+
     private final ChrysalisAnimationDispatcher animationDispatcher;
 
     private final PathNavigator pathNavigator;
@@ -53,6 +85,10 @@ public class Chrysalis extends Xenomorph implements GOAPUser<Chrysalis>, PathNav
     public Chrysalis(EntityType<? extends Chrysalis> entityType, Level level) {
         super(entityType, level);
         this.attackType = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_ATTACK_TYPE.get());
+        this.isRolling = new DataAccessor<>(this, AlienDataSyncKeys.CHRYSALIS_IS_ROLLING.get());
+        this.rollYaw = new DataAccessor<>(this, AlienDataSyncKeys.CHRYSALIS_ROLL_YAW.get());
+        this.rollCooldownTicks = new DataAccessor<>(this, AlienDataSyncKeys.CHRYSALIS_ROLL_COOLDOWN_TICKS.get());
+        this.rollWasSmashed = new DataAccessor<>(this, AlienDataSyncKeys.CHRYSALIS_ROLL_WAS_SMASHED.get());
         this.animationDispatcher = new ChrysalisAnimationDispatcher(this);
         this.pathNavigator = createPathNavigator(level);
         getXenomorphData().setParallelDigCount(2);
@@ -149,6 +185,220 @@ public class Chrysalis extends Xenomorph implements GOAPUser<Chrysalis>, PathNav
     @Override
     public boolean isPushable() {
         return false;
+    }
+
+    public void startRoll(float yaw) {
+        rollYaw.set(yaw);
+        rollWasSmashed.set(false);
+        isRolling.set(true);
+        rollTicksRemaining = ROLL_DURATION_TICKS;
+        previousRollDistanceSqr = -1.0;
+        rollMovingAwayTicks = 0;
+        lastRollFirePos = null;
+        setYRot(yaw);
+        setYHeadRot(yaw);
+        setYBodyRot(yaw);
+        getNavigation().stop();
+        playSound(
+            AlienSoundEvents.ENTITY_XENOMORPH_LUNGE.get(),
+            getSoundVolume(),
+            (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F
+        );
+    }
+
+    public void endRoll(boolean smashed) {
+        rollWasSmashed.set(smashed);
+        isRolling.set(false);
+        rollTicksRemaining = 0;
+        rollCooldownTicks.set(ROLL_COOLDOWN_TICKS);
+        setDeltaMovement(getDeltaMovement().scale(0.2));
+    }
+
+    public boolean isRollCooldownReady() {
+        return rollCooldownTicks.get() <= 0;
+    }
+
+    public int getRollTicksRemaining() {
+        return rollTicksRemaining;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        if (!level().isClientSide) {
+            tickRollState();
+        }
+    }
+
+    private void tickRollState() {
+        var cooldown = rollCooldownTicks.get();
+
+        if (cooldown > 0) {
+            rollCooldownTicks.set(cooldown - 1);
+        }
+
+        if (!isRolling.get()) {
+            return;
+        }
+
+        if (rollTicksRemaining > 0) {
+            rollTicksRemaining--;
+        }
+
+        var yaw = rollYaw.get();
+
+        setYRot(yaw);
+        setYHeadRot(yaw);
+        setYBodyRot(yaw);
+        getNavigation().stop();
+
+        var yawRad = yaw * Mth.DEG_TO_RAD;
+        var forwardX = -Mth.sin(yawRad);
+        var forwardZ = Mth.cos(yawRad);
+        var rightX = Mth.cos(yawRad);
+        var rightZ = Mth.sin(yawRad);
+        var speed = Math.max(0.5, getAttributeValue(Attributes.MOVEMENT_SPEED) * ROLL_SPEED_MULTIPLIER);
+        var strafeSpeed = speed * ROLL_STRAFE_SPEED_RATIO;
+        var strafeFactor = computeStrafeFactor(rightX, rightZ);
+        var current = getDeltaMovement();
+
+        var velX = forwardX * speed + rightX * strafeSpeed * strafeFactor;
+        var velZ = forwardZ * speed + rightZ * strafeSpeed * strafeFactor;
+
+        setDeltaMovement(velX, current.y, velZ);
+
+        if (getVariant() == AlienVariant.NETHER) {
+            leaveFireTrail();
+        }
+
+        var victim = findRollVictim();
+
+        if (victim != null) {
+            applyDirectionalKnockback(victim);
+            swing(InteractionHand.MAIN_HAND);
+            doHurtTarget(victim);
+            endRoll(false);
+            return;
+        }
+
+        if (horizontalCollision) {
+            endRoll(true);
+            return;
+        }
+
+        if (isMovingAwayFromTarget()) {
+            endRoll(false);
+            return;
+        }
+
+        if (rollTicksRemaining <= 0) {
+            endRoll(false);
+        }
+    }
+
+    private boolean isMovingAwayFromTarget() {
+        var target = getTarget();
+
+        if (target == null) {
+            previousRollDistanceSqr = -1.0;
+            rollMovingAwayTicks = 0;
+            return false;
+        }
+
+        var currentDistanceSqr = distanceToSqr(target);
+
+        if (previousRollDistanceSqr < 0) {
+            previousRollDistanceSqr = currentDistanceSqr;
+            return false;
+        }
+
+        if (currentDistanceSqr > previousRollDistanceSqr) {
+            rollMovingAwayTicks++;
+        } else {
+            rollMovingAwayTicks = 0;
+        }
+
+        previousRollDistanceSqr = currentDistanceSqr;
+
+        return rollMovingAwayTicks >= ROLL_MOVING_AWAY_TICK_LIMIT;
+    }
+
+    private double computeStrafeFactor(double rightX, double rightZ) {
+        var target = getTarget();
+
+        if (target == null) {
+            return 0.0;
+        }
+
+        var toTargetX = target.getX() - getX();
+        var toTargetZ = target.getZ() - getZ();
+        var rightProjection = toTargetX * rightX + toTargetZ * rightZ;
+
+        return Math.max(-1.0, Math.min(1.0, rightProjection / 5.0));
+    }
+
+    private void leaveFireTrail() {
+        var currentPos = blockPosition();
+        var trailPos = lastRollFirePos;
+
+        lastRollFirePos = currentPos;
+
+        if (trailPos == null || trailPos.equals(currentPos)) {
+            return;
+        }
+
+        if (level().isEmptyBlock(trailPos) && BaseFireBlock.canBePlacedAt(level(), trailPos, getDirection())) {
+            level().setBlockAndUpdate(trailPos, BaseFireBlock.getState(level(), trailPos));
+        }
+    }
+
+    private @Nullable LivingEntity findRollVictim() {
+        var target = getTarget();
+
+        if (target == null || !target.isAlive()) {
+            return null;
+        }
+
+        var bounds = getBoundingBox().inflate(0.2);
+
+        return bounds.intersects(target.getBoundingBox()) ? target : null;
+    }
+
+    private static final float ROLL_HEAD_ON_CONE_DEGREES = 30F;
+
+    private static final double ROLL_KNOCKBACK_STRENGTH = 1.5;
+
+    private void applyDirectionalKnockback(LivingEntity victim) {
+        var yawRad = rollYaw.get() * Mth.DEG_TO_RAD;
+        var forward = new Vec3(-Mth.sin(yawRad), 0, Mth.cos(yawRad));
+        var right = new Vec3(Mth.cos(yawRad), 0, Mth.sin(yawRad));
+
+        var hitVec = victim.position().subtract(position());
+        var hitFlat = new Vec3(hitVec.x, 0, hitVec.z);
+
+        Vec3 kbDir;
+
+        if (hitFlat.lengthSqr() < 1.0E-4) {
+            kbDir = forward;
+        } else {
+            var hitDir = hitFlat.normalize();
+            var forwardComponent = hitDir.dot(forward);
+            var rightComponent = hitDir.dot(right);
+            var angleFromForward = Math.toDegrees(Math.atan2(rightComponent, forwardComponent));
+
+            if (Math.abs(angleFromForward) <= ROLL_HEAD_ON_CONE_DEGREES) {
+                kbDir = forward;
+            } else if (rightComponent > 0) {
+                kbDir = right;
+            } else {
+                kbDir = right.scale(-1);
+            }
+        }
+
+        victim.knockback(ROLL_KNOCKBACK_STRENGTH, -kbDir.x, -kbDir.z);
+        victim.setDeltaMovement(victim.getDeltaMovement().add(0, 0.3, 0));
+        victim.hurtMarked = true;
     }
 
     public ChrysalisAnimationDispatcher getAnimationDispatcher() {

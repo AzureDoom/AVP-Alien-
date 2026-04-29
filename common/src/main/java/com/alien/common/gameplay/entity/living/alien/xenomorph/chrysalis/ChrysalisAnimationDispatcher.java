@@ -48,6 +48,30 @@ public class ChrysalisAnimationDispatcher {
         AzPlayBehaviors.LOOP
     );
 
+    private static final AzCommand ROLL_START = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        ChrysalisAnimationRefs.ROLL_START_ANIMATION_NAME,
+        AzPlayBehaviors.PLAY_ONCE
+    );
+
+    private static final AzCommand ROLL_LOOP = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        ChrysalisAnimationRefs.ROLL_LOOP_ANIMATION_NAME,
+        AzPlayBehaviors.LOOP
+    );
+
+    private static final AzCommand ROLL_STOP = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        ChrysalisAnimationRefs.ROLL_STOP_ANIMATION_NAME,
+        AzPlayBehaviors.PLAY_ONCE
+    );
+
+    private static final AzCommand ROLL_SMASHED = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        ChrysalisAnimationRefs.ROLL_SMASHED_ANIMATION_NAME,
+        AzPlayBehaviors.PLAY_ONCE
+    );
+
     private final Chrysalis chrysalis;
 
     public ChrysalisAnimationDispatcher(Chrysalis chrysalis) {
@@ -68,6 +92,22 @@ public class ChrysalisAnimationDispatcher {
 
     public void walk() {
         WALK.dispatchForEntity(chrysalis);
+    }
+
+    public void rollStart() {
+        ROLL_START.dispatchForEntity(chrysalis);
+    }
+
+    public void rollLoop() {
+        ROLL_LOOP.dispatchForEntity(chrysalis);
+    }
+
+    public void rollStop() {
+        ROLL_STOP.dispatchForEntity(chrysalis);
+    }
+
+    public void rollSmashed() {
+        ROLL_SMASHED.dispatchForEntity(chrysalis);
     }
 
     public void biteAttack() {

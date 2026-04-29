@@ -15,4 +15,12 @@ public class ChrysalisAnimationRefs {
     public static final String ATTACKCLAW_ANIMATION_NAME = "attackclaw";
 
     public static final String ATTACKTAIL_ANIMATION_NAME = "attacktail";
+
+    public static final String ROLL_START_ANIMATION_NAME = "roll.start";
+
+    public static final String ROLL_LOOP_ANIMATION_NAME = "roll.loop";
+
+    public static final String ROLL_STOP_ANIMATION_NAME = "roll.stop";
+
+    public static final String ROLL_SMASHED_ANIMATION_NAME = "roll.smashed";
 }

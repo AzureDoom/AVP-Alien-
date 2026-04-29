@@ -69,9 +69,14 @@ public class XenomorphGOAP {
     }
 
     public static <T extends Xenomorph> Graph.Builder<T> addCombatPackage(Graph.Builder<T> graphBuilder) {
+        addCombatPackageWithoutMove(graphBuilder);
+        graphBuilder.addAction(CombatActions.MOVE_TO_TARGET);
+        return graphBuilder;
+    }
+
+    public static <T extends Xenomorph> Graph.Builder<T> addCombatPackageWithoutMove(Graph.Builder<T> graphBuilder) {
         graphBuilder.addGoal(CombatGoals.KILL_TARGET);
 
-        graphBuilder.addAction(CombatActions.MOVE_TO_TARGET);
         graphBuilder.addAction(CombatActions.MELEE_ATTACK);
 
         graphBuilder.addSensor(

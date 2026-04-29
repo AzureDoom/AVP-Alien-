@@ -20,6 +20,10 @@ public class ChrysalisAnimator extends AzEntityAnimator<Chrysalis> {
 
     private int previousAttackId = Integer.MIN_VALUE;
 
+    private boolean wasRolling = false;
+
+    private int rollAnimationTicks = 0;
+
     public ChrysalisAnimator() {
         super(AzAnimatorConfig.defaultConfig());
     }
@@ -47,6 +51,29 @@ public class ChrysalisAnimator extends AzEntityAnimator<Chrysalis> {
 
     private void runPassiveAnimations(Chrysalis chrysalis) {
         var dispatcher = chrysalis.getAnimationDispatcher();
+
+        if (chrysalis.isRolling.get()) {
+            if (!wasRolling) {
+                dispatcher.rollStart();
+                rollAnimationTicks = 0;
+                wasRolling = true;
+            } else if (rollAnimationTicks > 10) {
+                dispatcher.rollLoop();
+            }
+            rollAnimationTicks++;
+            return;
+        }
+
+        if (wasRolling) {
+            if (chrysalis.rollWasSmashed.get()) {
+                dispatcher.rollSmashed();
+            } else {
+                dispatcher.rollStop();
+            }
+            wasRolling = false;
+            rollAnimationTicks = 0;
+            return;
+        }
 
         var attackType = chrysalis.attackType.get();
         var attackId = chrysalis.attackId.get();

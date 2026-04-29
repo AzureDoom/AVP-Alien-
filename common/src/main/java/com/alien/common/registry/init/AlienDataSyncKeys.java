@@ -122,6 +122,31 @@ public class AlienDataSyncKeys {
             .build(0)
     );
 
+    public static final BLibHolder<DataSyncKey<Boolean>> CHRYSALIS_IS_ROLLING = create(
+        "chrysalis_is_rolling",
+        builder -> builder.networkSynchronized(StreamCodecs.BOOLEAN)
+            .build(false)
+    );
+
+    public static final BLibHolder<DataSyncKey<Float>> CHRYSALIS_ROLL_YAW = create(
+        "chrysalis_roll_yaw",
+        builder -> builder.networkSynchronized(StreamCodecs.FLOAT)
+            .build(0F)
+    );
+
+    public static final BLibHolder<DataSyncKey<Integer>> CHRYSALIS_ROLL_COOLDOWN_TICKS = create(
+        "chrysalis_roll_cooldown_ticks",
+        builder -> builder.networkSynchronized(StreamCodecs.INT)
+            .persistent("rollCooldownTicks", Codec.INT)
+            .build(0)
+    );
+
+    public static final BLibHolder<DataSyncKey<Boolean>> CHRYSALIS_ROLL_WAS_SMASHED = create(
+        "chrysalis_roll_was_smashed",
+        builder -> builder.networkSynchronized(StreamCodecs.BOOLEAN)
+            .build(false)
+    );
+
     public static final BLibHolder<DataSyncKey<CrusherAttackType>> CRUSHER_ATTACK_TYPE = create(
         "crusher_attack_type",
         builder -> builder.networkSynchronized(CrusherAttackType.CODEC)
