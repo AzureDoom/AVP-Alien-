@@ -29,24 +29,6 @@ public class CarrierAnimator extends AzEntityAnimator<Carrier> {
         animationTrackContainer.add(
             AzAnimationTrack.builder(this, AzAlienAnimationUtil.BODY_TRACK_NAME)
                 .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.HEAD_TRACK_NAME)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_ARM_TRACK_NAME)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_LEG_TRACK_NAME)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_LEG_TRACK_NAME)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.TAIL_TRACK_NAME)
-                .setTransitionLength(5)
                 .build()
         );
     }
@@ -75,7 +57,7 @@ public class CarrierAnimator extends AzEntityAnimator<Carrier> {
 
                 switch (attackType) {
                     case BITE -> dispatcher.biteAttack(speed);
-                    case CLAW -> dispatcher.rightClawAttack(speed);
+                    case CLAW -> dispatcher.clawAttack(speed);
                     case TAIL -> dispatcher.tailAttack(speed);
                 }
 
@@ -104,9 +86,9 @@ public class CarrierAnimator extends AzEntityAnimator<Carrier> {
 
     private float calculateAttackSpeed(Carrier carrier, XenomorphAttackType attackType) {
         var animationName = switch (attackType) {
-            case BITE -> CarrierAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME;
-            case CLAW -> CarrierAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME;
-            case TAIL -> CarrierAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME;
+            case BITE -> CarrierAnimationRefs.ATTACKBITE_ANIMATION_NAME;
+            case CLAW -> CarrierAnimationRefs.ATTACKCLAW_ANIMATION_NAME;
+            case TAIL -> CarrierAnimationRefs.ATTACKTAIL_ANIMATION_NAME;
             default -> null;
         };
 
