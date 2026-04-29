@@ -2,6 +2,7 @@ package com.alien.client.render.entity;
 
 import com.alien.client.animation.entity.QueenAnimator;
 import com.alien.client.render.AlienRenderResourceCache;
+import com.alien.client.render.layer.MoltLayer;
 import com.alien.client.render.layer.RadiationGlowLayer;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
 import com.alien.common.model.alien.variant.AlienVariant;
@@ -23,6 +24,7 @@ public class QueenRenderer extends AzEntityRenderer<Queen> {
                 .setRenderType(QueenRenderer::renderType)
                 .setAnimatorProvider(QueenAnimator::new)
                 .addRenderLayer(new RadiationGlowLayer<>())
+                .addRenderLayer(new MoltLayer<>())
                 .setShadowRadius(1F)
                 .build(),
             context

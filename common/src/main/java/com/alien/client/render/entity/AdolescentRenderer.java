@@ -2,6 +2,7 @@ package com.alien.client.render.entity;
 
 import com.alien.client.animation.entity.AdolescentAnimator;
 import com.alien.client.render.AlienRenderResourceCache;
+import com.alien.client.render.layer.MoltLayer;
 import com.alien.common.gameplay.entity.living.alien.adolescent.Adolescent;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.blib.api.client.render.v1.entity.AzEntityRenderer;
@@ -21,6 +22,7 @@ public class AdolescentRenderer extends AzEntityRenderer<Adolescent> {
             AzEntityRendererConfig.builder(AdolescentRenderer::modelLocation, AdolescentRenderer::textureLocation)
                 .setRenderType(AdolescentRenderer::renderType)
                 .setAnimatorProvider(AdolescentAnimator::new)
+                .addRenderLayer(new MoltLayer<>())
                 .build(),
             context
         );

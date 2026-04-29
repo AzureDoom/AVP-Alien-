@@ -2,6 +2,7 @@ package com.alien.client.render.entity;
 
 import com.alien.client.animation.entity.RavagerAnimator;
 import com.alien.client.render.AlienRenderResourceCache;
+import com.alien.client.render.layer.MoltLayer;
 import com.alien.client.render.layer.RadiationGlowLayer;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ravager.Ravager;
 import com.alien.common.model.alien.variant.AlienVariant;
@@ -23,6 +24,7 @@ public class RavagerRenderer extends AzEntityRenderer<Ravager> {
                 .setRenderType(RavagerRenderer::renderType)
                 .setAnimatorProvider(RavagerAnimator::new)
                 .addRenderLayer(new RadiationGlowLayer<>())
+                .addRenderLayer(new MoltLayer<>())
                 .setShadowRadius(0.5F)
                 .build(),
             context

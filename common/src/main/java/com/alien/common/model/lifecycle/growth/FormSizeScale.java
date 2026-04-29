@@ -5,11 +5,13 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 
+import java.util.List;
+
 public record FormSizeScale(
     EntityType<?> entityType,
     float startScale,
     float endScale,
-    int maturationTimeInTicks
+    List<MoltPhase> phases
 ) {
 
     public static final Codec<FormSizeScale> CODEC = RecordCodecBuilder.create(
@@ -17,20 +19,34 @@ public record FormSizeScale(
             BuiltInRegistries.ENTITY_TYPE.byNameCodec().fieldOf("entityType").forGetter(FormSizeScale::entityType),
             Codec.FLOAT.fieldOf("startScale").forGetter(FormSizeScale::startScale),
             Codec.FLOAT.fieldOf("endScale").forGetter(FormSizeScale::endScale),
-            Codec.INT.fieldOf("maturationTimeInTicks").forGetter(FormSizeScale::maturationTimeInTicks)
+            MoltPhase.CODEC.listOf().fieldOf("phases").forGetter(FormSizeScale::phases)
         ).apply(instance, FormSizeScale::new)
     );
 
-    public float computeScale(int elapsedTicks) {
-        if (maturationTimeInTicks <= 0) {
+    public int totalMaturationTicks() {
+        return phases.stream().mapToInt(MoltPhase::totalTicks).sum();
+    }
+
+    public float scaleForPhase(int phaseIndex) {
+        int phaseCount = phases.size();
+
+        if (phaseCount == 0) {
             return endScale;
         }
 
-        var progress = Math.min(1.0f, (float) elapsedTicks / maturationTimeInTicks);
-        return startScale + (endScale - startScale) * progress;
+        float fraction = (float) (phaseIndex + 1) / phaseCount;
+        return startScale + (endScale - startScale) * fraction;
     }
 
-    public boolean isFullyMatured(int elapsedTicks) {
-        return elapsedTicks >= maturationTimeInTicks;
+    public float scaleBeforePhase(int phaseIndex) {
+        if (phaseIndex <= 0) {
+            return startScale;
+        }
+
+        return scaleForPhase(phaseIndex - 1);
+    }
+
+    public boolean isFullyMatured(int phaseIndex) {
+        return phaseIndex >= phases.size();
     }
 }

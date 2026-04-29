@@ -15,7 +15,7 @@ public class NetherAlienFormSizeScaleProvider {
                 AlienEntityTypes.NETHER_CHESTBURSTER.get(),
                 FormSizeScaleConstants.CHESTBURSTER_START_SCALE,
                 FormSizeScaleConstants.CHESTBURSTER_END_SCALE,
-                FormSizeScaleConstants.CHESTBURSTER_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.CHESTBURSTER_PHASES
             )
         );
         biConsumer.accept(
@@ -24,7 +24,7 @@ public class NetherAlienFormSizeScaleProvider {
                 AlienEntityTypes.ROYAL_NETHER_CHESTBURSTER.get(),
                 FormSizeScaleConstants.CHESTBURSTER_START_SCALE,
                 FormSizeScaleConstants.CHESTBURSTER_END_SCALE,
-                FormSizeScaleConstants.CHESTBURSTER_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.CHESTBURSTER_PHASES
             )
         );
         biConsumer.accept(
@@ -33,7 +33,7 @@ public class NetherAlienFormSizeScaleProvider {
                 AlienEntityTypes.NETHER_PREDALIEN_CHESTBURSTER.get(),
                 FormSizeScaleConstants.CHESTBURSTER_START_SCALE,
                 FormSizeScaleConstants.CHESTBURSTER_END_SCALE,
-                FormSizeScaleConstants.CHESTBURSTER_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.CHESTBURSTER_PHASES
             )
         );
 
@@ -43,7 +43,7 @@ public class NetherAlienFormSizeScaleProvider {
                 AlienEntityTypes.NETHER_ADOLESCENT.get(),
                 FormSizeScaleConstants.ADOLESCENT_START_SCALE,
                 FormSizeScaleConstants.ADOLESCENT_END_SCALE,
-                FormSizeScaleConstants.ADOLESCENT_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.ADOLESCENT_PHASES
             )
         );
         biConsumer.accept(
@@ -52,7 +52,7 @@ public class NetherAlienFormSizeScaleProvider {
                 AlienEntityTypes.ROYAL_NETHER_ADOLESCENT.get(),
                 FormSizeScaleConstants.ADOLESCENT_START_SCALE,
                 FormSizeScaleConstants.ADOLESCENT_END_SCALE,
-                FormSizeScaleConstants.ADOLESCENT_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.ADOLESCENT_PHASES
             )
         );
         biConsumer.accept(
@@ -61,7 +61,7 @@ public class NetherAlienFormSizeScaleProvider {
                 AlienEntityTypes.NETHER_PREDALIEN_ADOLESCENT.get(),
                 FormSizeScaleConstants.ADOLESCENT_START_SCALE,
                 FormSizeScaleConstants.ADOLESCENT_END_SCALE,
-                FormSizeScaleConstants.ADOLESCENT_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.ADOLESCENT_PHASES
             )
         );
 
@@ -71,7 +71,7 @@ public class NetherAlienFormSizeScaleProvider {
                 AlienEntityTypes.NETHER_DRONE.get(),
                 FormSizeScaleConstants.DRONE_START_SCALE,
                 FormSizeScaleConstants.DRONE_END_SCALE,
-                FormSizeScaleConstants.DRONE_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.DRONE_PHASES
             )
         );
 
@@ -81,7 +81,7 @@ public class NetherAlienFormSizeScaleProvider {
                 AlienEntityTypes.NETHER_CARRIER.get(),
                 FormSizeScaleConstants.PRAETORIAN_START_SCALE,
                 FormSizeScaleConstants.PRAETORIAN_END_SCALE,
-                FormSizeScaleConstants.PRAETORIAN_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.PRAETORIAN_PHASES
             )
         );
 
@@ -91,7 +91,7 @@ public class NetherAlienFormSizeScaleProvider {
                 AlienEntityTypes.NETHER_CHRYSALIS.get(),
                 FormSizeScaleConstants.PRAETORIAN_START_SCALE,
                 FormSizeScaleConstants.PRAETORIAN_END_SCALE,
-                FormSizeScaleConstants.PRAETORIAN_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.PRAETORIAN_PHASES
             )
         );
 
@@ -101,7 +101,7 @@ public class NetherAlienFormSizeScaleProvider {
                 AlienEntityTypes.NETHER_PREDALIEN.get(),
                 FormSizeScaleConstants.PRAETORIAN_START_SCALE,
                 FormSizeScaleConstants.PRAETORIAN_END_SCALE,
-                FormSizeScaleConstants.PRAETORIAN_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.PRAETORIAN_PHASES
             )
         );
 
@@ -111,7 +111,7 @@ public class NetherAlienFormSizeScaleProvider {
                 AlienEntityTypes.NETHER_PRAETORIAN.get(),
                 FormSizeScaleConstants.PRAETORIAN_START_SCALE,
                 FormSizeScaleConstants.PRAETORIAN_END_SCALE,
-                FormSizeScaleConstants.PRAETORIAN_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.PRAETORIAN_PHASES
             )
         );
 
@@ -121,7 +121,7 @@ public class NetherAlienFormSizeScaleProvider {
                 AlienEntityTypes.NETHER_RAVAGER.get(),
                 FormSizeScaleConstants.PRAETORIAN_START_SCALE,
                 FormSizeScaleConstants.PRAETORIAN_END_SCALE,
-                FormSizeScaleConstants.PRAETORIAN_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.PRAETORIAN_PHASES
             )
         );
 
@@ -131,7 +131,7 @@ public class NetherAlienFormSizeScaleProvider {
                 AlienEntityTypes.NETHER_RAZOR_CLAW.get(),
                 FormSizeScaleConstants.PRAETORIAN_START_SCALE,
                 FormSizeScaleConstants.PRAETORIAN_END_SCALE,
-                FormSizeScaleConstants.PRAETORIAN_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.PRAETORIAN_PHASES
             )
         );
 
@@ -141,7 +141,7 @@ public class NetherAlienFormSizeScaleProvider {
                 AlienEntityTypes.NETHER_QUEEN.get(),
                 FormSizeScaleConstants.QUEEN_START_SCALE,
                 FormSizeScaleConstants.QUEEN_END_SCALE,
-                FormSizeScaleConstants.QUEEN_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.QUEEN_PHASES
             )
         );
     }

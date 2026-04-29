@@ -1,6 +1,19 @@
 {
   "endScale": 1.0,
   "entityType": "avp_alien:irradiated_queen",
-  "maturationTimeInTicks": 18000,
+  "phases": [
+    {
+      "idleTicks": 4400,
+      "moltTicks": 1600
+    },
+    {
+      "idleTicks": 4400,
+      "moltTicks": 1600
+    },
+    {
+      "idleTicks": 4400,
+      "moltTicks": 1600
+    }
+  ],
   "startScale": 0.85
 }

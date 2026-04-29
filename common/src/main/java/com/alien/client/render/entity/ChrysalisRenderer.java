@@ -2,6 +2,7 @@ package com.alien.client.render.entity;
 
 import com.alien.client.animation.entity.ChrysalisAnimator;
 import com.alien.client.render.AlienRenderResourceCache;
+import com.alien.client.render.layer.MoltLayer;
 import com.alien.client.render.layer.RadiationGlowLayer;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.chrysalis.Chrysalis;
 import com.alien.common.model.alien.variant.AlienVariant;
@@ -23,6 +24,7 @@ public class ChrysalisRenderer extends AzEntityRenderer<Chrysalis> {
                 .setRenderType(ChrysalisRenderer::renderType)
                 .setAnimatorProvider(ChrysalisAnimator::new)
                 .addRenderLayer(new RadiationGlowLayer<>())
+                .addRenderLayer(new MoltLayer<>())
                 .setShadowRadius(0.5F)
                 .build(),
             context

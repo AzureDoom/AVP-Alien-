@@ -3,6 +3,7 @@ package com.alien.client.render.entity;
 import com.alien.client.animation.entity.BoilerAnimator;
 import com.alien.client.render.AlienRenderResourceCache;
 import com.alien.client.render.layer.BoilGlowLayer;
+import com.alien.client.render.layer.MoltLayer;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.boiler.Boiler;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.blib.api.client.render.v1.entity.AzEntityRenderer;
@@ -23,6 +24,7 @@ public class BoilerRenderer extends AzEntityRenderer<Boiler> {
                 .setRenderType(BoilerRenderer::renderType)
                 .setAnimatorProvider(BoilerAnimator::new)
                 .addRenderLayer(new BoilGlowLayer<>())
+                .addRenderLayer(new MoltLayer<>())
                 .setShadowRadius(0.5F)
                 .build(),
             context

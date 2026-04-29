@@ -28,7 +28,7 @@ public class AlienFormSizeScaleProvider {
                 AlienEntityTypes.CHESTBURSTER.get(),
                 FormSizeScaleConstants.CHESTBURSTER_START_SCALE,
                 FormSizeScaleConstants.CHESTBURSTER_END_SCALE,
-                FormSizeScaleConstants.CHESTBURSTER_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.CHESTBURSTER_PHASES
             )
         );
         biConsumer.accept(
@@ -37,7 +37,7 @@ public class AlienFormSizeScaleProvider {
                 AlienEntityTypes.ROYAL_CHESTBURSTER.get(),
                 FormSizeScaleConstants.CHESTBURSTER_START_SCALE,
                 FormSizeScaleConstants.CHESTBURSTER_END_SCALE,
-                FormSizeScaleConstants.CHESTBURSTER_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.CHESTBURSTER_PHASES
             )
         );
         biConsumer.accept(
@@ -46,7 +46,7 @@ public class AlienFormSizeScaleProvider {
                 AlienEntityTypes.PREDALIEN_CHESTBURSTER.get(),
                 FormSizeScaleConstants.CHESTBURSTER_START_SCALE,
                 FormSizeScaleConstants.CHESTBURSTER_END_SCALE,
-                FormSizeScaleConstants.CHESTBURSTER_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.CHESTBURSTER_PHASES
             )
         );
     }
@@ -58,7 +58,7 @@ public class AlienFormSizeScaleProvider {
                 AlienEntityTypes.ADOLESCENT.get(),
                 FormSizeScaleConstants.ADOLESCENT_START_SCALE,
                 FormSizeScaleConstants.ADOLESCENT_END_SCALE,
-                FormSizeScaleConstants.ADOLESCENT_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.ADOLESCENT_PHASES
             )
         );
         biConsumer.accept(
@@ -67,7 +67,7 @@ public class AlienFormSizeScaleProvider {
                 AlienEntityTypes.ROYAL_ADOLESCENT.get(),
                 FormSizeScaleConstants.ADOLESCENT_START_SCALE,
                 FormSizeScaleConstants.ADOLESCENT_END_SCALE,
-                FormSizeScaleConstants.ADOLESCENT_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.ADOLESCENT_PHASES
             )
         );
         biConsumer.accept(
@@ -76,7 +76,7 @@ public class AlienFormSizeScaleProvider {
                 AlienEntityTypes.PREDALIEN_ADOLESCENT.get(),
                 FormSizeScaleConstants.ADOLESCENT_START_SCALE,
                 FormSizeScaleConstants.ADOLESCENT_END_SCALE,
-                FormSizeScaleConstants.ADOLESCENT_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.ADOLESCENT_PHASES
             )
         );
     }
@@ -88,7 +88,7 @@ public class AlienFormSizeScaleProvider {
                 AlienEntityTypes.DRONE.get(),
                 FormSizeScaleConstants.DRONE_START_SCALE,
                 FormSizeScaleConstants.DRONE_END_SCALE,
-                FormSizeScaleConstants.DRONE_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.DRONE_PHASES
             )
         );
         biConsumer.accept(
@@ -97,7 +97,7 @@ public class AlienFormSizeScaleProvider {
                 AlienEntityTypes.IRRADIATED_DRONE.get(),
                 FormSizeScaleConstants.DRONE_START_SCALE,
                 FormSizeScaleConstants.DRONE_END_SCALE,
-                FormSizeScaleConstants.DRONE_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.DRONE_PHASES
             )
         );
     }
@@ -109,7 +109,7 @@ public class AlienFormSizeScaleProvider {
                 AlienEntityTypes.CARRIER.get(),
                 FormSizeScaleConstants.PRAETORIAN_START_SCALE,
                 FormSizeScaleConstants.PRAETORIAN_END_SCALE,
-                FormSizeScaleConstants.PRAETORIAN_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.PRAETORIAN_PHASES
             )
         );
         biConsumer.accept(
@@ -118,7 +118,7 @@ public class AlienFormSizeScaleProvider {
                 AlienEntityTypes.IRRADIATED_CARRIER.get(),
                 FormSizeScaleConstants.PRAETORIAN_START_SCALE,
                 FormSizeScaleConstants.PRAETORIAN_END_SCALE,
-                FormSizeScaleConstants.PRAETORIAN_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.PRAETORIAN_PHASES
             )
         );
     }
@@ -130,7 +130,7 @@ public class AlienFormSizeScaleProvider {
                 AlienEntityTypes.CHRYSALIS.get(),
                 FormSizeScaleConstants.PRAETORIAN_START_SCALE,
                 FormSizeScaleConstants.PRAETORIAN_END_SCALE,
-                FormSizeScaleConstants.PRAETORIAN_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.PRAETORIAN_PHASES
             )
         );
         biConsumer.accept(
@@ -139,7 +139,7 @@ public class AlienFormSizeScaleProvider {
                 AlienEntityTypes.IRRADIATED_CHRYSALIS.get(),
                 FormSizeScaleConstants.PRAETORIAN_START_SCALE,
                 FormSizeScaleConstants.PRAETORIAN_END_SCALE,
-                FormSizeScaleConstants.PRAETORIAN_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.PRAETORIAN_PHASES
             )
         );
     }
@@ -151,7 +151,7 @@ public class AlienFormSizeScaleProvider {
                 AlienEntityTypes.PREDALIEN.get(),
                 FormSizeScaleConstants.PRAETORIAN_START_SCALE,
                 FormSizeScaleConstants.PRAETORIAN_END_SCALE,
-                FormSizeScaleConstants.PRAETORIAN_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.PRAETORIAN_PHASES
             )
         );
     }
@@ -163,7 +163,7 @@ public class AlienFormSizeScaleProvider {
                 AlienEntityTypes.PRAETORIAN.get(),
                 FormSizeScaleConstants.PRAETORIAN_START_SCALE,
                 FormSizeScaleConstants.PRAETORIAN_END_SCALE,
-                FormSizeScaleConstants.PRAETORIAN_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.PRAETORIAN_PHASES
             )
         );
         biConsumer.accept(
@@ -172,7 +172,7 @@ public class AlienFormSizeScaleProvider {
                 AlienEntityTypes.IRRADIATED_PRAETORIAN.get(),
                 FormSizeScaleConstants.PRAETORIAN_START_SCALE,
                 FormSizeScaleConstants.PRAETORIAN_END_SCALE,
-                FormSizeScaleConstants.PRAETORIAN_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.PRAETORIAN_PHASES
             )
         );
     }
@@ -184,7 +184,7 @@ public class AlienFormSizeScaleProvider {
                 AlienEntityTypes.RAVAGER.get(),
                 FormSizeScaleConstants.PRAETORIAN_START_SCALE,
                 FormSizeScaleConstants.PRAETORIAN_END_SCALE,
-                FormSizeScaleConstants.PRAETORIAN_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.PRAETORIAN_PHASES
             )
         );
         biConsumer.accept(
@@ -193,7 +193,7 @@ public class AlienFormSizeScaleProvider {
                 AlienEntityTypes.IRRADIATED_RAVAGER.get(),
                 FormSizeScaleConstants.PRAETORIAN_START_SCALE,
                 FormSizeScaleConstants.PRAETORIAN_END_SCALE,
-                FormSizeScaleConstants.PRAETORIAN_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.PRAETORIAN_PHASES
             )
         );
     }
@@ -205,7 +205,7 @@ public class AlienFormSizeScaleProvider {
                 AlienEntityTypes.RAZOR_CLAW.get(),
                 FormSizeScaleConstants.PRAETORIAN_START_SCALE,
                 FormSizeScaleConstants.PRAETORIAN_END_SCALE,
-                FormSizeScaleConstants.PRAETORIAN_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.PRAETORIAN_PHASES
             )
         );
         biConsumer.accept(
@@ -214,7 +214,7 @@ public class AlienFormSizeScaleProvider {
                 AlienEntityTypes.IRRADIATED_RAZOR_CLAW.get(),
                 FormSizeScaleConstants.PRAETORIAN_START_SCALE,
                 FormSizeScaleConstants.PRAETORIAN_END_SCALE,
-                FormSizeScaleConstants.PRAETORIAN_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.PRAETORIAN_PHASES
             )
         );
     }
@@ -226,7 +226,7 @@ public class AlienFormSizeScaleProvider {
                 AlienEntityTypes.QUEEN.get(),
                 FormSizeScaleConstants.QUEEN_START_SCALE,
                 FormSizeScaleConstants.QUEEN_END_SCALE,
-                FormSizeScaleConstants.QUEEN_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.QUEEN_PHASES
             )
         );
         biConsumer.accept(
@@ -235,7 +235,7 @@ public class AlienFormSizeScaleProvider {
                 AlienEntityTypes.IRRADIATED_QUEEN.get(),
                 FormSizeScaleConstants.QUEEN_START_SCALE,
                 FormSizeScaleConstants.QUEEN_END_SCALE,
-                FormSizeScaleConstants.QUEEN_MATURATION_TIME_IN_TICKS
+                FormSizeScaleConstants.QUEEN_PHASES
             )
         );
     }

@@ -2,6 +2,7 @@ package com.alien.client.render.entity;
 
 import com.alien.client.animation.entity.ChestbursterAnimator;
 import com.alien.client.render.AlienRenderResourceCache;
+import com.alien.client.render.layer.MoltLayer;
 import com.alien.common.gameplay.entity.living.alien.chestburster.Chestburster;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.blib.api.client.render.v1.entity.AzEntityRenderer;
@@ -21,6 +22,7 @@ public class ChestbursterRenderer extends AzEntityRenderer<Chestburster> {
             AzEntityRendererConfig.builder(ChestbursterRenderer::modelLocation, ChestbursterRenderer::textureLocation)
                 .setRenderType(ChestbursterRenderer::renderType)
                 .setAnimatorProvider(ChestbursterAnimator::new)
+                .addRenderLayer(new MoltLayer<>())
                 .build(),
             context
         );

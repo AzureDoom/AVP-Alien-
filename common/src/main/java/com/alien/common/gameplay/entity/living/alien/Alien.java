@@ -64,6 +64,8 @@ public abstract class Alien extends Monster implements DataUser {
 
     public final DataAccessor<Boolean> isPoisoned;
 
+    public final DataAccessor<Float> moltAlpha;
+
     public final DataAccessor<Boolean> isMovingHorizontally;
 
     protected final HiveManager hiveManager;
@@ -81,6 +83,7 @@ public abstract class Alien extends Monster implements DataUser {
 
         this.hasTarget = new DataAccessor<>(this, BLibDataSyncKeys.ENTITY_HAS_TARGET.get());
         this.isPoisoned = new DataAccessor<>(this, AlienDataSyncKeys.ALIEN_IS_POISONED.get());
+        this.moltAlpha = new DataAccessor<>(this, AlienDataSyncKeys.ALIEN_MOLT_ALPHA.get());
         this.isMovingHorizontally = new DataAccessor<>(this, BLibDataSyncKeys.ENTITY_IS_MOVING_HORIZONTALLY.get());
 
         this.hiveManager = new HiveManager(this);

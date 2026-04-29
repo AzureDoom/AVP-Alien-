@@ -2,6 +2,7 @@ package com.alien.client.render.entity;
 
 import com.alien.client.animation.entity.SpitterAnimator;
 import com.alien.client.render.AlienRenderResourceCache;
+import com.alien.client.render.layer.MoltLayer;
 import com.alien.client.render.layer.SpitGlandGlowLayer;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.spitter.Spitter;
 import com.alien.common.model.alien.variant.AlienVariant;
@@ -23,6 +24,7 @@ public class SpitterRenderer extends AzEntityRenderer<Spitter> {
                 .setRenderType(SpitterRenderer::renderType)
                 .setAnimatorProvider(SpitterAnimator::new)
                 .addRenderLayer(new SpitGlandGlowLayer<>())
+                .addRenderLayer(new MoltLayer<>())
                 .setShadowRadius(0.5F)
                 .build(),
             context

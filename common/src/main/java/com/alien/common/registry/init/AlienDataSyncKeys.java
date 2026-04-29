@@ -39,6 +39,12 @@ public class AlienDataSyncKeys {
             .build(true)
     );
 
+    public static final BLibHolder<DataSyncKey<Float>> ALIEN_MOLT_ALPHA = create(
+        "alien_molt_alpha",
+        builder -> builder.networkSynchronized(StreamCodecs.FLOAT)
+            .build(0F)
+    );
+
     public static final BLibHolder<DataSyncKey<Boolean>> ALIEN_IS_POISONED = create(
         "alien_is_poisoned",
         builder -> builder.networkSynchronized(StreamCodecs.BOOLEAN)
