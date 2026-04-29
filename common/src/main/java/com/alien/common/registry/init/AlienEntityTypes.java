@@ -73,7 +73,7 @@ public class AlienEntityTypes {
     // Chrysalis
     public static final float CHRYSALIS_WIDTH = 0.98F;
 
-    public static final float CHRYSALIS_HEIGHT = 3.98F;
+    public static final float CHRYSALIS_HEIGHT = 2.98F;
 
     // Crusher
     public static final float CRUSHER_WIDTH = 1.8F;

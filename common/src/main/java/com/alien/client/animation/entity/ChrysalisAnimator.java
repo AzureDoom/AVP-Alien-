@@ -29,24 +29,6 @@ public class ChrysalisAnimator extends AzEntityAnimator<Chrysalis> {
         animationTrackContainer.add(
             AzAnimationTrack.builder(this, AzAlienAnimationUtil.BODY_TRACK_NAME)
                 .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.HEAD_TRACK_NAME)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_ARM_TRACK_NAME)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_LEG_TRACK_NAME)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_LEG_TRACK_NAME)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.TAIL_TRACK_NAME)
-                .setTransitionLength(5)
                 .build()
         );
     }
@@ -105,9 +87,9 @@ public class ChrysalisAnimator extends AzEntityAnimator<Chrysalis> {
 
     private float calculateAttackSpeed(Chrysalis chrysalis, XenomorphAttackType attackType) {
         var animationName = switch (attackType) {
-            case BITE -> ChrysalisAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME;
-            case CLAW -> ChrysalisAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME;
-            case TAIL -> ChrysalisAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME;
+            case BITE -> ChrysalisAnimationRefs.ATTACKBITE_ANIMATION_NAME;
+            case CLAW -> ChrysalisAnimationRefs.ATTACKCLAW_ANIMATION_NAME;
+            case TAIL -> ChrysalisAnimationRefs.ATTACKTAIL_ANIMATION_NAME;
             default -> null;
         };
 
