@@ -47,6 +47,8 @@ public class Chrysalis extends Xenomorph implements GOAPUser<Chrysalis>, PathNav
 
     public static final float ROLL_STRAFE_SPEED_RATIO = 1.5F;
 
+    public static final int ROLL_SMASHED_STUN_TICKS = 36;
+
     public static AttributeSupplier.Builder createChrysalisAttributes() {
         return Alien.createAlienAttributes()
             .add(Attributes.ARMOR, 12.0F)
@@ -68,7 +70,11 @@ public class Chrysalis extends Xenomorph implements GOAPUser<Chrysalis>, PathNav
 
     public final DataAccessor<Boolean> rollWasSmashed;
 
+    public final DataAccessor<Boolean> isStunned;
+
     private int rollTicksRemaining;
+
+    private int stunTicksRemaining;
 
     private double previousRollDistanceSqr = -1.0;
 
@@ -89,6 +95,7 @@ public class Chrysalis extends Xenomorph implements GOAPUser<Chrysalis>, PathNav
         this.rollYaw = new DataAccessor<>(this, AlienDataSyncKeys.CHRYSALIS_ROLL_YAW.get());
         this.rollCooldownTicks = new DataAccessor<>(this, AlienDataSyncKeys.CHRYSALIS_ROLL_COOLDOWN_TICKS.get());
         this.rollWasSmashed = new DataAccessor<>(this, AlienDataSyncKeys.CHRYSALIS_ROLL_WAS_SMASHED.get());
+        this.isStunned = new DataAccessor<>(this, AlienDataSyncKeys.CHRYSALIS_IS_STUNNED.get());
         this.animationDispatcher = new ChrysalisAnimationDispatcher(this);
         this.pathNavigator = createPathNavigator(level);
         getXenomorphData().setParallelDigCount(2);
@@ -178,6 +185,18 @@ public class Chrysalis extends Xenomorph implements GOAPUser<Chrysalis>, PathNav
     }
 
     @Override
+    public void travel(net.minecraft.world.phys.Vec3 vec3) {
+        if (isStunned.get()) {
+            var current = getDeltaMovement();
+            setDeltaMovement(0, current.y, 0);
+            super.travel(net.minecraft.world.phys.Vec3.ZERO);
+            return;
+        }
+
+        super.travel(vec3);
+    }
+
+    @Override
     public boolean isPushedByFluid() {
         return false;
     }
@@ -212,6 +231,12 @@ public class Chrysalis extends Xenomorph implements GOAPUser<Chrysalis>, PathNav
         rollTicksRemaining = 0;
         rollCooldownTicks.set(ROLL_COOLDOWN_TICKS);
         setDeltaMovement(getDeltaMovement().scale(0.2));
+
+        if (smashed) {
+            stunTicksRemaining = ROLL_SMASHED_STUN_TICKS;
+            isStunned.set(true);
+            getNavigation().stop();
+        }
     }
 
     public boolean isRollCooldownReady() {
@@ -227,7 +252,21 @@ public class Chrysalis extends Xenomorph implements GOAPUser<Chrysalis>, PathNav
         super.tick();
 
         if (!level().isClientSide) {
+            tickStunState();
             tickRollState();
+        }
+    }
+
+    private void tickStunState() {
+        if (stunTicksRemaining <= 0) {
+            return;
+        }
+
+        stunTicksRemaining--;
+        getNavigation().stop();
+
+        if (stunTicksRemaining <= 0) {
+            isStunned.set(false);
         }
     }
 

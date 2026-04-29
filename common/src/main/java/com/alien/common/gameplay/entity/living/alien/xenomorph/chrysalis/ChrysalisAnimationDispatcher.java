@@ -69,7 +69,7 @@ public class ChrysalisAnimationDispatcher {
     private static final AzCommand ROLL_SMASHED = AzCommand.create(
         AzAlienAnimationUtil.BODY_TRACK_NAME,
         ChrysalisAnimationRefs.ROLL_SMASHED_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
+        AzPlayBehaviors.HOLD_ON_LAST_FRAME
     );
 
     private final Chrysalis chrysalis;

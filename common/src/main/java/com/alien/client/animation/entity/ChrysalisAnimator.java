@@ -75,6 +75,10 @@ public class ChrysalisAnimator extends AzEntityAnimator<Chrysalis> {
             return;
         }
 
+        if (chrysalis.isStunned.get()) {
+            return;
+        }
+
         var attackType = chrysalis.attackType.get();
         var attackId = chrysalis.attackId.get();
 

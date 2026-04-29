@@ -147,6 +147,12 @@ public class AlienDataSyncKeys {
             .build(false)
     );
 
+    public static final BLibHolder<DataSyncKey<Boolean>> CHRYSALIS_IS_STUNNED = create(
+        "chrysalis_is_stunned",
+        builder -> builder.networkSynchronized(StreamCodecs.BOOLEAN)
+            .build(false)
+    );
+
     public static final BLibHolder<DataSyncKey<CrusherAttackType>> CRUSHER_ATTACK_TYPE = create(
         "crusher_attack_type",
         builder -> builder.networkSynchronized(CrusherAttackType.CODEC)
