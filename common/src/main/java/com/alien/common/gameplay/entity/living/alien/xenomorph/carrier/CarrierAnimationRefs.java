@@ -18,6 +18,8 @@ public class CarrierAnimationRefs {
 
     public static final String SPECIAL_ATTACK_THROW_ANIMATION_NAME = "specialattackthrow";
 
+    public static final String SPECIAL_ATTACK_SCREAM_ANIMATION_NAME = "specialattackscream";
+
     public static final String SPECIAL_ATTACK_HOLD_START_ANIMATION_NAME = "specialattackhold.start";
 
     public static final String HOLD_WAITING_ANIMATION_NAME = "hold.waiting";

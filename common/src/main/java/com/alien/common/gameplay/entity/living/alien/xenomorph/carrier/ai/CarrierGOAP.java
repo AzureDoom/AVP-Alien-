@@ -2,6 +2,9 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.ai;
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.XenomorphGOAP;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.Carrier;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.ai.panic_release.PanicReleaseActions;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.ai.panic_release.PanicReleaseGoals;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.ai.panic_release.PanicReleaseSensors;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.ai.throw_attack.ThrowAttackActions;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.ai.throw_attack.ThrowAttackSensors;
 import com.just.goap.Agent;
@@ -14,6 +17,7 @@ public class CarrierGOAP {
         .apply(CarrierGOAP::addCombatPackage)
         .apply(XenomorphGOAP::addDigPackage)
         .apply(XenomorphGOAP::addIdlePackage)
+        .apply(CarrierGOAP::addPanicReleasePackage)
         .apply(CarrierGOAP::addThrowPackage)
         .build();
 
@@ -32,6 +36,16 @@ public class CarrierGOAP {
         graphBuilder.addSensor(ThrowAttackSensors.HAS_RIDING_FACEHUGGER);
         graphBuilder.addSensor(ThrowAttackSensors.IS_THROW_COOLDOWN_READY);
         graphBuilder.addSensor(ThrowAttackSensors.CAN_THROW_FACEHUGGER);
+        return graphBuilder;
+    }
+
+    private static Graph.Builder<Carrier> addPanicReleasePackage(Graph.Builder<Carrier> graphBuilder) {
+        graphBuilder.addGoal(PanicReleaseGoals.PANIC_RELEASE_FACEHUGGERS);
+        graphBuilder.addAction(PanicReleaseActions.PANIC_RELEASE_FACEHUGGERS);
+        graphBuilder.addSensor(PanicReleaseSensors.IS_LOW_HEALTH);
+        graphBuilder.addSensor(PanicReleaseSensors.IS_SURROUNDED_BY_HOSTS);
+        graphBuilder.addSensor(PanicReleaseSensors.HAS_RELEASE_FACEHUGGER_COUNT);
+        graphBuilder.addSensor(PanicReleaseSensors.SHOULD_PANIC_RELEASE);
         return graphBuilder;
     }
 

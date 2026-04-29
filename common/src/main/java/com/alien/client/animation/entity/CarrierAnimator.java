@@ -71,6 +71,7 @@ public class CarrierAnimator extends AzEntityAnimator<Carrier> {
                     case CLAW -> dispatcher.clawAttack(calculateAttackSpeed(carrier, attackType));
                     case TAIL -> dispatcher.tailAttack(calculateAttackSpeed(carrier, attackType));
                     case THROW -> dispatcher.throwAttack();
+                    case SCREAM -> dispatcher.screamAttack();
                 }
 
                 previousAttackId = attackId;
@@ -148,6 +149,7 @@ public class CarrierAnimator extends AzEntityAnimator<Carrier> {
             case BITE -> CarrierAnimationRefs.ATTACKBITE_ANIMATION_NAME;
             case CLAW -> CarrierAnimationRefs.ATTACKCLAW_ANIMATION_NAME;
             case TAIL -> CarrierAnimationRefs.ATTACKTAIL_ANIMATION_NAME;
+            case SCREAM -> CarrierAnimationRefs.SPECIAL_ATTACK_SCREAM_ANIMATION_NAME;
             default -> null;
         };
 

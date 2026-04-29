@@ -184,11 +184,11 @@ public class Carrier extends Xenomorph implements GOAPUser<Carrier>, PathNavigat
 
     @Override
     public void die(@NotNull DamageSource damageSource) {
-        ejectAllFacehuggers();
+        releaseAllFacehuggers();
         super.die(damageSource);
     }
 
-    private void ejectAllFacehuggers() {
+    public void releaseAllFacehuggers() {
         var facehuggers = getPassengers().stream()
             .filter(p -> p.getType().is(AlienEntityTypeTags.FACEHUGGERS))
             .toList();
@@ -213,6 +213,11 @@ public class Carrier extends Xenomorph implements GOAPUser<Carrier>, PathNavigat
     public void throwFacehugger() {
         attackType.set(XenomorphAttackType.THROW);
         beginAttack(XenomorphAttackType.THROW.defaultDurationInTicks());
+    }
+
+    public void screamReleaseFacehuggers() {
+        attackType.set(XenomorphAttackType.SCREAM);
+        beginAttack(XenomorphAttackType.SCREAM.defaultDurationInTicks());
     }
 
     public int getRidingFacehuggerCount() {

@@ -9,7 +9,8 @@ public enum XenomorphAttackType {
     BITE(8),
     CLAW(10),
     TAIL(12),
-    THROW(20);
+    THROW(20),
+    SCREAM(35);
 
     public static final StreamCodec<XenomorphAttackType> CODEC = EnumStreamCodec.of(XenomorphAttackType.class, NONE);
 

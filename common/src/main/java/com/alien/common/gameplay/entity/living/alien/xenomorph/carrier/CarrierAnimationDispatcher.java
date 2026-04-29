@@ -54,6 +54,12 @@ public class CarrierAnimationDispatcher {
         AzPlayBehaviors.PLAY_ONCE
     );
 
+    private static final AzCommand SCREAM_ATTACK = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        CarrierAnimationRefs.SPECIAL_ATTACK_SCREAM_ANIMATION_NAME,
+        AzPlayBehaviors.PLAY_ONCE
+    );
+
     private static final AzCommand HOLD_START = AzCommand.create(
         AzAlienAnimationUtil.BODY_TRACK_NAME,
         CarrierAnimationRefs.SPECIAL_ATTACK_HOLD_START_ANIMATION_NAME,
@@ -141,6 +147,10 @@ public class CarrierAnimationDispatcher {
 
     public void throwAttack() {
         THROW_ATTACK.dispatchForEntity(carrier);
+    }
+
+    public void screamAttack() {
+        SCREAM_ATTACK.dispatchForEntity(carrier);
     }
 
     public void holdStart() {
