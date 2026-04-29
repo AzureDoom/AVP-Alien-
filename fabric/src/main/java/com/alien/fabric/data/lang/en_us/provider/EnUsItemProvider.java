@@ -92,6 +92,7 @@ public class EnUsItemProvider {
         addItem(builder, AlienSpawnEggItems.ABERRANT_RAZOR_CLAW_SPAWN_EGG, "Aberrant Razor Claw Spawn Egg");
         addItem(builder, AlienSpawnEggItems.ABERRANT_RAVAGER_SPAWN_EGG, "Aberrant Ravager Spawn Egg");
         addItem(builder, AlienSpawnEggItems.ABERRANT_QUEEN_SPAWN_EGG, "Aberrant Queen Spawn Egg");
+        addItem(builder, AlienSpawnEggItems.ABERRANT_BURSTER_SPAWN_EGG, "Aberrant Burster Spawn Egg");
         addItem(builder, AlienSpawnEggItems.ABERRANT_RUNNER_SPAWN_EGG, "Aberrant Runner Spawn Egg");
         addItem(builder, AlienSpawnEggItems.ABERRANT_SPITTER_SPAWN_EGG, "Aberrant Spitter Spawn Egg");
         addItem(builder, AlienSpawnEggItems.ADOLESCENT_SPAWN_EGG, "Adolescent Spawn Egg");
@@ -118,6 +119,7 @@ public class EnUsItemProvider {
         addItem(builder, AlienSpawnEggItems.NETHER_PREDALIEN_CHESTBURSTER_SPAWN_EGG, "Nether Predalien Chestburster Spawn Egg");
         addItem(builder, AlienSpawnEggItems.NETHER_PREDALIEN_SPAWN_EGG, "Nether Predalien Spawn Egg");
         addItem(builder, AlienSpawnEggItems.NETHER_PROWLER_SPAWN_EGG, "Nether Prowler Spawn Egg");
+        addItem(builder, AlienSpawnEggItems.NETHER_BURSTER_SPAWN_EGG, "Nether Burster Spawn Egg");
         addItem(builder, AlienSpawnEggItems.NETHER_RUNNER_SPAWN_EGG, "Nether Runner Spawn Egg");
         addItem(builder, AlienSpawnEggItems.NETHER_SPITTER_SPAWN_EGG, "Nether Spitter Spawn Egg");
         addItem(builder, AlienSpawnEggItems.NETHER_WARRIOR_SPAWN_EGG, "Nether Warrior Spawn Egg");
@@ -135,6 +137,7 @@ public class EnUsItemProvider {
         addItem(builder, AlienSpawnEggItems.IRRADIATED_RAZOR_CLAW_SPAWN_EGG, "Irradiated Razor Claw Spawn Egg");
         addItem(builder, AlienSpawnEggItems.IRRADIATED_RAVAGER_SPAWN_EGG, "Irradiated Ravager Spawn Egg");
         addItem(builder, AlienSpawnEggItems.IRRADIATED_QUEEN_SPAWN_EGG, "Irradiated Queen Spawn Egg");
+        addItem(builder, AlienSpawnEggItems.IRRADIATED_BURSTER_SPAWN_EGG, "Irradiated Burster Spawn Egg");
         addItem(builder, AlienSpawnEggItems.IRRADIATED_RUNNER_SPAWN_EGG, "Irradiated Runner Spawn Egg");
         addItem(builder, AlienSpawnEggItems.IRRADIATED_WARRIOR_SPAWN_EGG, "Irradiated Warrior Spawn Egg");
         addItem(builder, AlienSpawnEggItems.OVOMORPH_SPAWN_EGG, "Ovomorph Spawn Egg");
@@ -146,6 +149,7 @@ public class EnUsItemProvider {
         addItem(builder, AlienSpawnEggItems.RAZOR_CLAW_SPAWN_EGG, "Razor Claw Spawn Egg");
         addItem(builder, AlienSpawnEggItems.RAVAGER_SPAWN_EGG, "Ravager Spawn Egg");
         addItem(builder, AlienSpawnEggItems.QUEEN_SPAWN_EGG, "Queen Spawn Egg");
+        addItem(builder, AlienSpawnEggItems.BURSTER_SPAWN_EGG, "Burster Spawn Egg");
         addItem(builder, AlienSpawnEggItems.RUNNER_SPAWN_EGG, "Runner Spawn Egg");
         addItem(builder, AlienSpawnEggItems.SPITTER_SPAWN_EGG, "Spitter Spawn Egg");
         addItem(builder, AlienSpawnEggItems.WARRIOR_SPAWN_EGG, "Warrior Spawn Egg");

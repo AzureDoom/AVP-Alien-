@@ -5,6 +5,7 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.Crusher;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.praetorian.Praetorian;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.prowler.Prowler;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.burster.Burster;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.warrior.Warrior;
 import com.alien.common.gameplay.hive.ai.task.Task;
@@ -72,6 +73,13 @@ public class Hive {
         this.ventManager = new HiveVentManager();
         this.tasks = new ArrayList<>();
 
+        tasks.add(
+            new BalanceAveragingHiveTask(
+                this,
+                () -> Burster.getType(getVariant()),
+                () -> Prowler.getType(getVariant())
+            )
+        );
         tasks.add(
             new BalanceAveragingHiveTask(
                 this,

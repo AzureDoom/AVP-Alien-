@@ -31,6 +31,7 @@ public class EnUsEntityProvider {
         addEntity(builder, AlienEntityTypes.ABERRANT_RAZOR_CLAW, "Aberrant Razor Claw");
         addEntity(builder, AlienEntityTypes.ABERRANT_RAVAGER, "Aberrant Ravager");
         addEntity(builder, AlienEntityTypes.ABERRANT_QUEEN, "Aberrant Queen");
+        addEntity(builder, AlienEntityTypes.ABERRANT_BURSTER, "Aberrant Burster");
         addEntity(builder, AlienEntityTypes.ABERRANT_RUNNER, "Aberrant Runner");
         addEntity(builder, AlienEntityTypes.ABERRANT_SPITTER, "Aberrant Spitter");
         addEntity(builder, AlienEntityTypes.ABERRANT_WARRIOR, "Aberrant Warrior");
@@ -55,6 +56,7 @@ public class EnUsEntityProvider {
         addEntity(builder, AlienEntityTypes.IRRADIATED_RAZOR_CLAW, "Irradiated Razor Claw");
         addEntity(builder, AlienEntityTypes.IRRADIATED_RAVAGER, "Irradiated Ravager");
         addEntity(builder, AlienEntityTypes.IRRADIATED_QUEEN, "Irradiated Queen");
+        addEntity(builder, AlienEntityTypes.IRRADIATED_BURSTER, "Irradiated Burster");
         addEntity(builder, AlienEntityTypes.IRRADIATED_RUNNER, "Irradiated Runner");
         addEntity(builder, AlienEntityTypes.IRRADIATED_WARRIOR, "Irradiated Warrior");
         addEntity(builder, AlienEntityTypes.NETHER_ADOLESCENT, "Nether Adolescent");
@@ -75,6 +77,7 @@ public class EnUsEntityProvider {
         addEntity(builder, AlienEntityTypes.NETHER_RAZOR_CLAW, "Nether Razor Claw");
         addEntity(builder, AlienEntityTypes.NETHER_RAVAGER, "Nether Ravager");
         addEntity(builder, AlienEntityTypes.NETHER_QUEEN, "Nether Queen");
+        addEntity(builder, AlienEntityTypes.NETHER_BURSTER, "Nether Burster");
         addEntity(builder, AlienEntityTypes.NETHER_RUNNER, "Nether Runner");
         addEntity(builder, AlienEntityTypes.NETHER_SPITTER, "Nether Spitter");
         addEntity(builder, AlienEntityTypes.NETHER_WARRIOR, "Nether Warrior");
@@ -100,6 +103,7 @@ public class EnUsEntityProvider {
         addEntity(builder, AlienEntityTypes.ROYAL_NETHER_FACEHUGGER, "Royal Nether Facehugger");
         addEntity(builder, AlienEntityTypes.ROYAL_NETHER_OVOMORPH, "Royal Nether Ovomorph");
         addEntity(builder, AlienEntityTypes.ROYAL_OVOMORPH, "Royal Ovomorph");
+        addEntity(builder, AlienEntityTypes.BURSTER, "Burster");
         addEntity(builder, AlienEntityTypes.RUNNER, "Runner");
         addEntity(builder, AlienEntityTypes.SPITTER, "Spitter");
         addEntity(builder, AlienEntityTypes.WARRIOR, "Warrior");

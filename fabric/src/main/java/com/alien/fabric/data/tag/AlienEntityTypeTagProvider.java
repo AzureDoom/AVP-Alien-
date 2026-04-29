@@ -40,6 +40,7 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
         addHiveAliens();
         addHiveLayerSpawns();
         addScourgeAliens();
+        addBursterHosts();
         addRunnerHosts();
         addHosts();
         addIrradiatedAliens();
@@ -56,6 +57,7 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
         addRoyalAliens();
         addRoyalXenomorphs();
         addRunners();
+        addBursters();
         addSpitters();
         addWarriors();
         addXenomorphs();
@@ -89,6 +91,7 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
                 AlienEntityTypes.ABERRANT_RAZOR_CLAW.get(),
                 AlienEntityTypes.ABERRANT_RAVAGER.get(),
                 AlienEntityTypes.ABERRANT_QUEEN.get(),
+                AlienEntityTypes.ABERRANT_BURSTER.get(),
                 AlienEntityTypes.ABERRANT_RUNNER.get(),
                 AlienEntityTypes.ABERRANT_SPITTER.get(),
                 AlienEntityTypes.ABERRANT_WARRIOR.get(),
@@ -128,6 +131,7 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
 
     private void addAnswersXenomorphCriesForHelp() {
         getOrCreateTagBuilder(AlienEntityTypeTags.ANSWERS_XENOMORPH_CRIES_FOR_HELP)
+            .addTag(AlienEntityTypeTags.BURSTERS)
             .addTag(AlienEntityTypeTags.DRONES)
             .addTag(AlienEntityTypeTags.PROWLERS)
             .addTag(AlienEntityTypeTags.RUNNERS)
@@ -230,6 +234,7 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
             .addTag(AlienEntityTypeTags.SPAWNS_IN_HIVE_WARRIOR_LAYER)
             .addTag(AlienEntityTypeTags.ADOLESCENTS)
             .addTag(AlienEntityTypeTags.CHESTBURSTERS)
+            .addTag(AlienEntityTypeTags.BURSTERS)
             .addTag(AlienEntityTypeTags.DRONES)
             .addTag(AlienEntityTypeTags.RUNNERS)
             .addTag(AlienEntityTypeTags.OVOMORPHS);
@@ -247,6 +252,7 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
 
     private void addHosts() {
         getOrCreateTagBuilder(AlienEntityTypeTags.HOSTS)
+            .addTag(AlienEntityTypeTags.BURSTER_HOSTS)
             .addTag(AlienEntityTypeTags.RUNNER_HOSTS)
             .addOptionalTag(EntityTypeTags.ILLAGER)
             .add(
@@ -275,6 +281,7 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
                 AlienEntityTypes.IRRADIATED_RAZOR_CLAW.get(),
                 AlienEntityTypes.IRRADIATED_RAVAGER.get(),
                 AlienEntityTypes.IRRADIATED_QUEEN.get(),
+                AlienEntityTypes.IRRADIATED_BURSTER.get(),
                 AlienEntityTypes.IRRADIATED_RUNNER.get(),
                 AlienEntityTypes.IRRADIATED_WARRIOR.get()
             );
@@ -301,6 +308,7 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
                 AlienEntityTypes.NETHER_RAZOR_CLAW.get(),
                 AlienEntityTypes.NETHER_RAVAGER.get(),
                 AlienEntityTypes.NETHER_QUEEN.get(),
+                AlienEntityTypes.NETHER_BURSTER.get(),
                 AlienEntityTypes.NETHER_RUNNER.get(),
                 AlienEntityTypes.NETHER_SPITTER.get(),
                 AlienEntityTypes.NETHER_WARRIOR.get(),
@@ -336,6 +344,7 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
                 AlienEntityTypes.ROYAL_CHESTBURSTER.get(),
                 AlienEntityTypes.ROYAL_FACEHUGGER.get(),
                 AlienEntityTypes.ROYAL_OVOMORPH.get(),
+                AlienEntityTypes.BURSTER.get(),
                 AlienEntityTypes.RUNNER.get(),
                 AlienEntityTypes.SPITTER.get(),
                 AlienEntityTypes.WARRIOR.get()
@@ -474,6 +483,37 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
             .addTag(AlienEntityTypeTags.RAZOR_CLAWS);
     }
 
+    private void addBursterHosts() {
+        getOrCreateTagBuilder(AlienEntityTypeTags.BURSTER_HOSTS)
+            .add(
+                EntityType.CAMEL,
+                EntityType.COW,
+                EntityType.DONKEY,
+                EntityType.FOX,
+                EntityType.GOAT,
+                EntityType.HORSE,
+                EntityType.MOOSHROOM,
+                EntityType.MULE,
+                EntityType.PANDA,
+                EntityType.PIG,
+                EntityType.POLAR_BEAR,
+                EntityType.RAVAGER,
+                EntityType.SHEEP,
+                EntityType.SNIFFER,
+                EntityType.WOLF
+            );
+    }
+
+    private void addBursters() {
+        getOrCreateTagBuilder(AlienEntityTypeTags.BURSTERS)
+            .add(
+                AlienEntityTypes.ABERRANT_BURSTER.get(),
+                AlienEntityTypes.IRRADIATED_BURSTER.get(),
+                AlienEntityTypes.NETHER_BURSTER.get(),
+                AlienEntityTypes.BURSTER.get()
+            );
+    }
+
     private void addRunnerHosts() {
         // NOTE: Llamas are deliberately excluded here.
         getOrCreateTagBuilder(AlienEntityTypeTags.RUNNER_HOSTS)
@@ -527,6 +567,7 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
 
     private void addXenomorphs() {
         getOrCreateTagBuilder(AlienEntityTypeTags.XENOMORPHS)
+            .addTag(AlienEntityTypeTags.BURSTERS)
             .addTag(AlienEntityTypeTags.CARRIERS)
             .addTag(AlienEntityTypeTags.CHRYSALISES)
             .addTag(AlienEntityTypeTags.CRUSHERS)

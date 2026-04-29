@@ -2,6 +2,7 @@ package com.alien.common.gameplay.hive.membership;
 
 import com.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.burster.Burster;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
 import com.alien.common.gameplay.hive.HiveSpaceManager;
 import com.alien.common.model.alien.variant.AlienVariant;
@@ -59,9 +60,11 @@ public class HiveReserveManager implements NBTSerializable {
         var remainder = numberOfXenomorphsInOuterEdges % 2;
         var droneType = Drone.getType(variant);
         var runnerType = Runner.getType(variant);
+        var bursterType = Burster.getType(variant);
 
         hiveMemberReserves.add(droneType, half);
         hiveMemberReserves.add(runnerType, half);
+        hiveMemberReserves.add(bursterType, half);
 
         if (remainder > 0) {
             var extraType = randomSource.nextBoolean() ? droneType : runnerType;

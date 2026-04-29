@@ -16,6 +16,7 @@ import com.alien.client.render.entity.AcidRenderer;
 import com.alien.client.render.entity.AcidSpitRenderer;
 import com.alien.client.render.entity.AdolescentRenderer;
 import com.alien.client.render.entity.BoilerRenderer;
+import com.alien.client.render.entity.BursterRenderer;
 import com.alien.client.render.entity.CarrierRenderer;
 import com.alien.client.render.entity.ChestbursterRenderer;
 import com.alien.client.render.entity.ChrysalisRenderer;
@@ -235,6 +236,7 @@ public class AlienClient {
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_RAZOR_CLAW, RazorClawRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_RAVAGER, RavagerRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_QUEEN, QueenRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_BURSTER, BursterRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_RUNNER, RunnerRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_SPITTER, SpitterRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_WARRIOR, WarriorRenderer::new);
@@ -260,6 +262,7 @@ public class AlienClient {
         MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_RAZOR_CLAW, RazorClawRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_RAVAGER, RavagerRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_QUEEN, QueenRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_BURSTER, BursterRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_RUNNER, RunnerRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_WARRIOR, WarriorRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_ADOLESCENT, AdolescentRenderer::new);
@@ -284,6 +287,7 @@ public class AlienClient {
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_RAZOR_CLAW, RazorClawRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_RAVAGER, RavagerRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_QUEEN, QueenRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_BURSTER, BursterRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_RUNNER, RunnerRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_SPITTER, SpitterRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_WARRIOR, WarriorRenderer::new);
@@ -309,6 +313,7 @@ public class AlienClient {
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ROYAL_NETHER_FACEHUGGER, FacehuggerRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ROYAL_NETHER_OVOMORPH, OvomorphRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ROYAL_OVOMORPH, OvomorphRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.BURSTER, BursterRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.RUNNER, RunnerRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.SPITTER, SpitterRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.WARRIOR, WarriorRenderer::new);

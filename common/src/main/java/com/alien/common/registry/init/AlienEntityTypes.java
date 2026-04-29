@@ -21,6 +21,7 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.prowler.Prowler;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ravager.Ravager;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.razor_claw.RazorClaw;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.burster.Burster;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.spitter.Spitter;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.warrior.Warrior;
@@ -134,6 +135,11 @@ public class AlienEntityTypes {
     public static final float RAZOR_CLAW_WIDTH = 0.98F;
 
     public static final float RAZOR_CLAW_HEIGHT = 3.98F;
+
+    // Burster
+    public static final float BURSTER_WIDTH = 0.8F;
+
+    public static final float BURSTER_HEIGHT = 0.98F;
 
     // Runner
     public static final float RUNNER_WIDTH = 0.8F;
@@ -256,6 +262,12 @@ public class AlienEntityTypes {
         "aberrant_queen",
         EntityType.Builder.of(Queen::new, MobCategory.MONSTER)
             .sized(QUEEN_WIDTH, QUEEN_HEIGHT)
+    );
+
+    public static final BLibHolder<EntityType<Burster>> ABERRANT_BURSTER = create(
+        "aberrant_burster",
+        EntityType.Builder.of(Burster::new, MobCategory.MONSTER)
+            .sized(BURSTER_WIDTH, BURSTER_HEIGHT)
     );
 
     public static final BLibHolder<EntityType<Runner>> ABERRANT_RUNNER = create(
@@ -408,6 +420,12 @@ public class AlienEntityTypes {
             .sized(QUEEN_WIDTH, QUEEN_HEIGHT)
     );
 
+    public static final BLibHolder<EntityType<Burster>> IRRADIATED_BURSTER = create(
+        "irradiated_burster",
+        EntityType.Builder.of(Burster::new, MobCategory.MONSTER)
+            .sized(BURSTER_WIDTH, BURSTER_HEIGHT)
+    );
+
     public static final BLibHolder<EntityType<Runner>> IRRADIATED_RUNNER = create(
         "irradiated_runner",
         EntityType.Builder.of(Runner::new, MobCategory.MONSTER)
@@ -526,6 +544,12 @@ public class AlienEntityTypes {
         "nether_queen",
         EntityType.Builder.of(Queen::new, MobCategory.MONSTER)
             .sized(QUEEN_WIDTH, QUEEN_HEIGHT)
+    );
+
+    public static final BLibHolder<EntityType<Burster>> NETHER_BURSTER = create(
+        "nether_burster",
+        EntityType.Builder.of(Burster::new, MobCategory.MONSTER)
+            .sized(BURSTER_WIDTH, BURSTER_HEIGHT)
     );
 
     public static final BLibHolder<EntityType<Runner>> NETHER_RUNNER = create(
@@ -678,6 +702,12 @@ public class AlienEntityTypes {
             .sized(OVOMORPH_WIDTH, OVOMORPH_HEIGHT)
     );
 
+    public static final BLibHolder<EntityType<Burster>> BURSTER = create(
+        "burster",
+        EntityType.Builder.of(Burster::new, MobCategory.MONSTER)
+            .sized(BURSTER_WIDTH, BURSTER_HEIGHT)
+    );
+
     public static final BLibHolder<EntityType<Runner>> RUNNER = create(
         "runner",
         EntityType.Builder.of(Runner::new, MobCategory.MONSTER)
@@ -729,6 +759,7 @@ public class AlienEntityTypes {
         ATTRIBUTE_REGISTRY.register(ABERRANT_RAZOR_CLAW, RazorClaw::createRazorClawAttributes);
         ATTRIBUTE_REGISTRY.register(ABERRANT_RAVAGER, Ravager::createRavagerAttributes);
         ATTRIBUTE_REGISTRY.register(ABERRANT_QUEEN, Queen::createQueenAttributes);
+        ATTRIBUTE_REGISTRY.register(ABERRANT_BURSTER, Burster::createBursterAttributes);
         ATTRIBUTE_REGISTRY.register(ABERRANT_RUNNER, Runner::createRunnerAttributes);
         ATTRIBUTE_REGISTRY.register(ABERRANT_SPITTER, Spitter::createSpitterAttributes);
         ATTRIBUTE_REGISTRY.register(ABERRANT_WARRIOR, Warrior::createWarriorAttributes);
@@ -752,6 +783,7 @@ public class AlienEntityTypes {
         ATTRIBUTE_REGISTRY.register(IRRADIATED_RAZOR_CLAW, RazorClaw::createRazorClawAttributes);
         ATTRIBUTE_REGISTRY.register(IRRADIATED_RAVAGER, Ravager::createRavagerAttributes);
         ATTRIBUTE_REGISTRY.register(IRRADIATED_QUEEN, Queen::createQueenAttributes);
+        ATTRIBUTE_REGISTRY.register(IRRADIATED_BURSTER, Burster::createBursterAttributes);
         ATTRIBUTE_REGISTRY.register(IRRADIATED_RUNNER, Runner::createRunnerAttributes);
         ATTRIBUTE_REGISTRY.register(IRRADIATED_WARRIOR, Warrior::createWarriorAttributes);
         ATTRIBUTE_REGISTRY.register(NETHER_ADOLESCENT, Adolescent::createAdolescentAttributes);
@@ -778,6 +810,7 @@ public class AlienEntityTypes {
         ATTRIBUTE_REGISTRY.register(NETHER_RAZOR_CLAW, RazorClaw::createRazorClawAttributes);
         ATTRIBUTE_REGISTRY.register(NETHER_RAVAGER, Ravager::createRavagerAttributes);
         ATTRIBUTE_REGISTRY.register(NETHER_QUEEN, Queen::createQueenAttributes);
+        ATTRIBUTE_REGISTRY.register(NETHER_BURSTER, Burster::createBursterAttributes);
         ATTRIBUTE_REGISTRY.register(NETHER_RUNNER, Runner::createRunnerAttributes);
         ATTRIBUTE_REGISTRY.register(NETHER_SPITTER, Spitter::createSpitterAttributes);
         ATTRIBUTE_REGISTRY.register(NETHER_WARRIOR, Warrior::createWarriorAttributes);
@@ -806,6 +839,7 @@ public class AlienEntityTypes {
         ATTRIBUTE_REGISTRY.register(ROYAL_NETHER_FACEHUGGER, Facehugger::createFacehuggerAttributes);
         ATTRIBUTE_REGISTRY.register(ROYAL_NETHER_OVOMORPH, Ovomorph::createOvomorphAttributes);
         ATTRIBUTE_REGISTRY.register(ROYAL_OVOMORPH, Ovomorph::createOvomorphAttributes);
+        ATTRIBUTE_REGISTRY.register(BURSTER, Burster::createBursterAttributes);
         ATTRIBUTE_REGISTRY.register(RUNNER, Runner::createRunnerAttributes);
         ATTRIBUTE_REGISTRY.register(SPITTER, Spitter::createSpitterAttributes);
         ATTRIBUTE_REGISTRY.register(WARRIOR, Warrior::createWarriorAttributes);

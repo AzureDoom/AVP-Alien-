@@ -2,6 +2,7 @@ package com.alien.common.gameplay.entity.living.alien;
 
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.burster.Burster;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
 import com.alien.common.gameplay.hive.HiveRegistry;
 import com.alien.common.gameplay.level.saveddata.StrainLeakData;
@@ -339,6 +340,7 @@ public abstract class Alien extends Monster implements DataUser {
         ) {
             hiveManager.hive().ifSome(hive -> {
                 var wasRunnerHostKilled = entity.getType().is(AlienEntityTypeTags.RUNNER_HOSTS);
+                var wasBursterHostKilled = entity.getType().is(AlienEntityTypeTags.BURSTER_HOSTS);
 
                 var bonusCount = switch (getGeneManager()) {
                     case GeneManagerProxy.EMPTY ignored -> 1;
@@ -350,7 +352,9 @@ public abstract class Alien extends Monster implements DataUser {
 
                 var alienEntityType = wasRunnerHostKilled
                     ? Runner.getType(hive.getVariant())
-                    : Drone.getType(hive.getVariant());
+                    : wasBursterHostKilled
+                        ? Burster.getType(hive.getVariant())
+                        : Drone.getType(hive.getVariant());
 
                 hive.getReserveManager().add(alienEntityType, bonusCount);
             });

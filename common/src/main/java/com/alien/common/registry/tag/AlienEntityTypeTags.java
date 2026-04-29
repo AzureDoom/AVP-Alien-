@@ -67,6 +67,10 @@ public class AlienEntityTypeTags {
 
     public static final TagKey<EntityType<?>> ROYAL_XENOMORPHS = create("royal_xenomorphs");
 
+    public static final TagKey<EntityType<?>> BURSTER_HOSTS = create("burster_hosts");
+
+    public static final TagKey<EntityType<?>> BURSTERS = create("bursters");
+
     public static final TagKey<EntityType<?>> RUNNER_HOSTS = create("runner_hosts");
 
     public static final TagKey<EntityType<?>> RUNNERS = create("runners");

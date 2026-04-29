@@ -79,6 +79,8 @@ public class AlienSpawnEggItems {
 
     public static final BLibHolder<SpawnEggItem> ABERRANT_PROWLER_SPAWN_EGG = create("aberrant_prowler", AlienEntityTypes.ABERRANT_PROWLER);
 
+    public static final BLibHolder<SpawnEggItem> ABERRANT_BURSTER_SPAWN_EGG = create("aberrant_burster", AlienEntityTypes.ABERRANT_BURSTER);
+
     public static final BLibHolder<SpawnEggItem> ABERRANT_RUNNER_SPAWN_EGG = create("aberrant_runner", AlienEntityTypes.ABERRANT_RUNNER);
 
     public static final BLibHolder<SpawnEggItem> ABERRANT_SPITTER_SPAWN_EGG = create("aberrant_spitter", AlienEntityTypes.ABERRANT_SPITTER);
@@ -164,6 +166,11 @@ public class AlienSpawnEggItems {
 
     public static final BLibHolder<SpawnEggItem> IRRADIATED_QUEEN_SPAWN_EGG = create("irradiated_queen", AlienEntityTypes.IRRADIATED_QUEEN);
 
+    public static final BLibHolder<SpawnEggItem> IRRADIATED_BURSTER_SPAWN_EGG = create(
+        "irradiated_burster",
+        AlienEntityTypes.IRRADIATED_BURSTER
+    );
+
     public static final BLibHolder<SpawnEggItem> IRRADIATED_RUNNER_SPAWN_EGG = create(
         "irradiated_runner",
         AlienEntityTypes.IRRADIATED_RUNNER
@@ -230,6 +237,8 @@ public class AlienSpawnEggItems {
     public static final BLibHolder<SpawnEggItem> NETHER_PREDALIEN_SPAWN_EGG = create("nether_predalien", AlienEntityTypes.NETHER_PREDALIEN);
 
     public static final BLibHolder<SpawnEggItem> NETHER_PROWLER_SPAWN_EGG = create("nether_prowler", AlienEntityTypes.NETHER_PROWLER);
+
+    public static final BLibHolder<SpawnEggItem> NETHER_BURSTER_SPAWN_EGG = create("nether_burster", AlienEntityTypes.NETHER_BURSTER);
 
     public static final BLibHolder<SpawnEggItem> NETHER_RUNNER_SPAWN_EGG = create("nether_runner", AlienEntityTypes.NETHER_RUNNER);
 
@@ -323,6 +332,8 @@ public class AlienSpawnEggItems {
     );
 
     public static final BLibHolder<SpawnEggItem> ROYAL_OVOMORPH_SPAWN_EGG = create("royal_ovomorph", AlienEntityTypes.ROYAL_OVOMORPH);
+
+    public static final BLibHolder<SpawnEggItem> BURSTER_SPAWN_EGG = create("burster", AlienEntityTypes.BURSTER);
 
     public static final BLibHolder<SpawnEggItem> RUNNER_SPAWN_EGG = create("runner", AlienEntityTypes.RUNNER);
 
