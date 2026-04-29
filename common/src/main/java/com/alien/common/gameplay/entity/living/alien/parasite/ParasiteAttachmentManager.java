@@ -3,6 +3,7 @@ package com.alien.common.gameplay.entity.living.alien.parasite;
 import com.alien.common.model.alien.FreeMob;
 import com.alien.common.model.alien.Host;
 import com.alien.common.registry.init.AlienDataSyncKeys;
+import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.registry.key.AlienDamageTypeKeys;
 import com.alien.common.util.AlienPredicates;
 import com.blib.api.common.data_sync.v1.DataAccessor;
@@ -33,6 +34,11 @@ public class ParasiteAttachmentManager {
         }
 
         var host = getHost();
+
+        if (host != null && host.getType().is(AlienEntityTypeTags.ALIENS)) {
+            ticksAttachedToHost.reset();
+            return;
+        }
 
         if (!isAttachedToHost()) {
             ticksAttachedToHost.reset();

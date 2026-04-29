@@ -204,7 +204,11 @@ public abstract class Alien extends Monster implements DataUser {
 
     @Override
     protected final boolean canAddPassenger(@NotNull Entity passenger) {
-        return super.canAddPassenger(passenger) && canEntityRideAlien(passenger);
+        return getPassengers().size() < getMaxPassengerCount() && canEntityRideAlien(passenger);
+    }
+
+    protected int getMaxPassengerCount() {
+        return 1;
     }
 
     protected boolean canAlienRideVehicle(@NotNull Entity vehicle) {

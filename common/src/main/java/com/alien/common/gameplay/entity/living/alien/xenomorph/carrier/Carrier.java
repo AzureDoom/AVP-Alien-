@@ -9,7 +9,9 @@ import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienBlockTags;
+import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.data_sync.v1.DataAccessor;
+import com.blib.api.common.entity.v1.EntityUtil;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.goap.v1.GOAPUser;
 import com.blib.api.common.pathfinding.v1.cache.TerrainCacheRegistry;
@@ -23,10 +25,14 @@ import com.blib.api.common.pathfinding.v1.terrain.TerrainClassifiers;
 import com.blib.api.common.pathfinding.v1.terrain.TerrainType;
 import com.just.goap.Agent;
 import com.just.goap.graph.Graph;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class Carrier extends Xenomorph implements GOAPUser<Carrier>, PathNavigatorUser {
@@ -139,6 +145,80 @@ public class Carrier extends Xenomorph implements GOAPUser<Carrier>, PathNavigat
 
         attackType.set(attack);
         beginAttack(attack.defaultDurationInTicks());
+    }
+
+    @Override
+    protected int getMaxPassengerCount() {
+        return CarrierSpine.COUNT;
+    }
+
+    @Override
+    protected boolean canEntityRideAlien(@NotNull Entity passenger) {
+        if (passenger.getType().is(AlienEntityTypeTags.FACEHUGGERS)) {
+            if (passenger.getVehicle() == this) {
+                return true;
+            }
+            return getRidingFacehuggerCount() < CarrierSpine.COUNT;
+        }
+        return super.canEntityRideAlien(passenger);
+    }
+
+    @Override
+    protected void positionRider(@NotNull Entity passenger, @NotNull MoveFunction callback) {
+        if (passenger.getType().is(AlienEntityTypeTags.FACEHUGGERS)) {
+            callback.accept(passenger, getX(), getY(), getZ());
+            return;
+        }
+        super.positionRider(passenger, callback);
+    }
+
+    @Override
+    public void die(@NotNull DamageSource damageSource) {
+        ejectAllFacehuggers();
+        super.die(damageSource);
+    }
+
+    private void ejectAllFacehuggers() {
+        var facehuggers = getPassengers().stream()
+            .filter(p -> p.getType().is(AlienEntityTypeTags.FACEHUGGERS))
+            .toList();
+
+        var count = facehuggers.size();
+        for (int i = 0; i < count; i++) {
+            var facehugger = facehuggers.get(i);
+            facehugger.stopRiding();
+
+            var angle = ((float) i / count) * (float) (Math.PI * 2) + (random.nextFloat() - 0.5F) * 0.5F;
+            var horizontalSpeed = 0.5 + random.nextFloat() * 0.5;
+            var verticalSpeed = 0.3 + random.nextFloat() * 0.4;
+
+            facehugger.setDeltaMovement(
+                Math.cos(angle) * horizontalSpeed,
+                verticalSpeed,
+                Math.sin(angle) * horizontalSpeed
+            );
+        }
+    }
+
+    public void throwFacehugger() {
+        attackType.set(XenomorphAttackType.THROW);
+        beginAttack(XenomorphAttackType.THROW.defaultDurationInTicks());
+    }
+
+    public int getRidingFacehuggerCount() {
+        return (int) getPassengers().stream()
+            .filter(p -> p.getType().is(AlienEntityTypeTags.FACEHUGGERS))
+            .count();
+    }
+
+    @Override
+    protected boolean isImmobile() {
+        return isDeadOrDying();
+    }
+
+    @Override
+    public @Nullable LivingEntity getControllingPassenger() {
+        return null;
     }
 
     @Override

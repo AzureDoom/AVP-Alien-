@@ -3,6 +3,7 @@ package com.alien.common.gameplay.entity.living.alien.parasite.facehugger;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.parasite.Parasite;
 import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.ai.FacehuggerGOAP;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.Carrier;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienEntityTypes;
@@ -17,6 +18,7 @@ import com.just.goap.graph.Graph;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -100,6 +102,14 @@ public class Facehugger extends Parasite implements EntitySenseCacheUser, GOAPUs
     public void addAdditionalSaveData(@NotNull CompoundTag compoundTag) {
         super.addAdditionalSaveData(compoundTag);
         data.save(compoundTag);
+    }
+
+    @Override
+    public boolean isInvulnerableTo(@NotNull DamageSource damageSource) {
+        if (getVehicle() instanceof Carrier) {
+            return true;
+        }
+        return super.isInvulnerableTo(damageSource);
     }
 
     @Override

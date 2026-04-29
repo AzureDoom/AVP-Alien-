@@ -48,6 +48,24 @@ public class CarrierAnimationDispatcher {
         AzPlayBehaviors.PLAY_ONCE
     );
 
+    private static final AzCommand THROW_ATTACK = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        CarrierAnimationRefs.SPECIAL_ATTACK_THROW_ANIMATION_NAME,
+        AzPlayBehaviors.PLAY_ONCE
+    );
+
+    private static final AzCommand HOLD_START = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        CarrierAnimationRefs.SPECIAL_ATTACK_HOLD_START_ANIMATION_NAME,
+        AzPlayBehaviors.PLAY_ONCE
+    );
+
+    private static final AzCommand HOLD_WAITING = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        CarrierAnimationRefs.HOLD_WAITING_ANIMATION_NAME,
+        AzPlayBehaviors.LOOP
+    );
+
     private final Carrier carrier;
 
     public CarrierAnimationDispatcher(Carrier carrier) {
@@ -119,5 +137,17 @@ public class CarrierAnimationDispatcher {
             0F,
             false
         ).dispatchForEntity(carrier);
+    }
+
+    public void throwAttack() {
+        THROW_ATTACK.dispatchForEntity(carrier);
+    }
+
+    public void holdStart() {
+        HOLD_START.dispatchForEntity(carrier);
+    }
+
+    public void holdWaiting() {
+        HOLD_WAITING.dispatchForEntity(carrier);
     }
 }

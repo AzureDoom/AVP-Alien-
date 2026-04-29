@@ -7,6 +7,9 @@ import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.ai.atta
 import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.ai.idle.IdleActions;
 import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.ai.idle.IdleGoals;
 import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.ai.idle.IdleSensors;
+import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.ai.seek_carrier.SeekCarrierActions;
+import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.ai.seek_carrier.SeekCarrierGoals;
+import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.ai.seek_carrier.SeekCarrierSensors;
 import com.blib.api.common.goap.v1.GOAPSensors;
 import com.just.goap.Agent;
 import com.just.goap.graph.Graph;
@@ -17,6 +20,7 @@ public class FacehuggerGOAP {
     public static final Graph<Facehugger> GRAPH = Graph.<Facehugger>builder()
         .apply(FacehuggerGOAP::addSensorsPackage)
         .apply(FacehuggerGOAP::addCombatPackage)
+        .apply(FacehuggerGOAP::addSeekCarrierPackage)
         .apply(FacehuggerGOAP::addIdlePackage)
         .build();
 
@@ -74,6 +78,14 @@ public class FacehuggerGOAP {
         // Used for checking if the attack target is in range.
         graphBuilder.addSensor(AttachToHostSensors.IS_ATTACK_TARGET_IN_LUNGE_RANGE);
 
+        return graphBuilder;
+    }
+
+    private static Graph.Builder<Facehugger> addSeekCarrierPackage(Graph.Builder<Facehugger> graphBuilder) {
+        graphBuilder.addGoal(SeekCarrierGoals.SEEK_CARRIER);
+        graphBuilder.addAction(SeekCarrierActions.MOVE_TO_CARRIER);
+        graphBuilder.addSensor(SeekCarrierSensors.NEAREST_AVAILABLE_CARRIER);
+        graphBuilder.addSensor(SeekCarrierSensors.SHOULD_SEEK_CARRIER);
         return graphBuilder;
     }
 

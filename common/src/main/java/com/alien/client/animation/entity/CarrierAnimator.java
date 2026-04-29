@@ -1,9 +1,11 @@
 package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
+import com.alien.client.render.entity.carrier.CarrierSpineBoneCache;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.Carrier;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.CarrierAnimationRefs;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.CarrierSpine;
 import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
@@ -11,6 +13,8 @@ import com.blib.api.client.animation.v1.track.AzAnimationTrack;
 import com.blib.api.client.animation.v1.track.AzAnimationTrackContainer;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector3d;
+import org.joml.Vector3f;
 
 public class CarrierAnimator extends AzEntityAnimator<Carrier> {
 
@@ -19,6 +23,14 @@ public class CarrierAnimator extends AzEntityAnimator<Carrier> {
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
 
     private int previousAttackId = Integer.MIN_VALUE;
+
+    private double prevEntityX;
+
+    private double prevEntityY;
+
+    private double prevEntityZ;
+
+    private boolean hasPrevEntityPosition;
 
     public CarrierAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -43,6 +55,7 @@ public class CarrierAnimator extends AzEntityAnimator<Carrier> {
         super.setCustomAnimations(animatable, partialTicks);
 
         runPassiveAnimations(animatable);
+        updateSpineBoneData(animatable);
     }
 
     private void runPassiveAnimations(Carrier carrier) {
@@ -53,12 +66,11 @@ public class CarrierAnimator extends AzEntityAnimator<Carrier> {
 
         if (attackType != XenomorphAttackType.NONE) {
             if (attackId != previousAttackId) {
-                var speed = calculateAttackSpeed(carrier, attackType);
-
                 switch (attackType) {
-                    case BITE -> dispatcher.biteAttack(speed);
-                    case CLAW -> dispatcher.clawAttack(speed);
-                    case TAIL -> dispatcher.tailAttack(speed);
+                    case BITE -> dispatcher.biteAttack(calculateAttackSpeed(carrier, attackType));
+                    case CLAW -> dispatcher.clawAttack(calculateAttackSpeed(carrier, attackType));
+                    case TAIL -> dispatcher.tailAttack(calculateAttackSpeed(carrier, attackType));
+                    case THROW -> dispatcher.throwAttack();
                 }
 
                 previousAttackId = attackId;
@@ -82,6 +94,53 @@ public class CarrierAnimator extends AzEntityAnimator<Carrier> {
         }
 
         animFunction.run();
+    }
+
+    private void updateSpineBoneData(Carrier carrier) {
+        if (!hasPrevEntityPosition) {
+            saveCurrentEntityPosition(carrier);
+            CarrierSpineBoneCache.remove(carrier.getId());
+            return;
+        }
+
+        var bakedModel = context().boneCache().getBakedModel();
+        var offsets = new Vector3d[CarrierSpine.COUNT];
+        var rotations = new Vector3f[CarrierSpine.COUNT];
+
+        for (var spine : CarrierSpine.values()) {
+            var bone = bakedModel.getBoneOrNull(spine.getBoneName());
+
+            if (bone != null) {
+                bone.setTrackingMatrices(true);
+                var worldPos = bone.getWorldPosition();
+
+                // Matrix tracking is updated after this animation pass, during model rendering. The world position
+                // available here is therefore from the previous render and includes the carrier's tick position from
+                // that same render. Subtract that tick position, not the interpolated render position, so movement
+                // interpolation is applied exactly once by the facehugger renderer.
+                offsets[spine.getPassengerIndex()] = new Vector3d(
+                    worldPos.x - prevEntityX,
+                    worldPos.y - prevEntityY,
+                    worldPos.z - prevEntityZ
+                );
+
+                rotations[spine.getPassengerIndex()] = new Vector3f(
+                    bone.getRotX(),
+                    bone.getRotY(),
+                    bone.getRotZ()
+                );
+            }
+        }
+
+        CarrierSpineBoneCache.put(carrier.getId(), offsets, rotations);
+        saveCurrentEntityPosition(carrier);
+    }
+
+    private void saveCurrentEntityPosition(Carrier carrier) {
+        prevEntityX = carrier.getX();
+        prevEntityY = carrier.getY();
+        prevEntityZ = carrier.getZ();
+        hasPrevEntityPosition = true;
     }
 
     private float calculateAttackSpeed(Carrier carrier, XenomorphAttackType attackType) {
