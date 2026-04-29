@@ -100,6 +100,13 @@ public abstract class Alien extends Monster implements DataUser {
         return 1.5F;
     }
 
+    @Override
+    public void push(Entity entity) {
+        if (entity instanceof Alien) {
+            super.push(entity);
+        }
+    }
+
     private EntityType<? extends Entity> getDefaultHostType(EntityType<? extends Alien> entityType) {
         if (
             entityType.is(AlienEntityTypeTags.RUNNERS)

@@ -170,11 +170,6 @@ public class RazorClaw extends Xenomorph implements GOAPUser<RazorClaw>, PathNav
         return false;
     }
 
-    @Override
-    public boolean isPushable() {
-        return false;
-    }
-
     public RazorClawAnimationDispatcher getAnimationDispatcher() {
         return animationDispatcher;
     }

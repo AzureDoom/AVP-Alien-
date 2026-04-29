@@ -146,11 +146,6 @@ public class Predalien extends Xenomorph implements GOAPUser<Predalien>, PathNav
         return false;
     }
 
-    @Override
-    public boolean isPushable() {
-        return false;
-    }
-
     public PredalienAnimationDispatcher getAnimationDispatcher() {
         return animationDispatcher;
     }

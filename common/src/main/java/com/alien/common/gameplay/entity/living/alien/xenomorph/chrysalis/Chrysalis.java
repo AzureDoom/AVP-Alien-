@@ -209,11 +209,6 @@ public class Chrysalis extends Xenomorph implements GOAPUser<Chrysalis>, PathNav
         return false;
     }
 
-    @Override
-    public boolean isPushable() {
-        return false;
-    }
-
     public void startRoll(float yaw) {
         rollYaw.set(yaw);
         rollWasSmashed.set(false);

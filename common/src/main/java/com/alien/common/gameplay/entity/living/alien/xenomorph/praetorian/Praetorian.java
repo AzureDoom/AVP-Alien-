@@ -146,11 +146,6 @@ public class Praetorian extends Xenomorph implements GOAPUser<Praetorian>, PathN
         return false;
     }
 
-    @Override
-    public boolean isPushable() {
-        return false;
-    }
-
     public PraetorianAnimationDispatcher getAnimationDispatcher() {
         return animationDispatcher;
     }

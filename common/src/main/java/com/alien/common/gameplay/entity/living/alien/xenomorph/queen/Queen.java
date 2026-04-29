@@ -282,11 +282,6 @@ public class Queen extends Xenomorph implements GOAPUser<Queen>, PathNavigatorUs
     }
 
     @Override
-    public boolean isPushable() {
-        return false;
-    }
-
-    @Override
     public boolean isPersistenceRequired() {
         return true;
     }

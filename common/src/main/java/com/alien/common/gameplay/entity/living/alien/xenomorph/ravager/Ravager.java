@@ -146,11 +146,6 @@ public class Ravager extends Xenomorph implements GOAPUser<Ravager>, PathNavigat
         return false;
     }
 
-    @Override
-    public boolean isPushable() {
-        return false;
-    }
-
     public RavagerAnimationDispatcher getAnimationDispatcher() {
         return animationDispatcher;
     }

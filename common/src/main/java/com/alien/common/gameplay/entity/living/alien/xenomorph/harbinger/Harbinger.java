@@ -146,11 +146,6 @@ public class Harbinger extends Xenomorph implements GOAPUser<Harbinger>, PathNav
         return false;
     }
 
-    @Override
-    public boolean isPushable() {
-        return false;
-    }
-
     public HarbingerAnimationDispatcher getAnimationDispatcher() {
         return animationDispatcher;
     }

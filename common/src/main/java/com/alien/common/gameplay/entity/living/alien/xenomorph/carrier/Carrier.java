@@ -146,11 +146,6 @@ public class Carrier extends Xenomorph implements GOAPUser<Carrier>, PathNavigat
         return false;
     }
 
-    @Override
-    public boolean isPushable() {
-        return false;
-    }
-
     public CarrierAnimationDispatcher getAnimationDispatcher() {
         return animationDispatcher;
     }
