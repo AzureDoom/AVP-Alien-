@@ -3,6 +3,7 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.burster;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.EggCarrier;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.EggPickupManager;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ExplosiveXenomorphUtil;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.VentBuilder;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.VentData;
@@ -31,6 +32,7 @@ import com.just.goap.Agent;
 import com.just.goap.graph.Graph;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -43,6 +45,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.BiConsumer;
 
 public class Burster extends Xenomorph implements EggCarrier, GOAPUser<Burster>, PathNavigatorUser, VentBuilder {
+
+    private static final float CRITICAL_HEALTH_THRESHOLD = 0.1F;
+
+    private static final float EXPLOSION_RADIUS = 2F;
+
+    private static final int ACID_AMOUNT = 3;
 
     public static AttributeSupplier.Builder createBursterAttributes() {
         return Alien.createAlienAttributes()
@@ -66,6 +74,8 @@ public class Burster extends Xenomorph implements EggCarrier, GOAPUser<Burster>,
     private final VentData ventData;
 
     private final PathNavigator pathNavigator;
+
+    private boolean hasExploded;
 
     public Burster(EntityType<? extends Burster> entityType, Level level) {
         super(entityType, level);
@@ -129,6 +139,10 @@ public class Burster extends Xenomorph implements EggCarrier, GOAPUser<Burster>,
     public void tick() {
         super.tick();
         eggPickupManager.tick();
+
+        if (!level().isClientSide && isAlive() && getHealth() <= getMaxHealth() * CRITICAL_HEALTH_THRESHOLD) {
+            explodeAndDiscard();
+        }
     }
 
     @Override
@@ -176,6 +190,27 @@ public class Burster extends Xenomorph implements EggCarrier, GOAPUser<Burster>,
 
         attackType.set(attack);
         beginAttack(attack.defaultDurationInTicks());
+    }
+
+    @Override
+    public void die(@NotNull DamageSource damageSource) {
+        explode();
+        super.die(damageSource);
+    }
+
+    private void explodeAndDiscard() {
+        explode();
+        triggerOnDeathMobEffects(RemovalReason.KILLED);
+        discard();
+    }
+
+    private void explode() {
+        if (hasExploded || level().isClientSide) {
+            return;
+        }
+
+        hasExploded = true;
+        ExplosiveXenomorphUtil.explodeWithAcid(this, EXPLOSION_RADIUS, ACID_AMOUNT);
     }
 
     @Override

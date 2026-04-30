@@ -1,12 +1,12 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.boiler;
 
 import com.alien.common.gameplay.entity.living.alien.Alien;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ExplosiveXenomorphUtil;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.boiler.ai.BoilerGOAP;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.tag.AlienBlockTags;
-import com.alien.common.util.AcidBleedUtil;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.entity.v1.vibration.VibrationSystemManager;
 import com.blib.api.common.goap.v1.GOAPUser;
@@ -21,7 +21,6 @@ import com.blib.api.common.pathfinding.v1.terrain.TerrainClassifiers;
 import com.blib.api.common.pathfinding.v1.terrain.TerrainType;
 import com.just.goap.Agent;
 import com.just.goap.graph.Graph;
-import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -32,8 +31,6 @@ import net.minecraft.world.level.gameevent.DynamicGameEventListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.BiConsumer;
 
 public class Boiler extends Xenomorph implements GOAPUser<Boiler>, PathNavigatorUser {
@@ -130,33 +127,11 @@ public class Boiler extends Xenomorph implements GOAPUser<Boiler>, PathNavigator
     @Override
     public boolean doHurtTarget(@NotNull Entity entity) {
         var radius = 2F;
-        level().explode(this, getX(), getY(), getZ(), radius, Level.ExplosionInteraction.MOB);
+        ExplosiveXenomorphUtil.explodeWithAcid(this, radius, 3);
         triggerOnDeathMobEffects(RemovalReason.KILLED);
         discard();
 
-        getBlockArea(blockPosition(), (int) radius, (int) radius, (int) radius)
-            .stream()
-            .filter(blockPos -> {
-                var blockState = level().getBlockState(blockPos);
-                return blockState.isAir() || blockState.canBeReplaced();
-            })
-            .forEach(blockPos -> AcidBleedUtil.spawnAcid(this, 3, blockPos.getCenter()));
-
         return true;
-    }
-
-    private List<BlockPos> getBlockArea(BlockPos center, int radiusX, int radiusY, int radiusZ) {
-        var positions = new ArrayList<BlockPos>();
-
-        for (var dx = -radiusX; dx <= radiusX; dx++) {
-            for (var dy = -radiusY; dy <= radiusY; dy++) {
-                for (var dz = -radiusZ; dz <= radiusZ; dz++) {
-                    positions.add(center.offset(dx, dy, dz));
-                }
-            }
-        }
-
-        return positions;
     }
 
     @Override
