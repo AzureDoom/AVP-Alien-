@@ -4,6 +4,7 @@ import com.alien.AlienResources;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ravager.Ravager;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ravager.RavagerAnimationRefs;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ravager.ai.special_attack.RavagerSpecialAttackConfig;
 import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
@@ -28,24 +29,6 @@ public class RavagerAnimator extends AzEntityAnimator<Ravager> {
     public void registerTracks(AzAnimationTrackContainer<Ravager> animationTrackContainer) {
         animationTrackContainer.add(
             AzAnimationTrack.builder(this, AzAlienAnimationUtil.BODY_TRACK_NAME)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.HEAD_TRACK_NAME)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_ARM_TRACK_NAME)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_LEG_TRACK_NAME)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_LEG_TRACK_NAME)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.TAIL_TRACK_NAME)
                 .setTransitionLength(5)
                 .build()
         );
@@ -76,7 +59,11 @@ public class RavagerAnimator extends AzEntityAnimator<Ravager> {
                 switch (attackType) {
                     case BITE -> dispatcher.biteAttack(speed);
                     case CLAW -> dispatcher.rightClawAttack(speed);
+                    case CLAW_DOUBLE -> dispatcher.doubleClawAttack(speed);
                     case TAIL -> dispatcher.tailAttack(speed);
+                    case SWIM_ATTACK -> dispatcher.swimAttack(speed);
+                    case SPECIAL_WINDUP -> dispatcher.specialAttackWarmup(calculateWindupAnimationSpeed(ravager));
+                    case SPECIAL -> dispatcher.specialAttackActivate(speed);
                 }
 
                 previousAttackId = attackId;
@@ -104,9 +91,13 @@ public class RavagerAnimator extends AzEntityAnimator<Ravager> {
 
     private float calculateAttackSpeed(Ravager ravager, XenomorphAttackType attackType) {
         var animationName = switch (attackType) {
-            case BITE -> RavagerAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME;
-            case CLAW -> RavagerAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME;
-            case TAIL -> RavagerAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME;
+            case BITE -> RavagerAnimationRefs.ATTACK_BITE_ANIMATION_NAME;
+            case CLAW -> RavagerAnimationRefs.ATTACK_ARM_SINGLE_ANIMATION_NAME;
+            case CLAW_DOUBLE -> RavagerAnimationRefs.ATTACK_ARM_DOUBLE_ANIMATION_NAME;
+            case TAIL -> RavagerAnimationRefs.ATTACK_TAIL_ANIMATION_NAME;
+            case SWIM_ATTACK -> RavagerAnimationRefs.SWIM_ATTACK_ANIMATION_NAME;
+            case SPECIAL_WINDUP -> RavagerAnimationRefs.SPECIAL_ATTACK_WARMUP_ANIMATION_NAME;
+            case SPECIAL -> RavagerAnimationRefs.SPECIAL_ATTACK_ACTIVATE_ANIMATION_NAME;
             default -> null;
         };
 
@@ -119,5 +110,10 @@ public class RavagerAnimator extends AzEntityAnimator<Ravager> {
         var animation = getAnimation(ravager, animationName);
 
         return (float) (animation.length() / durationInTicks);
+    }
+
+    private float calculateWindupAnimationSpeed(Ravager ravager) {
+        var animation = getAnimation(ravager, RavagerAnimationRefs.SPECIAL_ATTACK_WARMUP_ANIMATION_NAME);
+        return (float) (animation.length() / RavagerSpecialAttackConfig.DEFAULT.windupAnimationDurationInTicks());
     }
 }

@@ -1,6 +1,9 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.action;
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ravager.Ravager;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ravager.ai.RavagerClawAttackActions;
 import com.blib.api.common.goap.v1.GOAPSensors;
 import com.just.core.functional.option.Option;
 import com.just.goap.StateKey;
@@ -56,11 +59,16 @@ public class MeleeAttackAction {
         var damageDealt = blackboard.getOrDefault(KEY_DAMAGE_DEALT, false);
 
         if (!damageDealt && elapsedTicks >= damageTickThreshold) {
-            var attackRange = xenomorph.getBbWidth() + 1.0;
-
-            if (xenomorph.distanceTo(attackTarget) <= attackRange && xenomorph.getSensing().hasLineOfSight(attackTarget)) {
+            if (isRavagerClawAttack(xenomorph)) {
                 xenomorph.swing(InteractionHand.MAIN_HAND);
-                xenomorph.doHurtTarget(attackTarget);
+                RavagerClawAttackActions.damageEntitiesInFront((Ravager) xenomorph);
+            } else {
+                var attackRange = xenomorph.getBbWidth() + 1.0;
+
+                if (xenomorph.distanceTo(attackTarget) <= attackRange && xenomorph.getSensing().hasLineOfSight(attackTarget)) {
+                    xenomorph.swing(InteractionHand.MAIN_HAND);
+                    xenomorph.doHurtTarget(attackTarget);
+                }
             }
 
             blackboard.set(KEY_DAMAGE_DEALT, true);
@@ -71,6 +79,15 @@ public class MeleeAttackAction {
         }
 
         return Action.Signal.CONTINUE;
+    }
+
+    private static boolean isRavagerClawAttack(Xenomorph xenomorph) {
+        if (!(xenomorph instanceof Ravager ravager)) {
+            return false;
+        }
+
+        var attackType = ravager.attackType.get();
+        return attackType == XenomorphAttackType.CLAW || attackType == XenomorphAttackType.CLAW_DOUBLE;
     }
 
     private MeleeAttackAction() {

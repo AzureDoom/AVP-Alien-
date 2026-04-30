@@ -1,37 +1,76 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.ravager;
 
 import com.alien.common.util.AzAlienAnimationUtil;
-import com.blib.api.client.animation.v1.AzAnimationUtil;
 import com.blib.api.client.animation.v1.command.AzCommand;
 import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
 
 public class RavagerAnimationDispatcher {
 
-    private static final AzCommand ARMATTACK_RIGHTARM = AzCommand.create(
-        AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
-        RavagerAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME,
+    private static final AzCommand ARMATTACK = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        RavagerAnimationRefs.ATTACK_ARM_SINGLE_ANIMATION_NAME,
         AzPlayBehaviors.PLAY_ONCE
     );
 
-    private static final AzCommand BITEATTACK_HEAD = AzCommand.create(
-        AzAlienAnimationUtil.HEAD_TRACK_NAME,
-        RavagerAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME,
+    private static final AzCommand DOUBLE_ARMATTACK = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        RavagerAnimationRefs.ATTACK_ARM_DOUBLE_ANIMATION_NAME,
         AzPlayBehaviors.PLAY_ONCE
     );
 
-    private static final AzCommand TAILATTACKQUAD_TAIL = AzCommand.create(
-        AzAlienAnimationUtil.TAIL_TRACK_NAME,
-        RavagerAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME,
+    private static final AzCommand BITEATTACK = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        RavagerAnimationRefs.ATTACK_BITE_ANIMATION_NAME,
         AzPlayBehaviors.PLAY_ONCE
     );
 
-    private static final AzCommand IDLE_ALL = AzAnimationUtil.compose(AzAlienAnimationUtil.XENO_LIMB_NAMES, "idle");
+    private static final AzCommand TAILATTACK = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        RavagerAnimationRefs.ATTACK_TAIL_ANIMATION_NAME,
+        AzPlayBehaviors.PLAY_ONCE
+    );
 
-    private static final AzCommand RUN_ALL = AzAnimationUtil.compose(AzAlienAnimationUtil.XENO_LIMB_NAMES, "run");
+    private static final AzCommand SWIM_ATTACK = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        RavagerAnimationRefs.SWIM_ATTACK_ANIMATION_NAME,
+        AzPlayBehaviors.PLAY_ONCE
+    );
 
-    private static final AzCommand SWIM_ALL = AzAnimationUtil.compose(AzAlienAnimationUtil.XENO_LIMB_NAMES, "swim");
+    private static final AzCommand SPECIAL_ATTACK_WARMUP = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        RavagerAnimationRefs.SPECIAL_ATTACK_WARMUP_ANIMATION_NAME,
+        AzPlayBehaviors.HOLD_ON_LAST_FRAME
+    );
 
-    private static final AzCommand WALK_ALL = AzAnimationUtil.compose(AzAlienAnimationUtil.XENO_LIMB_NAMES, "walk");
+    private static final AzCommand SPECIAL_ATTACK_ACTIVATE = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        RavagerAnimationRefs.SPECIAL_ATTACK_ACTIVATE_ANIMATION_NAME,
+        AzPlayBehaviors.PLAY_ONCE
+    );
+
+    private static final AzCommand IDLE = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        RavagerAnimationRefs.IDLE_ANIMATION_NAME,
+        AzPlayBehaviors.LOOP
+    );
+
+    private static final AzCommand RUN = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        RavagerAnimationRefs.RUN_ANIMATION_NAME,
+        AzPlayBehaviors.LOOP
+    );
+
+    private static final AzCommand SWIM = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        RavagerAnimationRefs.SWIM_ANIMATION_NAME,
+        AzPlayBehaviors.LOOP
+    );
+
+    private static final AzCommand WALK = AzCommand.create(
+        AzAlienAnimationUtil.BODY_TRACK_NAME,
+        RavagerAnimationRefs.WALK_ANIMATION_NAME,
+        AzPlayBehaviors.LOOP
+    );
 
     private final Ravager ravager;
 
@@ -40,29 +79,29 @@ public class RavagerAnimationDispatcher {
     }
 
     public void idle() {
-        IDLE_ALL.dispatchForEntity(ravager);
+        IDLE.dispatchForEntity(ravager);
     }
 
     public void run() {
-        RUN_ALL.dispatchForEntity(ravager);
+        RUN.dispatchForEntity(ravager);
     }
 
     public void swim() {
-        SWIM_ALL.dispatchForEntity(ravager);
+        SWIM.dispatchForEntity(ravager);
     }
 
     public void walk() {
-        WALK_ALL.dispatchForEntity(ravager);
+        WALK.dispatchForEntity(ravager);
     }
 
     public void biteAttack() {
-        BITEATTACK_HEAD.dispatchForEntity(ravager);
+        BITEATTACK.dispatchForEntity(ravager);
     }
 
     public void biteAttack(float speed) {
         AzCommand.create(
-            AzAlienAnimationUtil.HEAD_TRACK_NAME,
-            RavagerAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME,
+            AzAlienAnimationUtil.BODY_TRACK_NAME,
+            RavagerAnimationRefs.ATTACK_BITE_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
             0F,
             speed,
@@ -73,13 +112,30 @@ public class RavagerAnimationDispatcher {
     }
 
     public void rightClawAttack() {
-        ARMATTACK_RIGHTARM.dispatchForEntity(ravager);
+        ARMATTACK.dispatchForEntity(ravager);
     }
 
     public void rightClawAttack(float speed) {
         AzCommand.create(
-            AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
-            RavagerAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME,
+            AzAlienAnimationUtil.BODY_TRACK_NAME,
+            RavagerAnimationRefs.ATTACK_ARM_SINGLE_ANIMATION_NAME,
+            AzPlayBehaviors.PLAY_ONCE,
+            0F,
+            speed,
+            0F,
+            0F,
+            false
+        ).dispatchForEntity(ravager);
+    }
+
+    public void doubleClawAttack() {
+        DOUBLE_ARMATTACK.dispatchForEntity(ravager);
+    }
+
+    public void doubleClawAttack(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.BODY_TRACK_NAME,
+            RavagerAnimationRefs.ATTACK_ARM_DOUBLE_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
             0F,
             speed,
@@ -90,13 +146,64 @@ public class RavagerAnimationDispatcher {
     }
 
     public void tailAttack() {
-        TAILATTACKQUAD_TAIL.dispatchForEntity(ravager);
+        TAILATTACK.dispatchForEntity(ravager);
     }
 
     public void tailAttack(float speed) {
         AzCommand.create(
-            AzAlienAnimationUtil.TAIL_TRACK_NAME,
-            RavagerAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME,
+            AzAlienAnimationUtil.BODY_TRACK_NAME,
+            RavagerAnimationRefs.ATTACK_TAIL_ANIMATION_NAME,
+            AzPlayBehaviors.PLAY_ONCE,
+            0F,
+            speed,
+            0F,
+            0F,
+            false
+        ).dispatchForEntity(ravager);
+    }
+
+    public void swimAttack() {
+        SWIM_ATTACK.dispatchForEntity(ravager);
+    }
+
+    public void swimAttack(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.BODY_TRACK_NAME,
+            RavagerAnimationRefs.SWIM_ATTACK_ANIMATION_NAME,
+            AzPlayBehaviors.PLAY_ONCE,
+            0F,
+            speed,
+            0F,
+            0F,
+            false
+        ).dispatchForEntity(ravager);
+    }
+
+    public void specialAttackWarmup() {
+        SPECIAL_ATTACK_WARMUP.dispatchForEntity(ravager);
+    }
+
+    public void specialAttackWarmup(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.BODY_TRACK_NAME,
+            RavagerAnimationRefs.SPECIAL_ATTACK_WARMUP_ANIMATION_NAME,
+            AzPlayBehaviors.HOLD_ON_LAST_FRAME,
+            0F,
+            speed,
+            0F,
+            0F,
+            false
+        ).dispatchForEntity(ravager);
+    }
+
+    public void specialAttackActivate() {
+        SPECIAL_ATTACK_ACTIVATE.dispatchForEntity(ravager);
+    }
+
+    public void specialAttackActivate(float speed) {
+        AzCommand.create(
+            AzAlienAnimationUtil.BODY_TRACK_NAME,
+            RavagerAnimationRefs.SPECIAL_ATTACK_ACTIVATE_ANIMATION_NAME,
             AzPlayBehaviors.PLAY_ONCE,
             0F,
             speed,

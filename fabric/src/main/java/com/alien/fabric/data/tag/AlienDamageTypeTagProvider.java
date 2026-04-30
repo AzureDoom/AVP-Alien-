@@ -22,7 +22,9 @@ public class AlienDamageTypeTagProvider extends FabricTagProvider<DamageType> {
     protected void addTags(HolderLookup.Provider wrapperLookup) {
         getOrCreateTagBuilder(DamageTypeTags.BYPASSES_ARMOR)
             .add(
-                AlienDamageTypeKeys.CHESTBURSTING
+                AlienDamageTypeKeys.CHESTBURSTING,
+                AlienDamageTypeKeys.RAVAGER_CLAW,
+                AlienDamageTypeKeys.RAVAGER_SPECIAL
             );
 
         getOrCreateTagBuilder(DamageTypeTags.BYPASSES_ENCHANTMENTS)

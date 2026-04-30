@@ -4,6 +4,8 @@ import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ravager.ai.RavagerGOAP;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ravager.ai.special_attack.RavagerSpecialAttackActions;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ravager.ai.special_attack.RavagerSpecialAttackConfig;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienEntityTypes;
@@ -23,15 +25,21 @@ import com.blib.api.common.pathfinding.v1.terrain.TerrainClassifiers;
 import com.blib.api.common.pathfinding.v1.terrain.TerrainType;
 import com.just.goap.Agent;
 import com.just.goap.graph.Graph;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
+import net.minecraft.util.Mth;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class Ravager extends Xenomorph implements GOAPUser<Ravager>, PathNavigatorUser {
 
     private static final float MAX_BREAKABLE_DESTROY_TIME = 6.0F;
+
+    private static final int ATTACK_DURATION_MULTIPLIER = 3;
 
     public static AttributeSupplier.Builder createRavagerAttributes() {
         return Alien.createAlienAttributes()
@@ -48,12 +56,25 @@ public class Ravager extends Xenomorph implements GOAPUser<Ravager>, PathNavigat
 
     private final RavagerAnimationDispatcher animationDispatcher;
 
+    private final RavagerData ravagerData;
+
     private final PathNavigator pathNavigator;
+
+    private int specialWindupTicksRemaining;
+
+    private int specialAttackTicksRemaining;
+
+    private int specialAttackDurationInTicks;
+
+    private boolean specialAttackDamageDealt;
+
+    private float specialAttackYaw;
 
     public Ravager(EntityType<? extends Ravager> entityType, Level level) {
         super(entityType, level);
         this.attackType = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_ATTACK_TYPE.get());
         this.animationDispatcher = new RavagerAnimationDispatcher(this);
+        this.ravagerData = new RavagerData();
         this.pathNavigator = createPathNavigator(level);
         getXenomorphData().setParallelDigCount(2);
     }
@@ -123,7 +144,7 @@ public class Ravager extends Xenomorph implements GOAPUser<Ravager>, PathNavigat
 
     @Override
     public void runAttackAnimations() {
-        var attackVariant = random.nextInt(0, 3);
+        var attackVariant = random.nextInt(0, 4);
 
         playSound(
             AlienSoundEvents.ENTITY_XENOMORPH_ATTACK.get(),
@@ -131,14 +152,112 @@ public class Ravager extends Xenomorph implements GOAPUser<Ravager>, PathNavigat
             (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F
         );
 
-        var attack = switch (attackVariant) {
-            case 0 -> XenomorphAttackType.CLAW;
-            case 1 -> XenomorphAttackType.BITE;
-            default -> XenomorphAttackType.TAIL;
-        };
+        var attack = isUnderWater()
+            ? XenomorphAttackType.SWIM_ATTACK
+            : switch (attackVariant) {
+                case 0 -> XenomorphAttackType.CLAW;
+                case 1 -> XenomorphAttackType.CLAW_DOUBLE;
+                case 2 -> XenomorphAttackType.BITE;
+                default -> XenomorphAttackType.TAIL;
+            };
 
         attackType.set(attack);
-        beginAttack(attack.defaultDurationInTicks());
+        beginAttack(attack.defaultDurationInTicks() * ATTACK_DURATION_MULTIPLIER);
+    }
+
+    public void startSpecialAttackWindup(int durationInTicks, LivingEntity target) {
+        specialAttackYaw = computeYawTowards(target);
+        specialWindupTicksRemaining = durationInTicks;
+        specialAttackTicksRemaining = 0;
+        specialAttackDurationInTicks = 0;
+        specialAttackDamageDealt = false;
+        attackType.set(XenomorphAttackType.SPECIAL_WINDUP);
+        beginAttack(durationInTicks + 2);
+    }
+
+    public void activateSpecialAttack(int durationInTicks) {
+        specialWindupTicksRemaining = 0;
+        specialAttackTicksRemaining = durationInTicks;
+        specialAttackDurationInTicks = durationInTicks;
+        specialAttackDamageDealt = false;
+        attackType.set(XenomorphAttackType.SPECIAL);
+        beginAttack(durationInTicks + 1);
+    }
+
+    public boolean isUsingSpecialAttack() {
+        var currentAttackType = attackType.get();
+        return specialWindupTicksRemaining > 0
+            || specialAttackTicksRemaining > 0
+            || currentAttackType == XenomorphAttackType.SPECIAL_WINDUP
+            || currentAttackType == XenomorphAttackType.SPECIAL;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        if (!level().isClientSide) {
+            ravagerData.tick();
+            tickSpecialAttack();
+        }
+    }
+
+    private void tickSpecialAttack() {
+        if (specialWindupTicksRemaining > 0) {
+            lockSpecialAttackYaw();
+            specialWindupTicksRemaining--;
+
+            if (specialWindupTicksRemaining <= 0) {
+                activateSpecialAttack(RavagerSpecialAttackConfig.DEFAULT.attackDurationInTicks());
+            }
+
+            return;
+        }
+
+        if (specialAttackTicksRemaining <= 0) {
+            return;
+        }
+
+        lockSpecialAttackYaw();
+        specialAttackTicksRemaining--;
+
+        var elapsedTicks = specialAttackDurationInTicks - specialAttackTicksRemaining;
+        var damageTickThreshold = (int) (specialAttackDurationInTicks * RavagerSpecialAttackConfig.DEFAULT.damagePointPercent());
+
+        if (!specialAttackDamageDealt && elapsedTicks >= damageTickThreshold) {
+            RavagerSpecialAttackActions.damageEntitiesInFront(this, RavagerSpecialAttackConfig.DEFAULT);
+            specialAttackDamageDealt = true;
+        }
+
+        if (specialAttackTicksRemaining <= 0) {
+            resetAttackType();
+            attackDurationInTicks.set(0);
+        }
+    }
+
+    private void lockSpecialAttackYaw() {
+        setYRot(specialAttackYaw);
+        setYHeadRot(specialAttackYaw);
+        setYBodyRot(specialAttackYaw);
+        getNavigation().stop();
+    }
+
+    private float computeYawTowards(LivingEntity target) {
+        var dx = target.getX() - getX();
+        var dz = target.getZ() - getZ();
+        return (float) (Mth.atan2(-dx, dz) * Mth.RAD_TO_DEG);
+    }
+
+    @Override
+    public void readAdditionalSaveData(@NotNull CompoundTag compoundTag) {
+        super.readAdditionalSaveData(compoundTag);
+        ravagerData.load(compoundTag);
+    }
+
+    @Override
+    public void addAdditionalSaveData(@NotNull CompoundTag compoundTag) {
+        super.addAdditionalSaveData(compoundTag);
+        ravagerData.save(compoundTag);
     }
 
     @Override
@@ -148,6 +267,10 @@ public class Ravager extends Xenomorph implements GOAPUser<Ravager>, PathNavigat
 
     public RavagerAnimationDispatcher getAnimationDispatcher() {
         return animationDispatcher;
+    }
+
+    public RavagerData getRavagerData() {
+        return ravagerData;
     }
 
     public static EntityType<? extends Alien> getType(AlienVariant alienVariant) {

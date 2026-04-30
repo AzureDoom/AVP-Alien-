@@ -38,6 +38,10 @@ public class EnglishLanguageProvider extends FabricLanguageProvider {
         // Death messages
         builder.add("death.attack.acid", "%1$s vaporized in acid");
         builder.add("death.attack.chestbursting", "%1$s gave birth");
+        builder.add("death.attack.ravager_claw", "%1$s was torn apart");
+        builder.add("death.attack.ravager_claw.player", "%1$s was torn apart by %2$s");
+        builder.add("death.attack.ravager_special", "%1$s was eviscerated");
+        builder.add("death.attack.ravager_special.player", "%1$s was eviscerated by %2$s");
         builder.add("death.attack.smothering", "%1$s was smothered to death");
 
         // Effects
