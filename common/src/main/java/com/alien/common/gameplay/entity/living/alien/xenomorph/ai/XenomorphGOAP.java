@@ -30,6 +30,7 @@ public class XenomorphGOAP {
         return graphBuilder
             .apply(XenomorphGOAP::addSensorsPackage)
             .apply(XenomorphGOAP::addCombatPackage)
+            .apply(XenomorphGOAP::addDigSensorsPackage)
             .apply(XenomorphGOAP::addIdlePackage);
     }
 
@@ -93,6 +94,12 @@ public class XenomorphGOAP {
     public static <T extends Xenomorph> Graph.Builder<T> addDigPackage(Graph.Builder<T> graphBuilder) {
         graphBuilder.addAction(DigActions.DIG_TO_TARGET);
 
+        addDigSensorsPackage(graphBuilder);
+
+        return graphBuilder;
+    }
+
+    public static <T extends Xenomorph> Graph.Builder<T> addDigSensorsPackage(Graph.Builder<T> graphBuilder) {
         graphBuilder.addSensor(DigSensors.IS_PATH_TO_TARGET_BLOCKED);
 
         return graphBuilder;
