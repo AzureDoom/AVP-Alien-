@@ -9,6 +9,7 @@ import com.just.core.functional.option.Option;
 import com.just.goap.StateKey;
 import com.just.goap.action.Action;
 import com.just.goap.state.Blackboard;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 
@@ -37,6 +38,7 @@ public class MeleeAttackAction {
         var attackTarget = attackTargetOption.unwrap();
 
         xenomorph.getLookControl().setLookAt(attackTarget);
+        faceXenomorphTowardTarget(xenomorph, attackTarget);
 
         var attackStarted = blackboard.getOrDefault(KEY_ATTACK_STARTED, false);
 
@@ -88,6 +90,20 @@ public class MeleeAttackAction {
 
         var attackType = ravager.attackType.get();
         return attackType == XenomorphAttackType.CLAW || attackType == XenomorphAttackType.CLAW_DOUBLE;
+    }
+
+    private static void faceXenomorphTowardTarget(Xenomorph xenomorph, LivingEntity target) {
+        if (!(xenomorph instanceof Ravager ravager)) {
+            return;
+        }
+
+        var dx = target.getX() - ravager.getX();
+        var dz = target.getZ() - ravager.getZ();
+        var yaw = (float) (Mth.atan2(-dx, dz) * Mth.RAD_TO_DEG);
+
+        ravager.setYRot(yaw);
+        ravager.setYHeadRot(yaw);
+        ravager.setYBodyRot(yaw);
     }
 
     private MeleeAttackAction() {
