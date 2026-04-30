@@ -11,6 +11,7 @@ import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienBlockTags;
+import com.alien.common.util.AlienPredicates;
 import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.goap.v1.GOAPUser;
@@ -144,25 +145,48 @@ public class Ravager extends Xenomorph implements GOAPUser<Ravager>, PathNavigat
 
     @Override
     public void runAttackAnimations() {
-        var attackVariant = random.nextInt(0, 4);
-
         playSound(
             AlienSoundEvents.ENTITY_XENOMORPH_ATTACK.get(),
             getSoundVolume(),
             (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F
         );
 
-        var attack = isUnderWater()
-            ? XenomorphAttackType.SWIM_ATTACK
-            : switch (attackVariant) {
-                case 0 -> XenomorphAttackType.CLAW;
-                case 1 -> XenomorphAttackType.CLAW_DOUBLE;
-                case 2 -> XenomorphAttackType.BITE;
-                default -> XenomorphAttackType.TAIL;
-            };
+        var attack = selectAttack();
 
         attackType.set(attack);
         beginAttack(attack.defaultDurationInTicks() * ATTACK_DURATION_MULTIPLIER);
+    }
+
+    private XenomorphAttackType selectAttack() {
+        if (isUnderWater()) {
+            return XenomorphAttackType.SWIM_ATTACK;
+        }
+
+        if (getNearbyCloseAttackTargetCount() > 1) {
+            return random.nextBoolean()
+                ? XenomorphAttackType.CLAW
+                : XenomorphAttackType.CLAW_DOUBLE;
+        }
+
+        return switch (random.nextInt(0, 4)) {
+            case 0 -> XenomorphAttackType.CLAW;
+            case 1 -> XenomorphAttackType.CLAW_DOUBLE;
+            case 2 -> XenomorphAttackType.BITE;
+            default -> XenomorphAttackType.TAIL;
+        };
+    }
+
+    private long getNearbyCloseAttackTargetCount() {
+        var closeTargetRange = RavagerSpecialAttackConfig.DEFAULT.rangeInBlocks();
+        var closeTargetRangeSquared = closeTargetRange * closeTargetRange;
+
+        return getEntitySenseCache()
+            .getByClass(LivingEntity.class)
+            .stream()
+            .filter(target -> distanceToSqr(target) <= closeTargetRangeSquared)
+            .filter(target -> getSensing().hasLineOfSight(target))
+            .filter(target -> AlienPredicates.canTarget(this, target))
+            .count();
     }
 
     public void startSpecialAttackWindup(int durationInTicks, LivingEntity target) {
