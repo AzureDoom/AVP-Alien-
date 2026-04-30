@@ -1,18 +1,21 @@
 package com.alien.common.gameplay.entity.living.alien;
 
 import com.alien.AlienResources;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.model.lifecycle.growth.FormSizeScale;
 import com.alien.common.model.lifecycle.growth.MoltPhase;
 import com.alien.common.registry.FormSizeScaleRegistry;
+import com.alien.common.util.AlienPredicates;
 import com.blib.api.common.nbt.v1.model.NBTSerializable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import org.jetbrains.annotations.Nullable;
 
-public class FormSizeScaleManager implements NBTSerializable {
+public class MoltingManager implements NBTSerializable {
 
     public static final String FORM_SCALE_PHASE_INDEX_TAG = "formScalePhaseIndex";
     public static final String FORM_SCALE_PHASE_TICKS_TAG = "formScalePhaseTicks";
@@ -20,6 +23,8 @@ public class FormSizeScaleManager implements NBTSerializable {
     private static final ResourceLocation FORM_SIZE_SCALE_MODIFIER = AlienResources.location("form_size_scale");
 
     private static final int MOLT_FADE_TICKS = 20;
+
+    private static final int RECENTLY_HURT_WINDOW_IN_TICKS = 10 * 20;
 
     private final Alien entity;
 
@@ -31,7 +36,7 @@ public class FormSizeScaleManager implements NBTSerializable {
 
     private boolean dataCacheDirty;
 
-    public FormSizeScaleManager(Alien entity) {
+    public MoltingManager(Alien entity) {
         this.entity = entity;
         this.phaseIndex = 0;
         this.phaseElapsedTicks = 0;
@@ -61,6 +66,19 @@ public class FormSizeScaleManager implements NBTSerializable {
         }
 
         var currentPhase = data.phases().get(phaseIndex);
+
+        if (!isMolting(currentPhase) && shouldStartMoltImmediately()) {
+            if (!canStartMolting()) {
+                return;
+            }
+
+            phaseElapsedTicks = currentPhase.idleTicks();
+        }
+
+        if (willStartMolting(currentPhase) && !canStartMolting()) {
+            return;
+        }
+
         phaseElapsedTicks++;
 
         if (phaseElapsedTicks >= currentPhase.totalTicks()) {
@@ -115,8 +133,50 @@ public class FormSizeScaleManager implements NBTSerializable {
         return phaseStartScale + (phaseEndScale - phaseStartScale) * moltProgress;
     }
 
+    public boolean isMolting() {
+        var data = getData();
+
+        if (data == null || data.isFullyMatured(phaseIndex)) {
+            return false;
+        }
+
+        return isMolting(data.phases().get(phaseIndex));
+    }
+
     private boolean isMolting(MoltPhase phase) {
         return phaseElapsedTicks >= phase.idleTicks();
+    }
+
+    private boolean shouldStartMoltImmediately() {
+        return entity instanceof Xenomorph xenomorph && xenomorph.getGrowthManager().hasActiveGrowthRequirement();
+    }
+
+    private boolean willStartMolting(MoltPhase phase) {
+        return !isMolting(phase) && phaseElapsedTicks + 1 >= phase.idleTicks();
+    }
+
+    private boolean canStartMolting() {
+        return !isVulnerableAndOnFire() && !wasRecentlyHurt() && entity.getTarget() == null && !hasNearbyAttackTarget();
+    }
+
+    private boolean isVulnerableAndOnFire() {
+        return entity.isOnFire() && !entity.fireImmune();
+    }
+
+    private boolean wasRecentlyHurt() {
+        var lastHurtTime = entity.getLastHurtTimeInTicks();
+        return lastHurtTime > 0 && entity.tickCount - lastHurtTime < RECENTLY_HURT_WINDOW_IN_TICKS;
+    }
+
+    private boolean hasNearbyAttackTarget() {
+        if (!(entity instanceof Xenomorph xenomorph)) {
+            return false;
+        }
+
+        return xenomorph.getEntitySenseCache()
+            .getByClass(LivingEntity.class)
+            .stream()
+            .anyMatch(potentialTarget -> AlienPredicates.canTarget(xenomorph, potentialTarget));
     }
 
     private float computeMoltAlpha(MoltPhase phase) {

@@ -28,13 +28,11 @@ public class GrowthManager implements NBTSerializable {
 
     private static final String GROWTH_TIME_IN_TICKS_TAG_KEY = "growthTimeInTicks";
 
-    private static final int EFFECT_GROWTH_WINDOW_IN_TICKS = 20 * 10;
-
     private static final Set<String> TRANSITION_NBT_KEY_BLACKLIST = Util.make(() -> {
         var set = new HashSet<>(EntityTransitionUtil.DEFAULT_NBT_KEY_BLACKLIST);
         set.add(GROWTH_TIME_IN_TICKS_TAG_KEY);
-        set.add(FormSizeScaleManager.FORM_SCALE_PHASE_INDEX_TAG);
-        set.add(FormSizeScaleManager.FORM_SCALE_PHASE_TICKS_TAG);
+        set.add(MoltingManager.FORM_SCALE_PHASE_INDEX_TAG);
+        set.add(MoltingManager.FORM_SCALE_PHASE_TICKS_TAG);
         return set;
     });
 
@@ -49,6 +47,8 @@ public class GrowthManager implements NBTSerializable {
     private int growthRetryTimeInTicks;
 
     private boolean readyToGrow;
+
+    private @Nullable GrowthStage activeRequirementGrowthStage;
 
     public GrowthManager(Alien entity) {
         this(entity, null);
@@ -66,7 +66,7 @@ public class GrowthManager implements NBTSerializable {
             return;
         }
 
-        var matchingStage = findMatchingGrowthStage();
+        var matchingStage = findActiveOrMatchingGrowthStage();
 
         if (matchingStage == null) {
             return;
@@ -82,7 +82,7 @@ public class GrowthManager implements NBTSerializable {
             return;
         }
 
-        if (!entity.getFormSizeScaleManager().hasReachedTargetScale()) {
+        if (!entity.getMoltingManager().hasReachedTargetScale()) {
             return;
         }
 
@@ -102,6 +102,14 @@ public class GrowthManager implements NBTSerializable {
                 }
             }
         }
+    }
+
+    private @Nullable GrowthStage findActiveOrMatchingGrowthStage() {
+        if (activeRequirementGrowthStage != null) {
+            return activeRequirementGrowthStage;
+        }
+
+        return findMatchingGrowthStage();
     }
 
     private @Nullable GrowthStage findMatchingGrowthStage() {
@@ -132,18 +140,24 @@ public class GrowthManager implements NBTSerializable {
     }
 
     private void tickEffectBasedGrowth(GrowthStage stage) {
-        var allInWindow = true;
+        var requirementsMet = allRequirementsMet(stage.requirements());
 
-        for (var requirement : stage.requirements()) {
-            if (requirement instanceof GrowthRequirement.MobEffectRequirement effectRequirement) {
-                if (!effectRequirement.isInGrowthWindow(entity, EFFECT_GROWTH_WINDOW_IN_TICKS)) {
-                    allInWindow = false;
-                    break;
-                }
-            }
+        if (requirementsMet) {
+            activeRequirementGrowthStage = stage;
         }
 
-        this.readyToGrow = allInWindow;
+        if (activeRequirementGrowthStage == null) {
+            this.readyToGrow = false;
+            return;
+        }
+
+        if (!requirementsMet && !entity.getMoltingManager().isMolting() && !entity.getMoltingManager().hasReachedTargetScale()) {
+            activeRequirementGrowthStage = null;
+            this.readyToGrow = false;
+            return;
+        }
+
+        this.readyToGrow = true;
     }
 
     private void tickTimeBasedGrowth(GrowthStage stage) {
@@ -167,6 +181,7 @@ public class GrowthManager implements NBTSerializable {
     public GrowthResult grow(GrowthStage growthStage) {
         this.growthTimeInTicks = 0;
         this.readyToGrow = false;
+        this.activeRequirementGrowthStage = null;
 
         if (canNeverGrow()) {
             return GrowthResult.CanNotGrow.INSTANCE;
@@ -278,6 +293,11 @@ public class GrowthManager implements NBTSerializable {
     public GrowthManager setGrowOverTime(boolean growOverTime) {
         this.growOverTime = growOverTime;
         return this;
+    }
+
+    public boolean hasActiveGrowthRequirement() {
+        var stage = activeRequirementGrowthStage != null ? activeRequirementGrowthStage : findMatchingGrowthStage();
+        return stage != null && stage.hasRequirements() && allRequirementsMet(stage.requirements());
     }
 
     public sealed interface GrowthResult {
