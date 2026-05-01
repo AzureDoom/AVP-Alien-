@@ -32,24 +32,6 @@ public class RazorClawAnimator extends AzEntityAnimator<RazorClaw> {
         animationTrackContainer.add(
             AzAnimationTrack.builder(this, AzAlienAnimationUtil.BODY_TRACK_NAME)
                 .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.HEAD_TRACK_NAME)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_ARM_TRACK_NAME)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_LEG_TRACK_NAME)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_LEG_TRACK_NAME)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.TAIL_TRACK_NAME)
-                .setTransitionLength(5)
                 .build()
         );
     }
@@ -84,6 +66,8 @@ public class RazorClawAnimator extends AzEntityAnimator<RazorClaw> {
                     case BITE -> dispatcher.biteAttack(speed);
                     case CLAW -> dispatcher.rightClawAttack(speed);
                     case TAIL -> dispatcher.tailAttack(speed);
+                    case SWIM_ATTACK -> dispatcher.swimAttack(speed);
+                    case SPECIAL -> dispatcher.specialAttackSpin(speed);
                 }
 
                 previousAttackId = attackId;
@@ -111,9 +95,11 @@ public class RazorClawAnimator extends AzEntityAnimator<RazorClaw> {
 
     private float calculateAttackSpeed(RazorClaw razorClaw, XenomorphAttackType attackType) {
         var animationName = switch (attackType) {
-            case BITE -> RazorClawAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME;
-            case CLAW -> RazorClawAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME;
-            case TAIL -> RazorClawAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME;
+            case BITE -> RazorClawAnimationRefs.ATTACK_BITE_ANIMATION_NAME;
+            case CLAW -> RazorClawAnimationRefs.ATTACK_CLAW_ANIMATION_NAME;
+            case TAIL -> RazorClawAnimationRefs.ATTACK_TAIL_ANIMATION_NAME;
+            case SWIM_ATTACK -> RazorClawAnimationRefs.SWIM_ATTACK_ANIMATION_NAME;
+            case SPECIAL -> RazorClawAnimationRefs.SPECIAL_ATTACK_SPIN_ANIMATION_NAME;
             default -> null;
         };
 
