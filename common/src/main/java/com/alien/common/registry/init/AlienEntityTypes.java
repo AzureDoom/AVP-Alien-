@@ -135,7 +135,7 @@ public class AlienEntityTypes {
     // Razor Claw
     public static final float RAZOR_CLAW_WIDTH = 0.98F;
 
-    public static final float RAZOR_CLAW_HEIGHT = 3.98F;
+    public static final float RAZOR_CLAW_HEIGHT = 2.98F;
 
     // Burster
     public static final float BURSTER_WIDTH = 0.8F;
