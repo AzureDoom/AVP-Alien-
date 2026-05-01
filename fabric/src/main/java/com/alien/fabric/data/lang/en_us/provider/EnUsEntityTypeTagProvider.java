@@ -15,6 +15,7 @@ public class EnUsEntityTypeTagProvider {
         builder.add(AlienEntityTypeTags.CARRIERS, "Carriers");
         builder.add(AlienEntityTypeTags.CHRYSALISES, "Chrysalises");
         builder.add(AlienEntityTypeTags.DRONES, "Drones");
+        builder.add(AlienEntityTypeTags.EMPRESSES, "Empresses");
         builder.add(AlienEntityTypeTags.FACEHUGGERS, "Facehuggers");
         builder.add(AlienEntityTypeTags.HARBINGERS, "Harbingers");
         builder.add(AlienEntityTypeTags.HATED_BY_XENOMORPHS, "Hated By Xenomorphs");

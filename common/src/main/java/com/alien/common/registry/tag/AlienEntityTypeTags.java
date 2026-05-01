@@ -27,6 +27,8 @@ public class AlienEntityTypeTags {
 
     public static final TagKey<EntityType<?>> DRONES = create("drones");
 
+    public static final TagKey<EntityType<?>> EMPRESSES = create("empresses");
+
     public static final TagKey<EntityType<?>> FACEHUGGERS = create("facehuggers");
 
     public static final TagKey<EntityType<?>> HARBINGERS = create("harbingers");

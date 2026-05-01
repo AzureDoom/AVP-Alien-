@@ -183,6 +183,20 @@
       },
       "trigger": "minecraft:player_killed_entity"
     },
+    "avp_alien:aberrant_empress": {
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "avp_alien:aberrant_empress"
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:player_killed_entity"
+    },
     "avp_alien:aberrant_runner": {
       "conditions": {
         "entity": [
@@ -491,6 +505,20 @@
       },
       "trigger": "minecraft:player_killed_entity"
     },
+    "avp_alien:nether_empress": {
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "avp_alien:nether_empress"
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:player_killed_entity"
+    },
     "avp_alien:nether_runner": {
       "conditions": {
         "entity": [
@@ -625,6 +653,20 @@
             "entity": "this",
             "predicate": {
               "type": "avp_alien:queen"
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:player_killed_entity"
+    },
+    "avp_alien:empress": {
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "avp_alien:empress"
             }
           }
         ]
@@ -896,6 +938,9 @@
       "avp_alien:queen"
     ],
     [
+      "avp_alien:empress"
+    ],
+    [
       "avp_alien:runner"
     ],
     [
@@ -944,6 +989,9 @@
       "avp_alien:aberrant_queen"
     ],
     [
+      "avp_alien:aberrant_empress"
+    ],
+    [
       "avp_alien:aberrant_runner"
     ],
     [
@@ -990,6 +1038,9 @@
     ],
     [
       "avp_alien:nether_queen"
+    ],
+    [
+      "avp_alien:nether_empress"
     ],
     [
       "avp_alien:nether_runner"

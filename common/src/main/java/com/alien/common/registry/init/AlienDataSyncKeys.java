@@ -6,6 +6,7 @@ import com.alien.common.gameplay.entity.living.alien.ovomorph.Ovomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.QuadrupedAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.CrusherAttackType;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.empress.EmpressAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.QueenAttackType;
 import com.blib.api.common.data_sync.v1.model.DataSyncKey;
 import com.blib.api.common.registry.v1.BLibBuiltInRegistries;
@@ -181,6 +182,12 @@ public class AlienDataSyncKeys {
         "queen_attack_type",
         builder -> builder.networkSynchronized(QueenAttackType.CODEC)
             .build(QueenAttackType.NONE)
+    );
+
+    public static final BLibHolder<DataSyncKey<EmpressAttackType>> EMPRESS_ATTACK_TYPE = create(
+        "empress_attack_type",
+        builder -> builder.networkSynchronized(EmpressAttackType.CODEC)
+            .build(EmpressAttackType.NONE)
     );
 
     public static final BLibHolder<DataSyncKey<XenomorphAttackType>> XENOMORPH_ATTACK_TYPE = create(

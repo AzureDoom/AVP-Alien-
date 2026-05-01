@@ -55,6 +55,26 @@ public class AlienSoundEvents {
 
     public static final BLibHolder<SoundEvent> ENTITY_QUEEN_TAIL_ATTACK = create("entity.queen.tail_attack");
 
+    public static final BLibHolder<SoundEvent> ENTITY_EMPRESS_ARM_ATTACK = create("entity.empress.arm_attack");
+
+    public static final BLibHolder<SoundEvent> ENTITY_EMPRESS_BACK_HAND_ATTACK = create("entity.empress.back_hand_attack");
+
+    public static final BLibHolder<SoundEvent> ENTITY_EMPRESS_DEATH = create("entity.empress.death");
+
+    public static final BLibHolder<SoundEvent> ENTITY_EMPRESS_HURT = create("entity.empress.hurt");
+
+    public static final BLibHolder<SoundEvent> ENTITY_EMPRESS_IDLE = create("entity.empress.idle");
+
+    public static final BLibHolder<SoundEvent> ENTITY_EMPRESS_RAM_ATTACK = create("entity.empress.ram_attack");
+
+    public static final BLibHolder<SoundEvent> ENTITY_EMPRESS_SCREAM = create("entity.empress.scream");
+
+    public static final BLibHolder<SoundEvent> ENTITY_EMPRESS_STEP_THUMP = create("entity.empress.step_thump");
+
+    public static final BLibHolder<SoundEvent> ENTITY_EMPRESS_STEP_THUMP_ROCK = create("entity.empress.step_thump_rock");
+
+    public static final BLibHolder<SoundEvent> ENTITY_EMPRESS_TAIL_ATTACK = create("entity.empress.tail_attack");
+
     public static final BLibHolder<SoundEvent> ENTITY_XENOMORPH_ATTACK = create("entity.xenomorph.attack");
 
     public static final BLibHolder<SoundEvent> ENTITY_XENOMORPH_DEATH = create("entity.xenomorph.death");

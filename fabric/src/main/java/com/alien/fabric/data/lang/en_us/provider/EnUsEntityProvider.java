@@ -31,6 +31,7 @@ public class EnUsEntityProvider {
         addEntity(builder, AlienEntityTypes.ABERRANT_RAZOR_CLAW, "Aberrant Razor Claw");
         addEntity(builder, AlienEntityTypes.ABERRANT_RAVAGER, "Aberrant Ravager");
         addEntity(builder, AlienEntityTypes.ABERRANT_QUEEN, "Aberrant Queen");
+        addEntity(builder, AlienEntityTypes.ABERRANT_EMPRESS, "Aberrant Empress");
         addEntity(builder, AlienEntityTypes.ABERRANT_BURSTER, "Aberrant Burster");
         addEntity(builder, AlienEntityTypes.ABERRANT_RUNNER, "Aberrant Runner");
         addEntity(builder, AlienEntityTypes.ABERRANT_SPITTER, "Aberrant Spitter");
@@ -43,6 +44,7 @@ public class EnUsEntityProvider {
         addEntity(builder, AlienEntityTypes.CHRYSALIS, "Chrysalis");
         addEntity(builder, AlienEntityTypes.CRUSHER, "Crusher");
         addEntity(builder, AlienEntityTypes.DRONE, "Drone");
+        addEntity(builder, AlienEntityTypes.EMPRESS, "Empress");
         addEntity(builder, AlienEntityTypes.HARBINGER, "Harbinger");
         addEntity(builder, AlienEntityTypes.FACEHUGGER, "Facehugger");
         addEntity(builder, AlienEntityTypes.IRRADIATED_CARRIER, "Irradiated Carrier");
@@ -56,6 +58,7 @@ public class EnUsEntityProvider {
         addEntity(builder, AlienEntityTypes.IRRADIATED_RAZOR_CLAW, "Irradiated Razor Claw");
         addEntity(builder, AlienEntityTypes.IRRADIATED_RAVAGER, "Irradiated Ravager");
         addEntity(builder, AlienEntityTypes.IRRADIATED_QUEEN, "Irradiated Queen");
+        addEntity(builder, AlienEntityTypes.IRRADIATED_EMPRESS, "Irradiated Empress");
         addEntity(builder, AlienEntityTypes.IRRADIATED_BURSTER, "Irradiated Burster");
         addEntity(builder, AlienEntityTypes.IRRADIATED_RUNNER, "Irradiated Runner");
         addEntity(builder, AlienEntityTypes.IRRADIATED_WARRIOR, "Irradiated Warrior");
@@ -77,6 +80,7 @@ public class EnUsEntityProvider {
         addEntity(builder, AlienEntityTypes.NETHER_RAZOR_CLAW, "Nether Razor Claw");
         addEntity(builder, AlienEntityTypes.NETHER_RAVAGER, "Nether Ravager");
         addEntity(builder, AlienEntityTypes.NETHER_QUEEN, "Nether Queen");
+        addEntity(builder, AlienEntityTypes.NETHER_EMPRESS, "Nether Empress");
         addEntity(builder, AlienEntityTypes.NETHER_BURSTER, "Nether Burster");
         addEntity(builder, AlienEntityTypes.NETHER_RUNNER, "Nether Runner");
         addEntity(builder, AlienEntityTypes.NETHER_SPITTER, "Nether Spitter");

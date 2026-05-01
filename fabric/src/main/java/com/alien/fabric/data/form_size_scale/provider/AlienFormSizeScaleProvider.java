@@ -274,9 +274,27 @@ public class AlienFormSizeScaleProvider {
             )
         );
         biConsumer.accept(
+            "empress_form_size_scale",
+            new FormSizeScale(
+                AlienEntityTypes.EMPRESS.get(),
+                FormSizeScaleConstants.QUEEN_START_SCALE,
+                FormSizeScaleConstants.QUEEN_END_SCALE,
+                FormSizeScaleConstants.QUEEN_PHASES
+            )
+        );
+        biConsumer.accept(
             "irradiated_queen_form_size_scale",
             new FormSizeScale(
                 AlienEntityTypes.IRRADIATED_QUEEN.get(),
+                FormSizeScaleConstants.QUEEN_START_SCALE,
+                FormSizeScaleConstants.QUEEN_END_SCALE,
+                FormSizeScaleConstants.QUEEN_PHASES
+            )
+        );
+        biConsumer.accept(
+            "irradiated_empress_form_size_scale",
+            new FormSizeScale(
+                AlienEntityTypes.IRRADIATED_EMPRESS.get(),
                 FormSizeScaleConstants.QUEEN_START_SCALE,
                 FormSizeScaleConstants.QUEEN_END_SCALE,
                 FormSizeScaleConstants.QUEEN_PHASES

@@ -164,5 +164,14 @@ public class AberrantAlienFormSizeScaleProvider {
                 FormSizeScaleConstants.QUEEN_PHASES
             )
         );
+        biConsumer.accept(
+            "aberrant_empress_form_size_scale",
+            new FormSizeScale(
+                AlienEntityTypes.ABERRANT_EMPRESS.get(),
+                FormSizeScaleConstants.QUEEN_START_SCALE,
+                FormSizeScaleConstants.QUEEN_END_SCALE,
+                FormSizeScaleConstants.QUEEN_PHASES
+            )
+        );
     }
 }

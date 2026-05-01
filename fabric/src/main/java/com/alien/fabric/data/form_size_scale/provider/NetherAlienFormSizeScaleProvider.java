@@ -164,5 +164,14 @@ public class NetherAlienFormSizeScaleProvider {
                 FormSizeScaleConstants.QUEEN_PHASES
             )
         );
+        biConsumer.accept(
+            "nether_empress_form_size_scale",
+            new FormSizeScale(
+                AlienEntityTypes.NETHER_EMPRESS.get(),
+                FormSizeScaleConstants.QUEEN_START_SCALE,
+                FormSizeScaleConstants.QUEEN_END_SCALE,
+                FormSizeScaleConstants.QUEEN_PHASES
+            )
+        );
     }
 }

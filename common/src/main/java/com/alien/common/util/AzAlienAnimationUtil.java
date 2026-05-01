@@ -43,4 +43,16 @@ public class AzAlienAnimationUtil {
         RIGHT_TITTY_ARM_TRACK_NAME,
         TAIL_TRACK_NAME
     );
+
+    public static final List<String> XENO_EMPRESS_LIMB_NAMES = List.of(
+        BODY_TRACK_NAME,
+        HEAD_TRACK_NAME,
+        LEFT_ARM_TRACK_NAME,
+        LEFT_LEG_TRACK_NAME,
+        LEFT_TITTY_ARM_TRACK_NAME,
+        RIGHT_ARM_TRACK_NAME,
+        RIGHT_LEG_TRACK_NAME,
+        RIGHT_TITTY_ARM_TRACK_NAME,
+        TAIL_TRACK_NAME
+    );
 }

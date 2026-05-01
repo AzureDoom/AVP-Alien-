@@ -99,6 +99,11 @@ public class AlienSpawnEggItems {
 
     public static final BLibHolder<SpawnEggItem> ABERRANT_QUEEN_SPAWN_EGG = create("aberrant_queen", AlienEntityTypes.ABERRANT_QUEEN);
 
+    public static final BLibHolder<SpawnEggItem> ABERRANT_EMPRESS_SPAWN_EGG = create(
+        "aberrant_empress",
+        AlienEntityTypes.ABERRANT_EMPRESS
+    );
+
     public static final BLibHolder<SpawnEggItem> ADOLESCENT_SPAWN_EGG = create("adolescent", AlienEntityTypes.ADOLESCENT);
 
     public static final BLibHolder<SpawnEggItem> BOILER_SPAWN_EGG = create("boiler", AlienEntityTypes.BOILER);
@@ -112,6 +117,8 @@ public class AlienSpawnEggItems {
     public static final BLibHolder<SpawnEggItem> CRUSHER_SPAWN_EGG = create("crusher", AlienEntityTypes.CRUSHER);
 
     public static final BLibHolder<SpawnEggItem> DRONE_SPAWN_EGG = create("drone", AlienEntityTypes.DRONE);
+
+    public static final BLibHolder<SpawnEggItem> EMPRESS_SPAWN_EGG = create("empress", AlienEntityTypes.EMPRESS);
 
     public static final BLibHolder<SpawnEggItem> HARBINGER_SPAWN_EGG = create("harbinger", AlienEntityTypes.HARBINGER);
 
@@ -165,6 +172,11 @@ public class AlienSpawnEggItems {
     );
 
     public static final BLibHolder<SpawnEggItem> IRRADIATED_QUEEN_SPAWN_EGG = create("irradiated_queen", AlienEntityTypes.IRRADIATED_QUEEN);
+
+    public static final BLibHolder<SpawnEggItem> IRRADIATED_EMPRESS_SPAWN_EGG = create(
+        "irradiated_empress",
+        AlienEntityTypes.IRRADIATED_EMPRESS
+    );
 
     public static final BLibHolder<SpawnEggItem> IRRADIATED_BURSTER_SPAWN_EGG = create(
         "irradiated_burster",
@@ -257,6 +269,11 @@ public class AlienSpawnEggItems {
     );
 
     public static final BLibHolder<SpawnEggItem> NETHER_QUEEN_SPAWN_EGG = create("nether_queen", AlienEntityTypes.NETHER_QUEEN);
+
+    public static final BLibHolder<SpawnEggItem> NETHER_EMPRESS_SPAWN_EGG = create(
+        "nether_empress",
+        AlienEntityTypes.NETHER_EMPRESS
+    );
 
     public static final BLibHolder<SpawnEggItem> OVOMORPH_SPAWN_EGG = create("ovomorph", AlienEntityTypes.OVOMORPH);
 

@@ -14,6 +14,7 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.Carrier;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.chrysalis.Chrysalis;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.Crusher;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.empress.Empress;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.harbinger.Harbinger;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.praetorian.Praetorian;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.predalien.Predalien;
@@ -264,6 +265,12 @@ public class AlienEntityTypes {
             .sized(QUEEN_WIDTH, QUEEN_HEIGHT)
     );
 
+    public static final BLibHolder<EntityType<Empress>> ABERRANT_EMPRESS = create(
+        "aberrant_empress",
+        EntityType.Builder.of(Empress::new, MobCategory.MONSTER)
+            .sized(QUEEN_WIDTH, QUEEN_HEIGHT)
+    );
+
     public static final BLibHolder<EntityType<Burster>> ABERRANT_BURSTER = create(
         "aberrant_burster",
         EntityType.Builder.of(Burster::new, MobCategory.MONSTER)
@@ -342,6 +349,12 @@ public class AlienEntityTypes {
             .sized(DRONE_WIDTH, DRONE_HEIGHT)
     );
 
+    public static final BLibHolder<EntityType<Empress>> EMPRESS = create(
+        "empress",
+        EntityType.Builder.of(Empress::new, MobCategory.MONSTER)
+            .sized(QUEEN_WIDTH, QUEEN_HEIGHT)
+    );
+
     public static final BLibHolder<EntityType<Harbinger>> HARBINGER = create(
         "harbinger",
         EntityType.Builder.of(Harbinger::new, MobCategory.MONSTER)
@@ -417,6 +430,12 @@ public class AlienEntityTypes {
     public static final BLibHolder<EntityType<Queen>> IRRADIATED_QUEEN = create(
         "irradiated_queen",
         EntityType.Builder.of(Queen::new, MobCategory.MONSTER)
+            .sized(QUEEN_WIDTH, QUEEN_HEIGHT)
+    );
+
+    public static final BLibHolder<EntityType<Empress>> IRRADIATED_EMPRESS = create(
+        "irradiated_empress",
+        EntityType.Builder.of(Empress::new, MobCategory.MONSTER)
             .sized(QUEEN_WIDTH, QUEEN_HEIGHT)
     );
 
@@ -543,6 +562,12 @@ public class AlienEntityTypes {
     public static final BLibHolder<EntityType<Queen>> NETHER_QUEEN = create(
         "nether_queen",
         EntityType.Builder.of(Queen::new, MobCategory.MONSTER)
+            .sized(QUEEN_WIDTH, QUEEN_HEIGHT)
+    );
+
+    public static final BLibHolder<EntityType<Empress>> NETHER_EMPRESS = create(
+        "nether_empress",
+        EntityType.Builder.of(Empress::new, MobCategory.MONSTER)
             .sized(QUEEN_WIDTH, QUEEN_HEIGHT)
     );
 
@@ -759,6 +784,7 @@ public class AlienEntityTypes {
         ATTRIBUTE_REGISTRY.register(ABERRANT_RAZOR_CLAW, RazorClaw::createRazorClawAttributes);
         ATTRIBUTE_REGISTRY.register(ABERRANT_RAVAGER, Ravager::createRavagerAttributes);
         ATTRIBUTE_REGISTRY.register(ABERRANT_QUEEN, Queen::createQueenAttributes);
+        ATTRIBUTE_REGISTRY.register(ABERRANT_EMPRESS, Empress::createEmpressAttributes);
         ATTRIBUTE_REGISTRY.register(ABERRANT_BURSTER, Burster::createBursterAttributes);
         ATTRIBUTE_REGISTRY.register(ABERRANT_RUNNER, Runner::createRunnerAttributes);
         ATTRIBUTE_REGISTRY.register(ABERRANT_SPITTER, Spitter::createSpitterAttributes);
@@ -770,6 +796,7 @@ public class AlienEntityTypes {
         ATTRIBUTE_REGISTRY.register(BOILER, Boiler::createBoilerAttributes);
         ATTRIBUTE_REGISTRY.register(CRUSHER, Crusher::createCrusherAttributes);
         ATTRIBUTE_REGISTRY.register(DRONE, Drone::createDroneAttributes);
+        ATTRIBUTE_REGISTRY.register(EMPRESS, Empress::createEmpressAttributes);
         ATTRIBUTE_REGISTRY.register(HARBINGER, Harbinger::createHarbingerAttributes);
         ATTRIBUTE_REGISTRY.register(FACEHUGGER, Facehugger::createFacehuggerAttributes);
         ATTRIBUTE_REGISTRY.register(IRRADIATED_CARRIER, Carrier::createCarrierAttributes);
@@ -783,6 +810,7 @@ public class AlienEntityTypes {
         ATTRIBUTE_REGISTRY.register(IRRADIATED_RAZOR_CLAW, RazorClaw::createRazorClawAttributes);
         ATTRIBUTE_REGISTRY.register(IRRADIATED_RAVAGER, Ravager::createRavagerAttributes);
         ATTRIBUTE_REGISTRY.register(IRRADIATED_QUEEN, Queen::createQueenAttributes);
+        ATTRIBUTE_REGISTRY.register(IRRADIATED_EMPRESS, Empress::createEmpressAttributes);
         ATTRIBUTE_REGISTRY.register(IRRADIATED_BURSTER, Burster::createBursterAttributes);
         ATTRIBUTE_REGISTRY.register(IRRADIATED_RUNNER, Runner::createRunnerAttributes);
         ATTRIBUTE_REGISTRY.register(IRRADIATED_WARRIOR, Warrior::createWarriorAttributes);
@@ -810,6 +838,7 @@ public class AlienEntityTypes {
         ATTRIBUTE_REGISTRY.register(NETHER_RAZOR_CLAW, RazorClaw::createRazorClawAttributes);
         ATTRIBUTE_REGISTRY.register(NETHER_RAVAGER, Ravager::createRavagerAttributes);
         ATTRIBUTE_REGISTRY.register(NETHER_QUEEN, Queen::createQueenAttributes);
+        ATTRIBUTE_REGISTRY.register(NETHER_EMPRESS, Empress::createEmpressAttributes);
         ATTRIBUTE_REGISTRY.register(NETHER_BURSTER, Burster::createBursterAttributes);
         ATTRIBUTE_REGISTRY.register(NETHER_RUNNER, Runner::createRunnerAttributes);
         ATTRIBUTE_REGISTRY.register(NETHER_SPITTER, Spitter::createSpitterAttributes);

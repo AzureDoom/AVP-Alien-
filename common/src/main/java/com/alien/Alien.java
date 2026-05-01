@@ -3,6 +3,7 @@ package com.alien;
 import com.alien.common.data.AlienReloadListeners;
 import com.alien.common.data.fixer.migration.AlienDataMigrations;
 import com.alien.common.gameplay.hive.HiveRegistry;
+import com.alien.common.gameplay.level.saveddata.EmpressSpawnChunkData;
 import com.alien.common.gameplay.level.saveddata.QueenSpawnChunkData;
 import com.alien.common.property.AlienPropertyAccess;
 import com.alien.common.registry.GrowthStageRegistry;
@@ -148,6 +149,8 @@ public class Alien {
 
         QueenSpawnChunkData.getOrCreate(level)
             .ifSome(QueenSpawnChunkData::tick);
+        EmpressSpawnChunkData.getOrCreate(level)
+            .ifSome(EmpressSpawnChunkData::tick);
     }
 
     private static void onTagsUpdated(RegistryAccess registryAccess, boolean flag) {

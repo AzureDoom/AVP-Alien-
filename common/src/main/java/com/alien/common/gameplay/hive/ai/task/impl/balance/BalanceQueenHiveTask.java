@@ -1,10 +1,8 @@
 package com.alien.common.gameplay.hive.ai.task.impl.balance;
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
 import com.alien.common.gameplay.hive.Hive;
-
-import java.util.Set;
+import com.alien.common.registry.tag.AlienEntityTypeTags;
 
 public class BalanceQueenHiveTask extends BalanceHiveTask {
 
@@ -15,10 +13,11 @@ public class BalanceQueenHiveTask extends BalanceHiveTask {
     @Override
     public void run() {
         var loadedByType = hive.getFactionData().getLoadedMembersByType();
-        var queenEntityType = Queen.getType(hive.getVariant());
-        var queens = loadedByType.getOrDefault(queenEntityType, Set.of());
+        var hasQueenOrEmpress = loadedByType.entrySet()
+            .stream()
+            .anyMatch(entry -> entry.getKey().is(AlienEntityTypeTags.QUEENS) && !entry.getValue().isEmpty());
 
-        if (!queens.isEmpty()) {
+        if (hasQueenOrEmpress) {
             return;
         }
 
