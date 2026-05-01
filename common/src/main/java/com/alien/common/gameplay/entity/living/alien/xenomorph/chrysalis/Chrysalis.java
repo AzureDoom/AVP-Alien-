@@ -27,13 +27,16 @@ import com.just.goap.graph.Graph;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class Chrysalis extends Xenomorph implements GOAPUser<Chrysalis>, PathNavigatorUser {
@@ -53,6 +56,8 @@ public class Chrysalis extends Xenomorph implements GOAPUser<Chrysalis>, PathNav
     public static final int ROLL_SMASHED_STUN_TICKS_MAX = 44;
 
     public static final float ROLL_SMASH_WALL_DAMAGE = 60F;
+
+    private static final EntityDimensions ROLLING_DIMENSIONS = EntityDimensions.fixed(1.0F, 1.0F);
 
     public static AttributeSupplier.Builder createChrysalisAttributes() {
         return Alien.createAlienAttributes()
@@ -107,6 +112,8 @@ public class Chrysalis extends Xenomorph implements GOAPUser<Chrysalis>, PathNav
         this.animationDispatcher = new ChrysalisAnimationDispatcher(this);
         this.pathNavigator = createPathNavigator(level);
         getXenomorphData().setParallelDigCount(2);
+
+        isRolling.onChange($ -> refreshDimensions());
     }
 
     private PathNavigator createPathNavigator(Level level) {
@@ -207,6 +214,15 @@ public class Chrysalis extends Xenomorph implements GOAPUser<Chrysalis>, PathNav
     @Override
     public boolean isPushedByFluid() {
         return false;
+    }
+
+    @Override
+    public @NotNull EntityDimensions getDefaultDimensions(@NotNull Pose pose) {
+        if (isRolling.get()) {
+            return ROLLING_DIMENSIONS;
+        }
+
+        return super.getDefaultDimensions(pose);
     }
 
     public void startRoll(float yaw) {
