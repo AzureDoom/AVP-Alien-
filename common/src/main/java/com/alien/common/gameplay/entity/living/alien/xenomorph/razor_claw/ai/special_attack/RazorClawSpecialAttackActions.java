@@ -110,9 +110,29 @@ public class RazorClawSpecialAttackActions {
             }
 
             if (razorClaw.doHurtTarget(target)) {
+                applyRadialKnockback(razorClaw, target, config);
                 hitEntityIds.add(target.getId());
             }
         }
+    }
+
+    private static void applyRadialKnockback(RazorClaw razorClaw, LivingEntity target, RazorClawSpecialAttackConfig config) {
+        var dx = target.getX() - razorClaw.getX();
+        var dz = target.getZ() - razorClaw.getZ();
+        var length = Math.sqrt(dx * dx + dz * dz);
+
+        if (length < 1.0E-4) {
+            var yawRad = razorClaw.getYRot() * Mth.DEG_TO_RAD;
+            dx = -Mth.sin(yawRad);
+            dz = Mth.cos(yawRad);
+            length = 1.0;
+        }
+
+        var knockbackX = dx / length;
+        var knockbackZ = dz / length;
+        target.knockback(config.knockbackStrength(), -knockbackX, -knockbackZ);
+        target.setDeltaMovement(target.getDeltaMovement().add(0.0, config.knockbackVerticalBoost(), 0.0));
+        target.hurtMarked = true;
     }
 
     private static double computeSweepAngle(RazorClaw razorClaw, LivingEntity target, float startingYaw) {

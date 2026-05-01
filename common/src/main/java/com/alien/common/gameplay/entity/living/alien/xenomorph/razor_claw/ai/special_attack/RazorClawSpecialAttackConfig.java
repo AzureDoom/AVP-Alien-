@@ -7,6 +7,8 @@ public record RazorClawSpecialAttackConfig(
     int damageSweepDurationInTicks,
     double rangeInBlocks,
     double hitArcDegrees,
+    double knockbackStrength,
+    double knockbackVerticalBoost,
     int requiredMeleeTargetCount
 ) {
 
@@ -17,6 +19,8 @@ public record RazorClawSpecialAttackConfig(
         10,
         3.0,
         60.0,
+        0.3,
+        0.0625,
         3
     );
 }
