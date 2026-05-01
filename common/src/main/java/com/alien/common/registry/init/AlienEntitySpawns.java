@@ -2,7 +2,6 @@ package com.alien.common.registry.init;
 
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.AlienSpawning;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.empress.EmpressSpawning;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.QueenSpawning;
 import com.alien.common.registry.tag.AlienBiomeTags;
 import com.blib.api.common.entity.v1.spawning.BLibEntitySpawnData;
@@ -38,13 +37,6 @@ public class AlienEntitySpawns {
                 .withSpawnSettings(SPAWN_SETTINGS)
                 .build()
         );
-        REGISTRY.register(
-            BLibEntitySpawnData.builder(AlienEntityTypes.EMPRESS)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(EmpressSpawning.PREDICATE)
-                .withSpawnSettings(SPAWN_SETTINGS)
-                .build()
-        );
         register(AlienEntityTypes.RUNNER, SPAWN_SETTINGS);
         register(AlienEntityTypes.SPITTER, SPAWN_SETTINGS);
     }
@@ -61,13 +53,6 @@ public class AlienEntitySpawns {
             BLibEntitySpawnData.builder(AlienEntityTypes.ABERRANT_QUEEN)
                 .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
                 .withSpawnPredicate(QueenSpawning.PREDICATE)
-                .withSpawnSettings(SPAWN_SETTINGS)
-                .build()
-        );
-        REGISTRY.register(
-            BLibEntitySpawnData.builder(AlienEntityTypes.ABERRANT_EMPRESS)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(EmpressSpawning.PREDICATE)
                 .withSpawnSettings(SPAWN_SETTINGS)
                 .build()
         );
@@ -88,13 +73,6 @@ public class AlienEntitySpawns {
                 .withSpawnSettings(SPAWN_SETTINGS)
                 .build()
         );
-        REGISTRY.register(
-            BLibEntitySpawnData.builder(AlienEntityTypes.IRRADIATED_EMPRESS)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(EmpressSpawning.PREDICATE)
-                .withSpawnSettings(SPAWN_SETTINGS)
-                .build()
-        );
     }
 
     private static void registerNetherAlienSpawns() {
@@ -111,13 +89,6 @@ public class AlienEntitySpawns {
             BLibEntitySpawnData.builder(AlienEntityTypes.NETHER_QUEEN)
                 .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
                 .withSpawnPredicate(QueenSpawning.PREDICATE)
-                .withSpawnSettings(SPAWN_SETTINGS)
-                .build()
-        );
-        REGISTRY.register(
-            BLibEntitySpawnData.builder(AlienEntityTypes.NETHER_EMPRESS)
-                .withBiomeTagKey(AlienBiomeTags.HAS_XENOMORPHS)
-                .withSpawnPredicate(EmpressSpawning.PREDICATE)
                 .withSpawnSettings(SPAWN_SETTINGS)
                 .build()
         );

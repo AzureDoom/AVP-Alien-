@@ -3,6 +3,7 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.queen;
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg_laying.EggLayer;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.ai.QueenGOAP;
 import com.alien.common.gameplay.level.saveddata.QueenSpawnChunkData;
@@ -44,12 +45,13 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-public class Queen extends Xenomorph implements GOAPUser<Queen>, PathNavigatorUser {
+public class Queen extends Xenomorph implements GOAPUser<Queen>, PathNavigatorUser, EggLayer {
 
     public static AttributeSupplier.Builder createQueenAttributes() {
         return Alien.createAlienAttributes()
@@ -296,6 +298,31 @@ public class Queen extends Xenomorph implements GOAPUser<Queen>, PathNavigatorUs
 
     public QueenData getQueenData() {
         return queenData;
+    }
+
+    @Override
+    public Entity asEntity() {
+        return this;
+    }
+
+    @Override
+    public boolean isEggLayCooldownReady() {
+        return queenData.isEggLayCooldownReady();
+    }
+
+    @Override
+    public void resetEggLayCooldown() {
+        queenData.resetEggLayCooldown();
+    }
+
+    @Override
+    public boolean hasOvipositor() {
+        return ovipositorManager.hasOvipositor();
+    }
+
+    @Override
+    public Vec3 getEggLayingPosition() {
+        return ovipositorManager.getEggLayingPosition();
     }
 
     @Override

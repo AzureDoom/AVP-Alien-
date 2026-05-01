@@ -1,12 +1,9 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.empress;
 
-import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg_laying.EggLayer;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.empress.ai.EmpressGOAP;
-import com.alien.common.gameplay.level.saveddata.EmpressSpawnChunkData;
-import com.alien.common.gameplay.level.saveddata.StrainLeakData;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienEntityTypes;
@@ -15,7 +12,6 @@ import com.alien.common.registry.tag.AlienBlockTags;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
-import com.blib.api.common.entity.v1.PlayerUtil;
 import com.blib.api.common.goap.v1.GOAPUser;
 import com.blib.api.common.pathfinding.v1.cache.TerrainCacheRegistry;
 import com.blib.api.common.pathfinding.v1.evaluator.TerrainEvaluatorConfig;
@@ -28,28 +24,21 @@ import com.blib.api.common.pathfinding.v1.terrain.TerrainClassifiers;
 import com.blib.api.common.pathfinding.v1.terrain.TerrainType;
 import com.just.goap.Agent;
 import com.just.goap.graph.Graph;
-import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-public class Empress extends Xenomorph implements GOAPUser<Empress>, PathNavigatorUser {
+public class Empress extends Xenomorph implements GOAPUser<Empress>, PathNavigatorUser, EggLayer {
 
     public static AttributeSupplier.Builder createEmpressAttributes() {
         return Alien.createAlienAttributes()
@@ -156,62 +145,6 @@ public class Empress extends Xenomorph implements GOAPUser<Empress>, PathNavigat
     }
 
     @Override
-    public @Nullable SpawnGroupData finalizeSpawn(
-        @NotNull ServerLevelAccessor serverLevelAccessor,
-        @NotNull DifficultyInstance difficulty,
-        @NotNull MobSpawnType spawnType,
-        @Nullable SpawnGroupData spawnGroupData
-    ) {
-        if (spawnType == MobSpawnType.NATURAL) {
-            applyNaturalSpawnEffects();
-        }
-
-        return super.finalizeSpawn(serverLevelAccessor, difficulty, spawnType, spawnGroupData);
-    }
-
-    private void applyNaturalSpawnEffects() {
-        var level = level();
-
-        if (level.isClientSide) {
-            return;
-        }
-
-        alertPlayersOfSpawn();
-        spawnGuards();
-        resetEmpressSpawnCooldown();
-
-        StrainLeakData.getOrCreate(level)
-            .ifSome(strainLeakData -> strainLeakData.add(getVariant(), -1));
-    }
-
-    private void alertPlayersOfSpawn() {
-        for (var player : PlayerUtil.getTrackingPlayers(this)) {
-            player.playNotifySound(AlienSoundEvents.ENTITY_EMPRESS_SCREAM.get(), SoundSource.MASTER, 1, 1);
-            player.sendSystemMessage(
-                Component.literal("A scream from the depths sends chills down your spine...")
-                    .withStyle(AlienVariantTypes.getFor(this).chatColor(), ChatFormatting.ITALIC)
-            );
-        }
-    }
-
-    private void spawnGuards() {
-        var droneType = Drone.getType(getVariant());
-
-        for (var i = 0; i < 4; i++) {
-            var drone = droneType.spawn((ServerLevel) level(), blockPosition(), MobSpawnType.NATURAL);
-
-            if (drone != null) {
-                drone.setPersistenceRequired();
-            }
-        }
-    }
-
-    private void resetEmpressSpawnCooldown() {
-        EmpressSpawnChunkData.getOrCreate(level())
-            .ifSome(empressSpawnChunkData -> empressSpawnChunkData.getSpawnCooldown().reset());
-    }
-
-    @Override
     public float maxUpStep() {
         return 2.5F;
     }
@@ -296,6 +229,31 @@ public class Empress extends Xenomorph implements GOAPUser<Empress>, PathNavigat
 
     public EmpressData getEmpressData() {
         return empressData;
+    }
+
+    @Override
+    public Entity asEntity() {
+        return this;
+    }
+
+    @Override
+    public boolean isEggLayCooldownReady() {
+        return empressData.isEggLayCooldownReady();
+    }
+
+    @Override
+    public void resetEggLayCooldown() {
+        empressData.resetEggLayCooldown();
+    }
+
+    @Override
+    public boolean hasOvipositor() {
+        return empressOvipositorManager.hasOvipositor();
+    }
+
+    @Override
+    public Vec3 getEggLayingPosition() {
+        return empressOvipositorManager.getEggLayingPosition();
     }
 
     @Override

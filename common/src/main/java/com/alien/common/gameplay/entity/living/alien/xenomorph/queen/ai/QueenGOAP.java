@@ -1,6 +1,9 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.queen.ai;
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.XenomorphGOAP;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg_laying.EggLayingActions;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg_laying.EggLayingGoals;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg_laying.EggLayingSensors;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
 import com.just.goap.Agent;
 import com.just.goap.graph.Graph;
@@ -19,9 +22,9 @@ public class QueenGOAP {
     private static Graph.Builder<Queen> addEggLayingPackage(Graph.Builder<Queen> graphBuilder) {
         graphBuilder.addGoal(EggLayingGoals.LAY_EGG);
 
-        graphBuilder.addAction(EggLayingActions.LAY_EGG);
+        graphBuilder.addAction(EggLayingActions.layEgg());
 
-        graphBuilder.addSensor(EggLayingSensors.CAN_LAY_EGG);
+        graphBuilder.addSensor(EggLayingSensors.canLayEgg());
 
         return graphBuilder;
     }
