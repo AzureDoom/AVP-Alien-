@@ -1,5 +1,6 @@
 package com.alien.client.animation.entity;
 
+import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
 import com.alien.AlienResources;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.praetorian.Praetorian;
@@ -19,6 +20,8 @@ public class PraetorianAnimator extends AzEntityAnimator<Praetorian> {
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
 
     private int previousAttackId = Integer.MIN_VALUE;
+
+    private final CocoonAnimationStateTracker<Praetorian> cocoonAnimationStateTracker = new CocoonAnimationStateTracker<>();
 
     public PraetorianAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -59,6 +62,10 @@ public class PraetorianAnimator extends AzEntityAnimator<Praetorian> {
     @Override
     public void setCustomAnimations(Praetorian animatable, float partialTicks) {
         super.setCustomAnimations(animatable, partialTicks);
+
+        if (cocoonAnimationStateTracker.run(animatable)) {
+            return;
+        }
 
         runPassiveAnimations(animatable);
     }

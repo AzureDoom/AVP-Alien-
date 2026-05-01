@@ -108,7 +108,7 @@ public class Empress extends Xenomorph implements GOAPUser<Empress>, PathNavigat
 
     @Override
     public @Nullable Graph<Empress> blib$getGOAPGraphOrNull() {
-        return EmpressGOAP.GRAPH;
+        return getActiveGOAPGraph(EmpressGOAP.GRAPH);
     }
 
     @Override

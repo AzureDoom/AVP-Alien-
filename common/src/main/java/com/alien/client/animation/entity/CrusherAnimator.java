@@ -1,5 +1,6 @@
 package com.alien.client.animation.entity;
 
+import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
 import com.alien.AlienResources;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.Crusher;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.CrusherAnimationRefs;
@@ -19,6 +20,8 @@ public class CrusherAnimator extends AzEntityAnimator<Crusher> {
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
 
     private int previousAttackId = Integer.MIN_VALUE;
+
+    private final CocoonAnimationStateTracker<Crusher> cocoonAnimationStateTracker = new CocoonAnimationStateTracker<>();
 
     public CrusherAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -59,6 +62,10 @@ public class CrusherAnimator extends AzEntityAnimator<Crusher> {
     @Override
     public void setCustomAnimations(Crusher animatable, float partialTicks) {
         super.setCustomAnimations(animatable, partialTicks);
+
+        if (cocoonAnimationStateTracker.run(animatable)) {
+            return;
+        }
 
         runPassiveAnimations(animatable);
     }

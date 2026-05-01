@@ -122,7 +122,7 @@ public class Burster extends Xenomorph implements EggCarrier, GOAPUser<Burster>,
 
     @Override
     public @Nullable Graph<Burster> blib$getGOAPGraphOrNull() {
-        return BursterGOAP.GRAPH;
+        return getActiveGOAPGraph(BursterGOAP.GRAPH);
     }
 
     @Override

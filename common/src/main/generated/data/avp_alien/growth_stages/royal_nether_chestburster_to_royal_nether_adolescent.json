@@ -1,5 +1,9 @@
 {
   "from": "avp_alien:royal_nether_chestburster",
   "growthTimeInTicks": 6000,
-  "to": "avp_alien:royal_nether_adolescent"
+  "to": "avp_alien:royal_nether_adolescent",
+  "cocooning": {
+    "sourceTimeInTicks": 600,
+    "destinationTimeInTicks": 600
+  }
 }

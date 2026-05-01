@@ -6,5 +6,9 @@
       "effect": "avp_alien:metamorphosis"
     }
   ],
-  "to": "avp_alien:aberrant_warrior"
+  "to": "avp_alien:aberrant_warrior",
+  "cocooning": {
+    "sourceTimeInTicks": 600,
+    "destinationTimeInTicks": 600
+  }
 }

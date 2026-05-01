@@ -4,16 +4,17 @@ import com.alien.common.gameplay.entity.CrawlingManager;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.GrowthManager;
 import com.alien.common.gameplay.entity.living.alien.ResinManager;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.cocoon.CocoonGOAP;
 import com.alien.common.model.resin.ResinProducer;
 import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.util.AlienPredicates;
-import com.alien.common.util.XenomorphGrowthUtil;
 import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.entity.v1.EntitySenseCache;
 import com.blib.api.common.entity.v1.EntitySenseCacheUser;
 import com.blib.api.common.goap.v1.GOAPUser;
+import com.just.goap.graph.Graph;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -50,7 +51,13 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
 
     public final DataAccessor<Boolean> isCrawling;
 
+    public final DataAccessor<CocoonState> cocoonState;
+
+    public final DataAccessor<Integer> cocoonAnimationId;
+
     protected final CrawlingManager crawlingManager;
+
+    private final CocoonManager cocoonManager;
 
     private final GrowthManager growthManager;
 
@@ -71,9 +78,12 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         this.attackId = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_ATTACK_ID.get());
         this.isLunging = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_IS_LUNGING.get());
         this.isCrawling = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_IS_CRAWLING.get());
+        this.cocoonState = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_COCOON_STATE.get());
+        this.cocoonAnimationId = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_COCOON_ANIMATION_ID.get());
 
         this.crawlingManager = new CrawlingManager(this, isCrawling);
-        this.growthManager = new GrowthManager(this, XenomorphGrowthUtil.GROW_UP_CALLBACK)
+        this.cocoonManager = new CocoonManager(this);
+        this.growthManager = new GrowthManager(this)
             .setGrowOverTime(false);
         this.resinManager = new ResinManager(this);
         this.xenomorphData = new XenomorphData(getRandom());
@@ -101,6 +111,11 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
 
     public abstract boolean isAttacking();
 
+    @SuppressWarnings("unchecked")
+    protected <T extends Xenomorph> Graph<T> getActiveGOAPGraph(Graph<T> defaultGraph) {
+        return cocoonManager.shouldRunCocoonAction() ? (Graph<T>) CocoonGOAP.GRAPH : defaultGraph;
+    }
+
     protected abstract void resetAttackType();
 
     protected void beginAttack(int durationInTicks) {
@@ -114,6 +129,7 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         super.tick();
 
         crawlingManager.tick();
+        cocoonManager.maintainLockedState();
 
         growthManager.tick();
         resinManager.tick();
@@ -158,6 +174,11 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
 
     @Override
     public void travel(@NotNull Vec3 vec3) {
+        if (cocoonManager.isLocked()) {
+            setDeltaMovement(Vec3.ZERO);
+            return;
+        }
+
         if (isControlledByLocalInstance() && isUnderWater()) {
             moveRelative(0.01F, vec3);
             move(MoverType.SELF, getDeltaMovement());
@@ -219,6 +240,10 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
 
     @Override
     public void setTarget(@Nullable LivingEntity livingEntity) {
+        if (cocoonManager.isLocked() && livingEntity != null) {
+            return;
+        }
+
         if (livingEntity != null && !livingEntity.equals(getTarget()) && ambientSoundTime > getAmbientSoundInterval()) {
             playSound(
                 AlienSoundEvents.ENTITY_XENOMORPH_HISS.get(),
@@ -253,7 +278,7 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
     // combat code paths that bypass GOAP (e.g. vanilla retaliation targeting).
     @Override
     public boolean canAttack(@NotNull LivingEntity target) {
-        return super.canAttack(target) && AlienPredicates.canContinueTargeting(this, target);
+        return !cocoonManager.isLocked() && super.canAttack(target) && AlienPredicates.canContinueTargeting(this, target);
     }
 
     @Override
@@ -292,6 +317,7 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
     public void readAdditionalSaveData(@NotNull CompoundTag compoundTag) {
         super.readAdditionalSaveData(compoundTag);
         crawlingManager.load(compoundTag);
+        cocoonManager.load(compoundTag);
         growthManager.load(compoundTag);
         resinManager.load(compoundTag);
         xenomorphData.load(compoundTag);
@@ -301,6 +327,7 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
     public void addAdditionalSaveData(@NotNull CompoundTag compoundTag) {
         super.addAdditionalSaveData(compoundTag);
         crawlingManager.save(compoundTag);
+        cocoonManager.save(compoundTag);
         growthManager.save(compoundTag);
         resinManager.save(compoundTag);
         xenomorphData.save(compoundTag);
@@ -308,6 +335,10 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
 
     public GrowthManager getGrowthManager() {
         return growthManager;
+    }
+
+    public CocoonManager getCocoonManager() {
+        return cocoonManager;
     }
 
     @Override

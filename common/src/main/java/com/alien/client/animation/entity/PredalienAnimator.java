@@ -1,5 +1,6 @@
 package com.alien.client.animation.entity;
 
+import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
 import com.alien.AlienResources;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.predalien.Predalien;
@@ -19,6 +20,8 @@ public class PredalienAnimator extends AzEntityAnimator<Predalien> {
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
 
     private int previousAttackId = Integer.MIN_VALUE;
+
+    private final CocoonAnimationStateTracker<Predalien> cocoonAnimationStateTracker = new CocoonAnimationStateTracker<>();
 
     public PredalienAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -59,6 +62,10 @@ public class PredalienAnimator extends AzEntityAnimator<Predalien> {
     @Override
     public void setCustomAnimations(Predalien animatable, float partialTicks) {
         super.setCustomAnimations(animatable, partialTicks);
+
+        if (cocoonAnimationStateTracker.run(animatable)) {
+            return;
+        }
 
         runPassiveAnimations(animatable);
     }

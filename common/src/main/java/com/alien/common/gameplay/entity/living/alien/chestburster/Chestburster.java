@@ -5,7 +5,6 @@ import com.alien.common.gameplay.entity.living.alien.GrowthManager;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.util.AlienPredicates;
-import com.alien.common.util.XenomorphGrowthUtil;
 import com.blib.api.common.entity.v1.BLibEntityPredicates;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
 import net.minecraft.nbt.CompoundTag;
@@ -40,7 +39,7 @@ public class Chestburster extends Alien {
     public Chestburster(EntityType<? extends Chestburster> entityType, Level level) {
         super(entityType, level);
         this.animationDispatcher = new ChestbursterAnimationDispatcher(this);
-        this.growthManager = new GrowthManager(this, XenomorphGrowthUtil.GROW_UP_CALLBACK)
+        this.growthManager = new GrowthManager(this)
             .setGrowOverTime(true);
     }
 

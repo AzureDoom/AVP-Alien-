@@ -98,7 +98,7 @@ public class Spitter extends Xenomorph implements GOAPUser<Spitter>, PathNavigat
 
     @Override
     public @Nullable Graph<Spitter> blib$getGOAPGraphOrNull() {
-        return SpitterGOAP.GRAPH;
+        return getActiveGOAPGraph(SpitterGOAP.GRAPH);
     }
 
     @Override

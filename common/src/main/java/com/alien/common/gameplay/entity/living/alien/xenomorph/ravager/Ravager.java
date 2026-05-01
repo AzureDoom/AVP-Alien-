@@ -115,7 +115,7 @@ public class Ravager extends Xenomorph implements GOAPUser<Ravager>, PathNavigat
 
     @Override
     public @Nullable Graph<Ravager> blib$getGOAPGraphOrNull() {
-        return RavagerGOAP.GRAPH;
+        return getActiveGOAPGraph(RavagerGOAP.GRAPH);
     }
 
     @Override

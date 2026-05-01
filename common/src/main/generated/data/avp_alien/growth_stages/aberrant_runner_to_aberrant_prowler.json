@@ -6,5 +6,9 @@
       "effect": "avp_alien:metamorphosis"
     }
   ],
-  "to": "avp_alien:aberrant_prowler"
+  "to": "avp_alien:aberrant_prowler",
+  "cocooning": {
+    "sourceTimeInTicks": 600,
+    "destinationTimeInTicks": 600
+  }
 }

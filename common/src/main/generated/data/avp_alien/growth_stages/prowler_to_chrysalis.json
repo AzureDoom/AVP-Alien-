@@ -6,5 +6,9 @@
       "effect": "avp_alien:scourge"
     }
   ],
-  "to": "avp_alien:chrysalis"
+  "to": "avp_alien:chrysalis",
+  "cocooning": {
+    "sourceTimeInTicks": 600,
+    "destinationTimeInTicks": 600
+  }
 }

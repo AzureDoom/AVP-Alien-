@@ -6,5 +6,9 @@
       "effect": "avp_alien:scourge"
     }
   ],
-  "to": "avp_alien:nether_harbinger"
+  "to": "avp_alien:nether_harbinger",
+  "cocooning": {
+    "sourceTimeInTicks": 600,
+    "destinationTimeInTicks": 600
+  }
 }

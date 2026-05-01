@@ -1,5 +1,9 @@
 {
   "from": "avp_alien:aberrant_chestburster",
   "growthTimeInTicks": 6000,
-  "to": "avp_alien:aberrant_adolescent"
+  "to": "avp_alien:aberrant_adolescent",
+  "cocooning": {
+    "sourceTimeInTicks": 600,
+    "destinationTimeInTicks": 600
+  }
 }

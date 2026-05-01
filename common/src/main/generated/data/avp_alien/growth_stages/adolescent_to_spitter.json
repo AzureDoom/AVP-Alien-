@@ -5,5 +5,9 @@
     "minecraft:llama",
     "minecraft:trader_llama"
   ],
-  "to": "avp_alien:spitter"
+  "to": "avp_alien:spitter",
+  "cocooning": {
+    "sourceTimeInTicks": 600,
+    "destinationTimeInTicks": 600
+  }
 }

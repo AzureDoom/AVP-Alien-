@@ -1,5 +1,6 @@
 package com.alien.client.animation.entity;
 
+import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
 import com.alien.AlienResources;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.QuadrupedAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.prowler.Prowler;
@@ -19,6 +20,8 @@ public class ProwlerAnimator extends AzEntityAnimator<Prowler> {
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
 
     private int previousAttackId = Integer.MIN_VALUE;
+
+    private final CocoonAnimationStateTracker<Prowler> cocoonAnimationStateTracker = new CocoonAnimationStateTracker<>();
 
     public ProwlerAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -59,6 +62,10 @@ public class ProwlerAnimator extends AzEntityAnimator<Prowler> {
     @Override
     public void setCustomAnimations(Prowler animatable, float partialTicks) {
         super.setCustomAnimations(animatable, partialTicks);
+
+        if (cocoonAnimationStateTracker.run(animatable)) {
+            return;
+        }
 
         runPassiveAnimations(animatable);
     }

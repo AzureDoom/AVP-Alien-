@@ -1,5 +1,9 @@
 {
   "from": "avp_alien:aberrant_predalien_adolescent",
   "growthTimeInTicks": 6000,
-  "to": "avp_alien:aberrant_predalien"
+  "to": "avp_alien:aberrant_predalien",
+  "cocooning": {
+    "sourceTimeInTicks": 600,
+    "destinationTimeInTicks": 600
+  }
 }

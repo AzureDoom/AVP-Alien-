@@ -1,5 +1,6 @@
 package com.alien.client.animation.entity;
 
+import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
 import com.alien.AlienResources;
 import com.alien.client.render.entity.carrier.CarrierSpineBoneCache;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
@@ -32,6 +33,8 @@ public class CarrierAnimator extends AzEntityAnimator<Carrier> {
 
     private boolean hasPrevEntityPosition;
 
+    private final CocoonAnimationStateTracker<Carrier> cocoonAnimationStateTracker = new CocoonAnimationStateTracker<>();
+
     public CarrierAnimator() {
         super(AzAnimatorConfig.defaultConfig());
     }
@@ -53,6 +56,10 @@ public class CarrierAnimator extends AzEntityAnimator<Carrier> {
     @Override
     public void setCustomAnimations(Carrier animatable, float partialTicks) {
         super.setCustomAnimations(animatable, partialTicks);
+
+        if (cocoonAnimationStateTracker.run(animatable)) {
+            return;
+        }
 
         runPassiveAnimations(animatable);
         updateSpineBoneData(animatable);

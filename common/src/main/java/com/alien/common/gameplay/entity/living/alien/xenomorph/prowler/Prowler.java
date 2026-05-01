@@ -93,7 +93,7 @@ public class Prowler extends Xenomorph implements GOAPUser<Prowler>, PathNavigat
 
     @Override
     public @Nullable Graph<Prowler> blib$getGOAPGraphOrNull() {
-        return ProwlerGOAP.GRAPH;
+        return getActiveGOAPGraph(ProwlerGOAP.GRAPH);
     }
 
     @Override

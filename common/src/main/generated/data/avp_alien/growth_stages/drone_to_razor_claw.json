@@ -7,5 +7,9 @@
       "min_amplifier": 1
     }
   ],
-  "to": "avp_alien:razor_claw"
+  "to": "avp_alien:razor_claw",
+  "cocooning": {
+    "sourceTimeInTicks": 600,
+    "destinationTimeInTicks": 600
+  }
 }

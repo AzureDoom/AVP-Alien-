@@ -7,7 +7,6 @@ import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.util.AlienPredicates;
-import com.alien.common.util.XenomorphGrowthUtil;
 import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.entity.v1.BLibEntityPredicates;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
@@ -50,7 +49,7 @@ public class Adolescent extends Alien {
         this.hasDorsalTubes = new DataAccessor<>(this, AlienDataSyncKeys.ADOLESCENT_HAS_DORSAL_TUBES.get());
 
         this.animationDispatcher = new AdolescentAnimationDispatcher(this);
-        this.growthManager = new GrowthManager(this, XenomorphGrowthUtil.GROW_UP_CALLBACK)
+        this.growthManager = new GrowthManager(this)
             .setGrowOverTime(true);
     }
 

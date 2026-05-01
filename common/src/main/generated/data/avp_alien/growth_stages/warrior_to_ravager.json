@@ -6,5 +6,9 @@
       "effect": "avp_alien:scourge"
     }
   ],
-  "to": "avp_alien:ravager"
+  "to": "avp_alien:ravager",
+  "cocooning": {
+    "sourceTimeInTicks": 600,
+    "destinationTimeInTicks": 600
+  }
 }

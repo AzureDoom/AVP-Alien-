@@ -1,5 +1,6 @@
 package com.alien.client.animation.entity;
 
+import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
 import com.alien.AlienResources;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.chrysalis.Chrysalis;
@@ -24,6 +25,8 @@ public class ChrysalisAnimator extends AzEntityAnimator<Chrysalis> {
 
     private int rollAnimationTicks = 0;
 
+    private final CocoonAnimationStateTracker<Chrysalis> cocoonAnimationStateTracker = new CocoonAnimationStateTracker<>();
+
     public ChrysalisAnimator() {
         super(AzAnimatorConfig.defaultConfig());
     }
@@ -45,6 +48,10 @@ public class ChrysalisAnimator extends AzEntityAnimator<Chrysalis> {
     @Override
     public void setCustomAnimations(Chrysalis animatable, float partialTicks) {
         super.setCustomAnimations(animatable, partialTicks);
+
+        if (cocoonAnimationStateTracker.run(animatable)) {
+            return;
+        }
 
         runPassiveAnimations(animatable);
     }

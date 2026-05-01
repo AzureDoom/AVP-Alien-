@@ -1,5 +1,9 @@
 {
   "from": "avp_alien:nether_adolescent",
   "growthTimeInTicks": 6000,
-  "to": "avp_alien:nether_drone"
+  "to": "avp_alien:nether_drone",
+  "cocooning": {
+    "sourceTimeInTicks": 600,
+    "destinationTimeInTicks": 600
+  }
 }

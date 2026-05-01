@@ -112,7 +112,7 @@ public class Drone extends Xenomorph implements EggCarrier, GOAPUser<Drone>, Pat
 
     @Override
     public @Nullable Graph<Drone> blib$getGOAPGraphOrNull() {
-        return DroneGOAP.GRAPH;
+        return getActiveGOAPGraph(DroneGOAP.GRAPH);
     }
 
     @Override

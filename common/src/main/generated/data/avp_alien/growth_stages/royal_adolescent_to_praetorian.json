@@ -1,5 +1,9 @@
 {
   "from": "avp_alien:royal_adolescent",
   "growthTimeInTicks": 6000,
-  "to": "avp_alien:praetorian"
+  "to": "avp_alien:praetorian",
+  "cocooning": {
+    "sourceTimeInTicks": 600,
+    "destinationTimeInTicks": 600
+  }
 }

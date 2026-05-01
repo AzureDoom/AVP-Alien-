@@ -92,7 +92,7 @@ public class Crusher extends Xenomorph implements GOAPUser<Crusher>, PathNavigat
 
     @Override
     public @Nullable Graph<Crusher> blib$getGOAPGraphOrNull() {
-        return CrusherGOAP.GRAPH;
+        return getActiveGOAPGraph(CrusherGOAP.GRAPH);
     }
 
     @Override

@@ -93,7 +93,7 @@ public class Harbinger extends Xenomorph implements GOAPUser<Harbinger>, PathNav
 
     @Override
     public @Nullable Graph<Harbinger> blib$getGOAPGraphOrNull() {
-        return HarbingerGOAP.GRAPH;
+        return getActiveGOAPGraph(HarbingerGOAP.GRAPH);
     }
 
     @Override

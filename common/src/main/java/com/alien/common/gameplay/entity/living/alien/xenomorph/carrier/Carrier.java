@@ -103,7 +103,7 @@ public class Carrier extends Xenomorph implements GOAPUser<Carrier>, PathNavigat
 
     @Override
     public @Nullable Graph<Carrier> blib$getGOAPGraphOrNull() {
-        return CarrierGOAP.GRAPH;
+        return getActiveGOAPGraph(CarrierGOAP.GRAPH);
     }
 
     @Override

@@ -6,5 +6,9 @@
       "effect": "avp_alien:metamorphosis"
     }
   ],
-  "to": "avp_alien:queen"
+  "to": "avp_alien:queen",
+  "cocooning": {
+    "sourceTimeInTicks": 600,
+    "destinationTimeInTicks": 600
+  }
 }

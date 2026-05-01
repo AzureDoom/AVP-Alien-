@@ -22,23 +22,28 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 
 public class GrowthManager implements NBTSerializable {
 
     private static final String GROWTH_TIME_IN_TICKS_TAG_KEY = "growthTimeInTicks";
 
-    private static final Set<String> TRANSITION_NBT_KEY_BLACKLIST = Util.make(() -> {
+    private static final int POST_MOLT_GROWTH_BUFFER_TICKS = 20;
+
+    public static final Set<String> TRANSITION_NBT_KEY_BLACKLIST = Util.make(() -> {
         var set = new HashSet<>(EntityTransitionUtil.DEFAULT_NBT_KEY_BLACKLIST);
         set.add(GROWTH_TIME_IN_TICKS_TAG_KEY);
         set.add(MoltingManager.FORM_SCALE_PHASE_INDEX_TAG);
         set.add(MoltingManager.FORM_SCALE_PHASE_TICKS_TAG);
+        set.add(MoltingManager.FORM_SCALE_TARGET_REACHED_TICKS_TAG);
+        set.add(com.alien.common.gameplay.entity.living.alien.xenomorph.CocoonManager.COCOON_STATE_TAG);
+        set.add(com.alien.common.gameplay.entity.living.alien.xenomorph.CocoonManager.COCOON_TARGET_TYPE_TAG);
+        set.add(com.alien.common.gameplay.entity.living.alien.xenomorph.CocoonManager.COCOON_SOURCE_TIME_TAG);
+        set.add(com.alien.common.gameplay.entity.living.alien.xenomorph.CocoonManager.COCOON_DESTINATION_TIME_TAG);
+        set.add(com.alien.common.gameplay.entity.living.alien.xenomorph.CocoonManager.COCOON_ELAPSED_TICKS_TAG);
         return set;
     });
 
     private final Alien entity;
-
-    private final @Nullable Consumer<Entity> onGrowUpCallback;
 
     private boolean growOverTime;
 
@@ -51,12 +56,7 @@ public class GrowthManager implements NBTSerializable {
     private @Nullable GrowthStage activeRequirementGrowthStage;
 
     public GrowthManager(Alien entity) {
-        this(entity, null);
-    }
-
-    public GrowthManager(Alien entity, @Nullable Consumer<Entity> onGrowUpCallback) {
         this.entity = entity;
-        this.onGrowUpCallback = onGrowUpCallback;
         this.growOverTime = true;
         this.readyToGrow = false;
     }
@@ -82,7 +82,7 @@ public class GrowthManager implements NBTSerializable {
             return;
         }
 
-        if (!entity.getMoltingManager().hasReachedTargetScale()) {
+        if (!entity.getMoltingManager().hasReachedTargetScaleFor(POST_MOLT_GROWTH_BUFFER_TICKS)) {
             return;
         }
 
@@ -95,6 +95,7 @@ public class GrowthManager implements NBTSerializable {
         switch (grow(matchingStage)) {
             case GrowthResult.AlreadyFullyGrown ignored -> {/* NO-OP */}
             case GrowthResult.CanNotGrow ignored -> {/* NO-OP */}
+            case GrowthResult.CocoonStarted ignored -> {/* NO-OP */}
             case GrowthResult.Success ignored -> {/* NO-OP */}
             case GrowthResult.FailedTransitionResult failedTransitionResult -> {
                 if (failedTransitionResult.result instanceof EntityTransitionUtil.EntityTransitionResult.Obstructed) {
@@ -196,6 +197,11 @@ public class GrowthManager implements NBTSerializable {
 
         removeRequirementEffects(growthStage);
 
+        if (entity instanceof com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph xenomorph) {
+            xenomorph.getCocoonManager().prepare(nextFormType, growthStage.cocooning());
+            return GrowthResult.CocoonStarted.INSTANCE;
+        }
+
         var transitionResult = EntityTransitionUtil.transitionInto(entity, nextFormType, TRANSITION_NBT_KEY_BLACKLIST);
 
         Entity nextForm = null;
@@ -206,10 +212,6 @@ public class GrowthManager implements NBTSerializable {
 
         if (nextForm == null) {
             return new GrowthResult.FailedTransitionResult(transitionResult);
-        }
-
-        if (onGrowUpCallback != null) {
-            onGrowUpCallback.accept(nextForm);
         }
 
         return new GrowthResult.Success(nextForm);
@@ -307,6 +309,10 @@ public class GrowthManager implements NBTSerializable {
         }
 
         enum CanNotGrow implements GrowthResult {
+            INSTANCE
+        }
+
+        enum CocoonStarted implements GrowthResult {
             INSTANCE
         }
 

@@ -144,7 +144,7 @@ public class Chrysalis extends Xenomorph implements GOAPUser<Chrysalis>, PathNav
 
     @Override
     public @Nullable Graph<Chrysalis> blib$getGOAPGraphOrNull() {
-        return ChrysalisGOAP.GRAPH;
+        return getActiveGOAPGraph(ChrysalisGOAP.GRAPH);
     }
 
     @Override

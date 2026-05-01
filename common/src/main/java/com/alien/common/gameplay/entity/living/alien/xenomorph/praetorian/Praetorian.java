@@ -93,7 +93,7 @@ public class Praetorian extends Xenomorph implements GOAPUser<Praetorian>, PathN
 
     @Override
     public @Nullable Graph<Praetorian> blib$getGOAPGraphOrNull() {
-        return PraetorianGOAP.GRAPH;
+        return getActiveGOAPGraph(PraetorianGOAP.GRAPH);
     }
 
     @Override

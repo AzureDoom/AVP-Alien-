@@ -1,5 +1,6 @@
 package com.alien.client.animation.entity;
 
+import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
 import com.alien.AlienResources;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.burster.Burster;
@@ -19,6 +20,8 @@ public class BursterAnimator extends AzEntityAnimator<Burster> {
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
 
     private int previousAttackId = Integer.MIN_VALUE;
+
+    private final CocoonAnimationStateTracker<Burster> cocoonAnimationStateTracker = new CocoonAnimationStateTracker<>();
 
     public BursterAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -41,6 +44,10 @@ public class BursterAnimator extends AzEntityAnimator<Burster> {
     @Override
     public void setCustomAnimations(Burster animatable, float partialTicks) {
         super.setCustomAnimations(animatable, partialTicks);
+
+        if (cocoonAnimationStateTracker.run(animatable)) {
+            return;
+        }
 
         runPassiveAnimations(animatable);
     }

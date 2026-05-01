@@ -121,7 +121,7 @@ public class Queen extends Xenomorph implements GOAPUser<Queen>, PathNavigatorUs
 
     @Override
     public @Nullable Graph<Queen> blib$getGOAPGraphOrNull() {
-        return QueenGOAP.GRAPH;
+        return getActiveGOAPGraph(QueenGOAP.GRAPH);
     }
 
     @Override

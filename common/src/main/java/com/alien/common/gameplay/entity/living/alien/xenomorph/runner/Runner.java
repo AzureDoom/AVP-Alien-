@@ -112,7 +112,7 @@ public class Runner extends Xenomorph implements EggCarrier, GOAPUser<Runner>, P
 
     @Override
     public @Nullable Graph<Runner> blib$getGOAPGraphOrNull() {
-        return RunnerGOAP.GRAPH;
+        return getActiveGOAPGraph(RunnerGOAP.GRAPH);
     }
 
     @Override

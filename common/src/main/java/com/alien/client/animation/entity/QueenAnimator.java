@@ -1,5 +1,6 @@
 package com.alien.client.animation.entity;
 
+import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
 import com.alien.AlienResources;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.QueenAnimationRefs;
@@ -19,6 +20,8 @@ public class QueenAnimator extends AzEntityAnimator<Queen> {
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
 
     private int previousAttackId = Integer.MIN_VALUE;
+
+    private final CocoonAnimationStateTracker<Queen> cocoonAnimationStateTracker = new CocoonAnimationStateTracker<>();
 
     public QueenAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -65,6 +68,10 @@ public class QueenAnimator extends AzEntityAnimator<Queen> {
     @Override
     public void setCustomAnimations(Queen animatable, float partialTicks) {
         super.setCustomAnimations(animatable, partialTicks);
+
+        if (cocoonAnimationStateTracker.run(animatable)) {
+            return;
+        }
 
         runPassiveAnimations(animatable);
 

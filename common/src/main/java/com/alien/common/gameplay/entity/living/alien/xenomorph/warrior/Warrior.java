@@ -93,7 +93,7 @@ public class Warrior extends Xenomorph implements GOAPUser<Warrior>, PathNavigat
 
     @Override
     public @Nullable Graph<Warrior> blib$getGOAPGraphOrNull() {
-        return WarriorGOAP.GRAPH;
+        return getActiveGOAPGraph(WarriorGOAP.GRAPH);
     }
 
     @Override

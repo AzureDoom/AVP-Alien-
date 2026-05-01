@@ -1,5 +1,6 @@
 package com.alien.client.animation.entity;
 
+import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
 import com.alien.AlienResources;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.boiler.Boiler;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.boiler.BoilerAnimationRefs;
@@ -15,6 +16,8 @@ public class BoilerAnimator extends AzEntityAnimator<Boiler> {
     private static final String NAME = "boiler";
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
+
+    private final CocoonAnimationStateTracker<Boiler> cocoonAnimationStateTracker = new CocoonAnimationStateTracker<>();
 
     public BoilerAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -37,6 +40,10 @@ public class BoilerAnimator extends AzEntityAnimator<Boiler> {
     @Override
     public void setCustomAnimations(Boiler animatable, float partialTicks) {
         super.setCustomAnimations(animatable, partialTicks);
+
+        if (cocoonAnimationStateTracker.run(animatable)) {
+            return;
+        }
 
         runPassiveAnimations(animatable);
     }

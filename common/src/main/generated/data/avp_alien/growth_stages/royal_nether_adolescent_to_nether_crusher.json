@@ -2,5 +2,9 @@
   "from": "avp_alien:royal_nether_adolescent",
   "growthTimeInTicks": 3000,
   "hostTypePredicate": "#avp_alien:runner_hosts",
-  "to": "avp_alien:nether_crusher"
+  "to": "avp_alien:nether_crusher",
+  "cocooning": {
+    "sourceTimeInTicks": 600,
+    "destinationTimeInTicks": 600
+  }
 }

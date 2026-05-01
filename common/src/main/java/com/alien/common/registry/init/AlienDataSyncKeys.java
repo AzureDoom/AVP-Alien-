@@ -3,6 +3,7 @@ package com.alien.common.registry.init;
 import com.alien.Alien;
 import com.alien.AlienResources;
 import com.alien.common.gameplay.entity.living.alien.ovomorph.Ovomorph;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.CocoonState;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.QuadrupedAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.CrusherAttackType;
@@ -206,6 +207,18 @@ public class AlienDataSyncKeys {
         "xenomorph_is_crawling",
         builder -> builder.networkSynchronized(StreamCodecs.BOOLEAN)
             .build(false)
+    );
+
+    public static final BLibHolder<DataSyncKey<CocoonState>> XENOMORPH_COCOON_STATE = create(
+        "xenomorph_cocoon_state",
+        builder -> builder.networkSynchronized(CocoonState.STREAM_CODEC)
+            .build(CocoonState.NONE)
+    );
+
+    public static final BLibHolder<DataSyncKey<Integer>> XENOMORPH_COCOON_ANIMATION_ID = create(
+        "xenomorph_cocoon_animation_id",
+        builder -> builder.networkSynchronized(StreamCodecs.INT)
+            .build(0)
     );
 
     private static <T> BLibHolder<DataSyncKey<T>> create(String path, Function<DataSyncKey.Builder<T>, DataSyncKey<T>> factory) {

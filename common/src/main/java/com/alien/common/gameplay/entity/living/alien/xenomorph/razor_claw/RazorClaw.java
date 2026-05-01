@@ -100,7 +100,7 @@ public class RazorClaw extends Xenomorph implements GOAPUser<RazorClaw>, PathNav
 
     @Override
     public @Nullable Graph<RazorClaw> blib$getGOAPGraphOrNull() {
-        return RazorClawGOAP.GRAPH;
+        return getActiveGOAPGraph(RazorClawGOAP.GRAPH);
     }
 
     @Override

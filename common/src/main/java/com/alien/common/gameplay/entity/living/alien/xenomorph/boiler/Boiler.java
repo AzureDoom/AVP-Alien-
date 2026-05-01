@@ -99,7 +99,7 @@ public class Boiler extends Xenomorph implements GOAPUser<Boiler>, PathNavigator
 
     @Override
     public @Nullable Graph<Boiler> blib$getGOAPGraphOrNull() {
-        return BoilerGOAP.GRAPH;
+        return getActiveGOAPGraph(BoilerGOAP.GRAPH);
     }
 
     @Override

@@ -19,6 +19,7 @@ public class MoltingManager implements NBTSerializable {
 
     public static final String FORM_SCALE_PHASE_INDEX_TAG = "formScalePhaseIndex";
     public static final String FORM_SCALE_PHASE_TICKS_TAG = "formScalePhaseTicks";
+    public static final String FORM_SCALE_TARGET_REACHED_TICKS_TAG = "formScaleTargetReachedTicks";
 
     private static final ResourceLocation FORM_SIZE_SCALE_MODIFIER = AlienResources.location("form_size_scale");
 
@@ -32,6 +33,8 @@ public class MoltingManager implements NBTSerializable {
 
     private int phaseElapsedTicks;
 
+    private int targetScaleReachedTicks;
+
     private @Nullable FormSizeScale cachedData;
 
     private boolean dataCacheDirty;
@@ -40,11 +43,16 @@ public class MoltingManager implements NBTSerializable {
         this.entity = entity;
         this.phaseIndex = 0;
         this.phaseElapsedTicks = 0;
+        this.targetScaleReachedTicks = Integer.MAX_VALUE;
         this.dataCacheDirty = true;
 
         var data = getData();
 
         if (data != null) {
+            if (!data.isFullyMatured(phaseIndex)) {
+                this.targetScaleReachedTicks = 0;
+            }
+
             applyScaleModifier(data);
         }
     }
@@ -57,13 +65,17 @@ public class MoltingManager implements NBTSerializable {
         var data = getData();
 
         if (data == null) {
+            targetScaleReachedTicks = Integer.MAX_VALUE;
             return;
         }
 
         if (data.isFullyMatured(phaseIndex)) {
             entity.moltAlpha.set(0F);
+            incrementTargetScaleReachedTicks();
             return;
         }
+
+        targetScaleReachedTicks = 0;
 
         var currentPhase = data.phases().get(phaseIndex);
 
@@ -84,6 +96,10 @@ public class MoltingManager implements NBTSerializable {
         if (phaseElapsedTicks >= currentPhase.totalTicks()) {
             phaseIndex++;
             phaseElapsedTicks = 0;
+
+            if (data.isFullyMatured(phaseIndex)) {
+                targetScaleReachedTicks = 0;
+            }
 
             applyScaleModifier(data);
             entity.moltAlpha.set(0F);
@@ -106,6 +122,10 @@ public class MoltingManager implements NBTSerializable {
         }
 
         return data.isFullyMatured(phaseIndex);
+    }
+
+    public boolean hasReachedTargetScaleFor(int ticks) {
+        return hasReachedTargetScale() && targetScaleReachedTicks >= ticks;
     }
 
     public float getCurrentScale() {
@@ -219,6 +239,12 @@ public class MoltingManager implements NBTSerializable {
         }
     }
 
+    private void incrementTargetScaleReachedTicks() {
+        if (targetScaleReachedTicks < Integer.MAX_VALUE) {
+            targetScaleReachedTicks++;
+        }
+    }
+
     private @Nullable FormSizeScale getData() {
         if (dataCacheDirty) {
             cachedData = FormSizeScaleRegistry.get(entity.getType());
@@ -238,9 +264,17 @@ public class MoltingManager implements NBTSerializable {
             this.phaseElapsedTicks = compoundTag.getInt(FORM_SCALE_PHASE_TICKS_TAG);
         }
 
+        if (compoundTag.contains(FORM_SCALE_TARGET_REACHED_TICKS_TAG)) {
+            this.targetScaleReachedTicks = compoundTag.getInt(FORM_SCALE_TARGET_REACHED_TICKS_TAG);
+        }
+
         var data = getData();
 
         if (data != null) {
+            if (!compoundTag.contains(FORM_SCALE_TARGET_REACHED_TICKS_TAG)) {
+                this.targetScaleReachedTicks = data.isFullyMatured(phaseIndex) ? Integer.MAX_VALUE : 0;
+            }
+
             applyScaleModifier(data);
         }
     }
@@ -249,5 +283,6 @@ public class MoltingManager implements NBTSerializable {
     public void save(CompoundTag compoundTag) {
         compoundTag.putInt(FORM_SCALE_PHASE_INDEX_TAG, phaseIndex);
         compoundTag.putInt(FORM_SCALE_PHASE_TICKS_TAG, phaseElapsedTicks);
+        compoundTag.putInt(FORM_SCALE_TARGET_REACHED_TICKS_TAG, targetScaleReachedTicks);
     }
 }

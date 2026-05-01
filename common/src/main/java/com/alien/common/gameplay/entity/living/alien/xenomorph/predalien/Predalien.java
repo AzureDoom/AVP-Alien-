@@ -93,7 +93,7 @@ public class Predalien extends Xenomorph implements GOAPUser<Predalien>, PathNav
 
     @Override
     public @Nullable Graph<Predalien> blib$getGOAPGraphOrNull() {
-        return PredalienGOAP.GRAPH;
+        return getActiveGOAPGraph(PredalienGOAP.GRAPH);
     }
 
     @Override
