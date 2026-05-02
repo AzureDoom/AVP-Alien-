@@ -2,8 +2,8 @@ package com.alien.common.gameplay.entity.living.alien.ovomorph.ai;
 
 import com.alien.common.gameplay.entity.living.alien.ovomorph.Ovomorph;
 import com.alien.common.model.alien.HatchState;
-import com.just.goap.action.Action;
-import com.just.goap.condition.expression.Expressions;
+import com.just.ai.goap.action.Action;
+import com.just.ai.goap.condition.expression.Expressions;
 
 public class OvomorphGOAPActions {
 

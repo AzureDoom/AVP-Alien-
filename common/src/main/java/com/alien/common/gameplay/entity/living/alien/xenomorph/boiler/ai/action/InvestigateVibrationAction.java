@@ -4,9 +4,9 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.boiler.Boiler;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.util.AlienPredicates;
 import com.blib.api.common.goap.v1.action.impl.NeoMoveToPosAction;
-import com.just.goap.StateKey;
-import com.just.goap.action.Action;
-import com.just.goap.state.Blackboard;
+import com.just.ai.goap.StateKey;
+import com.just.ai.goap.action.Action;
+import com.just.ai.goap.state.Blackboard;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 

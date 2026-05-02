@@ -14,8 +14,8 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.vent.VentActio
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.vent.VentGoals;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.vent.VentSensors;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
-import com.just.goap.Agent;
-import com.just.goap.graph.Graph;
+import com.just.ai.goap.Agent;
+import com.just.ai.goap.graph.Graph;
 
 public class DroneGOAP {
 

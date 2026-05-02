@@ -1,7 +1,7 @@
 package com.alien.common.gameplay.entity.living.alien.parasite.facehugger.ai.seek_carrier;
 
-import com.just.goap.condition.expression.Expressions;
-import com.just.goap.goal.Goal;
+import com.just.ai.goap.condition.expression.Expressions;
+import com.just.ai.goap.goal.Goal;
 
 public class SeekCarrierGoals {
 

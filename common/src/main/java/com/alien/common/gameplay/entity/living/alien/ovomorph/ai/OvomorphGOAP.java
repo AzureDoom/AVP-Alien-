@@ -1,7 +1,7 @@
 package com.alien.common.gameplay.entity.living.alien.ovomorph.ai;
 
 import com.alien.common.gameplay.entity.living.alien.ovomorph.Ovomorph;
-import com.just.goap.graph.Graph;
+import com.just.ai.goap.graph.Graph;
 
 public class OvomorphGOAP {
 

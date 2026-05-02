@@ -2,9 +2,9 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.ai.panic
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.Carrier;
 import com.alien.common.util.AlienPredicates;
-import com.just.goap.StateKey;
-import com.just.goap.sensor.Sensor;
-import com.just.goap.sensor.Sensors;
+import com.just.ai.goap.StateKey;
+import com.just.ai.goap.sensor.Sensor;
+import com.just.ai.goap.sensor.Sensors;
 import net.minecraft.world.entity.LivingEntity;
 
 public class PanicReleaseSensors {

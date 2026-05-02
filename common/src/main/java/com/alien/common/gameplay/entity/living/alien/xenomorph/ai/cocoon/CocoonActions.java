@@ -3,8 +3,8 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.ai.cocoon;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.blib.api.common.goap.v1.action.ActionMasks;
 import com.blib.api.common.goap.v1.action.BLibAction;
-import com.just.goap.action.Action;
-import com.just.goap.condition.expression.Expressions;
+import com.just.ai.goap.action.Action;
+import com.just.ai.goap.condition.expression.Expressions;
 
 public class CocoonActions {
 

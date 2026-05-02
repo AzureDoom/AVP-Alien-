@@ -8,9 +8,9 @@ import com.blib.api.common.goap.v1.GOAPSensors;
 import com.blib.api.common.goap.v1.action.ActionMasks;
 import com.blib.api.common.goap.v1.action.BLibAction;
 import com.just.core.functional.option.Option;
-import com.just.goap.StateKey;
-import com.just.goap.action.Action;
-import com.just.goap.condition.expression.Expressions;
+import com.just.ai.goap.StateKey;
+import com.just.ai.goap.action.Action;
+import com.just.ai.goap.condition.expression.Expressions;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.world.entity.LivingEntity;
 
@@ -33,7 +33,7 @@ public class RavagerSpecialAttackActions {
     private static Action.Signal perform(Action.Context<? extends Ravager> context, RavagerSpecialAttackConfig config) {
         var ravager = context.getActor();
         var worldState = context.getWorldState();
-        var blackboard = context.getBlackboard(com.just.goap.state.Blackboard.Scope.ACTION);
+        var blackboard = context.getBlackboard(com.just.ai.goap.state.Blackboard.Scope.ACTION);
         var attackTargetOption = worldState.getOrDefault(GOAPSensors.NEAREST_ATTACKABLE_TARGET.key(), Option.<LivingEntity>none());
         var attackStarted = blackboard.getOrDefault(KEY_ATTACK_STARTED, false);
 

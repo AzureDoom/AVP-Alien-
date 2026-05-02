@@ -8,7 +8,7 @@ import com.alien.compatibility.avp_human.AVPHuman;
 import com.alien.compatibility.avp_human.GeneManagerProxy;
 import com.human.common.model.GeneCarrier;
 import com.human.common.util.GeneIntegrityUtil;
-import com.just.goap.action.Action;
+import com.just.ai.goap.action.Action;
 import net.minecraft.sounds.SoundSource;
 
 public class LayEggAction {

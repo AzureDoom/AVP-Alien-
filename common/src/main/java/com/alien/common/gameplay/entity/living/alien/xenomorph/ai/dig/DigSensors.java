@@ -1,9 +1,9 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.ai.dig;
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
-import com.just.goap.StateKey;
-import com.just.goap.sensor.Sensor;
-import com.just.goap.sensor.Sensors;
+import com.just.ai.goap.StateKey;
+import com.just.ai.goap.sensor.Sensor;
+import com.just.ai.goap.sensor.Sensors;
 import net.minecraft.world.level.GameRules;
 
 public class DigSensors {

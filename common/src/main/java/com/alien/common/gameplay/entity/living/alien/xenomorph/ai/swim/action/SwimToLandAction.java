@@ -1,7 +1,7 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.ai.swim.action;
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
-import com.just.goap.action.Action;
+import com.just.ai.goap.action.Action;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;

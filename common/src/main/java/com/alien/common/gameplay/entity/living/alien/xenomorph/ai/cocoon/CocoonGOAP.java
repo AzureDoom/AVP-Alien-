@@ -1,7 +1,7 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.ai.cocoon;
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
-import com.just.goap.graph.Graph;
+import com.just.ai.goap.graph.Graph;
 
 public class CocoonGOAP {
 

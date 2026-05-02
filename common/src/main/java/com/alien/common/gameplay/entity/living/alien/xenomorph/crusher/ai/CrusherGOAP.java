@@ -5,8 +5,8 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.lunge.LungeAct
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.lunge.LungeConfig;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.lunge.LungeSensors;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.Crusher;
-import com.just.goap.Agent;
-import com.just.goap.graph.Graph;
+import com.just.ai.goap.Agent;
+import com.just.ai.goap.graph.Graph;
 
 public class CrusherGOAP {
 

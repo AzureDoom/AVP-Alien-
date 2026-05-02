@@ -1,6 +1,6 @@
 package com.alien.common.gameplay.ai;
 
-import com.just.goap.StateKey;
+import com.just.ai.goap.StateKey;
 import net.minecraft.world.entity.LivingEntity;
 
 import java.util.List;

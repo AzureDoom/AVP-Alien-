@@ -3,7 +3,7 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.spitter.ai.spit.
 import com.alien.common.gameplay.entity.living.alien.xenomorph.spitter.Spitter;
 import com.blib.api.common.goap.v1.GOAPSensors;
 import com.just.core.functional.option.Option;
-import com.just.goap.action.Action;
+import com.just.ai.goap.action.Action;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.world.entity.LivingEntity;
 import org.slf4j.Logger;

@@ -5,10 +5,10 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.Carrier;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.CarrierSpine;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.goap.v1.GOAPSensors;
-import com.just.goap.StateKey;
-import com.just.goap.sensor.Compose2;
-import com.just.goap.sensor.Sensor;
-import com.just.goap.sensor.Sensors;
+import com.just.ai.goap.StateKey;
+import com.just.ai.goap.sensor.Compose2;
+import com.just.ai.goap.sensor.Sensor;
+import com.just.ai.goap.sensor.Sensors;
 import net.minecraft.world.entity.LivingEntity;
 
 import java.util.Comparator;

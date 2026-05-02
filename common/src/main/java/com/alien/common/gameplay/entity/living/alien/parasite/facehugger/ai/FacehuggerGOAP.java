@@ -11,9 +11,9 @@ import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.ai.seek
 import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.ai.seek_carrier.SeekCarrierGoals;
 import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.ai.seek_carrier.SeekCarrierSensors;
 import com.blib.api.common.goap.v1.GOAPSensors;
-import com.just.goap.Agent;
-import com.just.goap.graph.Graph;
-import com.just.goap.plan.ReplanPolicies;
+import com.just.ai.goap.Agent;
+import com.just.ai.goap.graph.Graph;
+import com.just.ai.goap.plan.ReplanPolicies;
 
 public class FacehuggerGOAP {
 

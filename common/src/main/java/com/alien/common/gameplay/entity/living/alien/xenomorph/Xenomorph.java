@@ -14,7 +14,7 @@ import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.entity.v1.EntitySenseCache;
 import com.blib.api.common.entity.v1.EntitySenseCacheUser;
 import com.blib.api.common.goap.v1.GOAPUser;
-import com.just.goap.graph.Graph;
+import com.just.ai.goap.graph.Graph;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;

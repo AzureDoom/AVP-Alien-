@@ -7,11 +7,11 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.razor_claw.ai.spe
 import com.alien.common.gameplay.entity.living.alien.xenomorph.razor_claw.ai.special_attack.RazorClawSpecialAttackSensors;
 import com.blib.api.common.goap.v1.GOAPSensors;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
-import com.just.goap.Agent;
-import com.just.goap.condition.expression.Expressions;
-import com.just.goap.goal.Goal;
-import com.just.goap.graph.Graph;
-import com.just.goap.plan.ReplanPolicies;
+import com.just.ai.goap.Agent;
+import com.just.ai.goap.condition.expression.Expressions;
+import com.just.ai.goap.goal.Goal;
+import com.just.ai.goap.graph.Graph;
+import com.just.ai.goap.plan.ReplanPolicies;
 
 public class RazorClawGOAP {
 

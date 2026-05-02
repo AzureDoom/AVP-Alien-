@@ -3,7 +3,7 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg.action;
 import com.alien.common.gameplay.entity.living.alien.EggCarrier;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.blib.api.common.goap.v1.action.impl.NeoMoveToPosAction;
-import com.just.goap.action.Action;
+import com.just.ai.goap.action.Action;
 
 public class PickUpEggAction {
 

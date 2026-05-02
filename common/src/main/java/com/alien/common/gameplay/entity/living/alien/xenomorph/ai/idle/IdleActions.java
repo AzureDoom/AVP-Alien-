@@ -7,8 +7,8 @@ import com.blib.api.common.goap.v1.action.BLibAction;
 import com.blib.api.common.goap.v1.action.impl.NeoWanderAction;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
 import com.blib.api.common.pathfinding.v1.terrain.TerrainType;
-import com.just.goap.action.Action;
-import com.just.goap.condition.expression.Expressions;
+import com.just.ai.goap.action.Action;
+import com.just.ai.goap.condition.expression.Expressions;
 
 import java.util.EnumSet;
 

@@ -7,8 +7,8 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.ai.panic_
 import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.ai.panic_release.PanicReleaseSensors;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.ai.throw_attack.ThrowAttackActions;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.ai.throw_attack.ThrowAttackSensors;
-import com.just.goap.Agent;
-import com.just.goap.graph.Graph;
+import com.just.ai.goap.Agent;
+import com.just.ai.goap.graph.Graph;
 
 public class CarrierGOAP {
 

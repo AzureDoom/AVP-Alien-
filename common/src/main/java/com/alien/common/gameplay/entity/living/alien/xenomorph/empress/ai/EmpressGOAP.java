@@ -5,8 +5,8 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg_laying.Egg
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg_laying.EggLayingGoals;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg_laying.EggLayingSensors;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.empress.Empress;
-import com.just.goap.Agent;
-import com.just.goap.graph.Graph;
+import com.just.ai.goap.Agent;
+import com.just.ai.goap.graph.Graph;
 
 public class EmpressGOAP {
 

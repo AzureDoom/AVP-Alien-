@@ -2,8 +2,8 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.predalien.ai;
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.XenomorphGOAP;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.predalien.Predalien;
-import com.just.goap.Agent;
-import com.just.goap.graph.Graph;
+import com.just.ai.goap.Agent;
+import com.just.ai.goap.graph.Graph;
 
 public class PredalienGOAP {
 

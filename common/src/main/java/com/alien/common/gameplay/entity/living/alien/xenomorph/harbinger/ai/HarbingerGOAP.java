@@ -2,8 +2,8 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.harbinger.ai;
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.XenomorphGOAP;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.harbinger.Harbinger;
-import com.just.goap.Agent;
-import com.just.goap.graph.Graph;
+import com.just.ai.goap.Agent;
+import com.just.ai.goap.graph.Graph;
 
 public class HarbingerGOAP {
 

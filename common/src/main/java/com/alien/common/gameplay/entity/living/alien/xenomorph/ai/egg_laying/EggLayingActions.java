@@ -2,8 +2,8 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg_laying;
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg_laying.action.LayEggAction;
 import com.blib.api.common.goap.v1.action.BLibAction;
-import com.just.goap.action.Action;
-import com.just.goap.condition.expression.Expressions;
+import com.just.ai.goap.action.Action;
+import com.just.ai.goap.condition.expression.Expressions;
 
 public class EggLayingActions {
 

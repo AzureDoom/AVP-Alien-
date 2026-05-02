@@ -5,10 +5,10 @@ import com.blib.api.common.goap.v1.GOAPSensors;
 import com.blib.api.common.goap.v1.action.ActionMasks;
 import com.blib.api.common.goap.v1.action.BLibAction;
 import com.just.core.functional.option.Option;
-import com.just.goap.StateKey;
-import com.just.goap.action.Action;
-import com.just.goap.condition.expression.Expressions;
-import com.just.goap.state.Blackboard;
+import com.just.ai.goap.StateKey;
+import com.just.ai.goap.action.Action;
+import com.just.ai.goap.condition.expression.Expressions;
+import com.just.ai.goap.state.Blackboard;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.world.entity.LivingEntity;
 

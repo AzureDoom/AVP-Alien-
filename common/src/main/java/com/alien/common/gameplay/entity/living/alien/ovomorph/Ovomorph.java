@@ -16,7 +16,7 @@ import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.entity.v1.vibration.VibrationSystemManager;
 import com.blib.api.common.goap.v1.GOAPUser;
 import com.just.core.functional.option.Option;
-import com.just.goap.graph.Graph;
+import com.just.ai.goap.graph.Graph;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;

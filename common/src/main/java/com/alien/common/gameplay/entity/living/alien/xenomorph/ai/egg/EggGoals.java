@@ -1,8 +1,8 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg;
 
 import com.blib.api.common.goap.v1.GOAPSensors;
-import com.just.goap.condition.expression.Expressions;
-import com.just.goap.goal.Goal;
+import com.just.ai.goap.condition.expression.Expressions;
+import com.just.ai.goap.goal.Goal;
 
 public class EggGoals {
 

@@ -5,8 +5,8 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.chrysalis.Chrysal
 import com.alien.common.gameplay.entity.living.alien.xenomorph.chrysalis.ai.roll.RollActions;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.chrysalis.ai.roll.RollConfig;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.chrysalis.ai.roll.RollSensors;
-import com.just.goap.Agent;
-import com.just.goap.graph.Graph;
+import com.just.ai.goap.Agent;
+import com.just.ai.goap.graph.Graph;
 
 public class ChrysalisGOAP {
 
