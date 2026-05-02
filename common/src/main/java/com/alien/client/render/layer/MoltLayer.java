@@ -13,7 +13,9 @@ public class MoltLayer<T> implements AzRenderLayer<UUID, T> {
     private static final float MOLT_INFLATE = 0.025F;
 
     private static final int MOLT_TINT_R = 160;
+
     private static final int MOLT_TINT_G = 130;
+
     private static final int MOLT_TINT_B = 100;
 
     @Override

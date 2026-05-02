@@ -10,11 +10,11 @@ import com.blib.api.common.goap.v1.action.BLibAction;
 import com.blib.api.common.goap.v1.action.impl.MoveToPosAction;
 import com.blib.api.common.goap.v1.action.impl.NeoMoveToPosAction;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
-import com.just.core.functional.option.Option;
 import com.just.ai.goap.StateKey;
 import com.just.ai.goap.action.Action;
 import com.just.ai.goap.condition.expression.Expressions;
 import com.just.ai.goap.state.Blackboard;
+import com.just.core.functional.option.Option;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 

@@ -9,7 +9,6 @@ import com.just.ai.goap.StateKey;
 import com.just.ai.goap.sensor.Compose2;
 import com.just.ai.goap.sensor.Sensor;
 import com.just.ai.goap.sensor.Sensors;
-import net.minecraft.world.entity.LivingEntity;
 
 import java.util.Comparator;
 
@@ -37,8 +36,7 @@ public class SeekCarrierSensors {
         GOAPSensors.HAS_ATTACK_TARGET.key(),
         NEAREST_AVAILABLE_CARRIER.key(),
         StateKey.sensed("should_seek_carrier"),
-        (facehugger, hasAttackTarget, nearestCarrier) ->
-            !hasAttackTarget && !facehugger.isPassenger() && nearestCarrier != null
+        (facehugger, hasAttackTarget, nearestCarrier) -> !hasAttackTarget && !facehugger.isPassenger() && nearestCarrier != null
     );
 
     private SeekCarrierSensors() {

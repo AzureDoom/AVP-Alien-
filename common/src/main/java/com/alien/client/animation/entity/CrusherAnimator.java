@@ -1,7 +1,7 @@
 package com.alien.client.animation.entity;
 
-import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
 import com.alien.AlienResources;
+import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.Crusher;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.CrusherAnimationRefs;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.CrusherAttackType;

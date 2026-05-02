@@ -2,9 +2,7 @@ package com.alien.fabric.data.growth_stages;
 
 import com.alien.AlienResources;
 import com.alien.common.data.GrowthStageReloadListener;
-import com.alien.common.model.lifecycle.growth.CocooningConfig;
 import com.alien.common.model.lifecycle.growth.GrowthStage;
-import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.minecraft.data.CachedOutput;

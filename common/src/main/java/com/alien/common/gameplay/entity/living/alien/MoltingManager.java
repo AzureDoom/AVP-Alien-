@@ -9,7 +9,6 @@ import com.alien.common.util.AlienPredicates;
 import com.blib.api.common.nbt.v1.model.NBTSerializable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -18,7 +17,9 @@ import org.jetbrains.annotations.Nullable;
 public class MoltingManager implements NBTSerializable {
 
     public static final String FORM_SCALE_PHASE_INDEX_TAG = "formScalePhaseIndex";
+
     public static final String FORM_SCALE_PHASE_TICKS_TAG = "formScalePhaseTicks";
+
     public static final String FORM_SCALE_TARGET_REACHED_TICKS_TAG = "formScaleTargetReachedTicks";
 
     private static final ResourceLocation FORM_SIZE_SCALE_MODIFIER = AlienResources.location("form_size_scale");

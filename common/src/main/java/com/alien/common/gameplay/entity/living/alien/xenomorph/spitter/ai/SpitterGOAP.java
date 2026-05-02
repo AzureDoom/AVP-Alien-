@@ -4,9 +4,7 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.XenomorphGOAP;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.CombatActions;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.CombatGoals;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.CombatSensors;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.lunge.LungeActions;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.lunge.LungeConfig;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.lunge.LungeSensors;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.spitter.Spitter;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.spitter.ai.spit.SpitActions;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.spitter.ai.spit.SpitSensors;
@@ -24,7 +22,7 @@ public class SpitterGOAP {
         .apply(SpitterGOAP::addCombatPackage)
         .apply(XenomorphGOAP::addDigPackage)
         .apply(XenomorphGOAP::addIdlePackage)
-        .apply(SpitterGOAP::addLungePackage)
+        .apply(b -> XenomorphGOAP.addLungePackage(b, LUNGE_CONFIG))
         .apply(SpitterGOAP::addSpitPackage)
         .build();
 
@@ -45,15 +43,6 @@ public class SpitterGOAP {
         graphBuilder.addSensor(GOAPSensors.NEAREST_ATTACKABLE_TARGET);
         graphBuilder.addSensor(GOAPSensors.HAS_ATTACK_TARGET);
         graphBuilder.addSensor(CombatSensors.IS_TARGET_IN_MELEE_RANGE);
-
-        return graphBuilder;
-    }
-
-    private static Graph.Builder<Spitter> addLungePackage(Graph.Builder<Spitter> graphBuilder) {
-        var lungeSensor = LungeSensors.<Spitter>createLungeRangeSensor(LUNGE_CONFIG);
-
-        graphBuilder.addAction(LungeActions.createLungeAtTarget(lungeSensor.key()));
-        graphBuilder.addSensor(lungeSensor);
 
         return graphBuilder;
     }

@@ -10,6 +10,7 @@ import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.Facehug
 import com.alien.common.gameplay.entity.living.alien.predalien_adolescent.PredalienAdolescent;
 import com.alien.common.gameplay.entity.living.alien.predalien_chestburster.PredalienChestburster;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.boiler.Boiler;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.burster.Burster;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.Carrier;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.chrysalis.Chrysalis;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.Crusher;
@@ -22,7 +23,6 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.prowler.Prowler;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ravager.Ravager;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.razor_claw.RazorClaw;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.burster.Burster;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.spitter.Spitter;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.warrior.Warrior;

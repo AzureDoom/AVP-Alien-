@@ -1,7 +1,7 @@
 package com.alien.client.animation.entity;
 
-import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
 import com.alien.AlienResources;
+import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.boiler.Boiler;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.boiler.BoilerAnimationRefs;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;

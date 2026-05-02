@@ -6,11 +6,11 @@ import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.goap.v1.GOAPSensors;
 import com.blib.api.common.goap.v1.action.ActionMasks;
 import com.blib.api.common.goap.v1.action.BLibAction;
-import com.just.core.functional.option.Option;
 import com.just.ai.goap.StateKey;
 import com.just.ai.goap.action.Action;
 import com.just.ai.goap.condition.expression.Expressions;
 import com.just.ai.goap.state.Blackboard;
+import com.just.core.functional.option.Option;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
@@ -90,7 +90,8 @@ public class ThrowAttackActions {
     private static boolean releaseFacehugger(Carrier carrier, LivingEntity target) {
         carrier.lookAt(EntityAnchorArgument.Anchor.EYES, target.getEyePosition());
 
-        var facehugger = carrier.getPassengers().stream()
+        var facehugger = carrier.getPassengers()
+            .stream()
             .filter(p -> p.getType().is(AlienEntityTypeTags.FACEHUGGERS))
             .filter(p -> p instanceof Facehugger)
             .map(p -> (Facehugger) p)
@@ -110,11 +111,13 @@ public class ThrowAttackActions {
         var horizontalSpeed = Math.min(distance * 0.1, 1.5);
         var verticalBoost = 0.4 + distance * 0.02;
 
-        facehugger.setDeltaMovement(new Vec3(
-            normalized.x * horizontalSpeed,
-            normalized.y * horizontalSpeed + verticalBoost,
-            normalized.z * horizontalSpeed
-        ));
+        facehugger.setDeltaMovement(
+            new Vec3(
+                normalized.x * horizontalSpeed,
+                normalized.y * horizontalSpeed + verticalBoost,
+                normalized.z * horizontalSpeed
+            )
+        );
 
         facehugger.isLunging.set(true);
         carrier.getCarrierData().resetThrowCooldown(carrier.getRandom());

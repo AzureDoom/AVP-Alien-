@@ -1,6 +1,7 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.ravager;
 
 import com.alien.common.gameplay.entity.living.alien.Alien;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.SpecialAttackUser;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ravager.ai.RavagerGOAP;
@@ -27,16 +28,16 @@ import com.blib.api.common.pathfinding.v1.terrain.TerrainType;
 import com.just.ai.goap.Agent;
 import com.just.ai.goap.graph.Graph;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
-import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class Ravager extends Xenomorph implements GOAPUser<Ravager>, PathNavigatorUser {
+public class Ravager extends Xenomorph implements GOAPUser<Ravager>, PathNavigatorUser, SpecialAttackUser {
 
     private static final float MAX_BREAKABLE_DESTROY_TIME = 6.0F;
 

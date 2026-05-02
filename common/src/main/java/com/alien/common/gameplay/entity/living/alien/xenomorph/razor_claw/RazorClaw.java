@@ -1,6 +1,7 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.razor_claw;
 
 import com.alien.common.gameplay.entity.living.alien.Alien;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.SpecialAttackUser;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.razor_claw.ai.RazorClawGOAP;
@@ -42,7 +43,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class RazorClaw extends Xenomorph implements GOAPUser<RazorClaw>, PathNavigatorUser {
+public class RazorClaw extends Xenomorph implements GOAPUser<RazorClaw>, PathNavigatorUser, SpecialAttackUser {
 
     private static final int BLOOD_LOSS_DURATION_IN_TICKS = 20 * 15;
 

@@ -2,8 +2,8 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.chrysalis.ai.rol
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.chrysalis.Chrysalis;
 import com.blib.api.common.goap.v1.GOAPSensors;
-import com.just.core.functional.option.Option;
 import com.just.ai.goap.action.Action;
+import com.just.core.functional.option.Option;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 

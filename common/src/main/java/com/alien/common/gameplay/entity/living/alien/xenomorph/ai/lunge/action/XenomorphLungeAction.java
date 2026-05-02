@@ -3,10 +3,10 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.ai.lunge.action;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.blib.api.common.goap.v1.GOAPSensors;
-import com.just.core.functional.option.Option;
 import com.just.ai.goap.StateKey;
 import com.just.ai.goap.action.Action;
 import com.just.ai.goap.state.Blackboard;
+import com.just.core.functional.option.Option;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.world.entity.LivingEntity;
 

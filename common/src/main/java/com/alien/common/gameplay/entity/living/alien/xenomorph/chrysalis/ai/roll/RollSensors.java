@@ -2,10 +2,10 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.chrysalis.ai.rol
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.chrysalis.Chrysalis;
 import com.blib.api.common.goap.v1.GOAPSensors;
-import com.just.core.functional.option.Option;
 import com.just.ai.goap.StateKey;
 import com.just.ai.goap.sensor.Compose2;
 import com.just.ai.goap.sensor.Sensors;
+import com.just.core.functional.option.Option;
 import net.minecraft.world.entity.LivingEntity;
 
 public class RollSensors {

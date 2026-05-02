@@ -1,7 +1,7 @@
 package com.alien.client.animation.entity;
 
-import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
 import com.alien.AlienResources;
+import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ravager.Ravager;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ravager.RavagerAnimationRefs;

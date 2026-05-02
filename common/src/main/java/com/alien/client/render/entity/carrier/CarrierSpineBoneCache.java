@@ -9,7 +9,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class CarrierSpineBoneCache {
 
-    public record SpineData(Vector3d[] modelPositions, Vector3f[] rotations) {}
+    public record SpineData(
+        Vector3d[] modelPositions,
+        Vector3f[] rotations
+    ) {}
 
     private static final Map<Integer, SpineData> CACHE = new ConcurrentHashMap<>();
 

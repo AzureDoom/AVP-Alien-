@@ -13,11 +13,12 @@ public class RavagerAreaAttackUtil {
             .expandTowards(getForward(ravager).scale(rangeInBlocks))
             .inflate(ravager.getBbWidth(), ravager.getBbHeight() * 0.5, ravager.getBbWidth());
 
-        return ravager.level().getEntitiesOfClass(
-            LivingEntity.class,
-            searchBox,
-            target -> target != ravager && target.isAlive() && isInAttackCone(ravager, target, rangeInBlocks, coneAngleInDegrees)
-        );
+        return ravager.level()
+            .getEntitiesOfClass(
+                LivingEntity.class,
+                searchBox,
+                target -> target != ravager && target.isAlive() && isInAttackCone(ravager, target, rangeInBlocks, coneAngleInDegrees)
+            );
     }
 
     private static boolean isInAttackCone(Ravager ravager, LivingEntity target, double rangeInBlocks, double coneAngleInDegrees) {

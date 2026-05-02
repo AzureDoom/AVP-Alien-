@@ -6,7 +6,6 @@ import com.alien.client.render.entity.head.EntityHeadDataCache;
 import com.alien.client.render.entity.parasite.attachment.ParasiteHeadAttachmentOffsetDataCache;
 import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.Facehugger;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.Carrier;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.CarrierSpine;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.client.render.v1.AzLayerRenderer;
 import com.blib.api.client.render.v1.entity.model.AzEntityModelRenderer;
@@ -80,7 +79,8 @@ public class FacehuggerModelRenderer extends AzEntityModelRenderer<Facehugger> {
             return;
         }
 
-        var facehuggers = carrier.getPassengers().stream()
+        var facehuggers = carrier.getPassengers()
+            .stream()
             .filter(p -> p.getType().is(AlienEntityTypeTags.FACEHUGGERS))
             .toList();
 

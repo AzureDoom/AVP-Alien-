@@ -6,10 +6,10 @@ import com.alien.common.util.AlienPredicates;
 import com.blib.api.common.goap.v1.GOAPSensors;
 import com.blib.api.common.goap.v1.action.ActionMasks;
 import com.blib.api.common.goap.v1.action.BLibAction;
-import com.just.core.functional.option.Option;
 import com.just.ai.goap.StateKey;
 import com.just.ai.goap.action.Action;
 import com.just.ai.goap.condition.expression.Expressions;
+import com.just.core.functional.option.Option;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
@@ -91,16 +91,17 @@ public class RazorClawSpecialAttackActions {
         var arcPadding = config.hitArcDegrees() * 0.5;
         var rangeSquared = config.rangeInBlocks() * config.rangeInBlocks();
 
-        var targets = razorClaw.level().getEntitiesOfClass(
-            LivingEntity.class,
-            razorClaw.getBoundingBox().inflate(config.rangeInBlocks(), 1.0, config.rangeInBlocks()),
-            target -> target != razorClaw
-                && target.isAlive()
-                && !hitEntityIds.contains(target.getId())
-                && razorClaw.distanceToSqr(target) <= rangeSquared
-                && AlienPredicates.canTarget(razorClaw, target)
-                && razorClaw.getSensing().hasLineOfSight(target)
-        );
+        var targets = razorClaw.level()
+            .getEntitiesOfClass(
+                LivingEntity.class,
+                razorClaw.getBoundingBox().inflate(config.rangeInBlocks(), 1.0, config.rangeInBlocks()),
+                target -> target != razorClaw
+                    && target.isAlive()
+                    && !hitEntityIds.contains(target.getId())
+                    && razorClaw.distanceToSqr(target) <= rangeSquared
+                    && AlienPredicates.canTarget(razorClaw, target)
+                    && razorClaw.getSensing().hasLineOfSight(target)
+            );
 
         for (var target : targets) {
             var targetSweepAngle = computeSweepAngle(razorClaw, target, startingYaw);

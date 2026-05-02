@@ -3,7 +3,6 @@ package com.alien.fabric.data.form_size_scale;
 import com.alien.common.model.lifecycle.growth.MoltPhase;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class FormSizeScaleConstants {
 

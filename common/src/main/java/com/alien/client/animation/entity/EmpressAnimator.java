@@ -1,7 +1,7 @@
 package com.alien.client.animation.entity;
 
-import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
 import com.alien.AlienResources;
+import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.empress.Empress;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.empress.EmpressAnimationRefs;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.empress.EmpressAttackType;

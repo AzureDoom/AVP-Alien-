@@ -2,11 +2,11 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.ravager.ai.speci
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ravager.Ravager;
 import com.blib.api.common.goap.v1.GOAPSensors;
-import com.just.core.functional.option.Option;
 import com.just.ai.goap.StateKey;
 import com.just.ai.goap.sensor.Compose2;
 import com.just.ai.goap.sensor.Sensor;
 import com.just.ai.goap.sensor.Sensors;
+import com.just.core.functional.option.Option;
 import net.minecraft.world.entity.LivingEntity;
 
 public class RavagerSpecialAttackSensors {

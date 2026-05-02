@@ -7,7 +7,6 @@ import com.blib.api.common.nbt.v1.model.NBTSerializable;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -15,9 +14,13 @@ import org.jetbrains.annotations.Nullable;
 public class CocoonManager implements NBTSerializable {
 
     public static final String COCOON_STATE_TAG = "cocoonState";
+
     public static final String COCOON_TARGET_TYPE_TAG = "cocoonTargetType";
+
     public static final String COCOON_SOURCE_TIME_TAG = "cocoonSourceTimeInTicks";
+
     public static final String COCOON_DESTINATION_TIME_TAG = "cocoonDestinationTimeInTicks";
+
     public static final String COCOON_ELAPSED_TICKS_TAG = "cocoonElapsedTicks";
 
     private static final int EMERGE_TIME_IN_TICKS = 20;

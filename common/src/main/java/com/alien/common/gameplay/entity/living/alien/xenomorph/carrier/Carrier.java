@@ -11,7 +11,6 @@ import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienBlockTags;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.data_sync.v1.DataAccessor;
-import com.blib.api.common.entity.v1.EntityUtil;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.goap.v1.GOAPUser;
 import com.blib.api.common.pathfinding.v1.cache.TerrainCacheRegistry;
