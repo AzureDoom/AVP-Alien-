@@ -2,7 +2,7 @@ package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
 import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.spitter.Spitter;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.spitter.SpitterAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
@@ -81,14 +81,16 @@ public class SpitterAnimator extends AzEntityAnimator<Spitter> {
         var attackType = spitter.attackType.get();
         var attackId = spitter.attackId.get();
 
-        if (attackType != XenomorphAttackType.NONE) {
+        if (!attackType.isNone()) {
             if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(spitter, attackType);
 
-                switch (attackType) {
-                    case BITE -> dispatcher.biteAttack(speed);
-                    case CLAW -> dispatcher.rightClawAttack(speed);
-                    case TAIL -> dispatcher.tailAttack(speed);
+                if (attackType == Spitter.BITE) {
+                    dispatcher.biteAttack(speed);
+                } else if (attackType == Spitter.CLAW) {
+                    dispatcher.rightClawAttack(speed);
+                } else if (attackType == Spitter.TAIL) {
+                    dispatcher.tailAttack(speed);
                 }
 
                 previousAttackId = attackId;
@@ -119,13 +121,18 @@ public class SpitterAnimator extends AzEntityAnimator<Spitter> {
         animFunction.run();
     }
 
-    private float calculateAttackSpeed(Spitter spitter, XenomorphAttackType attackType) {
-        var animationName = switch (attackType) {
-            case BITE -> SpitterAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME;
-            case CLAW -> SpitterAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME;
-            case TAIL -> SpitterAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME;
-            default -> null;
-        };
+    private float calculateAttackSpeed(Spitter spitter, AttackType attackType) {
+        String animationName;
+
+        if (attackType == Spitter.BITE) {
+            animationName = SpitterAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME;
+        } else if (attackType == Spitter.CLAW) {
+            animationName = SpitterAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME;
+        } else if (attackType == Spitter.TAIL) {
+            animationName = SpitterAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME;
+        } else {
+            animationName = null;
+        }
 
         var durationInTicks = spitter.attackDurationInTicks.get();
 

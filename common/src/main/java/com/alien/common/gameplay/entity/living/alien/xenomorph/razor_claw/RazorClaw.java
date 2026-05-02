@@ -1,35 +1,20 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.razor_claw;
 
 import com.alien.common.gameplay.entity.living.alien.Alien;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.SpecialAttackUser;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphPathConfig;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.razor_claw.ai.RazorClawGOAP;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.razor_claw.ai.special_attack.RazorClawSpecialAttackActions;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.razor_claw.ai.special_attack.RazorClawSpecialAttackConfig;
 import com.alien.common.model.alien.variant.AlienVariant;
-import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienMobEffects;
 import com.alien.common.registry.init.AlienSoundEvents;
-import com.alien.common.registry.tag.AlienBlockTags;
-import com.alien.common.util.AlienPredicates;
-import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.goap.v1.GOAPUser;
-import com.blib.api.common.pathfinding.v1.cache.TerrainCacheRegistry;
-import com.blib.api.common.pathfinding.v1.evaluator.TerrainEvaluatorConfig;
-import com.blib.api.common.pathfinding.v1.navigator.PathNavigator;
-import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorConfig;
-import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
-import com.blib.api.common.pathfinding.v1.search.SearchConfig;
-import com.blib.api.common.pathfinding.v1.terrain.BlockBreakabilityEvaluators;
-import com.blib.api.common.pathfinding.v1.terrain.TerrainClassifiers;
-import com.blib.api.common.pathfinding.v1.terrain.TerrainType;
 import com.just.ai.goap.Agent;
 import com.just.ai.goap.graph.Graph;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -40,14 +25,42 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-import java.util.Set;
+public class RazorClaw extends Xenomorph implements GOAPUser<RazorClaw> {
 
-public class RazorClaw extends Xenomorph implements GOAPUser<RazorClaw>, PathNavigatorUser, SpecialAttackUser {
+    public static final AttackType CLAW = AttackType.builder("claw")
+        .defaultDurationInTicks(10)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    public static final AttackType BITE = AttackType.builder("bite")
+        .defaultDurationInTicks(8)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    public static final AttackType TAIL = AttackType.builder("tail")
+        .defaultDurationInTicks(12)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    public static final AttackType SWIM_ATTACK = AttackType.builder("swim_attack")
+        .defaultDurationInTicks(10)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    private static final XenomorphConfig CONFIG = XenomorphConfig.builder(XenomorphPathConfig.LARGE, RazorClaw::getType)
+        .attackConfig(
+            XenomorphAttackConfig.builder()
+                .addRegular(CLAW)
+                .addRegular(BITE)
+                .addRegular(TAIL)
+                .addTriggered(RazorClawSweepAttack.ATTACK)
+                .build()
+        )
+        .parallelDigCount(2)
+        .pushedByFluid(false)
+        .build();
 
     private static final int BLOOD_LOSS_DURATION_IN_TICKS = 20 * 15;
-
-    private static final float MAX_BREAKABLE_DESTROY_TIME = 6.0F;
 
     public static AttributeSupplier.Builder createRazorClawAttributes() {
         return Alien.createAlienAttributes()
@@ -60,58 +73,11 @@ public class RazorClaw extends Xenomorph implements GOAPUser<RazorClaw>, PathNav
             .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1.2F);
     }
 
-    public final DataAccessor<XenomorphAttackType> attackType;
-
     private final RazorClawAnimationDispatcher animationDispatcher;
 
-    private final RazorClawData razorClawData;
-
-    private final PathNavigator pathNavigator;
-
-    private final Set<Integer> specialAttackHitEntityIds;
-
-    private int specialAttackTicksRemaining;
-
-    private int specialAttackDurationInTicks;
-
-    private float specialAttackYaw;
-
     public RazorClaw(EntityType<? extends RazorClaw> entityType, Level level) {
-        super(entityType, level);
-        this.attackType = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_ATTACK_TYPE.get());
+        super(entityType, level, CONFIG);
         this.animationDispatcher = new RazorClawAnimationDispatcher(this);
-        this.razorClawData = new RazorClawData();
-        this.pathNavigator = createPathNavigator(level);
-        this.specialAttackHitEntityIds = new HashSet<>();
-        getXenomorphData().setParallelDigCount(2);
-    }
-
-    private PathNavigator createPathNavigator(Level level) {
-        var evaluatorConfig = TerrainEvaluatorConfig.builder()
-            .addTerrain(TerrainType.GROUND, 1.0f)
-            .addTerrain(TerrainType.WATER, 4.0f)
-            .addTerrain(TerrainType.BREAKABLE, 8.0f)
-            .withTerrainClassifier(TerrainClassifiers.GROUND_AND_WATER)
-            .withBreakabilityEvaluator(
-                BlockBreakabilityEvaluators.withExcludedTag(
-                    BlockBreakabilityEvaluators.defaultEvaluator(MAX_BREAKABLE_DESTROY_TIME),
-                    AlienBlockTags.XENOMORPH_IMMUNE
-                )
-            )
-            .withEntitySize(1, 4)
-            .withMaxFallDistance(14)
-            .withCanOpenDoors(false)
-            .build();
-
-        var followRange = (float) getAttributeValue(Attributes.FOLLOW_RANGE);
-
-        var navigatorConfig = PathNavigatorConfig.builder(evaluatorConfig)
-            .withSearchConfig(SearchConfig.fromFollowRange(followRange))
-            .build();
-
-        var classificationCache = TerrainCacheRegistry.getOrCreate(level, evaluatorConfig.getTerrainClassifier());
-
-        return new PathNavigator(level, navigatorConfig, classificationCache);
     }
 
     @Override
@@ -122,21 +88,6 @@ public class RazorClaw extends Xenomorph implements GOAPUser<RazorClaw>, PathNav
     @Override
     public @Nullable Graph<RazorClaw> blib$getGOAPGraphOrNull() {
         return getActiveGOAPGraph(RazorClawGOAP.GRAPH);
-    }
-
-    @Override
-    public PathNavigator getPathNavigator() {
-        return pathNavigator;
-    }
-
-    @Override
-    public @Nullable EntityType<? extends Alien> getTypeForVariant(AlienVariant alienVariant) {
-        return getType(alienVariant);
-    }
-
-    @Override
-    protected float getHealthRegenPerSecond() {
-        return 0.5F;
     }
 
     @Override
@@ -156,135 +107,8 @@ public class RazorClaw extends Xenomorph implements GOAPUser<RazorClaw>, PathNav
         return result;
     }
 
-    @Override
-    public boolean isAttacking() {
-        return attackType.get() != XenomorphAttackType.NONE;
-    }
-
-    @Override
-    protected void resetAttackType() {
-        attackType.set(XenomorphAttackType.NONE);
-    }
-
-    @Override
-    public void runAttackAnimations() {
-        var attackVariant = random.nextInt(0, 3);
-
-        playSound(
-            AlienSoundEvents.ENTITY_XENOMORPH_ATTACK.get(),
-            getSoundVolume(),
-            (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F
-        );
-
-        var attack = switch (attackVariant) {
-            case 0 -> XenomorphAttackType.CLAW;
-            case 1 -> XenomorphAttackType.BITE;
-            default -> XenomorphAttackType.TAIL;
-        };
-
-        attackType.set(attack);
-        beginAttack(attack.defaultDurationInTicks());
-    }
-
-    public void startSpecialAttack(int durationInTicks, LivingEntity target) {
-        specialAttackYaw = computeYawTowards(target);
-        specialAttackTicksRemaining = durationInTicks;
-        specialAttackDurationInTicks = durationInTicks;
-        specialAttackHitEntityIds.clear();
-        attackType.set(XenomorphAttackType.SPECIAL);
-        beginAttack(durationInTicks + 1);
-    }
-
-    public boolean isUsingSpecialAttack() {
-        return specialAttackTicksRemaining > 0 || attackType.get() == XenomorphAttackType.SPECIAL;
-    }
-
-    public long getNearbyMeleeAttackTargetCount() {
-        var closeTargetRange = getBbWidth() + 1.0;
-        var closeTargetRangeSquared = closeTargetRange * closeTargetRange;
-
-        return getEntitySenseCache()
-            .getByClass(LivingEntity.class)
-            .stream()
-            .filter(target -> distanceToSqr(target) <= closeTargetRangeSquared)
-            .filter(target -> getSensing().hasLineOfSight(target))
-            .filter(target -> AlienPredicates.canTarget(this, target))
-            .count();
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
-
-        if (!level().isClientSide) {
-            razorClawData.tick();
-            tickSpecialAttack();
-        }
-    }
-
-    private void tickSpecialAttack() {
-        if (specialAttackTicksRemaining <= 0) {
-            return;
-        }
-
-        lockSpecialAttackYaw();
-
-        var previousElapsedTicks = specialAttackDurationInTicks - specialAttackTicksRemaining;
-        specialAttackTicksRemaining--;
-        var elapsedTicks = specialAttackDurationInTicks - specialAttackTicksRemaining;
-
-        RazorClawSpecialAttackActions.damageSweptArc(
-            this,
-            RazorClawSpecialAttackConfig.DEFAULT,
-            previousElapsedTicks,
-            elapsedTicks,
-            specialAttackYaw,
-            specialAttackHitEntityIds
-        );
-
-        if (specialAttackTicksRemaining <= 0) {
-            specialAttackHitEntityIds.clear();
-            resetAttackType();
-            attackDurationInTicks.set(0);
-        }
-    }
-
-    private void lockSpecialAttackYaw() {
-        setYRot(specialAttackYaw);
-        setYHeadRot(specialAttackYaw);
-        setYBodyRot(specialAttackYaw);
-        getNavigation().stop();
-    }
-
-    private float computeYawTowards(LivingEntity target) {
-        var dx = target.getX() - getX();
-        var dz = target.getZ() - getZ();
-        return (float) (Mth.atan2(-dx, dz) * Mth.RAD_TO_DEG);
-    }
-
-    @Override
-    public void readAdditionalSaveData(@NotNull CompoundTag compoundTag) {
-        super.readAdditionalSaveData(compoundTag);
-        razorClawData.load(compoundTag);
-    }
-
-    @Override
-    public void addAdditionalSaveData(@NotNull CompoundTag compoundTag) {
-        super.addAdditionalSaveData(compoundTag);
-        razorClawData.save(compoundTag);
-    }
-
-    @Override
-    public boolean isPushedByFluid() {
-        return false;
-    }
-
     public RazorClawAnimationDispatcher getAnimationDispatcher() {
         return animationDispatcher;
-    }
-
-    public RazorClawData getRazorClawData() {
-        return razorClawData;
     }
 
     public static EntityType<? extends Alien> getType(AlienVariant alienVariant) {

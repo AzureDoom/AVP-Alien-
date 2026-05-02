@@ -3,7 +3,7 @@ package com.alien.client.animation.entity;
 import com.alien.AlienResources;
 import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
 import com.alien.client.render.entity.carrier.CarrierSpineBoneCache;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.Carrier;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.CarrierAnimationRefs;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.CarrierSpine;
@@ -71,15 +71,18 @@ public class CarrierAnimator extends AzEntityAnimator<Carrier> {
         var attackType = carrier.attackType.get();
         var attackId = carrier.attackId.get();
 
-        if (attackType != XenomorphAttackType.NONE) {
+        if (!attackType.isNone()) {
             if (attackId != previousAttackId) {
-                switch (attackType) {
-                    case BITE -> dispatcher.biteAttack(calculateAttackSpeed(carrier, attackType));
-                    case CLAW -> dispatcher.clawAttack(calculateAttackSpeed(carrier, attackType));
-                    case TAIL -> dispatcher.tailAttack(calculateAttackSpeed(carrier, attackType));
-                    case THROW -> dispatcher.throwAttack();
-                    case SCREAM -> dispatcher.screamAttack();
-                }
+                if (attackType == Carrier.BITE)
+                    dispatcher.biteAttack(calculateAttackSpeed(carrier, attackType));
+                else if (attackType == Carrier.CLAW)
+                    dispatcher.clawAttack(calculateAttackSpeed(carrier, attackType));
+                else if (attackType == Carrier.TAIL)
+                    dispatcher.tailAttack(calculateAttackSpeed(carrier, attackType));
+                else if (attackType == Carrier.THROW)
+                    dispatcher.throwAttack();
+                else if (attackType == Carrier.SCREAM)
+                    dispatcher.screamAttack();
 
                 previousAttackId = attackId;
             }
@@ -151,14 +154,19 @@ public class CarrierAnimator extends AzEntityAnimator<Carrier> {
         hasPrevEntityPosition = true;
     }
 
-    private float calculateAttackSpeed(Carrier carrier, XenomorphAttackType attackType) {
-        var animationName = switch (attackType) {
-            case BITE -> CarrierAnimationRefs.ATTACKBITE_ANIMATION_NAME;
-            case CLAW -> CarrierAnimationRefs.ATTACKCLAW_ANIMATION_NAME;
-            case TAIL -> CarrierAnimationRefs.ATTACKTAIL_ANIMATION_NAME;
-            case SCREAM -> CarrierAnimationRefs.SPECIAL_ATTACK_SCREAM_ANIMATION_NAME;
-            default -> null;
-        };
+    private float calculateAttackSpeed(Carrier carrier, AttackType attackType) {
+        String animationName;
+
+        if (attackType == Carrier.BITE)
+            animationName = CarrierAnimationRefs.ATTACKBITE_ANIMATION_NAME;
+        else if (attackType == Carrier.CLAW)
+            animationName = CarrierAnimationRefs.ATTACKCLAW_ANIMATION_NAME;
+        else if (attackType == Carrier.TAIL)
+            animationName = CarrierAnimationRefs.ATTACKTAIL_ANIMATION_NAME;
+        else if (attackType == Carrier.SCREAM)
+            animationName = CarrierAnimationRefs.SPECIAL_ATTACK_SCREAM_ANIMATION_NAME;
+        else
+            animationName = null;
 
         var durationInTicks = carrier.attackDurationInTicks.get();
 

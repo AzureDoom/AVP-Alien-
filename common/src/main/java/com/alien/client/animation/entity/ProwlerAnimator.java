@@ -2,7 +2,7 @@ package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
 import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.QuadrupedAttackType;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.prowler.Prowler;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.prowler.ProwlerAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
@@ -81,14 +81,16 @@ public class ProwlerAnimator extends AzEntityAnimator<Prowler> {
         var attackType = prowler.attackType.get();
         var attackId = prowler.attackId.get();
 
-        if (attackType != QuadrupedAttackType.NONE) {
+        if (!attackType.isNone()) {
             if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(prowler, attackType);
 
-                switch (attackType) {
-                    case BITE -> dispatcher.biteAttack(speed);
-                    case CLAW -> dispatcher.rightClawAttack(speed);
-                    case TAIL_QUAD -> dispatcher.tailAttackQuad(speed);
+                if (attackType == Prowler.BITE) {
+                    dispatcher.biteAttack(speed);
+                } else if (attackType == Prowler.CLAW) {
+                    dispatcher.rightClawAttack(speed);
+                } else if (attackType == Prowler.TAIL_QUAD) {
+                    dispatcher.tailAttackQuad(speed);
                 }
 
                 previousAttackId = attackId;
@@ -119,13 +121,18 @@ public class ProwlerAnimator extends AzEntityAnimator<Prowler> {
         animFunction.run();
     }
 
-    private float calculateAttackSpeed(Prowler prowler, QuadrupedAttackType attackType) {
-        var animationName = switch (attackType) {
-            case BITE -> ProwlerAnimationRefs.BITEATTACK_HEAD_ANIMATION_NAME;
-            case CLAW -> ProwlerAnimationRefs.CLAWATTACKQUAD_RIGHTARM_ANIMATION_NAME;
-            case TAIL_QUAD -> ProwlerAnimationRefs.TAILATTACKQUAD_TAIL_ANIMATION_NAME;
-            default -> null;
-        };
+    private float calculateAttackSpeed(Prowler prowler, AttackType attackType) {
+        String animationName;
+
+        if (attackType == Prowler.BITE) {
+            animationName = ProwlerAnimationRefs.BITEATTACK_HEAD_ANIMATION_NAME;
+        } else if (attackType == Prowler.CLAW) {
+            animationName = ProwlerAnimationRefs.CLAWATTACKQUAD_RIGHTARM_ANIMATION_NAME;
+        } else if (attackType == Prowler.TAIL_QUAD) {
+            animationName = ProwlerAnimationRefs.TAILATTACKQUAD_TAIL_ANIMATION_NAME;
+        } else {
+            animationName = null;
+        }
 
         var durationInTicks = prowler.attackDurationInTicks.get();
 

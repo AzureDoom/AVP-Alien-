@@ -2,31 +2,23 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.queen;
 
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.entity.living.alien.Alien;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphPathConfig;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg_laying.EggLayer;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.ai.QueenGOAP;
 import com.alien.common.gameplay.level.saveddata.QueenSpawnChunkData;
 import com.alien.common.gameplay.level.saveddata.StrainLeakData;
 import com.alien.common.model.alien.variant.AlienVariant;
-import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
-import com.alien.common.registry.tag.AlienBlockTags;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
-import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.entity.v1.PlayerUtil;
 import com.blib.api.common.goap.v1.GOAPUser;
-import com.blib.api.common.pathfinding.v1.cache.TerrainCacheRegistry;
-import com.blib.api.common.pathfinding.v1.evaluator.TerrainEvaluatorConfig;
-import com.blib.api.common.pathfinding.v1.navigator.PathNavigator;
-import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorConfig;
-import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
-import com.blib.api.common.pathfinding.v1.search.SearchConfig;
-import com.blib.api.common.pathfinding.v1.terrain.BlockBreakabilityEvaluators;
-import com.blib.api.common.pathfinding.v1.terrain.TerrainClassifiers;
-import com.blib.api.common.pathfinding.v1.terrain.TerrainType;
 import com.just.ai.goap.Agent;
 import com.just.ai.goap.graph.Graph;
 import net.minecraft.ChatFormatting;
@@ -51,7 +43,34 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-public class Queen extends Xenomorph implements GOAPUser<Queen>, PathNavigatorUser, EggLayer {
+public class Queen extends Xenomorph implements GOAPUser<Queen>, EggLayer {
+
+    public static final AttackType SWIPE_DOWN = AttackType.builder("swipe_down")
+        .defaultDurationInTicks(18)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    public static final AttackType BACKHAND = AttackType.builder("backhand")
+        .defaultDurationInTicks(15)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    public static final AttackType TAIL_STRIKE = AttackType.builder("tail_strike")
+        .defaultDurationInTicks(20)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    private static final XenomorphConfig CONFIG = XenomorphConfig.builder(XenomorphPathConfig.WIDE_TALL, Queen::getType)
+        .attackConfig(
+            XenomorphAttackConfig.builder()
+                .addRegular(SWIPE_DOWN)
+                .addRegular(BACKHAND)
+                .addRegular(TAIL_STRIKE)
+                .build()
+        )
+        .parallelDigCount(4)
+        .pushedByFluid(false)
+        .build();
 
     public static AttributeSupplier.Builder createQueenAttributes() {
         return Alien.createAlienAttributes()
@@ -64,54 +83,17 @@ public class Queen extends Xenomorph implements GOAPUser<Queen>, PathNavigatorUs
             .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 0.9F);
     }
 
-    private static final float MAX_BREAKABLE_DESTROY_TIME = 6.0F;
-
-    public final DataAccessor<QueenAttackType> attackType;
-
     private final QueenAnimationDispatcher animationDispatcher;
 
     private final OvipositorManager ovipositorManager;
 
     private final QueenData queenData;
 
-    private final PathNavigator pathNavigator;
-
     public Queen(EntityType<? extends Queen> entityType, Level level) {
-        super(entityType, level);
-        this.attackType = new DataAccessor<>(this, AlienDataSyncKeys.QUEEN_ATTACK_TYPE.get());
+        super(entityType, level, CONFIG);
         this.animationDispatcher = new QueenAnimationDispatcher(this);
         this.ovipositorManager = new OvipositorManager(this);
         this.queenData = new QueenData();
-        this.pathNavigator = createPathNavigator(level);
-        getXenomorphData().setParallelDigCount(4);
-    }
-
-    private PathNavigator createPathNavigator(Level level) {
-        var evaluatorConfig = TerrainEvaluatorConfig.builder()
-            .addTerrain(TerrainType.GROUND, 1.0f)
-            .addTerrain(TerrainType.WATER, 4.0f)
-            .addTerrain(TerrainType.BREAKABLE, 8.0f)
-            .withTerrainClassifier(TerrainClassifiers.GROUND_AND_WATER)
-            .withBreakabilityEvaluator(
-                BlockBreakabilityEvaluators.withExcludedTag(
-                    BlockBreakabilityEvaluators.defaultEvaluator(MAX_BREAKABLE_DESTROY_TIME),
-                    AlienBlockTags.XENOMORPH_IMMUNE
-                )
-            )
-            .withEntitySize(2, 4)
-            .withMaxFallDistance(14)
-            .withCanOpenDoors(false)
-            .build();
-
-        var followRange = (float) getAttributeValue(Attributes.FOLLOW_RANGE);
-
-        var navigatorConfig = PathNavigatorConfig.builder(evaluatorConfig)
-            .withSearchConfig(SearchConfig.fromFollowRange(followRange))
-            .build();
-
-        var classificationCache = TerrainCacheRegistry.getOrCreate(level, evaluatorConfig.getTerrainClassifier());
-
-        return new PathNavigator(level, navigatorConfig, classificationCache);
     }
 
     @Override
@@ -122,16 +104,6 @@ public class Queen extends Xenomorph implements GOAPUser<Queen>, PathNavigatorUs
     @Override
     public @Nullable Graph<Queen> blib$getGOAPGraphOrNull() {
         return getActiveGOAPGraph(QueenGOAP.GRAPH);
-    }
-
-    @Override
-    public PathNavigator getPathNavigator() {
-        return pathNavigator;
-    }
-
-    @Override
-    public @Nullable EntityType<? extends Alien> getTypeForVariant(AlienVariant alienVariant) {
-        return getType(alienVariant);
     }
 
     @Override
@@ -234,41 +206,6 @@ public class Queen extends Xenomorph implements GOAPUser<Queen>, PathNavigatorUs
     }
 
     @Override
-    protected float getHealthRegenPerSecond() {
-        return 0.5F;
-    }
-
-    @Override
-    public boolean isAttacking() {
-        return attackType.get() != QueenAttackType.NONE;
-    }
-
-    @Override
-    protected void resetAttackType() {
-        attackType.set(QueenAttackType.NONE);
-    }
-
-    @Override
-    public void runAttackAnimations() {
-        var attackVariant = random.nextInt(0, 3);
-
-        playSound(
-            AlienSoundEvents.ENTITY_XENOMORPH_ATTACK.get(),
-            getSoundVolume(),
-            (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F
-        );
-
-        var attack = switch (attackVariant) {
-            case 0 -> QueenAttackType.SWIPE_DOWN;
-            case 1 -> QueenAttackType.BACKHAND;
-            default -> QueenAttackType.TAIL_STRIKE;
-        };
-
-        attackType.set(attack);
-        beginAttack(attack.defaultDurationInTicks());
-    }
-
-    @Override
     protected void doPush(@NotNull Entity entity) {
         if (
             !ovipositorManager.hasOvipositor()
@@ -276,11 +213,6 @@ public class Queen extends Xenomorph implements GOAPUser<Queen>, PathNavigatorUs
         ) {
             super.doPush(entity);
         }
-    }
-
-    @Override
-    public boolean isPushedByFluid() {
-        return false;
     }
 
     @Override

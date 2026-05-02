@@ -2,7 +2,7 @@ package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
 import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.burster.Burster;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.burster.BursterAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
@@ -63,15 +63,16 @@ public class BursterAnimator extends AzEntityAnimator<Burster> {
         var attackType = burster.attackType.get();
         var attackId = burster.attackId.get();
 
-        if (attackType != XenomorphAttackType.NONE) {
+        if (!attackType.isNone()) {
             if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(burster, attackType);
 
-                switch (attackType) {
-                    case BITE -> dispatcher.biteAttack(speed);
-                    case CLAW -> dispatcher.clawAttack(speed);
-                    case TAIL -> dispatcher.tailAttack(speed);
-                }
+                if (attackType == Burster.BITE)
+                    dispatcher.biteAttack(speed);
+                else if (attackType == Burster.CLAW)
+                    dispatcher.clawAttack(speed);
+                else if (attackType == Burster.TAIL)
+                    dispatcher.tailAttack(speed);
 
                 previousAttackId = attackId;
             }
@@ -99,13 +100,17 @@ public class BursterAnimator extends AzEntityAnimator<Burster> {
         animFunction.run();
     }
 
-    private float calculateAttackSpeed(Burster burster, XenomorphAttackType attackType) {
-        var animationName = switch (attackType) {
-            case BITE -> BursterAnimationRefs.FULLATTACKBITE_ANIMATION_NAME;
-            case CLAW -> BursterAnimationRefs.FULLATTACKARM_ANIMATION_NAME;
-            case TAIL -> BursterAnimationRefs.FULLATTACKTAIL_ANIMATION_NAME;
-            default -> null;
-        };
+    private float calculateAttackSpeed(Burster burster, AttackType attackType) {
+        String animationName;
+
+        if (attackType == Burster.BITE)
+            animationName = BursterAnimationRefs.FULLATTACKBITE_ANIMATION_NAME;
+        else if (attackType == Burster.CLAW)
+            animationName = BursterAnimationRefs.FULLATTACKARM_ANIMATION_NAME;
+        else if (attackType == Burster.TAIL)
+            animationName = BursterAnimationRefs.FULLATTACKTAIL_ANIMATION_NAME;
+        else
+            animationName = null;
 
         var durationInTicks = burster.attackDurationInTicks.get();
 

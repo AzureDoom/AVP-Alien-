@@ -2,7 +2,7 @@ package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
 import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.chrysalis.Chrysalis;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.chrysalis.ChrysalisAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
@@ -90,15 +90,16 @@ public class ChrysalisAnimator extends AzEntityAnimator<Chrysalis> {
         var attackType = chrysalis.attackType.get();
         var attackId = chrysalis.attackId.get();
 
-        if (attackType != XenomorphAttackType.NONE) {
+        if (!attackType.isNone()) {
             if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(chrysalis, attackType);
 
-                switch (attackType) {
-                    case BITE -> dispatcher.biteAttack(speed);
-                    case CLAW -> dispatcher.rightClawAttack(speed);
-                    case TAIL -> dispatcher.tailAttack(speed);
-                }
+                if (attackType == Chrysalis.BITE)
+                    dispatcher.biteAttack(speed);
+                else if (attackType == Chrysalis.CLAW)
+                    dispatcher.rightClawAttack(speed);
+                else if (attackType == Chrysalis.TAIL)
+                    dispatcher.tailAttack(speed);
 
                 previousAttackId = attackId;
             }
@@ -135,13 +136,17 @@ public class ChrysalisAnimator extends AzEntityAnimator<Chrysalis> {
         return (float) (animation.length() / durationInTicks);
     }
 
-    private float calculateAttackSpeed(Chrysalis chrysalis, XenomorphAttackType attackType) {
-        var animationName = switch (attackType) {
-            case BITE -> ChrysalisAnimationRefs.ATTACKBITE_ANIMATION_NAME;
-            case CLAW -> ChrysalisAnimationRefs.ATTACKCLAW_ANIMATION_NAME;
-            case TAIL -> ChrysalisAnimationRefs.ATTACKTAIL_ANIMATION_NAME;
-            default -> null;
-        };
+    private float calculateAttackSpeed(Chrysalis chrysalis, AttackType attackType) {
+        String animationName;
+
+        if (attackType == Chrysalis.BITE)
+            animationName = ChrysalisAnimationRefs.ATTACKBITE_ANIMATION_NAME;
+        else if (attackType == Chrysalis.CLAW)
+            animationName = ChrysalisAnimationRefs.ATTACKCLAW_ANIMATION_NAME;
+        else if (attackType == Chrysalis.TAIL)
+            animationName = ChrysalisAnimationRefs.ATTACKTAIL_ANIMATION_NAME;
+        else
+            animationName = null;
 
         var durationInTicks = chrysalis.attackDurationInTicks.get();
 

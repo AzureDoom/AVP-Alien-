@@ -3,12 +3,8 @@ package com.alien.common.registry.init;
 import com.alien.Alien;
 import com.alien.AlienResources;
 import com.alien.common.gameplay.entity.living.alien.ovomorph.Ovomorph;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.CocoonState;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.QuadrupedAttackType;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.CrusherAttackType;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.empress.EmpressAttackType;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.QueenAttackType;
 import com.blib.api.common.data_sync.v1.model.DataSyncKey;
 import com.blib.api.common.registry.v1.BLibBuiltInRegistries;
 import com.blib.api.common.registry.v1.BLibHolder;
@@ -167,34 +163,10 @@ public class AlienDataSyncKeys {
             .build(0)
     );
 
-    public static final BLibHolder<DataSyncKey<CrusherAttackType>> CRUSHER_ATTACK_TYPE = create(
-        "crusher_attack_type",
-        builder -> builder.networkSynchronized(CrusherAttackType.CODEC)
-            .build(CrusherAttackType.NONE)
-    );
-
-    public static final BLibHolder<DataSyncKey<QuadrupedAttackType>> QUADRUPED_ATTACK_TYPE = create(
-        "quadruped_attack_type",
-        builder -> builder.networkSynchronized(QuadrupedAttackType.CODEC)
-            .build(QuadrupedAttackType.NONE)
-    );
-
-    public static final BLibHolder<DataSyncKey<QueenAttackType>> QUEEN_ATTACK_TYPE = create(
-        "queen_attack_type",
-        builder -> builder.networkSynchronized(QueenAttackType.CODEC)
-            .build(QueenAttackType.NONE)
-    );
-
-    public static final BLibHolder<DataSyncKey<EmpressAttackType>> EMPRESS_ATTACK_TYPE = create(
-        "empress_attack_type",
-        builder -> builder.networkSynchronized(EmpressAttackType.CODEC)
-            .build(EmpressAttackType.NONE)
-    );
-
-    public static final BLibHolder<DataSyncKey<XenomorphAttackType>> XENOMORPH_ATTACK_TYPE = create(
-        "xenomorph_attack_type",
-        builder -> builder.networkSynchronized(XenomorphAttackType.CODEC)
-            .build(XenomorphAttackType.NONE)
+    public static final BLibHolder<DataSyncKey<AttackType>> ATTACK_TYPE = create(
+        "attack_type",
+        builder -> builder.networkSynchronized(AttackType.CODEC)
+            .build(AttackType.NONE)
     );
 
     public static final BLibHolder<DataSyncKey<Boolean>> XENOMORPH_IS_LUNGING = create(

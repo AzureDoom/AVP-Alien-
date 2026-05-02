@@ -2,7 +2,7 @@ package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
 import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.warrior.Warrior;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.warrior.WarriorAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
@@ -81,14 +81,16 @@ public class WarriorAnimator extends AzEntityAnimator<Warrior> {
         var attackType = warrior.attackType.get();
         var attackId = warrior.attackId.get();
 
-        if (attackType != XenomorphAttackType.NONE) {
+        if (!attackType.isNone()) {
             if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(warrior, attackType);
 
-                switch (attackType) {
-                    case BITE -> dispatcher.biteAttack(speed);
-                    case CLAW -> dispatcher.rightClawAttack(speed);
-                    case TAIL -> dispatcher.tailAttack(speed);
+                if (attackType == Warrior.BITE) {
+                    dispatcher.biteAttack(speed);
+                } else if (attackType == Warrior.CLAW) {
+                    dispatcher.rightClawAttack(speed);
+                } else if (attackType == Warrior.TAIL) {
+                    dispatcher.tailAttack(speed);
                 }
 
                 previousAttackId = attackId;
@@ -119,13 +121,18 @@ public class WarriorAnimator extends AzEntityAnimator<Warrior> {
         animFunction.run();
     }
 
-    private float calculateAttackSpeed(Warrior warrior, XenomorphAttackType attackType) {
-        var animationName = switch (attackType) {
-            case BITE -> WarriorAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME;
-            case CLAW -> WarriorAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME;
-            case TAIL -> WarriorAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME;
-            default -> null;
-        };
+    private float calculateAttackSpeed(Warrior warrior, AttackType attackType) {
+        String animationName;
+
+        if (attackType == Warrior.BITE) {
+            animationName = WarriorAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME;
+        } else if (attackType == Warrior.CLAW) {
+            animationName = WarriorAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME;
+        } else if (attackType == Warrior.TAIL) {
+            animationName = WarriorAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME;
+        } else {
+            animationName = null;
+        }
 
         var durationInTicks = warrior.attackDurationInTicks.get();
 

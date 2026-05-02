@@ -2,7 +2,7 @@ package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
 import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.harbinger.Harbinger;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.harbinger.HarbingerAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
@@ -76,14 +76,16 @@ public class HarbingerAnimator extends AzEntityAnimator<Harbinger> {
         var attackType = harbinger.attackType.get();
         var attackId = harbinger.attackId.get();
 
-        if (attackType != XenomorphAttackType.NONE) {
+        if (!attackType.isNone()) {
             if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(harbinger, attackType);
 
-                switch (attackType) {
-                    case BITE -> dispatcher.biteAttack(speed);
-                    case CLAW -> dispatcher.rightClawAttack(speed);
-                    case TAIL -> dispatcher.tailAttack(speed);
+                if (attackType == Harbinger.BITE) {
+                    dispatcher.biteAttack(speed);
+                } else if (attackType == Harbinger.CLAW) {
+                    dispatcher.rightClawAttack(speed);
+                } else if (attackType == Harbinger.TAIL) {
+                    dispatcher.tailAttack(speed);
                 }
 
                 previousAttackId = attackId;
@@ -109,13 +111,18 @@ public class HarbingerAnimator extends AzEntityAnimator<Harbinger> {
         animFunction.run();
     }
 
-    private float calculateAttackSpeed(Harbinger harbinger, XenomorphAttackType attackType) {
-        var animationName = switch (attackType) {
-            case BITE -> HarbingerAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME;
-            case CLAW -> HarbingerAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME;
-            case TAIL -> HarbingerAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME;
-            default -> null;
-        };
+    private float calculateAttackSpeed(Harbinger harbinger, AttackType attackType) {
+        String animationName;
+
+        if (attackType == Harbinger.BITE) {
+            animationName = HarbingerAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME;
+        } else if (attackType == Harbinger.CLAW) {
+            animationName = HarbingerAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME;
+        } else if (attackType == Harbinger.TAIL) {
+            animationName = HarbingerAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME;
+        } else {
+            animationName = null;
+        }
 
         var durationInTicks = harbinger.attackDurationInTicks.get();
 

@@ -2,9 +2,9 @@ package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
 import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.empress.Empress;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.empress.EmpressAnimationRefs;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.empress.EmpressAttackType;
 import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
@@ -89,15 +89,16 @@ public class EmpressAnimator extends AzEntityAnimator<Empress> {
         var attackType = empress.attackType.get();
         var attackId = empress.attackId.get();
 
-        if (attackType != EmpressAttackType.NONE) {
+        if (!attackType.isNone()) {
             if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(empress, attackType);
 
-                switch (attackType) {
-                    case SWIPE_DOWN -> dispatcher.swipeDownAttack(speed);
-                    case BACKHAND -> dispatcher.backhandAttack(speed);
-                    case TAIL_STRIKE -> dispatcher.tailStrikeAttack(speed);
-                }
+                if (attackType == Empress.SWIPE_DOWN)
+                    dispatcher.swipeDownAttack(speed);
+                else if (attackType == Empress.BACKHAND)
+                    dispatcher.backhandAttack(speed);
+                else if (attackType == Empress.TAIL_STRIKE)
+                    dispatcher.tailStrikeAttack(speed);
 
                 previousAttackId = attackId;
             }
@@ -110,7 +111,6 @@ public class EmpressAnimator extends AzEntityAnimator<Empress> {
         if (empress.getEmpressOvipositorManager().hasOvipositor()) {
             animFunction = dispatcher::sitOnOvipositor;
         } else if (empress.isUnderWater()) {
-            // TODO: idle swim
             animFunction = dispatcher::swim;
         } else if (isMovingOnGround) {
             if (empress.hasTarget.get()) {
@@ -119,20 +119,21 @@ public class EmpressAnimator extends AzEntityAnimator<Empress> {
                 animFunction = dispatcher::walk;
             }
         } else {
-            // TODO: idle crawl
             animFunction = dispatcher::idle;
         }
 
         animFunction.run();
     }
 
-    private float calculateAttackSpeed(Empress empress, EmpressAttackType attackType) {
-        var animationName = switch (attackType) {
-            case SWIPE_DOWN -> EmpressAnimationRefs.SWIPEDOWN_BODY_ANIMATION_NAME;
-            case BACKHAND -> EmpressAnimationRefs.BACKHAND_BODY_ANIMATION_NAME;
-            case TAIL_STRIKE -> EmpressAnimationRefs.TAILSTRIKE_BODY_ANIMATION_NAME;
-            default -> null;
-        };
+    private float calculateAttackSpeed(Empress empress, AttackType attackType) {
+        String animationName = null;
+
+        if (attackType == Empress.SWIPE_DOWN)
+            animationName = EmpressAnimationRefs.SWIPEDOWN_BODY_ANIMATION_NAME;
+        else if (attackType == Empress.BACKHAND)
+            animationName = EmpressAnimationRefs.BACKHAND_BODY_ANIMATION_NAME;
+        else if (attackType == Empress.TAIL_STRIKE)
+            animationName = EmpressAnimationRefs.TAILSTRIKE_BODY_ANIMATION_NAME;
 
         var durationInTicks = empress.attackDurationInTicks.get();
 

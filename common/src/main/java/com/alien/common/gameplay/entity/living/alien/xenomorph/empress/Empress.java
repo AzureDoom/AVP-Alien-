@@ -1,27 +1,19 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.empress;
 
 import com.alien.common.gameplay.entity.living.alien.Alien;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphPathConfig;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg_laying.EggLayer;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.empress.ai.EmpressGOAP;
 import com.alien.common.model.alien.variant.AlienVariant;
-import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
-import com.alien.common.registry.tag.AlienBlockTags;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
-import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.goap.v1.GOAPUser;
-import com.blib.api.common.pathfinding.v1.cache.TerrainCacheRegistry;
-import com.blib.api.common.pathfinding.v1.evaluator.TerrainEvaluatorConfig;
-import com.blib.api.common.pathfinding.v1.navigator.PathNavigator;
-import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorConfig;
-import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
-import com.blib.api.common.pathfinding.v1.search.SearchConfig;
-import com.blib.api.common.pathfinding.v1.terrain.BlockBreakabilityEvaluators;
-import com.blib.api.common.pathfinding.v1.terrain.TerrainClassifiers;
-import com.blib.api.common.pathfinding.v1.terrain.TerrainType;
 import com.just.ai.goap.Agent;
 import com.just.ai.goap.graph.Graph;
 import net.minecraft.nbt.CompoundTag;
@@ -38,7 +30,34 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-public class Empress extends Xenomorph implements GOAPUser<Empress>, PathNavigatorUser, EggLayer {
+public class Empress extends Xenomorph implements GOAPUser<Empress>, EggLayer {
+
+    public static final AttackType SWIPE_DOWN = AttackType.builder("swipe_down")
+        .defaultDurationInTicks(18)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    public static final AttackType BACKHAND = AttackType.builder("backhand")
+        .defaultDurationInTicks(15)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    public static final AttackType TAIL_STRIKE = AttackType.builder("tail_strike")
+        .defaultDurationInTicks(20)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    private static final XenomorphConfig CONFIG = XenomorphConfig.builder(XenomorphPathConfig.WIDE_TALL, Empress::getType)
+        .attackConfig(
+            XenomorphAttackConfig.builder()
+                .addRegular(SWIPE_DOWN)
+                .addRegular(BACKHAND)
+                .addRegular(TAIL_STRIKE)
+                .build()
+        )
+        .parallelDigCount(4)
+        .pushedByFluid(false)
+        .build();
 
     public static AttributeSupplier.Builder createEmpressAttributes() {
         return Alien.createAlienAttributes()
@@ -51,54 +70,17 @@ public class Empress extends Xenomorph implements GOAPUser<Empress>, PathNavigat
             .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 0.9F);
     }
 
-    private static final float MAX_BREAKABLE_DESTROY_TIME = 6.0F;
-
-    public final DataAccessor<EmpressAttackType> attackType;
-
     private final EmpressAnimationDispatcher animationDispatcher;
 
     private final EmpressOvipositorManager empressOvipositorManager;
 
     private final EmpressData empressData;
 
-    private final PathNavigator pathNavigator;
-
     public Empress(EntityType<? extends Empress> entityType, Level level) {
-        super(entityType, level);
-        this.attackType = new DataAccessor<>(this, AlienDataSyncKeys.EMPRESS_ATTACK_TYPE.get());
+        super(entityType, level, CONFIG);
         this.animationDispatcher = new EmpressAnimationDispatcher(this);
         this.empressOvipositorManager = new EmpressOvipositorManager(this);
         this.empressData = new EmpressData();
-        this.pathNavigator = createPathNavigator(level);
-        getXenomorphData().setParallelDigCount(4);
-    }
-
-    private PathNavigator createPathNavigator(Level level) {
-        var evaluatorConfig = TerrainEvaluatorConfig.builder()
-            .addTerrain(TerrainType.GROUND, 1.0f)
-            .addTerrain(TerrainType.WATER, 4.0f)
-            .addTerrain(TerrainType.BREAKABLE, 8.0f)
-            .withTerrainClassifier(TerrainClassifiers.GROUND_AND_WATER)
-            .withBreakabilityEvaluator(
-                BlockBreakabilityEvaluators.withExcludedTag(
-                    BlockBreakabilityEvaluators.defaultEvaluator(MAX_BREAKABLE_DESTROY_TIME),
-                    AlienBlockTags.XENOMORPH_IMMUNE
-                )
-            )
-            .withEntitySize(2, 4)
-            .withMaxFallDistance(14)
-            .withCanOpenDoors(false)
-            .build();
-
-        var followRange = (float) getAttributeValue(Attributes.FOLLOW_RANGE);
-
-        var navigatorConfig = PathNavigatorConfig.builder(evaluatorConfig)
-            .withSearchConfig(SearchConfig.fromFollowRange(followRange))
-            .build();
-
-        var classificationCache = TerrainCacheRegistry.getOrCreate(level, evaluatorConfig.getTerrainClassifier());
-
-        return new PathNavigator(level, navigatorConfig, classificationCache);
     }
 
     @Override
@@ -109,16 +91,6 @@ public class Empress extends Xenomorph implements GOAPUser<Empress>, PathNavigat
     @Override
     public @Nullable Graph<Empress> blib$getGOAPGraphOrNull() {
         return getActiveGOAPGraph(EmpressGOAP.GRAPH);
-    }
-
-    @Override
-    public PathNavigator getPathNavigator() {
-        return pathNavigator;
-    }
-
-    @Override
-    public @Nullable EntityType<? extends Alien> getTypeForVariant(AlienVariant alienVariant) {
-        return getType(alienVariant);
     }
 
     @Override
@@ -165,41 +137,6 @@ public class Empress extends Xenomorph implements GOAPUser<Empress>, PathNavigat
     }
 
     @Override
-    protected float getHealthRegenPerSecond() {
-        return 0.5F;
-    }
-
-    @Override
-    public boolean isAttacking() {
-        return attackType.get() != EmpressAttackType.NONE;
-    }
-
-    @Override
-    protected void resetAttackType() {
-        attackType.set(EmpressAttackType.NONE);
-    }
-
-    @Override
-    public void runAttackAnimations() {
-        var attackVariant = random.nextInt(0, 3);
-
-        playSound(
-            AlienSoundEvents.ENTITY_XENOMORPH_ATTACK.get(),
-            getSoundVolume(),
-            (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F
-        );
-
-        var attack = switch (attackVariant) {
-            case 0 -> EmpressAttackType.SWIPE_DOWN;
-            case 1 -> EmpressAttackType.BACKHAND;
-            default -> EmpressAttackType.TAIL_STRIKE;
-        };
-
-        attackType.set(attack);
-        beginAttack(attack.defaultDurationInTicks());
-    }
-
-    @Override
     protected void doPush(@NotNull Entity entity) {
         if (
             !empressOvipositorManager.hasOvipositor()
@@ -207,11 +144,6 @@ public class Empress extends Xenomorph implements GOAPUser<Empress>, PathNavigat
         ) {
             super.doPush(entity);
         }
-    }
-
-    @Override
-    public boolean isPushedByFluid() {
-        return false;
     }
 
     @Override

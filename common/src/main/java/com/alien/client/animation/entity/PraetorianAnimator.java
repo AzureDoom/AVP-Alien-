@@ -2,7 +2,7 @@ package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
 import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.praetorian.Praetorian;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.praetorian.PraetorianAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
@@ -76,14 +76,16 @@ public class PraetorianAnimator extends AzEntityAnimator<Praetorian> {
         var attackType = praetorian.attackType.get();
         var attackId = praetorian.attackId.get();
 
-        if (attackType != XenomorphAttackType.NONE) {
+        if (!attackType.isNone()) {
             if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(praetorian, attackType);
 
-                switch (attackType) {
-                    case BITE -> dispatcher.biteAttack(speed);
-                    case CLAW -> dispatcher.rightClawAttack(speed);
-                    case TAIL -> dispatcher.tailAttack(speed);
+                if (attackType == Praetorian.BITE) {
+                    dispatcher.biteAttack(speed);
+                } else if (attackType == Praetorian.CLAW) {
+                    dispatcher.rightClawAttack(speed);
+                } else if (attackType == Praetorian.TAIL) {
+                    dispatcher.tailAttack(speed);
                 }
 
                 previousAttackId = attackId;
@@ -111,13 +113,18 @@ public class PraetorianAnimator extends AzEntityAnimator<Praetorian> {
         animFunction.run();
     }
 
-    private float calculateAttackSpeed(Praetorian praetorian, XenomorphAttackType attackType) {
-        var animationName = switch (attackType) {
-            case BITE -> PraetorianAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME;
-            case CLAW -> PraetorianAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME;
-            case TAIL -> PraetorianAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME;
-            default -> null;
-        };
+    private float calculateAttackSpeed(Praetorian praetorian, AttackType attackType) {
+        String animationName;
+
+        if (attackType == Praetorian.BITE) {
+            animationName = PraetorianAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME;
+        } else if (attackType == Praetorian.CLAW) {
+            animationName = PraetorianAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME;
+        } else if (attackType == Praetorian.TAIL) {
+            animationName = PraetorianAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME;
+        } else {
+            animationName = null;
+        }
 
         var durationInTicks = praetorian.attackDurationInTicks.get();
 

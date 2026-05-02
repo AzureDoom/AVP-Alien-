@@ -2,7 +2,7 @@ package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
 import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.QuadrupedAttackType;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.RunnerAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
@@ -81,15 +81,16 @@ public class RunnerAnimator extends AzEntityAnimator<Runner> {
         var attackType = runner.attackType.get();
         var attackId = runner.attackId.get();
 
-        if (attackType != QuadrupedAttackType.NONE) {
+        if (!attackType.isNone()) {
             if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(runner, attackType);
 
-                switch (attackType) {
-                    case BITE -> dispatcher.biteAttack(speed);
-                    case CLAW -> dispatcher.rightClawAttack(speed);
-                    case TAIL_QUAD -> dispatcher.tailAttackQuad(speed);
-                }
+                if (attackType == Runner.BITE)
+                    dispatcher.biteAttack(speed);
+                else if (attackType == Runner.CLAW)
+                    dispatcher.rightClawAttack(speed);
+                else if (attackType == Runner.TAIL_QUAD)
+                    dispatcher.tailAttackQuad(speed);
 
                 previousAttackId = attackId;
             }
@@ -119,13 +120,17 @@ public class RunnerAnimator extends AzEntityAnimator<Runner> {
         animFunction.run();
     }
 
-    private float calculateAttackSpeed(Runner runner, QuadrupedAttackType attackType) {
-        var animationName = switch (attackType) {
-            case BITE -> RunnerAnimationRefs.BITEATTACK_HEAD_ANIMATION_NAME;
-            case CLAW -> RunnerAnimationRefs.ATTACKCLAWQUAD_RIGHTARM_ANIMATION_NAME;
-            case TAIL_QUAD -> RunnerAnimationRefs.TAILATTACKQUAD_TAIL_ANIMATION_NAME;
-            default -> null;
-        };
+    private float calculateAttackSpeed(Runner runner, AttackType attackType) {
+        String animationName;
+
+        if (attackType == Runner.BITE)
+            animationName = RunnerAnimationRefs.BITEATTACK_HEAD_ANIMATION_NAME;
+        else if (attackType == Runner.CLAW)
+            animationName = RunnerAnimationRefs.ATTACKCLAWQUAD_RIGHTARM_ANIMATION_NAME;
+        else if (attackType == Runner.TAIL_QUAD)
+            animationName = RunnerAnimationRefs.TAILATTACKQUAD_TAIL_ANIMATION_NAME;
+        else
+            animationName = null;
 
         var durationInTicks = runner.attackDurationInTicks.get();
 

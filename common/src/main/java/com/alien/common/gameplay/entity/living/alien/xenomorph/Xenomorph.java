@@ -5,15 +5,26 @@ import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.GrowthManager;
 import com.alien.common.gameplay.entity.living.alien.ResinManager;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.cocoon.CocoonGOAP;
+import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.model.resin.ResinProducer;
 import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienSoundEvents;
+import com.alien.common.registry.tag.AlienBlockTags;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.util.AlienPredicates;
 import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.entity.v1.EntitySenseCache;
 import com.blib.api.common.entity.v1.EntitySenseCacheUser;
 import com.blib.api.common.goap.v1.GOAPUser;
+import com.blib.api.common.pathfinding.v1.cache.TerrainCacheRegistry;
+import com.blib.api.common.pathfinding.v1.evaluator.TerrainEvaluatorConfig;
+import com.blib.api.common.pathfinding.v1.navigator.PathNavigator;
+import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorConfig;
+import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
+import com.blib.api.common.pathfinding.v1.search.SearchConfig;
+import com.blib.api.common.pathfinding.v1.terrain.BlockBreakabilityEvaluators;
+import com.blib.api.common.pathfinding.v1.terrain.TerrainClassifiers;
+import com.blib.api.common.pathfinding.v1.terrain.TerrainType;
 import com.just.ai.goap.graph.Graph;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -28,6 +39,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.Minecart;
 import net.minecraft.world.level.Level;
@@ -41,11 +53,15 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
-public abstract class Xenomorph extends Alien implements ResinProducer, EntitySenseCacheUser {
+public abstract class Xenomorph extends Alien implements ResinProducer, EntitySenseCacheUser, PathNavigatorUser {
+
+    private static final float MAX_BREAKABLE_DESTROY_TIME = 6.0F;
 
     public final DataAccessor<Integer> attackDurationInTicks;
 
     public final DataAccessor<Integer> attackId;
+
+    public final DataAccessor<AttackType> attackType;
 
     public final DataAccessor<Boolean> isLunging;
 
@@ -67,15 +83,26 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
 
     private final EntitySenseCache entitySenseCache;
 
-    private int remainingAttackTicks;
+    private final PathNavigator pathNavigator;
+
+    private final XenomorphConfig config;
+
+    private final AttackCooldownTracker cooldownTracker;
+
+    private @Nullable AttackType activeAttack;
+
+    private @Nullable AttackExecutor activeExecutor;
 
     private boolean wasUnderwaterLastTick;
 
-    public Xenomorph(EntityType<? extends Xenomorph> entityType, Level level) {
+    public Xenomorph(EntityType<? extends Xenomorph> entityType, Level level, XenomorphConfig config) {
         super(entityType, level);
+
+        this.config = config;
 
         this.attackDurationInTicks = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_ATTACK_DURATION_IN_TICKS.get());
         this.attackId = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_ATTACK_ID.get());
+        this.attackType = new DataAccessor<>(this, AlienDataSyncKeys.ATTACK_TYPE.get());
         this.isLunging = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_IS_LUNGING.get());
         this.isCrawling = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_IS_CRAWLING.get());
         this.cocoonState = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_COCOON_STATE.get());
@@ -98,30 +125,167 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
                 return ticksSinceRefresh > 20 || (wasRecentlyHurt && ticksSinceRefresh > 10);
             })
             .build();
+        this.pathNavigator = createPathNavigator(level, config.pathConfig());
+        this.cooldownTracker = new AttackCooldownTracker();
         this.wasUnderwaterLastTick = false;
 
+        xenomorphData.setParallelDigCount(config.parallelDigCount());
         isCrawling.onChange($ -> refreshDimensions());
     }
 
-    public abstract void runAttackAnimations();
+    private PathNavigator createPathNavigator(Level level, XenomorphPathConfig pathConfig) {
+        var evaluatorConfig = TerrainEvaluatorConfig.builder()
+            .addTerrain(TerrainType.GROUND, 1.0f)
+            .addTerrain(TerrainType.WATER, 4.0f)
+            .addTerrain(TerrainType.BREAKABLE, 8.0f)
+            .withTerrainClassifier(TerrainClassifiers.GROUND_AND_WATER)
+            .withBreakabilityEvaluator(
+                BlockBreakabilityEvaluators.withExcludedTag(
+                    BlockBreakabilityEvaluators.defaultEvaluator(MAX_BREAKABLE_DESTROY_TIME),
+                    AlienBlockTags.XENOMORPH_IMMUNE
+                )
+            )
+            .withEntitySize(pathConfig.entityWidth(), pathConfig.entityHeight())
+            .withMaxFallDistance(14)
+            .withCanOpenDoors(pathConfig.canOpenDoors())
+            .build();
+
+        var followRange = (float) getAttributeValue(Attributes.FOLLOW_RANGE);
+
+        var navigatorConfig = PathNavigatorConfig.builder(evaluatorConfig)
+            .withSearchConfig(SearchConfig.fromFollowRange(followRange))
+            .build();
+
+        var classificationCache = TerrainCacheRegistry.getOrCreate(level, evaluatorConfig.getTerrainClassifier());
+
+        return new PathNavigator(level, navigatorConfig, classificationCache);
+    }
+
+    @Override
+    public final PathNavigator getPathNavigator() {
+        return pathNavigator;
+    }
+
+    @Override
+    public @Nullable EntityType<? extends Alien> getTypeForVariant(AlienVariant alienVariant) {
+        return config.variantResolver().apply(alienVariant);
+    }
+
+    @Override
+    protected float getHealthRegenPerSecond() {
+        return config.healthRegenPerSecond();
+    }
+
+    @Override
+    public boolean isPushedByFluid() {
+        return config.isPushedByFluid();
+    }
+
+    public void runAttackAnimations() {
+        var attackConfig = config.attackConfig();
+
+        if (attackConfig == null || !attackConfig.hasRegulars()) {
+            return;
+        }
+
+        var attack = attackConfig.selectRegular(random, cooldownTracker);
+
+        if (attack == null) {
+            return;
+        }
+
+        startAttack(attack, getTarget());
+    }
 
     public void runDigAnimation() {
         runAttackAnimations();
     }
 
-    public abstract boolean isAttacking();
+    public boolean isAttacking() {
+        return !attackType.get().isNone();
+    }
+
+    public boolean isExecutingTriggeredAttack() {
+        var attackConfig = config.attackConfig();
+        return activeAttack != null && attackConfig != null && attackConfig.triggered().contains(activeAttack);
+    }
+
+    protected void resetAttackType() {
+        attackType.set(AttackType.NONE);
+    }
+
+    public void startAttack(AttackType attack, @Nullable LivingEntity target) {
+        if (attack.isNone()) {
+            return;
+        }
+
+        if (activeAttack != null) {
+            completeActiveAttack();
+        }
+
+        var executor = attack.executorFactory().get();
+        var totalTicks = executor.totalDurationInTicks(attack);
+
+        activeAttack = attack;
+        activeExecutor = executor;
+
+        playAttackSound(attack);
+        cooldownTracker.start(attack);
+
+        attackType.set(attack);
+        beginAttack(totalTicks);
+
+        executor.onStart(this, attack, target);
+    }
+
+    private void completeActiveAttack() {
+        if (activeExecutor != null && activeAttack != null) {
+            activeExecutor.onComplete(this, activeAttack);
+        }
+
+        activeAttack = null;
+        activeExecutor = null;
+        resetAttackType();
+        attackDurationInTicks.set(0);
+    }
+
+    private void playAttackSound(AttackType attack) {
+        if (attack.sound() == null) {
+            return;
+        }
+
+        playSound(
+            attack.sound().get(),
+            getSoundVolume(),
+            (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F
+        );
+    }
+
+    public AttackCooldownTracker getCooldownTracker() {
+        return cooldownTracker;
+    }
+
+    public XenomorphConfig getConfig() {
+        return config;
+    }
 
     @SuppressWarnings("unchecked")
     protected <T extends Xenomorph> Graph<T> getActiveGOAPGraph(Graph<T> defaultGraph) {
         return cocoonManager.shouldRunCocoonAction() ? (Graph<T>) CocoonGOAP.GRAPH : defaultGraph;
     }
 
-    protected abstract void resetAttackType();
-
-    protected void beginAttack(int durationInTicks) {
+    public void beginAttack(int durationInTicks) {
         attackDurationInTicks.set(durationInTicks);
         attackId.set(attackId.get() + 1);
-        remainingAttackTicks = durationInTicks;
+    }
+
+    /**
+     * Transition the visible/synced attack-type without spinning up a new executor. Used by executors that want to swap
+     * animations mid-flight (e.g. windup → active charge).
+     */
+    public void transitionAttack(AttackType newAttackType, int newDurationInTicks) {
+        attackType.set(newAttackType);
+        beginAttack(newDurationInTicks);
     }
 
     @Override
@@ -137,16 +301,19 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
 
         updateDimensionsBasedOnWaterState();
 
+        if (!level().isClientSide) {
+            cooldownTracker.tick();
+        }
+
         if (!level().isClientSide && isLunging.get() && onGround()) {
             isLunging.set(false);
         }
 
-        if (!level().isClientSide && remainingAttackTicks > 0) {
-            remainingAttackTicks--;
+        if (!level().isClientSide && activeAttack != null && activeExecutor != null) {
+            var stillActive = activeExecutor.onTick(this, activeAttack);
 
-            if (remainingAttackTicks <= 0) {
-                resetAttackType();
-                attackDurationInTicks.set(0);
+            if (!stillActive) {
+                completeActiveAttack();
             }
         }
 
@@ -154,7 +321,6 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
             var target = getTarget();
 
             if (target != null && !AlienPredicates.canContinueTargeting(this, target)) {
-                // If the target is no longer valid, stop targeting them.
                 setTarget(null);
             }
 
@@ -210,19 +376,16 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         resinManager.updateDynamicGameEventListener(biConsumer);
     }
 
-    // Allows the xenomorph to disable shields on attack.
     @Override
     public boolean canDisableShield() {
         return true;
     }
 
-    // Prevents the xenomorph from having a bias towards pathing in darker areas.
     @Override
     public float getWalkTargetValue(@NotNull BlockPos blockPos, @NotNull LevelReader levelReader) {
         return 0.0F;
     }
 
-    // Reduces how much FLOWING water slows down xenomorphs.
     @Override
     public boolean updateFluidHeightAndDoFluidPushing(@NotNull TagKey<Fluid> tagKey, double d) {
         var modifier = d;
@@ -274,8 +437,6 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         }
     }
 
-    // GOAP target selection already filters infected hosts, but this guards against any
-    // combat code paths that bypass GOAP (e.g. vanilla retaliation targeting).
     @Override
     public boolean canAttack(@NotNull LivingEntity target) {
         return !cocoonManager.isLocked() && super.canAttack(target) && AlienPredicates.canContinueTargeting(this, target);
@@ -288,7 +449,6 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
                 && !entity.getType().is(AlienEntityTypeTags.CHESTBURSTERS)
                 && !entity.getType().is(AlienEntityTypeTags.ADOLESCENTS)
         ) {
-            // Xenomorphs should not collide with smaller aliens.
             super.doPush(entity);
         }
     }
@@ -321,6 +481,7 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         growthManager.load(compoundTag);
         resinManager.load(compoundTag);
         xenomorphData.load(compoundTag);
+        cooldownTracker.load(compoundTag);
     }
 
     @Override
@@ -331,6 +492,7 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         growthManager.save(compoundTag);
         resinManager.save(compoundTag);
         xenomorphData.save(compoundTag);
+        cooldownTracker.save(compoundTag);
     }
 
     public GrowthManager getGrowthManager() {

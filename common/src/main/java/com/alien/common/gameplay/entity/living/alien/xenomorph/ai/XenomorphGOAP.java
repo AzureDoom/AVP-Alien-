@@ -1,6 +1,5 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.ai;
 
-import com.alien.common.gameplay.entity.living.alien.xenomorph.SpecialAttackUser;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.CombatActions;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.CombatGoals;
@@ -78,18 +77,18 @@ public class XenomorphGOAP {
         );
     }
 
-    public static <T extends Xenomorph & SpecialAttackUser> Agent.Builder<T> applySpecialAttackAgentProperties(
+    public static <T extends Xenomorph> Agent.Builder<T> applySpecialAttackAgentProperties(
         Agent.Builder<T> agentBuilder
     ) {
         return agentBuilder.withReplanPolicy(
             ReplanPolicies.anyOf(
                 ReplanPolicies.custom(
-                    context -> !context.agent().getActor().isUsingSpecialAttack() && !context.agent().hasPlan()
+                    context -> !context.agent().getActor().isExecutingTriggeredAttack() && !context.agent().hasPlan()
                 ),
                 ReplanPolicies.custom(context -> {
                     var actor = context.agent().getActor();
 
-                    if (actor.isUsingSpecialAttack()) {
+                    if (actor.isExecutingTriggeredAttack()) {
                         return false;
                     }
 
@@ -100,7 +99,7 @@ public class XenomorphGOAP {
                     return actor.tickCount % 20 == 0;
                 }),
                 ReplanPolicies.custom(context -> {
-                    if (context.agent().getActor().isUsingSpecialAttack()) {
+                    if (context.agent().getActor().isExecutingTriggeredAttack()) {
                         return false;
                     }
 
@@ -109,7 +108,7 @@ public class XenomorphGOAP {
                     return !wasOnFire && isOnFire;
                 }),
                 ReplanPolicies.custom(context -> {
-                    if (context.agent().getActor().isUsingSpecialAttack()) {
+                    if (context.agent().getActor().isExecutingTriggeredAttack()) {
                         return false;
                     }
 

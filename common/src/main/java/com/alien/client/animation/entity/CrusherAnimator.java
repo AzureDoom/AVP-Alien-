@@ -2,9 +2,9 @@ package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
 import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.Crusher;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.CrusherAnimationRefs;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.CrusherAttackType;
 import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
@@ -81,14 +81,14 @@ public class CrusherAnimator extends AzEntityAnimator<Crusher> {
         var attackType = crusher.attackType.get();
         var attackId = crusher.attackId.get();
 
-        if (attackType != CrusherAttackType.NONE) {
+        if (!attackType.isNone()) {
             if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(crusher, attackType);
 
-                switch (attackType) {
-                    case BITE -> dispatcher.biteAttack(speed);
-                    case TAIL -> dispatcher.tailAttack(speed);
-                }
+                if (attackType == Crusher.BITE)
+                    dispatcher.biteAttack(speed);
+                else if (attackType == Crusher.TAIL)
+                    dispatcher.tailAttack(speed);
 
                 previousAttackId = attackId;
             }
@@ -115,12 +115,15 @@ public class CrusherAnimator extends AzEntityAnimator<Crusher> {
         animFunction.run();
     }
 
-    private float calculateAttackSpeed(Crusher crusher, CrusherAttackType attackType) {
-        var animationName = switch (attackType) {
-            case BITE -> CrusherAnimationRefs.BITEATTACK_HEAD_ANIMATION_NAME;
-            case TAIL -> CrusherAnimationRefs.TAILATTACK_TAIL_ANIMATION_NAME;
-            default -> null;
-        };
+    private float calculateAttackSpeed(Crusher crusher, AttackType attackType) {
+        String animationName;
+
+        if (attackType == Crusher.BITE)
+            animationName = CrusherAnimationRefs.BITEATTACK_HEAD_ANIMATION_NAME;
+        else if (attackType == Crusher.TAIL)
+            animationName = CrusherAnimationRefs.TAILATTACK_TAIL_ANIMATION_NAME;
+        else
+            animationName = null;
 
         var durationInTicks = crusher.attackDurationInTicks.get();
 

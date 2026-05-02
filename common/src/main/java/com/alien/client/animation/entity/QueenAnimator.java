@@ -2,9 +2,9 @@ package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
 import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.QueenAnimationRefs;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.QueenAttackType;
 import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
@@ -89,15 +89,16 @@ public class QueenAnimator extends AzEntityAnimator<Queen> {
         var attackType = queen.attackType.get();
         var attackId = queen.attackId.get();
 
-        if (attackType != QueenAttackType.NONE) {
+        if (!attackType.isNone()) {
             if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(queen, attackType);
 
-                switch (attackType) {
-                    case SWIPE_DOWN -> dispatcher.swipeDownAttack(speed);
-                    case BACKHAND -> dispatcher.backhandAttack(speed);
-                    case TAIL_STRIKE -> dispatcher.tailStrikeAttack(speed);
-                }
+                if (attackType == Queen.SWIPE_DOWN)
+                    dispatcher.swipeDownAttack(speed);
+                else if (attackType == Queen.BACKHAND)
+                    dispatcher.backhandAttack(speed);
+                else if (attackType == Queen.TAIL_STRIKE)
+                    dispatcher.tailStrikeAttack(speed);
 
                 previousAttackId = attackId;
             }
@@ -110,7 +111,6 @@ public class QueenAnimator extends AzEntityAnimator<Queen> {
         if (queen.getOvipositorManager().hasOvipositor()) {
             animFunction = dispatcher::sitOnOvipositor;
         } else if (queen.isUnderWater()) {
-            // TODO: idle swim
             animFunction = dispatcher::swim;
         } else if (isMovingOnGround) {
             if (queen.hasTarget.get()) {
@@ -119,20 +119,21 @@ public class QueenAnimator extends AzEntityAnimator<Queen> {
                 animFunction = dispatcher::walk;
             }
         } else {
-            // TODO: idle crawl
             animFunction = dispatcher::idle;
         }
 
         animFunction.run();
     }
 
-    private float calculateAttackSpeed(Queen queen, QueenAttackType attackType) {
-        var animationName = switch (attackType) {
-            case SWIPE_DOWN -> QueenAnimationRefs.SWIPEDOWN_BODY_ANIMATION_NAME;
-            case BACKHAND -> QueenAnimationRefs.BACKHAND_BODY_ANIMATION_NAME;
-            case TAIL_STRIKE -> QueenAnimationRefs.TAILSTRIKE_BODY_ANIMATION_NAME;
-            default -> null;
-        };
+    private float calculateAttackSpeed(Queen queen, AttackType attackType) {
+        String animationName = null;
+
+        if (attackType == Queen.SWIPE_DOWN)
+            animationName = QueenAnimationRefs.SWIPEDOWN_BODY_ANIMATION_NAME;
+        else if (attackType == Queen.BACKHAND)
+            animationName = QueenAnimationRefs.BACKHAND_BODY_ANIMATION_NAME;
+        else if (attackType == Queen.TAIL_STRIKE)
+            animationName = QueenAnimationRefs.TAILSTRIKE_BODY_ANIMATION_NAME;
 
         var durationInTicks = queen.attackDurationInTicks.get();
 

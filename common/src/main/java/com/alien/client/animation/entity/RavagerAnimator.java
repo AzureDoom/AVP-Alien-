@@ -2,10 +2,10 @@ package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
 import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ravager.Ravager;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ravager.RavagerAnimationRefs;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.ravager.ai.special_attack.RavagerSpecialAttackConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ravager.RavagerChargeAttack;
 import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
@@ -59,19 +59,24 @@ public class RavagerAnimator extends AzEntityAnimator<Ravager> {
         var attackType = ravager.attackType.get();
         var attackId = ravager.attackId.get();
 
-        if (attackType != XenomorphAttackType.NONE) {
+        if (!attackType.isNone()) {
             if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(ravager, attackType);
 
-                switch (attackType) {
-                    case BITE -> dispatcher.biteAttack(speed);
-                    case CLAW -> dispatcher.rightClawAttack(speed);
-                    case CLAW_DOUBLE -> dispatcher.doubleClawAttack(speed);
-                    case TAIL -> dispatcher.tailAttack(speed);
-                    case SWIM_ATTACK -> dispatcher.swimAttack(speed);
-                    case SPECIAL_WINDUP -> dispatcher.specialAttackWarmup(calculateWindupAnimationSpeed(ravager));
-                    case SPECIAL -> dispatcher.specialAttackActivate(speed);
-                }
+                if (attackType == Ravager.BITE)
+                    dispatcher.biteAttack(speed);
+                else if (attackType == Ravager.CLAW)
+                    dispatcher.rightClawAttack(speed);
+                else if (attackType == Ravager.CLAW_DOUBLE)
+                    dispatcher.doubleClawAttack(speed);
+                else if (attackType == Ravager.TAIL)
+                    dispatcher.tailAttack(speed);
+                else if (attackType == Ravager.SWIM_ATTACK)
+                    dispatcher.swimAttack(speed);
+                else if (attackType == RavagerChargeAttack.WINDUP)
+                    dispatcher.specialAttackWarmup(calculateWindupAnimationSpeed(ravager));
+                else if (attackType == RavagerChargeAttack.ATTACK)
+                    dispatcher.specialAttackActivate(speed);
 
                 previousAttackId = attackId;
             }
@@ -96,17 +101,23 @@ public class RavagerAnimator extends AzEntityAnimator<Ravager> {
         animFunction.run();
     }
 
-    private float calculateAttackSpeed(Ravager ravager, XenomorphAttackType attackType) {
-        var animationName = switch (attackType) {
-            case BITE -> RavagerAnimationRefs.ATTACK_BITE_ANIMATION_NAME;
-            case CLAW -> RavagerAnimationRefs.ATTACK_ARM_SINGLE_ANIMATION_NAME;
-            case CLAW_DOUBLE -> RavagerAnimationRefs.ATTACK_ARM_DOUBLE_ANIMATION_NAME;
-            case TAIL -> RavagerAnimationRefs.ATTACK_TAIL_ANIMATION_NAME;
-            case SWIM_ATTACK -> RavagerAnimationRefs.SWIM_ATTACK_ANIMATION_NAME;
-            case SPECIAL_WINDUP -> RavagerAnimationRefs.SPECIAL_ATTACK_WARMUP_ANIMATION_NAME;
-            case SPECIAL -> RavagerAnimationRefs.SPECIAL_ATTACK_ACTIVATE_ANIMATION_NAME;
-            default -> null;
-        };
+    private float calculateAttackSpeed(Ravager ravager, AttackType attackType) {
+        String animationName = null;
+
+        if (attackType == Ravager.BITE)
+            animationName = RavagerAnimationRefs.ATTACK_BITE_ANIMATION_NAME;
+        else if (attackType == Ravager.CLAW)
+            animationName = RavagerAnimationRefs.ATTACK_ARM_SINGLE_ANIMATION_NAME;
+        else if (attackType == Ravager.CLAW_DOUBLE)
+            animationName = RavagerAnimationRefs.ATTACK_ARM_DOUBLE_ANIMATION_NAME;
+        else if (attackType == Ravager.TAIL)
+            animationName = RavagerAnimationRefs.ATTACK_TAIL_ANIMATION_NAME;
+        else if (attackType == Ravager.SWIM_ATTACK)
+            animationName = RavagerAnimationRefs.SWIM_ATTACK_ANIMATION_NAME;
+        else if (attackType == RavagerChargeAttack.WINDUP)
+            animationName = RavagerAnimationRefs.SPECIAL_ATTACK_WARMUP_ANIMATION_NAME;
+        else if (attackType == RavagerChargeAttack.ATTACK)
+            animationName = RavagerAnimationRefs.SPECIAL_ATTACK_ACTIVATE_ANIMATION_NAME;
 
         var durationInTicks = ravager.attackDurationInTicks.get();
 
@@ -121,6 +132,6 @@ public class RavagerAnimator extends AzEntityAnimator<Ravager> {
 
     private float calculateWindupAnimationSpeed(Ravager ravager) {
         var animation = getAnimation(ravager, RavagerAnimationRefs.SPECIAL_ATTACK_WARMUP_ANIMATION_NAME);
-        return (float) (animation.length() / RavagerSpecialAttackConfig.DEFAULT.windupAnimationDurationInTicks());
+        return (float) (animation.length() / RavagerChargeAttack.WINDUP.defaultDurationInTicks());
     }
 }

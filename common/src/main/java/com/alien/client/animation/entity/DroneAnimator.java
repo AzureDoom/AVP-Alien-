@@ -2,7 +2,7 @@ package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
 import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackType;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.DroneAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
@@ -81,15 +81,16 @@ public class DroneAnimator extends AzEntityAnimator<Drone> {
         var attackType = drone.attackType.get();
         var attackId = drone.attackId.get();
 
-        if (attackType != XenomorphAttackType.NONE) {
+        if (!attackType.isNone()) {
             if (attackId != previousAttackId) {
                 var speed = calculateAttackSpeed(drone, attackType);
 
-                switch (attackType) {
-                    case BITE -> dispatcher.biteAttack(speed);
-                    case CLAW -> dispatcher.rightClawAttack(speed);
-                    case TAIL -> dispatcher.tailAttack(speed);
-                }
+                if (attackType == Drone.BITE)
+                    dispatcher.biteAttack(speed);
+                else if (attackType == Drone.CLAW)
+                    dispatcher.rightClawAttack(speed);
+                else if (attackType == Drone.TAIL)
+                    dispatcher.tailAttack(speed);
 
                 previousAttackId = attackId;
             }
@@ -119,13 +120,17 @@ public class DroneAnimator extends AzEntityAnimator<Drone> {
         animFunction.run();
     }
 
-    private float calculateAttackSpeed(Drone drone, XenomorphAttackType attackType) {
-        var animationName = switch (attackType) {
-            case BITE -> DroneAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME;
-            case CLAW -> DroneAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME;
-            case TAIL -> DroneAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME;
-            default -> null;
-        };
+    private float calculateAttackSpeed(Drone drone, AttackType attackType) {
+        String animationName;
+
+        if (attackType == Drone.BITE)
+            animationName = DroneAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME;
+        else if (attackType == Drone.CLAW)
+            animationName = DroneAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME;
+        else if (attackType == Drone.TAIL)
+            animationName = DroneAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME;
+        else
+            animationName = null;
 
         var durationInTicks = drone.attackDurationInTicks.get();
 
