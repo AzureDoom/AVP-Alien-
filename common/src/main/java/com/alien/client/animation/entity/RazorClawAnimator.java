@@ -31,7 +31,7 @@ public class RazorClawAnimator extends AzEntityAnimator<RazorClaw> {
     @Override
     public void registerTracks(AzAnimationTrackContainer<RazorClaw> animationTrackContainer) {
         animationTrackContainer.add(
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.BODY_TRACK_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.BODY)
                 .setTransitionLength(5)
                 .build()
         );

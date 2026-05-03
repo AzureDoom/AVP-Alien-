@@ -42,7 +42,7 @@ public class CarrierAnimator extends AzEntityAnimator<Carrier> {
     @Override
     public void registerTracks(AzAnimationTrackContainer<Carrier> animationTrackContainer) {
         animationTrackContainer.add(
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.BODY_TRACK_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.BODY)
                 .setTransitionLength(5)
                 .build()
         );

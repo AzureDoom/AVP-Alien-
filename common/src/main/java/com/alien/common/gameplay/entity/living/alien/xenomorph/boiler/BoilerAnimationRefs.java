@@ -1,8 +1,11 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.boiler;
 
+import com.alien.common.gameplay.entity.living.alien.Alien;
+import com.blib.api.client.animation.v1.track.AzTrackHandle;
+
 public class BoilerAnimationRefs {
 
-    public static final String FULL_BODY_TRACK_NAME = "full_body";
+    public static final AzTrackHandle<Alien> FULL_BODY = AzTrackHandle.declare("full_body");
 
     public static final String ATTACK_CLAW_ANIMATION_NAME = "animation.attackclaw";
 

@@ -1,8 +1,11 @@
 package com.alien.common.gameplay.entity.living.alien.ovomorph;
 
+import com.alien.common.gameplay.entity.living.alien.Alien;
+import com.blib.api.client.animation.v1.track.AzTrackHandle;
+
 public class OvomorphAnimationRefs {
 
-    public static final String BASE_TRACK_NAME = "base";
+    public static final AzTrackHandle<Alien> BASE = AzTrackHandle.declare("base");
 
     public static final String CLOSE_HOLD_ANIMATION_NAME = "animation.eggclosehold";
 

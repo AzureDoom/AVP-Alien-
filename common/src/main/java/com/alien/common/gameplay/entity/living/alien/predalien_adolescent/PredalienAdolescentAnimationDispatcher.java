@@ -5,42 +5,66 @@ import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.AzAnimationUtil;
 import com.blib.api.client.animation.v1.command.AzCommand;
 import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
+import com.blib.api.client.animation.v1.command.policy.AzDispatchMode;
 
 public class PredalienAdolescentAnimationDispatcher {
 
-    private static final AzCommand ARMATTACK_RIGHTARM = AzCommand.create(
-        AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
-        AdolescentAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
-    );
+    private static final AzCommand<PredalienAdolescent> ARMATTACK_RIGHTARM = AzCommand.<PredalienAdolescent>replay()
+        .play(AzAlienAnimationUtil.RIGHT_ARM, AdolescentAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
 
-    private static final AzCommand BITEATTACK_HEAD = AzCommand.create(
-        AzAlienAnimationUtil.HEAD_TRACK_NAME,
-        AdolescentAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
-    );
+    private static final AzCommand<PredalienAdolescent> BITEATTACK_HEAD = AzCommand.<PredalienAdolescent>replay()
+        .play(AzAlienAnimationUtil.HEAD, AdolescentAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
 
-    private static final AzCommand CRAWL_ALL = AzAnimationUtil.compose(AzAlienAnimationUtil.XENO_LIMB_NAMES, "crawl");
-
-    private static final AzCommand CRAWL_ALL_HOLD = AzAnimationUtil.compose(
-        AzAlienAnimationUtil.XENO_LIMB_NAMES,
+    private static final AzCommand<PredalienAdolescent> CRAWL_ALL = AzAnimationUtil.compose(
+        AzAlienAnimationUtil.XENO_LIMBS,
         "crawl",
-        AzPlayBehaviors.HOLD_ON_LAST_FRAME
+        AzPlayBehaviors.LOOP,
+        AzDispatchMode.PLAY_IF_NOT_PLAYING
     );
 
-    private static final AzCommand IDLE_ALL = AzAnimationUtil.compose(AzAlienAnimationUtil.XENO_LIMB_NAMES, "idle");
+    private static final AzCommand<PredalienAdolescent> CRAWL_ALL_HOLD = AzAnimationUtil.compose(
+        AzAlienAnimationUtil.XENO_LIMBS,
+        "crawl",
+        AzPlayBehaviors.HOLD_ON_LAST_FRAME,
+        AzDispatchMode.PLAY_IF_NOT_PLAYING
+    );
 
-    private static final AzCommand LUNGE_ALL = AzAnimationUtil.compose(
-        AzAlienAnimationUtil.XENO_LIMB_NAMES,
+    private static final AzCommand<PredalienAdolescent> IDLE_ALL = AzAnimationUtil.compose(
+        AzAlienAnimationUtil.XENO_LIMBS,
+        "idle",
+        AzPlayBehaviors.LOOP,
+        AzDispatchMode.PLAY_IF_NOT_PLAYING
+    );
+
+    private static final AzCommand<PredalienAdolescent> LUNGE_ALL = AzAnimationUtil.compose(
+        AzAlienAnimationUtil.XENO_LIMBS,
         "lunge",
-        AzPlayBehaviors.PLAY_ONCE
+        AzPlayBehaviors.PLAY_ONCE,
+        AzDispatchMode.REPLAY
     );
 
-    private static final AzCommand RUN_ALL = AzAnimationUtil.compose(AzAlienAnimationUtil.XENO_LIMB_NAMES, "sprint");
+    private static final AzCommand<PredalienAdolescent> RUN_ALL = AzAnimationUtil.compose(
+        AzAlienAnimationUtil.XENO_LIMBS,
+        "sprint",
+        AzPlayBehaviors.LOOP,
+        AzDispatchMode.PLAY_IF_NOT_PLAYING
+    );
 
-    private static final AzCommand SWIM_ALL = AzAnimationUtil.compose(AzAlienAnimationUtil.XENO_LIMB_NAMES, "swim");
+    private static final AzCommand<PredalienAdolescent> SWIM_ALL = AzAnimationUtil.compose(
+        AzAlienAnimationUtil.XENO_LIMBS,
+        "swim",
+        AzPlayBehaviors.LOOP,
+        AzDispatchMode.PLAY_IF_NOT_PLAYING
+    );
 
-    private static final AzCommand WALK_ALL = AzAnimationUtil.compose(AzAlienAnimationUtil.XENO_LIMB_NAMES, "walk");
+    private static final AzCommand<PredalienAdolescent> WALK_ALL = AzAnimationUtil.compose(
+        AzAlienAnimationUtil.XENO_LIMBS,
+        "walk",
+        AzPlayBehaviors.LOOP,
+        AzDispatchMode.PLAY_IF_NOT_PLAYING
+    );
 
     private final PredalienAdolescent predalienAdolescent;
 

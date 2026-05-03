@@ -4,54 +4,74 @@ import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.AzAnimationUtil;
 import com.blib.api.client.animation.v1.command.AzCommand;
 import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
+import com.blib.api.client.animation.v1.command.policy.AzDispatchMode;
 
 public class SpitterAnimationDispatcher {
 
-    private static final AzCommand ATTACKCLAW_RIGHTARM = AzCommand.create(
-        AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
-        SpitterAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
-    );
+    private static final AzCommand<Spitter> ATTACKCLAW_RIGHTARM = AzCommand.<Spitter>replay()
+        .play(AzAlienAnimationUtil.RIGHT_ARM, SpitterAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
 
-    private static final AzCommand ATTACKCLAWQUAD_RIGHTARM = AzCommand.create(
-        AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
-        SpitterAnimationRefs.ATTACKCLAWQUAD_RIGHTARM_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
-    );
+    private static final AzCommand<Spitter> ATTACKCLAWQUAD_RIGHTARM = AzCommand.<Spitter>replay()
+        .play(AzAlienAnimationUtil.RIGHT_ARM, SpitterAnimationRefs.ATTACKCLAWQUAD_RIGHTARM_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
 
-    private static final AzCommand BITEATTACK_HEAD = AzCommand.create(
-        AzAlienAnimationUtil.HEAD_TRACK_NAME,
-        SpitterAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
-    );
+    private static final AzCommand<Spitter> BITEATTACK_HEAD = AzCommand.<Spitter>replay()
+        .play(AzAlienAnimationUtil.HEAD, SpitterAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
 
-    private static final AzCommand TAILATTACKQUAD_TAIL = AzCommand.create(
-        AzAlienAnimationUtil.TAIL_TRACK_NAME,
-        SpitterAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
-    );
+    private static final AzCommand<Spitter> TAILATTACKQUAD_TAIL = AzCommand.<Spitter>replay()
+        .play(AzAlienAnimationUtil.TAIL, SpitterAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
 
-    private static final AzCommand CRAWL_ALL = AzAnimationUtil.compose(AzAlienAnimationUtil.XENO_LIMB_NAMES, "crawl");
-
-    private static final AzCommand CRAWL_ALL_HOLD = AzAnimationUtil.compose(
-        AzAlienAnimationUtil.XENO_LIMB_NAMES,
+    private static final AzCommand<Spitter> CRAWL_ALL = AzAnimationUtil.compose(
+        AzAlienAnimationUtil.XENO_LIMBS,
         "crawl",
-        AzPlayBehaviors.HOLD_ON_LAST_FRAME
+        AzPlayBehaviors.LOOP,
+        AzDispatchMode.PLAY_IF_NOT_PLAYING
     );
 
-    private static final AzCommand IDLE_ALL = AzAnimationUtil.compose(AzAlienAnimationUtil.XENO_LIMB_NAMES, "idle");
+    private static final AzCommand<Spitter> CRAWL_ALL_HOLD = AzAnimationUtil.compose(
+        AzAlienAnimationUtil.XENO_LIMBS,
+        "crawl",
+        AzPlayBehaviors.HOLD_ON_LAST_FRAME,
+        AzDispatchMode.PLAY_IF_NOT_PLAYING
+    );
 
-    private static final AzCommand LUNGE_ALL = AzAnimationUtil.compose(
-        AzAlienAnimationUtil.XENO_LIMB_NAMES,
+    private static final AzCommand<Spitter> IDLE_ALL = AzAnimationUtil.compose(
+        AzAlienAnimationUtil.XENO_LIMBS,
+        "idle",
+        AzPlayBehaviors.LOOP,
+        AzDispatchMode.PLAY_IF_NOT_PLAYING
+    );
+
+    private static final AzCommand<Spitter> LUNGE_ALL = AzAnimationUtil.compose(
+        AzAlienAnimationUtil.XENO_LIMBS,
         "lunge",
-        AzPlayBehaviors.PLAY_ONCE
+        AzPlayBehaviors.PLAY_ONCE,
+        AzDispatchMode.REPLAY
     );
 
-    private static final AzCommand RUN_ALL = AzAnimationUtil.compose(AzAlienAnimationUtil.XENO_LIMB_NAMES, "sprint");
+    private static final AzCommand<Spitter> RUN_ALL = AzAnimationUtil.compose(
+        AzAlienAnimationUtil.XENO_LIMBS,
+        "sprint",
+        AzPlayBehaviors.LOOP,
+        AzDispatchMode.PLAY_IF_NOT_PLAYING
+    );
 
-    private static final AzCommand SWIM_ALL = AzAnimationUtil.compose(AzAlienAnimationUtil.XENO_LIMB_NAMES, "swim");
+    private static final AzCommand<Spitter> SWIM_ALL = AzAnimationUtil.compose(
+        AzAlienAnimationUtil.XENO_LIMBS,
+        "swim",
+        AzPlayBehaviors.LOOP,
+        AzDispatchMode.PLAY_IF_NOT_PLAYING
+    );
 
-    private static final AzCommand WALK_ALL = AzAnimationUtil.compose(AzAlienAnimationUtil.XENO_LIMB_NAMES, "walk");
+    private static final AzCommand<Spitter> WALK_ALL = AzAnimationUtil.compose(
+        AzAlienAnimationUtil.XENO_LIMBS,
+        "walk",
+        AzPlayBehaviors.LOOP,
+        AzDispatchMode.PLAY_IF_NOT_PLAYING
+    );
 
     private final Spitter spitter;
 
@@ -92,16 +112,11 @@ public class SpitterAnimationDispatcher {
     }
 
     public void biteAttack(float speed) {
-        AzCommand.create(
-            AzAlienAnimationUtil.HEAD_TRACK_NAME,
-            SpitterAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME,
-            AzPlayBehaviors.PLAY_ONCE,
-            0F,
-            speed,
-            0F,
-            0F,
-            false
-        ).dispatchForEntity(spitter);
+        AzCommand.<Spitter>replay()
+            .play(AzAlienAnimationUtil.HEAD, SpitterAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+            .setSpeed(AzAlienAnimationUtil.HEAD, speed)
+            .build()
+            .dispatchForEntity(spitter);
     }
 
     public void rightClawAttack() {
@@ -109,16 +124,11 @@ public class SpitterAnimationDispatcher {
     }
 
     public void rightClawAttack(float speed) {
-        AzCommand.create(
-            AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME,
-            SpitterAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME,
-            AzPlayBehaviors.PLAY_ONCE,
-            0F,
-            speed,
-            0F,
-            0F,
-            false
-        ).dispatchForEntity(spitter);
+        AzCommand.<Spitter>replay()
+            .play(AzAlienAnimationUtil.RIGHT_ARM, SpitterAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+            .setSpeed(AzAlienAnimationUtil.RIGHT_ARM, speed)
+            .build()
+            .dispatchForEntity(spitter);
     }
 
     public void rightClawAttackQuad() {
@@ -130,15 +140,10 @@ public class SpitterAnimationDispatcher {
     }
 
     public void tailAttack(float speed) {
-        AzCommand.create(
-            AzAlienAnimationUtil.TAIL_TRACK_NAME,
-            SpitterAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME,
-            AzPlayBehaviors.PLAY_ONCE,
-            0F,
-            speed,
-            0F,
-            0F,
-            false
-        ).dispatchForEntity(spitter);
+        AzCommand.<Spitter>replay()
+            .play(AzAlienAnimationUtil.TAIL, SpitterAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+            .setSpeed(AzAlienAnimationUtil.TAIL, speed)
+            .build()
+            .dispatchForEntity(spitter);
     }
 }

@@ -1,10 +1,13 @@
 package com.alien.common.gameplay.entity.living.alien.predalien_chestburster;
 
+import com.alien.common.gameplay.entity.living.alien.Alien;
+import com.blib.api.client.animation.v1.track.AzTrackHandle;
+
 public class PredalienChestbursterAnimationRefs {
 
-    public static final String HEAD_TRACK_NAME = "head";
+    public static final AzTrackHandle<Alien> HEAD = AzTrackHandle.declare("head");
 
-    public static final String TAIL_TRACK_NAME = "tail";
+    public static final AzTrackHandle<Alien> TAIL = AzTrackHandle.declare("tail");
 
     public static final String BITE_HEAD_ANIMATION_NAME = "bite";
 

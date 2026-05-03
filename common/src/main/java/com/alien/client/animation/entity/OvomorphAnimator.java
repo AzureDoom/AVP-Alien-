@@ -23,7 +23,7 @@ public class OvomorphAnimator extends AzEntityAnimator<Ovomorph> {
     @Override
     public void registerTracks(AzAnimationTrackContainer<Ovomorph> animationTrackContainer) {
         animationTrackContainer.add(
-            AzAnimationTrack.builder(this, OvomorphAnimationRefs.BASE_TRACK_NAME)
+            AzAnimationTrack.builder(this, OvomorphAnimationRefs.BASE)
                 .setTransitionLength(5)
                 .build()
         );

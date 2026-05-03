@@ -23,10 +23,10 @@ public class PredalienChestbursterAnimator extends AzEntityAnimator<PredalienChe
     @Override
     public void registerTracks(AzAnimationTrackContainer<PredalienChestburster> animationTrackContainer) {
         animationTrackContainer.add(
-            AzAnimationTrack.builder(this, PredalienChestbursterAnimationRefs.HEAD_TRACK_NAME)
+            AzAnimationTrack.builder(this, PredalienChestbursterAnimationRefs.HEAD)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationTrack.builder(this, PredalienChestbursterAnimationRefs.TAIL_TRACK_NAME)
+            AzAnimationTrack.builder(this, PredalienChestbursterAnimationRefs.TAIL)
                 .setTransitionLength(5)
                 .build()
         );

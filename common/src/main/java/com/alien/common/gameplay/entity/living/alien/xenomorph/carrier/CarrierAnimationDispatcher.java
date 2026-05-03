@@ -6,71 +6,49 @@ import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
 
 public class CarrierAnimationDispatcher {
 
-    private static final AzCommand IDLE = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        CarrierAnimationRefs.IDLE_ANIMATION_NAME,
-        AzPlayBehaviors.LOOP
-    );
+    private static final AzCommand<Carrier> IDLE = AzCommand.<Carrier>idempotent()
+        .play(AzAlienAnimationUtil.BODY, CarrierAnimationRefs.IDLE_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
 
-    private static final AzCommand WALK = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        CarrierAnimationRefs.WALK_ANIMATION_NAME,
-        AzPlayBehaviors.LOOP
-    );
+    private static final AzCommand<Carrier> WALK = AzCommand.<Carrier>idempotent()
+        .play(AzAlienAnimationUtil.BODY, CarrierAnimationRefs.WALK_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
 
-    private static final AzCommand RUN = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        CarrierAnimationRefs.RUN_ANIMATION_NAME,
-        AzPlayBehaviors.LOOP
-    );
+    private static final AzCommand<Carrier> RUN = AzCommand.<Carrier>idempotent()
+        .play(AzAlienAnimationUtil.BODY, CarrierAnimationRefs.RUN_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
 
-    private static final AzCommand SWIM = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        CarrierAnimationRefs.SWIM_ANIMATION_NAME,
-        AzPlayBehaviors.LOOP
-    );
+    private static final AzCommand<Carrier> SWIM = AzCommand.<Carrier>idempotent()
+        .play(AzAlienAnimationUtil.BODY, CarrierAnimationRefs.SWIM_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
 
-    private static final AzCommand ATTACKCLAW = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        CarrierAnimationRefs.ATTACKCLAW_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
-    );
+    private static final AzCommand<Carrier> ATTACKCLAW = AzCommand.<Carrier>replay()
+        .play(AzAlienAnimationUtil.BODY, CarrierAnimationRefs.ATTACKCLAW_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
 
-    private static final AzCommand ATTACKBITE = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        CarrierAnimationRefs.ATTACKBITE_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
-    );
+    private static final AzCommand<Carrier> ATTACKBITE = AzCommand.<Carrier>replay()
+        .play(AzAlienAnimationUtil.BODY, CarrierAnimationRefs.ATTACKBITE_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
 
-    private static final AzCommand ATTACKTAIL = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        CarrierAnimationRefs.ATTACKTAIL_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
-    );
+    private static final AzCommand<Carrier> ATTACKTAIL = AzCommand.<Carrier>replay()
+        .play(AzAlienAnimationUtil.BODY, CarrierAnimationRefs.ATTACKTAIL_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
 
-    private static final AzCommand THROW_ATTACK = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        CarrierAnimationRefs.SPECIAL_ATTACK_THROW_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
-    );
+    private static final AzCommand<Carrier> THROW_ATTACK = AzCommand.<Carrier>replay()
+        .play(AzAlienAnimationUtil.BODY, CarrierAnimationRefs.SPECIAL_ATTACK_THROW_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
 
-    private static final AzCommand SCREAM_ATTACK = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        CarrierAnimationRefs.SPECIAL_ATTACK_SCREAM_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
-    );
+    private static final AzCommand<Carrier> SCREAM_ATTACK = AzCommand.<Carrier>replay()
+        .play(AzAlienAnimationUtil.BODY, CarrierAnimationRefs.SPECIAL_ATTACK_SCREAM_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
 
-    private static final AzCommand HOLD_START = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        CarrierAnimationRefs.SPECIAL_ATTACK_HOLD_START_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
-    );
+    private static final AzCommand<Carrier> HOLD_START = AzCommand.<Carrier>replay()
+        .play(AzAlienAnimationUtil.BODY, CarrierAnimationRefs.SPECIAL_ATTACK_HOLD_START_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
 
-    private static final AzCommand HOLD_WAITING = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        CarrierAnimationRefs.HOLD_WAITING_ANIMATION_NAME,
-        AzPlayBehaviors.LOOP
-    );
+    private static final AzCommand<Carrier> HOLD_WAITING = AzCommand.<Carrier>idempotent()
+        .play(AzAlienAnimationUtil.BODY, CarrierAnimationRefs.HOLD_WAITING_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
 
     private final Carrier carrier;
 
@@ -99,16 +77,11 @@ public class CarrierAnimationDispatcher {
     }
 
     public void clawAttack(float speed) {
-        AzCommand.create(
-            AzAlienAnimationUtil.BODY_TRACK_NAME,
-            CarrierAnimationRefs.ATTACKCLAW_ANIMATION_NAME,
-            AzPlayBehaviors.PLAY_ONCE,
-            0F,
-            speed,
-            0F,
-            0F,
-            false
-        ).dispatchForEntity(carrier);
+        AzCommand.<Carrier>replay()
+            .play(AzAlienAnimationUtil.BODY, CarrierAnimationRefs.ATTACKCLAW_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+            .setSpeed(AzAlienAnimationUtil.BODY, speed)
+            .build()
+            .dispatchForEntity(carrier);
     }
 
     public void biteAttack() {
@@ -116,16 +89,11 @@ public class CarrierAnimationDispatcher {
     }
 
     public void biteAttack(float speed) {
-        AzCommand.create(
-            AzAlienAnimationUtil.BODY_TRACK_NAME,
-            CarrierAnimationRefs.ATTACKBITE_ANIMATION_NAME,
-            AzPlayBehaviors.PLAY_ONCE,
-            0F,
-            speed,
-            0F,
-            0F,
-            false
-        ).dispatchForEntity(carrier);
+        AzCommand.<Carrier>replay()
+            .play(AzAlienAnimationUtil.BODY, CarrierAnimationRefs.ATTACKBITE_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+            .setSpeed(AzAlienAnimationUtil.BODY, speed)
+            .build()
+            .dispatchForEntity(carrier);
     }
 
     public void tailAttack() {
@@ -133,16 +101,11 @@ public class CarrierAnimationDispatcher {
     }
 
     public void tailAttack(float speed) {
-        AzCommand.create(
-            AzAlienAnimationUtil.BODY_TRACK_NAME,
-            CarrierAnimationRefs.ATTACKTAIL_ANIMATION_NAME,
-            AzPlayBehaviors.PLAY_ONCE,
-            0F,
-            speed,
-            0F,
-            0F,
-            false
-        ).dispatchForEntity(carrier);
+        AzCommand.<Carrier>replay()
+            .play(AzAlienAnimationUtil.BODY, CarrierAnimationRefs.ATTACKTAIL_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+            .setSpeed(AzAlienAnimationUtil.BODY, speed)
+            .build()
+            .dispatchForEntity(carrier);
     }
 
     public void throwAttack() {

@@ -6,65 +6,45 @@ import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
 
 public class BursterAnimationDispatcher {
 
-    private static final AzCommand IDLE = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        BursterAnimationRefs.IDLE_ANIMATION_NAME,
-        AzPlayBehaviors.LOOP
-    );
+    private static final AzCommand<Burster> IDLE = AzCommand.<Burster>idempotent()
+        .play(AzAlienAnimationUtil.BODY, BursterAnimationRefs.IDLE_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
 
-    private static final AzCommand WALK = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        BursterAnimationRefs.WALK_ANIMATION_NAME,
-        AzPlayBehaviors.LOOP
-    );
+    private static final AzCommand<Burster> WALK = AzCommand.<Burster>idempotent()
+        .play(AzAlienAnimationUtil.BODY, BursterAnimationRefs.WALK_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
 
-    private static final AzCommand RUN = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        BursterAnimationRefs.RUN_ANIMATION_NAME,
-        AzPlayBehaviors.LOOP
-    );
+    private static final AzCommand<Burster> RUN = AzCommand.<Burster>idempotent()
+        .play(AzAlienAnimationUtil.BODY, BursterAnimationRefs.RUN_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
 
-    private static final AzCommand CRAWL = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        BursterAnimationRefs.CRAWL_ANIMATION_NAME,
-        AzPlayBehaviors.LOOP
-    );
+    private static final AzCommand<Burster> CRAWL = AzCommand.<Burster>idempotent()
+        .play(AzAlienAnimationUtil.BODY, BursterAnimationRefs.CRAWL_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
 
-    private static final AzCommand CRAWL_HOLD = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        BursterAnimationRefs.CRAWL_ANIMATION_NAME,
-        AzPlayBehaviors.HOLD_ON_LAST_FRAME
-    );
+    private static final AzCommand<Burster> CRAWL_HOLD = AzCommand.<Burster>idempotent()
+        .play(AzAlienAnimationUtil.BODY, BursterAnimationRefs.CRAWL_ANIMATION_NAME, AzPlayBehaviors.HOLD_ON_LAST_FRAME)
+        .build();
 
-    private static final AzCommand LUNGE = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        BursterAnimationRefs.LUNGE_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
-    );
+    private static final AzCommand<Burster> LUNGE = AzCommand.<Burster>replay()
+        .play(AzAlienAnimationUtil.BODY, BursterAnimationRefs.LUNGE_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
 
-    private static final AzCommand SWIM = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        BursterAnimationRefs.SWIM_ANIMATION_NAME,
-        AzPlayBehaviors.LOOP
-    );
+    private static final AzCommand<Burster> SWIM = AzCommand.<Burster>idempotent()
+        .play(AzAlienAnimationUtil.BODY, BursterAnimationRefs.SWIM_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
 
-    private static final AzCommand FULLATTACKARM = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        BursterAnimationRefs.FULLATTACKARM_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
-    );
+    private static final AzCommand<Burster> FULLATTACKARM = AzCommand.<Burster>replay()
+        .play(AzAlienAnimationUtil.BODY, BursterAnimationRefs.FULLATTACKARM_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
 
-    private static final AzCommand FULLATTACKBITE = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        BursterAnimationRefs.FULLATTACKBITE_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
-    );
+    private static final AzCommand<Burster> FULLATTACKBITE = AzCommand.<Burster>replay()
+        .play(AzAlienAnimationUtil.BODY, BursterAnimationRefs.FULLATTACKBITE_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
 
-    private static final AzCommand FULLATTACKTAIL = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        BursterAnimationRefs.FULLATTACKTAIL_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
-    );
+    private static final AzCommand<Burster> FULLATTACKTAIL = AzCommand.<Burster>replay()
+        .play(AzAlienAnimationUtil.BODY, BursterAnimationRefs.FULLATTACKTAIL_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
 
     private final Burster burster;
 
@@ -105,16 +85,11 @@ public class BursterAnimationDispatcher {
     }
 
     public void clawAttack(float speed) {
-        AzCommand.create(
-            AzAlienAnimationUtil.BODY_TRACK_NAME,
-            BursterAnimationRefs.FULLATTACKARM_ANIMATION_NAME,
-            AzPlayBehaviors.PLAY_ONCE,
-            0F,
-            speed,
-            0F,
-            0F,
-            false
-        ).dispatchForEntity(burster);
+        AzCommand.<Burster>replay()
+            .play(AzAlienAnimationUtil.BODY, BursterAnimationRefs.FULLATTACKARM_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+            .setSpeed(AzAlienAnimationUtil.BODY, speed)
+            .build()
+            .dispatchForEntity(burster);
     }
 
     public void biteAttack() {
@@ -122,16 +97,11 @@ public class BursterAnimationDispatcher {
     }
 
     public void biteAttack(float speed) {
-        AzCommand.create(
-            AzAlienAnimationUtil.BODY_TRACK_NAME,
-            BursterAnimationRefs.FULLATTACKBITE_ANIMATION_NAME,
-            AzPlayBehaviors.PLAY_ONCE,
-            0F,
-            speed,
-            0F,
-            0F,
-            false
-        ).dispatchForEntity(burster);
+        AzCommand.<Burster>replay()
+            .play(AzAlienAnimationUtil.BODY, BursterAnimationRefs.FULLATTACKBITE_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+            .setSpeed(AzAlienAnimationUtil.BODY, speed)
+            .build()
+            .dispatchForEntity(burster);
     }
 
     public void tailAttack() {
@@ -139,15 +109,10 @@ public class BursterAnimationDispatcher {
     }
 
     public void tailAttack(float speed) {
-        AzCommand.create(
-            AzAlienAnimationUtil.BODY_TRACK_NAME,
-            BursterAnimationRefs.FULLATTACKTAIL_ANIMATION_NAME,
-            AzPlayBehaviors.PLAY_ONCE,
-            0F,
-            speed,
-            0F,
-            0F,
-            false
-        ).dispatchForEntity(burster);
+        AzCommand.<Burster>replay()
+            .play(AzAlienAnimationUtil.BODY, BursterAnimationRefs.FULLATTACKTAIL_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+            .setSpeed(AzAlienAnimationUtil.BODY, speed)
+            .build()
+            .dispatchForEntity(burster);
     }
 }

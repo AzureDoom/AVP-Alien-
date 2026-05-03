@@ -6,59 +6,41 @@ import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
 
 public class RazorClawAnimationDispatcher {
 
-    private static final AzCommand ARMATTACK = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        RazorClawAnimationRefs.ATTACK_CLAW_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
-    );
+    private static final AzCommand<RazorClaw> ARMATTACK = AzCommand.<RazorClaw>replay()
+        .play(AzAlienAnimationUtil.BODY, RazorClawAnimationRefs.ATTACK_CLAW_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
 
-    private static final AzCommand BITEATTACK = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        RazorClawAnimationRefs.ATTACK_BITE_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
-    );
+    private static final AzCommand<RazorClaw> BITEATTACK = AzCommand.<RazorClaw>replay()
+        .play(AzAlienAnimationUtil.BODY, RazorClawAnimationRefs.ATTACK_BITE_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
 
-    private static final AzCommand TAILATTACK = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        RazorClawAnimationRefs.ATTACK_TAIL_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
-    );
+    private static final AzCommand<RazorClaw> TAILATTACK = AzCommand.<RazorClaw>replay()
+        .play(AzAlienAnimationUtil.BODY, RazorClawAnimationRefs.ATTACK_TAIL_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
 
-    private static final AzCommand SWIM_ATTACK = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        RazorClawAnimationRefs.SWIM_ATTACK_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
-    );
+    private static final AzCommand<RazorClaw> SWIM_ATTACK = AzCommand.<RazorClaw>replay()
+        .play(AzAlienAnimationUtil.BODY, RazorClawAnimationRefs.SWIM_ATTACK_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
 
-    private static final AzCommand SPECIAL_ATTACK_SPIN = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        RazorClawAnimationRefs.SPECIAL_ATTACK_SPIN_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
-    );
+    private static final AzCommand<RazorClaw> SPECIAL_ATTACK_SPIN = AzCommand.<RazorClaw>replay()
+        .play(AzAlienAnimationUtil.BODY, RazorClawAnimationRefs.SPECIAL_ATTACK_SPIN_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
 
-    private static final AzCommand IDLE = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        "idle",
-        AzPlayBehaviors.LOOP
-    );
+    private static final AzCommand<RazorClaw> IDLE = AzCommand.<RazorClaw>idempotent()
+        .play(AzAlienAnimationUtil.BODY, "idle", AzPlayBehaviors.LOOP)
+        .build();
 
-    private static final AzCommand RUN = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        "run",
-        AzPlayBehaviors.LOOP
-    );
+    private static final AzCommand<RazorClaw> RUN = AzCommand.<RazorClaw>idempotent()
+        .play(AzAlienAnimationUtil.BODY, "run", AzPlayBehaviors.LOOP)
+        .build();
 
-    private static final AzCommand SWIM = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        "swim",
-        AzPlayBehaviors.LOOP
-    );
+    private static final AzCommand<RazorClaw> SWIM = AzCommand.<RazorClaw>idempotent()
+        .play(AzAlienAnimationUtil.BODY, "swim", AzPlayBehaviors.LOOP)
+        .build();
 
-    private static final AzCommand WALK = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        "walk",
-        AzPlayBehaviors.LOOP
-    );
+    private static final AzCommand<RazorClaw> WALK = AzCommand.<RazorClaw>idempotent()
+        .play(AzAlienAnimationUtil.BODY, "walk", AzPlayBehaviors.LOOP)
+        .build();
 
     private final RazorClaw razorClaw;
 
@@ -87,16 +69,11 @@ public class RazorClawAnimationDispatcher {
     }
 
     public void biteAttack(float speed) {
-        AzCommand.create(
-            AzAlienAnimationUtil.BODY_TRACK_NAME,
-            RazorClawAnimationRefs.ATTACK_BITE_ANIMATION_NAME,
-            AzPlayBehaviors.PLAY_ONCE,
-            0F,
-            speed,
-            0F,
-            0F,
-            false
-        ).dispatchForEntity(razorClaw);
+        AzCommand.<RazorClaw>replay()
+            .play(AzAlienAnimationUtil.BODY, RazorClawAnimationRefs.ATTACK_BITE_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+            .setSpeed(AzAlienAnimationUtil.BODY, speed)
+            .build()
+            .dispatchForEntity(razorClaw);
     }
 
     public void rightClawAttack() {
@@ -104,16 +81,11 @@ public class RazorClawAnimationDispatcher {
     }
 
     public void rightClawAttack(float speed) {
-        AzCommand.create(
-            AzAlienAnimationUtil.BODY_TRACK_NAME,
-            RazorClawAnimationRefs.ATTACK_CLAW_ANIMATION_NAME,
-            AzPlayBehaviors.PLAY_ONCE,
-            0F,
-            speed,
-            0F,
-            0F,
-            false
-        ).dispatchForEntity(razorClaw);
+        AzCommand.<RazorClaw>replay()
+            .play(AzAlienAnimationUtil.BODY, RazorClawAnimationRefs.ATTACK_CLAW_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+            .setSpeed(AzAlienAnimationUtil.BODY, speed)
+            .build()
+            .dispatchForEntity(razorClaw);
     }
 
     public void tailAttack() {
@@ -121,16 +93,11 @@ public class RazorClawAnimationDispatcher {
     }
 
     public void tailAttack(float speed) {
-        AzCommand.create(
-            AzAlienAnimationUtil.BODY_TRACK_NAME,
-            RazorClawAnimationRefs.ATTACK_TAIL_ANIMATION_NAME,
-            AzPlayBehaviors.PLAY_ONCE,
-            0F,
-            speed,
-            0F,
-            0F,
-            false
-        ).dispatchForEntity(razorClaw);
+        AzCommand.<RazorClaw>replay()
+            .play(AzAlienAnimationUtil.BODY, RazorClawAnimationRefs.ATTACK_TAIL_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+            .setSpeed(AzAlienAnimationUtil.BODY, speed)
+            .build()
+            .dispatchForEntity(razorClaw);
     }
 
     public void swimAttack() {
@@ -138,16 +105,11 @@ public class RazorClawAnimationDispatcher {
     }
 
     public void swimAttack(float speed) {
-        AzCommand.create(
-            AzAlienAnimationUtil.BODY_TRACK_NAME,
-            RazorClawAnimationRefs.SWIM_ATTACK_ANIMATION_NAME,
-            AzPlayBehaviors.PLAY_ONCE,
-            0F,
-            speed,
-            0F,
-            0F,
-            false
-        ).dispatchForEntity(razorClaw);
+        AzCommand.<RazorClaw>replay()
+            .play(AzAlienAnimationUtil.BODY, RazorClawAnimationRefs.SWIM_ATTACK_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+            .setSpeed(AzAlienAnimationUtil.BODY, speed)
+            .build()
+            .dispatchForEntity(razorClaw);
     }
 
     public void specialAttackSpin() {
@@ -155,15 +117,10 @@ public class RazorClawAnimationDispatcher {
     }
 
     public void specialAttackSpin(float speed) {
-        AzCommand.create(
-            AzAlienAnimationUtil.BODY_TRACK_NAME,
-            RazorClawAnimationRefs.SPECIAL_ATTACK_SPIN_ANIMATION_NAME,
-            AzPlayBehaviors.PLAY_ONCE,
-            0F,
-            speed,
-            0F,
-            0F,
-            false
-        ).dispatchForEntity(razorClaw);
+        AzCommand.<RazorClaw>replay()
+            .play(AzAlienAnimationUtil.BODY, RazorClawAnimationRefs.SPECIAL_ATTACK_SPIN_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+            .setSpeed(AzAlienAnimationUtil.BODY, speed)
+            .build()
+            .dispatchForEntity(razorClaw);
     }
 }

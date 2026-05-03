@@ -23,10 +23,10 @@ public class ChestbursterAnimator extends AzEntityAnimator<Chestburster> {
     @Override
     public void registerTracks(AzAnimationTrackContainer<Chestburster> animationTrackContainer) {
         animationTrackContainer.add(
-            AzAnimationTrack.builder(this, ChestbursterAnimationRefs.HEAD_TRACK_NAME)
+            AzAnimationTrack.builder(this, ChestbursterAnimationRefs.HEAD)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationTrack.builder(this, ChestbursterAnimationRefs.TAIL_TRACK_NAME)
+            AzAnimationTrack.builder(this, ChestbursterAnimationRefs.TAIL)
                 .setTransitionLength(5)
                 .build()
         );

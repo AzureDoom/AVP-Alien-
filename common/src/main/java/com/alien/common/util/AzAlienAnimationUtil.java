@@ -1,58 +1,61 @@
 package com.alien.common.util;
 
+import com.alien.common.gameplay.entity.living.alien.Alien;
+import com.blib.api.client.animation.v1.track.AzTrackHandle;
+
 import java.util.List;
 
 public class AzAlienAnimationUtil {
 
-    public static final String BODY_TRACK_NAME = "body";
+    public static final AzTrackHandle<Alien> BODY = AzTrackHandle.declare("body");
 
-    public static final String HEAD_TRACK_NAME = "head";
+    public static final AzTrackHandle<Alien> HEAD = AzTrackHandle.declare("head");
 
-    public static final String LEFT_ARM_TRACK_NAME = "leftarm";
+    public static final AzTrackHandle<Alien> LEFT_ARM = AzTrackHandle.declare("leftarm");
 
-    public static final String LEFT_LEG_TRACK_NAME = "leftleg";
+    public static final AzTrackHandle<Alien> LEFT_LEG = AzTrackHandle.declare("leftleg");
 
-    public static final String LEFT_TITTY_ARM_TRACK_NAME = "lefttittyarm";
+    public static final AzTrackHandle<Alien> LEFT_TITTY_ARM = AzTrackHandle.declare("lefttittyarm");
 
-    public static final String RIGHT_ARM_TRACK_NAME = "rightarm";
+    public static final AzTrackHandle<Alien> RIGHT_ARM = AzTrackHandle.declare("rightarm");
 
-    public static final String RIGHT_LEG_TRACK_NAME = "rightleg";
+    public static final AzTrackHandle<Alien> RIGHT_LEG = AzTrackHandle.declare("rightleg");
 
-    public static final String RIGHT_TITTY_ARM_TRACK_NAME = "righttittyarm";
+    public static final AzTrackHandle<Alien> RIGHT_TITTY_ARM = AzTrackHandle.declare("righttittyarm");
 
-    public static final String TAIL_TRACK_NAME = "tail";
+    public static final AzTrackHandle<Alien> TAIL = AzTrackHandle.declare("tail");
 
-    public static final List<String> XENO_LIMB_NAMES = List.of(
-        BODY_TRACK_NAME,
-        HEAD_TRACK_NAME,
-        LEFT_ARM_TRACK_NAME,
-        LEFT_LEG_TRACK_NAME,
-        RIGHT_ARM_TRACK_NAME,
-        RIGHT_LEG_TRACK_NAME,
-        TAIL_TRACK_NAME
+    public static final List<AzTrackHandle<Alien>> XENO_LIMBS = List.of(
+        BODY,
+        HEAD,
+        LEFT_ARM,
+        LEFT_LEG,
+        RIGHT_ARM,
+        RIGHT_LEG,
+        TAIL
     );
 
-    public static final List<String> XENO_QUEEN_LIMB_NAMES = List.of(
-        BODY_TRACK_NAME,
-        HEAD_TRACK_NAME,
-        LEFT_ARM_TRACK_NAME,
-        LEFT_LEG_TRACK_NAME,
-        LEFT_TITTY_ARM_TRACK_NAME,
-        RIGHT_ARM_TRACK_NAME,
-        RIGHT_LEG_TRACK_NAME,
-        RIGHT_TITTY_ARM_TRACK_NAME,
-        TAIL_TRACK_NAME
+    public static final List<AzTrackHandle<Alien>> XENO_QUEEN_LIMBS = List.of(
+        BODY,
+        HEAD,
+        LEFT_ARM,
+        LEFT_LEG,
+        LEFT_TITTY_ARM,
+        RIGHT_ARM,
+        RIGHT_LEG,
+        RIGHT_TITTY_ARM,
+        TAIL
     );
 
-    public static final List<String> XENO_EMPRESS_LIMB_NAMES = List.of(
-        BODY_TRACK_NAME,
-        HEAD_TRACK_NAME,
-        LEFT_ARM_TRACK_NAME,
-        LEFT_LEG_TRACK_NAME,
-        LEFT_TITTY_ARM_TRACK_NAME,
-        RIGHT_ARM_TRACK_NAME,
-        RIGHT_LEG_TRACK_NAME,
-        RIGHT_TITTY_ARM_TRACK_NAME,
-        TAIL_TRACK_NAME
+    public static final List<AzTrackHandle<Alien>> XENO_EMPRESS_LIMBS = List.of(
+        BODY,
+        HEAD,
+        LEFT_ARM,
+        LEFT_LEG,
+        LEFT_TITTY_ARM,
+        RIGHT_ARM,
+        RIGHT_LEG,
+        RIGHT_TITTY_ARM,
+        TAIL
     );
 }

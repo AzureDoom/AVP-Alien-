@@ -5,93 +5,69 @@ import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
 
 public class FacehuggerAnimationDispatcher {
 
-    private static final AzCommand FLAIL = AzCommand.create(
-        FacehuggerAnimationRefs.TAIL_TRACK_NAME,
-        FacehuggerAnimationRefs.TAIL_FLAIL_ANIMATION_NAME,
-        AzPlayBehaviors.LOOP
-    );
-
-    private static final AzCommand IDLE = AzCommand.compose(
-        AzCommand.create(
-            FacehuggerAnimationRefs.LEGS_TRACK_NAME,
-            FacehuggerAnimationRefs.IDLE_ANIMATION_NAME,
-            AzPlayBehaviors.LOOP
-        ),
-        AzCommand.create(
-            FacehuggerAnimationRefs.TAIL_TRACK_NAME,
-            FacehuggerAnimationRefs.IDLE_ANIMATION_NAME,
-            AzPlayBehaviors.LOOP
-        )
-    );
-
-    private static final AzCommand LUNGE = AzCommand.compose(
-        AzCommand.create(
-            FacehuggerAnimationRefs.LEGS_TRACK_NAME,
-            FacehuggerAnimationRefs.LEAP_ANIMATION_NAME,
-            AzPlayBehaviors.PLAY_ONCE
-        ),
-        AzCommand.create(
-            FacehuggerAnimationRefs.TAIL_TRACK_NAME,
-            FacehuggerAnimationRefs.LEAP_ANIMATION_NAME,
-            AzPlayBehaviors.PLAY_ONCE
-        )
-    );
-
-    private static final AzCommand RUN = AzCommand.create(
-        FacehuggerAnimationRefs.LEGS_TRACK_NAME,
-        FacehuggerAnimationRefs.RUN_ANIMATION_NAME,
-        AzPlayBehaviors.LOOP
-    );
-
-    private static final AzCommand BREATHE = AzCommand.create(
-        FacehuggerAnimationRefs.LUNGS_TRACK_NAME,
-        FacehuggerAnimationRefs.SACK_ANIMATION_NAME,
-        AzPlayBehaviors.LOOP
-    );
-
-    private static final AzCommand CANCEL_BREATHING = AzCommand.trackBuilder()
-        .cancel(FacehuggerAnimationRefs.LUNGS_TRACK_NAME)
+    private static final AzCommand<Facehugger> FLAIL = AzCommand.<Facehugger>idempotent()
+        .play(FacehuggerAnimationRefs.TAIL, FacehuggerAnimationRefs.TAIL_FLAIL_ANIMATION_NAME, AzPlayBehaviors.LOOP)
         .build();
 
-    private static final AzCommand SWAY = AzCommand.create(
-        FacehuggerAnimationRefs.TAIL_TRACK_NAME,
-        FacehuggerAnimationRefs.TAIL_SWAY_ANIMATION_NAME,
-        AzPlayBehaviors.LOOP
+    private static final AzCommand<Facehugger> IDLE = AzCommand.compose(
+        AzCommand.<Facehugger>idempotent()
+            .play(FacehuggerAnimationRefs.LEGS, FacehuggerAnimationRefs.IDLE_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+            .build(),
+        AzCommand.<Facehugger>idempotent()
+            .play(FacehuggerAnimationRefs.TAIL, FacehuggerAnimationRefs.IDLE_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+            .build()
     );
 
-    private static final AzCommand HUG = AzCommand.compose(
-        AzCommand.create(
-            FacehuggerAnimationRefs.LEGS_TRACK_NAME,
-            FacehuggerAnimationRefs.FACEHUG_ANIMATION_NAME,
-            AzPlayBehaviors.HOLD_ON_LAST_FRAME
-        ),
-        AzCommand.create(
-            FacehuggerAnimationRefs.TAIL_TRACK_NAME,
-            FacehuggerAnimationRefs.FACEHUG_ANIMATION_NAME,
-            AzPlayBehaviors.HOLD_ON_LAST_FRAME
-        ),
+    private static final AzCommand<Facehugger> LUNGE = AzCommand.compose(
+        AzCommand.<Facehugger>replay()
+            .play(FacehuggerAnimationRefs.LEGS, FacehuggerAnimationRefs.LEAP_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+            .build(),
+        AzCommand.<Facehugger>replay()
+            .play(FacehuggerAnimationRefs.TAIL, FacehuggerAnimationRefs.LEAP_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+            .build()
+    );
+
+    private static final AzCommand<Facehugger> RUN = AzCommand.<Facehugger>idempotent()
+        .play(FacehuggerAnimationRefs.LEGS, FacehuggerAnimationRefs.RUN_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
+
+    private static final AzCommand<Facehugger> BREATHE = AzCommand.<Facehugger>idempotent()
+        .play(FacehuggerAnimationRefs.LUNGS, FacehuggerAnimationRefs.SACK_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
+
+    private static final AzCommand<Facehugger> CANCEL_BREATHING = AzCommand.<Facehugger>builder()
+        .cancel(FacehuggerAnimationRefs.LUNGS)
+        .build();
+
+    private static final AzCommand<Facehugger> SWAY = AzCommand.<Facehugger>idempotent()
+        .play(FacehuggerAnimationRefs.TAIL, FacehuggerAnimationRefs.TAIL_SWAY_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
+
+    private static final AzCommand<Facehugger> HUG = AzCommand.compose(
+        AzCommand.<Facehugger>idempotent()
+            .play(FacehuggerAnimationRefs.LEGS, FacehuggerAnimationRefs.FACEHUG_ANIMATION_NAME, AzPlayBehaviors.HOLD_ON_LAST_FRAME)
+            .build(),
+        AzCommand.<Facehugger>idempotent()
+            .play(FacehuggerAnimationRefs.TAIL, FacehuggerAnimationRefs.FACEHUG_ANIMATION_NAME, AzPlayBehaviors.HOLD_ON_LAST_FRAME)
+            .build(),
         BREATHE
     );
 
-    private static final AzCommand INFERTILE = AzCommand.compose(
-        AzCommand.create(
-            FacehuggerAnimationRefs.LEGS_TRACK_NAME,
-            FacehuggerAnimationRefs.INFERTILE_ANIMATION_NAME,
-            AzPlayBehaviors.HOLD_ON_LAST_FRAME
-        ),
-        AzCommand.create(
-            FacehuggerAnimationRefs.TAIL_TRACK_NAME,
-            FacehuggerAnimationRefs.INFERTILE_ANIMATION_NAME,
-            AzPlayBehaviors.HOLD_ON_LAST_FRAME
-        ),
+    private static final AzCommand<Facehugger> INFERTILE = AzCommand.compose(
+        AzCommand.<Facehugger>idempotent()
+            .play(FacehuggerAnimationRefs.LEGS, FacehuggerAnimationRefs.INFERTILE_ANIMATION_NAME, AzPlayBehaviors.HOLD_ON_LAST_FRAME)
+            .build(),
+        AzCommand.<Facehugger>idempotent()
+            .play(FacehuggerAnimationRefs.TAIL, FacehuggerAnimationRefs.INFERTILE_ANIMATION_NAME, AzPlayBehaviors.HOLD_ON_LAST_FRAME)
+            .build(),
         CANCEL_BREATHING
     );
 
-    private static final AzCommand LUNGE_AND_CANCEL_BREATHING = AzCommand.compose(LUNGE, CANCEL_BREATHING);
+    private static final AzCommand<Facehugger> LUNGE_AND_CANCEL_BREATHING = AzCommand.compose(LUNGE, CANCEL_BREATHING);
 
-    private static final AzCommand RUN_AND_FLAIL = AzCommand.compose(RUN, FLAIL, CANCEL_BREATHING);
+    private static final AzCommand<Facehugger> RUN_AND_FLAIL = AzCommand.compose(RUN, FLAIL, CANCEL_BREATHING);
 
-    private static final AzCommand IDLE_AND_SWAY = AzCommand.compose(IDLE, SWAY, CANCEL_BREATHING);
+    private static final AzCommand<Facehugger> IDLE_AND_SWAY = AzCommand.compose(IDLE, SWAY, CANCEL_BREATHING);
 
     private final Facehugger facehugger;
 

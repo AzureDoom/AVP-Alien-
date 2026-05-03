@@ -4,39 +4,65 @@ import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.AzAnimationUtil;
 import com.blib.api.client.animation.v1.command.AzCommand;
 import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
+import com.blib.api.client.animation.v1.command.policy.AzDispatchMode;
 
 public class EmpressAnimationDispatcher {
 
-    private static final AzCommand BACKHAND_ALL = AzAnimationUtil.compose(
-        AzAlienAnimationUtil.XENO_EMPRESS_LIMB_NAMES,
+    private static final AzCommand<Empress> BACKHAND_ALL = AzAnimationUtil.compose(
+        AzAlienAnimationUtil.XENO_EMPRESS_LIMBS,
         "backhand",
-        AzPlayBehaviors.PLAY_ONCE
+        AzPlayBehaviors.PLAY_ONCE,
+        AzDispatchMode.REPLAY
     );
 
-    private static final AzCommand IDLE_ALL = AzAnimationUtil.compose(AzAlienAnimationUtil.XENO_EMPRESS_LIMB_NAMES, "idle");
-
-    private static final AzCommand RUN_ALL = AzAnimationUtil.compose(AzAlienAnimationUtil.XENO_EMPRESS_LIMB_NAMES, "run");
-
-    private static final AzCommand SIT_ON_OVIPOSITOR_ALL = AzAnimationUtil.compose(
-        AzAlienAnimationUtil.XENO_EMPRESS_LIMB_NAMES,
-        "rideeggsack"
+    private static final AzCommand<Empress> IDLE_ALL = AzAnimationUtil.compose(
+        AzAlienAnimationUtil.XENO_EMPRESS_LIMBS,
+        "idle",
+        AzPlayBehaviors.LOOP,
+        AzDispatchMode.PLAY_IF_NOT_PLAYING
     );
 
-    private static final AzCommand SWIM_ALL = AzAnimationUtil.compose(AzAlienAnimationUtil.XENO_EMPRESS_LIMB_NAMES, "swim");
+    private static final AzCommand<Empress> RUN_ALL = AzAnimationUtil.compose(
+        AzAlienAnimationUtil.XENO_EMPRESS_LIMBS,
+        "run",
+        AzPlayBehaviors.LOOP,
+        AzDispatchMode.PLAY_IF_NOT_PLAYING
+    );
 
-    private static final AzCommand SWIPEDOWN_ALL = AzAnimationUtil.compose(
-        AzAlienAnimationUtil.XENO_EMPRESS_LIMB_NAMES,
+    private static final AzCommand<Empress> SIT_ON_OVIPOSITOR_ALL = AzAnimationUtil.compose(
+        AzAlienAnimationUtil.XENO_EMPRESS_LIMBS,
+        "rideeggsack",
+        AzPlayBehaviors.LOOP,
+        AzDispatchMode.PLAY_IF_NOT_PLAYING
+    );
+
+    private static final AzCommand<Empress> SWIM_ALL = AzAnimationUtil.compose(
+        AzAlienAnimationUtil.XENO_EMPRESS_LIMBS,
+        "swim",
+        AzPlayBehaviors.LOOP,
+        AzDispatchMode.PLAY_IF_NOT_PLAYING
+    );
+
+    private static final AzCommand<Empress> SWIPEDOWN_ALL = AzAnimationUtil.compose(
+        AzAlienAnimationUtil.XENO_EMPRESS_LIMBS,
         "swipedown",
-        AzPlayBehaviors.PLAY_ONCE
+        AzPlayBehaviors.PLAY_ONCE,
+        AzDispatchMode.REPLAY
     );
 
-    private static final AzCommand TAILSTRIKE_ALL = AzAnimationUtil.compose(
-        AzAlienAnimationUtil.XENO_EMPRESS_LIMB_NAMES,
+    private static final AzCommand<Empress> TAILSTRIKE_ALL = AzAnimationUtil.compose(
+        AzAlienAnimationUtil.XENO_EMPRESS_LIMBS,
         "tailstrike",
-        AzPlayBehaviors.PLAY_ONCE
+        AzPlayBehaviors.PLAY_ONCE,
+        AzDispatchMode.REPLAY
     );
 
-    private static final AzCommand WALK_ALL = AzAnimationUtil.compose(AzAlienAnimationUtil.XENO_EMPRESS_LIMB_NAMES, "walk");
+    private static final AzCommand<Empress> WALK_ALL = AzAnimationUtil.compose(
+        AzAlienAnimationUtil.XENO_EMPRESS_LIMBS,
+        "walk",
+        AzPlayBehaviors.LOOP,
+        AzDispatchMode.PLAY_IF_NOT_PLAYING
+    );
 
     private final Empress empress;
 
@@ -69,22 +95,7 @@ public class EmpressAnimationDispatcher {
     }
 
     public void backhandAttack(float speed) {
-        AzCommand.compose(
-            AzAlienAnimationUtil.XENO_EMPRESS_LIMB_NAMES.stream()
-                .map(
-                    limbName -> AzCommand.create(
-                        limbName,
-                        "backhand." + limbName,
-                        AzPlayBehaviors.PLAY_ONCE,
-                        0F,
-                        speed,
-                        0F,
-                        0F,
-                        false
-                    )
-                )
-                .toList()
-        ).dispatchForEntity(empress);
+        attackWithSpeed("backhand", speed);
     }
 
     public void swipeDownAttack() {
@@ -92,22 +103,7 @@ public class EmpressAnimationDispatcher {
     }
 
     public void swipeDownAttack(float speed) {
-        AzCommand.compose(
-            AzAlienAnimationUtil.XENO_EMPRESS_LIMB_NAMES.stream()
-                .map(
-                    limbName -> AzCommand.create(
-                        limbName,
-                        "swipedown." + limbName,
-                        AzPlayBehaviors.PLAY_ONCE,
-                        0F,
-                        speed,
-                        0F,
-                        0F,
-                        false
-                    )
-                )
-                .toList()
-        ).dispatchForEntity(empress);
+        attackWithSpeed("swipedown", speed);
     }
 
     public void tailStrikeAttack() {
@@ -115,19 +111,17 @@ public class EmpressAnimationDispatcher {
     }
 
     public void tailStrikeAttack(float speed) {
+        attackWithSpeed("tailstrike", speed);
+    }
+
+    private void attackWithSpeed(String baseName, float speed) {
         AzCommand.compose(
-            AzAlienAnimationUtil.XENO_EMPRESS_LIMB_NAMES.stream()
+            AzAlienAnimationUtil.XENO_EMPRESS_LIMBS.stream()
                 .map(
-                    limbName -> AzCommand.create(
-                        limbName,
-                        "tailstrike." + limbName,
-                        AzPlayBehaviors.PLAY_ONCE,
-                        0F,
-                        speed,
-                        0F,
-                        0F,
-                        false
-                    )
+                    handle -> AzCommand.<Empress>replay()
+                        .play(handle, baseName + "." + handle.name(), AzPlayBehaviors.PLAY_ONCE)
+                        .setSpeed(handle, speed)
+                        .build()
                 )
                 .toList()
         ).dispatchForEntity(empress);

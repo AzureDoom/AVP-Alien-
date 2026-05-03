@@ -30,25 +30,25 @@ public class HarbingerAnimator extends AzEntityAnimator<Harbinger> {
     @Override
     public void registerTracks(AzAnimationTrackContainer<Harbinger> animationTrackContainer) {
         animationTrackContainer.add(
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.BODY_TRACK_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.BODY)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.HEAD_TRACK_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.HEAD)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_ARM_TRACK_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_ARM)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_LEG_TRACK_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_LEG)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_ARM_TRACK_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_ARM)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_LEG_TRACK_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_LEG)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.TAIL_TRACK_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.TAIL)
                 .setTransitionLength(5)
                 .build()
         );

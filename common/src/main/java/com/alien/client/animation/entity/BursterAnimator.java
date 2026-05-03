@@ -30,7 +30,7 @@ public class BursterAnimator extends AzEntityAnimator<Burster> {
     @Override
     public void registerTracks(AzAnimationTrackContainer<Burster> animationTrackContainer) {
         animationTrackContainer.add(
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.BODY_TRACK_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.BODY)
                 .setTransitionLength(5)
                 .build()
         );

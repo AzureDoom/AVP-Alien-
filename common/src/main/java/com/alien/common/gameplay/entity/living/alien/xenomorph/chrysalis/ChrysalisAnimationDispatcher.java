@@ -6,71 +6,49 @@ import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
 
 public class ChrysalisAnimationDispatcher {
 
-    private static final AzCommand ARMATTACK = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        ChrysalisAnimationRefs.ATTACKCLAW_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
-    );
+    private static final AzCommand<Chrysalis> ARMATTACK = AzCommand.<Chrysalis>replay()
+        .play(AzAlienAnimationUtil.BODY, ChrysalisAnimationRefs.ATTACKCLAW_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
 
-    private static final AzCommand BITEATTACK = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        ChrysalisAnimationRefs.ATTACKBITE_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
-    );
+    private static final AzCommand<Chrysalis> BITEATTACK = AzCommand.<Chrysalis>replay()
+        .play(AzAlienAnimationUtil.BODY, ChrysalisAnimationRefs.ATTACKBITE_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
 
-    private static final AzCommand TAILATTACK = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        ChrysalisAnimationRefs.ATTACKTAIL_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
-    );
+    private static final AzCommand<Chrysalis> TAILATTACK = AzCommand.<Chrysalis>replay()
+        .play(AzAlienAnimationUtil.BODY, ChrysalisAnimationRefs.ATTACKTAIL_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
 
-    private static final AzCommand IDLE = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        ChrysalisAnimationRefs.IDLE_ANIMATION_NAME,
-        AzPlayBehaviors.LOOP
-    );
+    private static final AzCommand<Chrysalis> IDLE = AzCommand.<Chrysalis>idempotent()
+        .play(AzAlienAnimationUtil.BODY, ChrysalisAnimationRefs.IDLE_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
 
-    private static final AzCommand RUN = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        ChrysalisAnimationRefs.RUN_ANIMATION_NAME,
-        AzPlayBehaviors.LOOP
-    );
+    private static final AzCommand<Chrysalis> RUN = AzCommand.<Chrysalis>idempotent()
+        .play(AzAlienAnimationUtil.BODY, ChrysalisAnimationRefs.RUN_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
 
-    private static final AzCommand SWIM = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        ChrysalisAnimationRefs.SWIM_ANIMATION_NAME,
-        AzPlayBehaviors.LOOP
-    );
+    private static final AzCommand<Chrysalis> SWIM = AzCommand.<Chrysalis>idempotent()
+        .play(AzAlienAnimationUtil.BODY, ChrysalisAnimationRefs.SWIM_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
 
-    private static final AzCommand WALK = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        ChrysalisAnimationRefs.WALK_ANIMATION_NAME,
-        AzPlayBehaviors.LOOP
-    );
+    private static final AzCommand<Chrysalis> WALK = AzCommand.<Chrysalis>idempotent()
+        .play(AzAlienAnimationUtil.BODY, ChrysalisAnimationRefs.WALK_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
 
-    private static final AzCommand ROLL_START = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        ChrysalisAnimationRefs.ROLL_START_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
-    );
+    private static final AzCommand<Chrysalis> ROLL_START = AzCommand.<Chrysalis>replay()
+        .play(AzAlienAnimationUtil.BODY, ChrysalisAnimationRefs.ROLL_START_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
 
-    private static final AzCommand ROLL_LOOP = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        ChrysalisAnimationRefs.ROLL_LOOP_ANIMATION_NAME,
-        AzPlayBehaviors.LOOP
-    );
+    private static final AzCommand<Chrysalis> ROLL_LOOP = AzCommand.<Chrysalis>idempotent()
+        .play(AzAlienAnimationUtil.BODY, ChrysalisAnimationRefs.ROLL_LOOP_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
 
-    private static final AzCommand ROLL_STOP = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        ChrysalisAnimationRefs.ROLL_STOP_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
-    );
+    private static final AzCommand<Chrysalis> ROLL_STOP = AzCommand.<Chrysalis>replay()
+        .play(AzAlienAnimationUtil.BODY, ChrysalisAnimationRefs.ROLL_STOP_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
 
-    private static final AzCommand ROLL_SMASHED = AzCommand.create(
-        AzAlienAnimationUtil.BODY_TRACK_NAME,
-        ChrysalisAnimationRefs.ROLL_SMASHED_ANIMATION_NAME,
-        AzPlayBehaviors.HOLD_ON_LAST_FRAME
-    );
+    private static final AzCommand<Chrysalis> ROLL_SMASHED = AzCommand.<Chrysalis>idempotent()
+        .play(AzAlienAnimationUtil.BODY, ChrysalisAnimationRefs.ROLL_SMASHED_ANIMATION_NAME, AzPlayBehaviors.HOLD_ON_LAST_FRAME)
+        .build();
 
     private final Chrysalis chrysalis;
 
@@ -111,16 +89,11 @@ public class ChrysalisAnimationDispatcher {
     }
 
     public void rollSmashed(float speed) {
-        AzCommand.create(
-            AzAlienAnimationUtil.BODY_TRACK_NAME,
-            ChrysalisAnimationRefs.ROLL_SMASHED_ANIMATION_NAME,
-            AzPlayBehaviors.HOLD_ON_LAST_FRAME,
-            0F,
-            speed,
-            0F,
-            0F,
-            false
-        ).dispatchForEntity(chrysalis);
+        AzCommand.<Chrysalis>idempotent()
+            .play(AzAlienAnimationUtil.BODY, ChrysalisAnimationRefs.ROLL_SMASHED_ANIMATION_NAME, AzPlayBehaviors.HOLD_ON_LAST_FRAME)
+            .setSpeed(AzAlienAnimationUtil.BODY, speed)
+            .build()
+            .dispatchForEntity(chrysalis);
     }
 
     public void biteAttack() {
@@ -128,16 +101,11 @@ public class ChrysalisAnimationDispatcher {
     }
 
     public void biteAttack(float speed) {
-        AzCommand.create(
-            AzAlienAnimationUtil.BODY_TRACK_NAME,
-            ChrysalisAnimationRefs.ATTACKBITE_ANIMATION_NAME,
-            AzPlayBehaviors.PLAY_ONCE,
-            0F,
-            speed,
-            0F,
-            0F,
-            false
-        ).dispatchForEntity(chrysalis);
+        AzCommand.<Chrysalis>replay()
+            .play(AzAlienAnimationUtil.BODY, ChrysalisAnimationRefs.ATTACKBITE_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+            .setSpeed(AzAlienAnimationUtil.BODY, speed)
+            .build()
+            .dispatchForEntity(chrysalis);
     }
 
     public void rightClawAttack() {
@@ -145,16 +113,11 @@ public class ChrysalisAnimationDispatcher {
     }
 
     public void rightClawAttack(float speed) {
-        AzCommand.create(
-            AzAlienAnimationUtil.BODY_TRACK_NAME,
-            ChrysalisAnimationRefs.ATTACKCLAW_ANIMATION_NAME,
-            AzPlayBehaviors.PLAY_ONCE,
-            0F,
-            speed,
-            0F,
-            0F,
-            false
-        ).dispatchForEntity(chrysalis);
+        AzCommand.<Chrysalis>replay()
+            .play(AzAlienAnimationUtil.BODY, ChrysalisAnimationRefs.ATTACKCLAW_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+            .setSpeed(AzAlienAnimationUtil.BODY, speed)
+            .build()
+            .dispatchForEntity(chrysalis);
     }
 
     public void tailAttack() {
@@ -162,15 +125,10 @@ public class ChrysalisAnimationDispatcher {
     }
 
     public void tailAttack(float speed) {
-        AzCommand.create(
-            AzAlienAnimationUtil.BODY_TRACK_NAME,
-            ChrysalisAnimationRefs.ATTACKTAIL_ANIMATION_NAME,
-            AzPlayBehaviors.PLAY_ONCE,
-            0F,
-            speed,
-            0F,
-            0F,
-            false
-        ).dispatchForEntity(chrysalis);
+        AzCommand.<Chrysalis>replay()
+            .play(AzAlienAnimationUtil.BODY, ChrysalisAnimationRefs.ATTACKTAIL_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+            .setSpeed(AzAlienAnimationUtil.BODY, speed)
+            .build()
+            .dispatchForEntity(chrysalis);
     }
 }

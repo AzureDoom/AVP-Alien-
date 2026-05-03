@@ -65,31 +65,24 @@ public class CocoonAnimationStateTracker<T extends Xenomorph> {
     }
 
     private static void playEnter(Xenomorph xenomorph) {
-        AzCommand.create(
-            AzAlienAnimationUtil.BODY_TRACK_NAME,
-            EMERGE_ANIMATION_NAME,
-            AzPlayBehaviors.PLAY_ONCE,
-            0F,
-            1F,
-            0F,
-            0F,
-            true
-        ).dispatchForEntity(xenomorph);
+        AzCommand.<Xenomorph>replay()
+            .play(AzAlienAnimationUtil.BODY, EMERGE_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+            .setReverseAnimation(AzAlienAnimationUtil.BODY, true)
+            .build()
+            .dispatchForEntity(xenomorph);
     }
 
     private static void playLoop(Xenomorph xenomorph) {
-        AzCommand.create(
-            AzAlienAnimationUtil.BODY_TRACK_NAME,
-            COCOON_LOOP_ANIMATION_NAME,
-            AzPlayBehaviors.LOOP
-        ).dispatchForEntity(xenomorph);
+        AzCommand.<Xenomorph>idempotent()
+            .play(AzAlienAnimationUtil.BODY, COCOON_LOOP_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+            .build()
+            .dispatchForEntity(xenomorph);
     }
 
     private static void playEmerge(Xenomorph xenomorph) {
-        AzCommand.create(
-            AzAlienAnimationUtil.BODY_TRACK_NAME,
-            EMERGE_ANIMATION_NAME,
-            AzPlayBehaviors.PLAY_ONCE
-        ).dispatchForEntity(xenomorph);
+        AzCommand.<Xenomorph>replay()
+            .play(AzAlienAnimationUtil.BODY, EMERGE_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+            .build()
+            .dispatchForEntity(xenomorph);
     }
 }

@@ -26,7 +26,7 @@ public class BoilerAnimator extends AzEntityAnimator<Boiler> {
     @Override
     public void registerTracks(AzAnimationTrackContainer<Boiler> animationTrackContainer) {
         animationTrackContainer.add(
-            AzAnimationTrack.builder(this, BoilerAnimationRefs.FULL_BODY_TRACK_NAME)
+            AzAnimationTrack.builder(this, BoilerAnimationRefs.FULL_BODY)
                 .setTransitionLength(5)
                 .build()
         );

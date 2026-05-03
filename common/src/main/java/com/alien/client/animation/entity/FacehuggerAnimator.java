@@ -23,13 +23,13 @@ public class FacehuggerAnimator extends AzEntityAnimator<Facehugger> {
     @Override
     public void registerTracks(AzAnimationTrackContainer<Facehugger> animationTrackContainer) {
         animationTrackContainer.add(
-            AzAnimationTrack.builder(this, FacehuggerAnimationRefs.LEGS_TRACK_NAME)
+            AzAnimationTrack.builder(this, FacehuggerAnimationRefs.LEGS)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationTrack.builder(this, FacehuggerAnimationRefs.LUNGS_TRACK_NAME)
+            AzAnimationTrack.builder(this, FacehuggerAnimationRefs.LUNGS)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationTrack.builder(this, FacehuggerAnimationRefs.TAIL_TRACK_NAME)
+            AzAnimationTrack.builder(this, FacehuggerAnimationRefs.TAIL)
                 .setTransitionLength(5)
                 .build()
         );

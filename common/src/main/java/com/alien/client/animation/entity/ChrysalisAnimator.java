@@ -34,7 +34,7 @@ public class ChrysalisAnimator extends AzEntityAnimator<Chrysalis> {
     @Override
     public void registerTracks(AzAnimationTrackContainer<Chrysalis> animationTrackContainer) {
         animationTrackContainer.add(
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.BODY_TRACK_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.BODY)
                 .setTransitionLength(5)
                 .build()
         );

@@ -1,14 +1,17 @@
 package com.alien.common.gameplay.entity.living.alien.parasite.facehugger;
 
+import com.alien.common.gameplay.entity.living.alien.Alien;
+import com.blib.api.client.animation.v1.track.AzTrackHandle;
+
 public class FacehuggerAnimationRefs {
 
     public static final String FACEHUG_ANIMATION_NAME = "animation.hug";
 
-    public static final String LEGS_TRACK_NAME = "legs";
+    public static final AzTrackHandle<Alien> LEGS = AzTrackHandle.declare("legs");
 
-    public static final String LUNGS_TRACK_NAME = "lungs";
+    public static final AzTrackHandle<Alien> LUNGS = AzTrackHandle.declare("lungs");
 
-    public static final String TAIL_TRACK_NAME = "tail";
+    public static final AzTrackHandle<Alien> TAIL = AzTrackHandle.declare("tail");
 
     public static final String IDLE_ANIMATION_NAME = "animation.idle";
 
