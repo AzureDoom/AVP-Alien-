@@ -93,7 +93,6 @@ public final class RavagerChargeAttack {
             }
 
             lockYaw(entity);
-            activeTicksRemaining--;
 
             var elapsedTicks = totalActiveTicks - activeTicksRemaining;
             var damageThresholdTick = (int) (totalActiveTicks * DAMAGE_POINT_PERCENT);
@@ -102,6 +101,8 @@ public final class RavagerChargeAttack {
                 damageEntitiesInFront(ravager);
                 damageDealt = true;
             }
+
+            activeTicksRemaining--;
 
             return activeTicksRemaining > 0;
         }

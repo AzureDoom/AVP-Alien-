@@ -3,21 +3,16 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.action
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ravager.Ravager;
 import com.blib.api.common.goap.v1.GOAPSensors;
-import com.just.ai.goap.StateKey;
 import com.just.ai.goap.action.Action;
-import com.just.ai.goap.state.Blackboard;
 import com.just.core.functional.option.Option;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 
 public class MeleeAttackAction {
 
-    private static final StateKey<Boolean> KEY_ATTACK_STARTED = StateKey.sensed("melee_attack_started");
-
     public static Action.Signal perform(Action.Context<? extends Xenomorph> context) {
         var xenomorph = context.getActor();
         var worldState = context.getWorldState();
-        var blackboard = context.getBlackboard(Blackboard.Scope.ACTION);
         var attackTargetOption = worldState.getOrDefault(GOAPSensors.NEAREST_ATTACKABLE_TARGET.key(), Option.<LivingEntity>none());
 
         if (attackTargetOption.isNone()) {
@@ -29,21 +24,14 @@ public class MeleeAttackAction {
         xenomorph.getLookControl().setLookAt(attackTarget);
         faceXenomorphTowardTarget(xenomorph, attackTarget);
 
-        var attackStarted = blackboard.getOrDefault(KEY_ATTACK_STARTED, false);
-
-        if (!attackStarted) {
-            xenomorph.runAttackAnimations();
-
-            if (!xenomorph.isAttacking()) {
-                return Action.Signal.ABORT;
-            }
-
-            blackboard.set(KEY_ATTACK_STARTED, true);
+        if (xenomorph.isAttacking()) {
             return Action.Signal.CONTINUE;
         }
 
+        xenomorph.runAttackAnimations();
+
         if (!xenomorph.isAttacking()) {
-            blackboard.set(KEY_ATTACK_STARTED, false);
+            return Action.Signal.ABORT;
         }
 
         return Action.Signal.CONTINUE;

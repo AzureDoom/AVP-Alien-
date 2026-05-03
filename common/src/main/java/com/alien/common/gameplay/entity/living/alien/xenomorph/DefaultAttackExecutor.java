@@ -28,10 +28,9 @@ public class DefaultAttackExecutor implements AttackExecutor {
 
     @Override
     public boolean onTick(Xenomorph entity, AttackType attack) {
-        ticksRemaining--;
+        var elapsed = totalTicks - ticksRemaining;
 
         if (!damageDealt && target != null && target.isAlive()) {
-            var elapsed = totalTicks - ticksRemaining;
             var damageTickThreshold = (int) (totalTicks * attack.damageThresholdPercent());
 
             if (elapsed >= damageTickThreshold) {
@@ -39,6 +38,8 @@ public class DefaultAttackExecutor implements AttackExecutor {
                 damageDealt = true;
             }
         }
+
+        ticksRemaining--;
 
         return ticksRemaining > 0;
     }
