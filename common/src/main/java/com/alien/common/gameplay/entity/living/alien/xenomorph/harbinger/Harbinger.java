@@ -22,17 +22,17 @@ import org.jetbrains.annotations.Nullable;
 
 public class Harbinger extends Xenomorph implements GOAPUser<Harbinger> {
 
-    public static final AttackType CLAW = AttackType.builder("claw")
+    public static final AttackType CLAW = AttackType.builder("harbinger_claw")
         .defaultDurationInTicks(10)
         .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
         .build();
 
-    public static final AttackType BITE = AttackType.builder("bite")
+    public static final AttackType BITE = AttackType.builder("harbinger_bite")
         .defaultDurationInTicks(8)
         .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
         .build();
 
-    public static final AttackType TAIL = AttackType.builder("tail")
+    public static final AttackType TAIL = AttackType.builder("harbinger_tail")
         .defaultDurationInTicks(12)
         .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
         .build();

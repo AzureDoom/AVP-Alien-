@@ -22,17 +22,17 @@ import org.jetbrains.annotations.Nullable;
 
 public class Prowler extends Xenomorph implements GOAPUser<Prowler> {
 
-    public static final AttackType CLAW = AttackType.builder("claw")
+    public static final AttackType CLAW = AttackType.builder("prowler_claw")
         .defaultDurationInTicks(10)
         .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
         .build();
 
-    public static final AttackType BITE = AttackType.builder("bite")
+    public static final AttackType BITE = AttackType.builder("prowler_bite")
         .defaultDurationInTicks(8)
         .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
         .build();
 
-    public static final AttackType TAIL_QUAD = AttackType.builder("tail_quad")
+    public static final AttackType TAIL_QUAD = AttackType.builder("prowler_tail_quad")
         .defaultDurationInTicks(10)
         .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
         .build();

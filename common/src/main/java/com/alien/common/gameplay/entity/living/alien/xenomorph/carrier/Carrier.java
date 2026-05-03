@@ -28,26 +28,26 @@ import org.jetbrains.annotations.Nullable;
 
 public class Carrier extends Xenomorph implements GOAPUser<Carrier> {
 
-    public static final AttackType CLAW = AttackType.builder("claw")
+    public static final AttackType CLAW = AttackType.builder("carrier_claw")
         .defaultDurationInTicks(10)
         .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
         .build();
 
-    public static final AttackType BITE = AttackType.builder("bite")
+    public static final AttackType BITE = AttackType.builder("carrier_bite")
         .defaultDurationInTicks(8)
         .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
         .build();
 
-    public static final AttackType TAIL = AttackType.builder("tail")
+    public static final AttackType TAIL = AttackType.builder("carrier_tail")
         .defaultDurationInTicks(12)
         .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
         .build();
 
-    public static final AttackType THROW = AttackType.builder("throw")
+    public static final AttackType THROW = AttackType.builder("carrier_throw")
         .defaultDurationInTicks(20)
         .build();
 
-    public static final AttackType SCREAM = AttackType.builder("scream")
+    public static final AttackType SCREAM = AttackType.builder("carrier_scream")
         .defaultDurationInTicks(35)
         .build();
 
