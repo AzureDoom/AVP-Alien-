@@ -7,6 +7,7 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.razor_claw.RazorC
 import com.alien.common.gameplay.entity.living.alien.xenomorph.razor_claw.RazorClawAnimationRefs;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.razor_claw.RazorClawSweepAttack;
 import com.alien.common.util.AzAlienAnimationUtil;
+import com.alien.common.util.AzAlienHeadAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
 import com.blib.api.client.animation.v1.track.AzAnimationTrack;
@@ -49,6 +50,8 @@ public class RazorClawAnimator extends AzEntityAnimator<RazorClaw> {
         if (cocoonAnimationStateTracker.run(animatable)) {
             return;
         }
+
+        AzAlienHeadAnimationUtil.applyHeadLookFromBindPose(animatable, context(), partialTicks, "gNeck");
 
         runPassiveAnimations(animatable);
     }

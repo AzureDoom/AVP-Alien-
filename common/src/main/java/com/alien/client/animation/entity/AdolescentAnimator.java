@@ -3,6 +3,7 @@ package com.alien.client.animation.entity;
 import com.alien.AlienResources;
 import com.alien.common.gameplay.entity.living.alien.adolescent.Adolescent;
 import com.alien.common.util.AzAlienAnimationUtil;
+import com.alien.common.util.AzAlienHeadAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
 import com.blib.api.client.animation.v1.track.AzAnimationTrack;
@@ -56,6 +57,9 @@ public class AdolescentAnimator extends AzEntityAnimator<Adolescent> {
     @Override
     public void setCustomAnimations(Adolescent animatable, float partialTicks) {
         super.setCustomAnimations(animatable, partialTicks);
+
+        AzAlienHeadAnimationUtil.applyHeadLookFromBindPose(animatable, context(), partialTicks, "gNeck");
+
         // TODO: This belongs in rendering, not in animation.
         showDorsalTubes(animatable);
 

@@ -6,6 +6,7 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.Crusher;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.CrusherAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
+import com.alien.common.util.AzAlienHeadAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
 import com.blib.api.client.animation.v1.track.AzAnimationTrack;
@@ -66,6 +67,8 @@ public class CrusherAnimator extends AzEntityAnimator<Crusher> {
         if (cocoonAnimationStateTracker.run(animatable)) {
             return;
         }
+
+        AzAlienHeadAnimationUtil.applyHeadLookFromBindPose(animatable, context(), partialTicks, "gNeck");
 
         runPassiveAnimations(animatable);
     }

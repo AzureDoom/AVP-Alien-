@@ -6,6 +6,7 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.warrior.Warrior;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.warrior.WarriorAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
+import com.alien.common.util.AzAlienHeadAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
 import com.blib.api.client.animation.v1.track.AzAnimationTrack;
@@ -66,6 +67,8 @@ public class WarriorAnimator extends AzEntityAnimator<Warrior> {
         if (cocoonAnimationStateTracker.run(animatable)) {
             return;
         }
+
+        AzAlienHeadAnimationUtil.applyHeadLookFromBindPose(animatable, context(), partialTicks, "gNeck");
 
         runPassiveAnimations(animatable);
     }

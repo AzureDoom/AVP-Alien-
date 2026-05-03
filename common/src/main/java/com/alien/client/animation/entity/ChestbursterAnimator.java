@@ -3,6 +3,7 @@ package com.alien.client.animation.entity;
 import com.alien.AlienResources;
 import com.alien.common.gameplay.entity.living.alien.chestburster.Chestburster;
 import com.alien.common.gameplay.entity.living.alien.chestburster.ChestbursterAnimationRefs;
+import com.alien.common.util.AzAlienHeadAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
 import com.blib.api.client.animation.v1.track.AzAnimationTrack;
@@ -40,6 +41,8 @@ public class ChestbursterAnimator extends AzEntityAnimator<Chestburster> {
     @Override
     public void setCustomAnimations(Chestburster animatable, float partialTicks) {
         super.setCustomAnimations(animatable, partialTicks);
+
+        AzAlienHeadAnimationUtil.applyHeadLookFromBindPose(animatable, context(), partialTicks, "gNeck");
 
         runPassiveAnimations(animatable);
     }

@@ -3,6 +3,7 @@ package com.alien.client.animation.entity;
 import com.alien.AlienResources;
 import com.alien.common.gameplay.entity.living.alien.predalien_adolescent.PredalienAdolescent;
 import com.alien.common.util.AzAlienAnimationUtil;
+import com.alien.common.util.AzAlienHeadAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
 import com.blib.api.client.animation.v1.track.AzAnimationTrack;
@@ -55,6 +56,9 @@ public class PredalienAdolescentAnimator extends AzEntityAnimator<PredalienAdole
     @Override
     public void setCustomAnimations(PredalienAdolescent animatable, float partialTicks) {
         super.setCustomAnimations(animatable, partialTicks);
+
+        AzAlienHeadAnimationUtil.applyHeadLookFromBindPose(animatable, context(), partialTicks, "gNeck");
+
         runPassiveAnimations(animatable);
     }
 
