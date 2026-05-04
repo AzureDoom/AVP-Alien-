@@ -422,12 +422,12 @@ public abstract class Alien extends Monster implements DataUser {
      * <p>
      * Eligibility rules:
      * <ul>
-     *     <li>Head-category limbs are only eligible if the explosion <em>killed</em> the alien — surviving an
-     *         explosion never costs you your head.</li>
-     *     <li>Leg-category limbs are off-limits for xenomorphs whose {@code CrawlingManager} reports
-     *         {@code canCrawl() == false} — they wouldn't be able to crawl after, and standing on remaining legs
-     *         reads weird.</li>
-     *     <li>Arm- and tail-category limbs are always eligible.</li>
+     * <li>Head-category limbs are only eligible if the explosion <em>killed</em> the alien — surviving an explosion
+     * never costs you your head.</li>
+     * <li>Leg-category limbs are off-limits for xenomorphs whose {@code CrawlingManager} reports
+     * {@code canCrawl() == false} — they wouldn't be able to crawl after, and standing on remaining legs reads
+     * weird.</li>
+     * <li>Arm- and tail-category limbs are always eligible.</li>
      * </ul>
      */
     private void rollExplosionDismemberment(float damageDealt) {

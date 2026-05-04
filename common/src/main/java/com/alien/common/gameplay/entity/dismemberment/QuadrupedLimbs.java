@@ -9,9 +9,9 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Shared registration helper for vanilla mobs whose model exposes the {@code QuadrupedModel}-style part naming
- * (head, body, four named hind/front legs). Used for cow/pig (which extend {@code QuadrupedModel}) and creeper
- * (which extends {@code HierarchicalModel} but uses the same {@code LayerDefinition} child names).
+ * Shared registration helper for vanilla mobs whose model exposes the {@code QuadrupedModel}-style part naming (head,
+ * body, four named hind/front legs). Used for cow/pig (which extend {@code QuadrupedModel}) and creeper (which extends
+ * {@code HierarchicalModel} but uses the same {@code LayerDefinition} child names).
  */
 public final class QuadrupedLimbs {
 
