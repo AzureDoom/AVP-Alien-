@@ -130,7 +130,7 @@ public class AlienEntityTypes {
     // Ravager
     public static final float RAVAGER_WIDTH = 0.98F;
 
-    public static final float RAVAGER_HEIGHT = 3.98F;
+    public static final float RAVAGER_HEIGHT = 2.98F;
 
     // Razor Claw
     public static final float RAZOR_CLAW_WIDTH = 0.98F;
