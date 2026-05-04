@@ -108,7 +108,7 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         this.cocoonState = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_COCOON_STATE.get());
         this.cocoonAnimationId = new DataAccessor<>(this, AlienDataSyncKeys.XENOMORPH_COCOON_ANIMATION_ID.get());
 
-        this.crawlingManager = new CrawlingManager(this, isCrawling);
+        this.crawlingManager = new CrawlingManager(this, isCrawling, config.canCrawl());
         this.cocoonManager = new CocoonManager(this);
         this.growthManager = new GrowthManager(this)
             .setGrowOverTime(false);

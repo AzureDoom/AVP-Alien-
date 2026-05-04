@@ -13,6 +13,7 @@ public record XenomorphConfig(
     int parallelDigCount,
     float healthRegenPerSecond,
     boolean isPushedByFluid,
+    boolean canCrawl,
     Function<AlienVariant, @Nullable EntityType<? extends Alien>> variantResolver
 ) {
 
@@ -36,6 +37,8 @@ public record XenomorphConfig(
         private float healthRegenPerSecond = 0.5F;
 
         private boolean isPushedByFluid = true;
+
+        private boolean canCrawl = true;
 
         private Builder(
             XenomorphPathConfig pathConfig,
@@ -65,6 +68,16 @@ public record XenomorphConfig(
             return this;
         }
 
+        /**
+         * Whether this xenomorph type can drop into a crawling stance — driven both by tight overhead clearance and by
+         * leg dismemberment. Set to {@code false} for monumentally large variants (queen, empress, ...) so the
+         * crawling manager skips them entirely and the dismemberment system never takes their legs.
+         */
+        public Builder canCrawl(boolean canCrawl) {
+            this.canCrawl = canCrawl;
+            return this;
+        }
+
         public XenomorphConfig build() {
             return new XenomorphConfig(
                 pathConfig,
@@ -72,6 +85,7 @@ public record XenomorphConfig(
                 parallelDigCount,
                 healthRegenPerSecond,
                 isPushedByFluid,
+                canCrawl,
                 variantResolver
             );
         }

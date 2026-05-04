@@ -1,7 +1,9 @@
 package com.alien.common.gameplay.entity;
 
-import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
 import com.blib.api.common.data_sync.v1.DataAccessor;
+import com.blib.api.common.dismemberment.v1.Dismemberable;
+import com.blib.api.common.dismemberment.v1.LimbCategories;
+import com.blib.api.common.dismemberment.v1.LimbDefinitionRegistry;
 import com.blib.api.common.nbt.v1.model.NBTSerializable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -15,9 +17,20 @@ public class CrawlingManager implements NBTSerializable {
 
     private final DataAccessor<Boolean> isCrawling;
 
-    public CrawlingManager(PathfinderMob entity, DataAccessor<Boolean> isCrawling) {
+    /**
+     * Whether this entity type is permitted to crawl at all. Owned by the manager so callers (movement, animation,
+     * dismemberment-eligibility) can ask one source of truth instead of poking at entity-class instanceof checks.
+     */
+    private final boolean canCrawl;
+
+    public CrawlingManager(PathfinderMob entity, DataAccessor<Boolean> isCrawling, boolean canCrawl) {
         this.entity = entity;
         this.isCrawling = isCrawling;
+        this.canCrawl = canCrawl;
+    }
+
+    public boolean canCrawl() {
+        return canCrawl;
     }
 
     public void tick() {
@@ -25,7 +38,7 @@ public class CrawlingManager implements NBTSerializable {
             return;
         }
 
-        if (entity instanceof Queen) {
+        if (!canCrawl) {
             return;
         }
 
@@ -56,7 +69,27 @@ public class CrawlingManager implements NBTSerializable {
             isTight = isTight || isTightSpace(nextNode.asBlockPos());
         }
 
-        isCrawling.set(isTight);
+        // A dismembered leg forces the stance into crawling regardless of overhead clearance — the mob lost a leg, it
+        // can't stand back up.
+        var hasLegOff = entity instanceof Dismemberable dismemberable && hasDetachedLegLimb(dismemberable);
+
+        isCrawling.set(isTight || hasLegOff);
+    }
+
+    private boolean hasDetachedLegLimb(Dismemberable dismemberable) {
+        var manager = dismemberable.getDismembermentManager();
+
+        if (manager == null || !manager.hasAnyDetached()) {
+            return false;
+        }
+
+        for (var definition : LimbDefinitionRegistry.getDefinitions(entity.getType())) {
+            if (definition.category().equals(LimbCategories.LEG) && manager.isDetached(definition)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private boolean isTightSpace(BlockPos blockPos) {

@@ -1,6 +1,7 @@
 package com.alien.common.gameplay.entity.living.alien;
 
 import com.alien.common.data.AlienVariantTypes;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
 import com.alien.common.gameplay.hive.HiveRegistry;
@@ -17,6 +18,10 @@ import com.alien.compatibility.avp_human.GeneManagerProxy;
 import com.alien.compatibility.avp_predator.AVPPredator;
 import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.data_sync.v1.model.DataUser;
+import com.blib.api.common.dismemberment.v1.Dismemberable;
+import com.blib.api.common.dismemberment.v1.LimbCategories;
+import com.blib.api.common.dismemberment.v1.LimbDefinitionRegistry;
+import com.blib.api.common.dismemberment.v1.LimbDismemberer;
 import com.blib.api.common.entity.v1.MovementAnalyzer;
 import com.blib.mod.common.registry.init.BLibDataSyncKeys;
 import com.human.common.gameplay.gene.Genes;
@@ -32,6 +37,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.util.Mth;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -363,8 +369,15 @@ public abstract class Alien extends Monster implements DataUser {
         return killedEntity;
     }
 
+    /** Floor chance per limb for an explosion to tear it off, applied even on grazing hits. */
+    private static final float EXPLOSION_LIMB_BASE_CHANCE = 0.10F;
+
+    /** Bonus chance per limb scaled by how much of the alien's max health the explosion consumed (capped at 1×). */
+    private static final float EXPLOSION_LIMB_DAMAGE_BONUS = 0.40F;
+
     @Override
     public boolean hurt(@NotNull DamageSource damageSource, float damage) {
+        var healthBefore = getHealth();
         var isHurt = super.hurt(damageSource, damage);
 
         if (isHurt) {
@@ -389,9 +402,81 @@ public abstract class Alien extends Monster implements DataUser {
                 var randomPos = AcidBleedUtil.computeRandomPosFromBoundingBox(this);
                 AcidBleedUtil.spawnAcid(this, damage, randomPos);
             }
+
+            if (!level().isClientSide && damageSource.is(DamageTypeTags.IS_EXPLOSION)) {
+                var damageDealt = Math.max(0F, healthBefore - getHealth());
+
+                if (damageDealt > 0F) {
+                    rollExplosionDismemberment(damageDealt);
+                }
+            }
         }
 
         return isHurt;
+    }
+
+    /**
+     * Rolls each registered limb independently for explosion-driven dismemberment. Probability per limb scales with how
+     * much of max health the explosion stripped, so tossing TNT under a drone is much more dangerous than catching the
+     * edge of a creeper blast.
+     * <p>
+     * Eligibility rules:
+     * <ul>
+     *     <li>Head-category limbs are only eligible if the explosion <em>killed</em> the alien — surviving an
+     *         explosion never costs you your head.</li>
+     *     <li>Leg-category limbs are off-limits for xenomorphs whose {@code CrawlingManager} reports
+     *         {@code canCrawl() == false} — they wouldn't be able to crawl after, and standing on remaining legs
+     *         reads weird.</li>
+     *     <li>Arm- and tail-category limbs are always eligible.</li>
+     * </ul>
+     */
+    private void rollExplosionDismemberment(float damageDealt) {
+        if (!(this instanceof Dismemberable dismemberable)) {
+            return;
+        }
+
+        var manager = dismemberable.getDismembermentManager();
+
+        if (manager == null) {
+            return;
+        }
+
+        var definitions = LimbDefinitionRegistry.getDefinitions(getType());
+
+        if (definitions.isEmpty()) {
+            return;
+        }
+
+        var maxHealth = getMaxHealth();
+        var damageRatio = maxHealth > 0F ? Mth.clamp(damageDealt / maxHealth, 0F, 1F) : 0F;
+        var perLimbChance = Mth.clamp(
+            EXPLOSION_LIMB_BASE_CHANCE + EXPLOSION_LIMB_DAMAGE_BONUS * damageRatio,
+            0F,
+            1F
+        );
+
+        var canLoseLegs = !(this instanceof Xenomorph xeno) || xeno.getCrawlingManager().canCrawl();
+        var killedByExplosion = isDeadOrDying();
+
+        for (var definition : definitions) {
+            if (manager.isDetached(definition)) {
+                continue;
+            }
+
+            var category = definition.category();
+
+            if (category.equals(LimbCategories.HEAD) && !killedByExplosion) {
+                continue;
+            }
+
+            if (!canLoseLegs && category.equals(LimbCategories.LEG)) {
+                continue;
+            }
+
+            if (random.nextFloat() < perLimbChance) {
+                LimbDismemberer.detach(this, definition.id(), null);
+            }
+        }
     }
 
     // Prevent the alien from drowning or otherwise running out of air.
