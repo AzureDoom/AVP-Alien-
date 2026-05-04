@@ -1,92 +1,38 @@
 package com.alien.common.gameplay.entity.dismemberment;
 
-import com.alien.AlienResources;
-import com.alien.common.registry.init.AlienEntityTypes;
-import com.blib.api.common.dismemberment.v1.LimbCategories;
-import com.blib.api.common.dismemberment.v1.LimbDefinition;
-import com.blib.api.common.dismemberment.v1.LimbDefinitionRegistry;
-import com.blib.api.common.registry.v1.BLibHolder;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.phys.Vec3;
 
+/**
+ * Aggregates per-mob limb definition registrations. Inline {@link HumanoidLimbs}/{@link QuadrupedLimbs} calls cover any
+ * vanilla mob whose limbs follow a standard pattern; mobs with bespoke geometry (e.g. the drone) keep their own
+ * dedicated definition class.
+ */
 public final class AlienLimbDefinitions {
 
-    public static final LimbDefinition DRONE_HEAD = LimbDefinition.builder(
-        AlienResources.location("drone_head"),
-        "gHead",
-        LimbCategories.HEAD
-    )
-        // Lift the rendered head so it sits inside the limb entity's hitbox
-        // rather than penetrating the ground.
-        .renderOffset(0.0, 0.125, 0.0)
-        // Spawn at the drone's eye height so the head pops off where it
-        // visually was on the body, not the entity's centre.
-        .spawnAtEyeHeight()
-        .build();
-
-    public static final LimbDefinition DRONE_LEFT_ARM = LimbDefinition.builder(
-        AlienResources.location("drone_left_arm"),
-        "gLeftShoulder",
-        LimbCategories.ARM
-    )
-        .renderOffset(0.0, 0.25, 0.0)
-        // Arms hang downward in bind pose; pitch them backward so they lie
-        // along the ground instead of standing up from the shoulder.
-        .renderRotation(-135.0, 0.0, 0.0)
-        .spawnOffset(entity -> new Vec3(0.0, entity.getBbHeight() * 0.75, 0.0))
-        .build();
-
-    public static final LimbDefinition DRONE_RIGHT_ARM = LimbDefinition.builder(
-        AlienResources.location("drone_right_arm"),
-        "gRightShoulder",
-        LimbCategories.ARM
-    )
-        .renderOffset(0.0, 0.25, 0.0)
-        .renderRotation(-135.0, 0.0, 0.0)
-        .spawnOffset(entity -> new Vec3(0.0, entity.getBbHeight() * 0.75, 0.0))
-        .build();
-
-    public static final LimbDefinition DRONE_LEFT_LEG = LimbDefinition.builder(
-        AlienResources.location("drone_left_leg"),
-        "gLeftLeg",
-        LimbCategories.LEG
-    )
-        .renderOffset(0.0, 0.5, 0.0)
-        .renderRotation(-90.0, 0.0, 0.0)
-        .spawnOffset(entity -> new Vec3(0.0, entity.getBbHeight() * 0.3, 0.0))
-        .build();
-
-    public static final LimbDefinition DRONE_RIGHT_LEG = LimbDefinition.builder(
-        AlienResources.location("drone_right_leg"),
-        "gRightLeg",
-        LimbCategories.LEG
-    )
-        .renderOffset(0.0, 0.5, 0.0)
-        .renderRotation(-90.0, 0.0, 0.0)
-        .spawnOffset(entity -> new Vec3(0.0, entity.getBbHeight() * 0.3, 0.0))
-        .build();
-
-    public static final LimbDefinition DRONE_TAIL = LimbDefinition.builder(
-        AlienResources.location("drone_tail"),
-        "gTail1",
-        LimbCategories.TAIL
-    )
-        .build();
-
     public static void initialize() {
-        registerDroneLimbs(AlienEntityTypes.DRONE);
-        registerDroneLimbs(AlienEntityTypes.NETHER_DRONE);
-        registerDroneLimbs(AlienEntityTypes.ABERRANT_DRONE);
-        registerDroneLimbs(AlienEntityTypes.IRRADIATED_DRONE);
-    }
+        // AVP entities
+        DroneLimbDefinitions.initialize();
 
-    private static void registerDroneLimbs(BLibHolder<? extends EntityType<?>> entityType) {
-        LimbDefinitionRegistry.register(entityType, DRONE_HEAD);
-        LimbDefinitionRegistry.register(entityType, DRONE_LEFT_ARM);
-        LimbDefinitionRegistry.register(entityType, DRONE_RIGHT_ARM);
-        LimbDefinitionRegistry.register(entityType, DRONE_LEFT_LEG);
-        LimbDefinitionRegistry.register(entityType, DRONE_RIGHT_LEG);
-        LimbDefinitionRegistry.register(entityType, DRONE_TAIL);
+        // Vanilla humanoid hostile mobs
+        HumanoidLimbs.register(EntityType.ZOMBIE, "zombie");
+        HumanoidLimbs.register(EntityType.ZOMBIE_VILLAGER, "zombie_villager");
+        HumanoidLimbs.register(EntityType.HUSK, "husk");
+        HumanoidLimbs.register(EntityType.DROWNED, "drowned");
+        HumanoidLimbs.register(EntityType.SKELETON, "skeleton");
+        HumanoidLimbs.register(EntityType.STRAY, "stray");
+        HumanoidLimbs.register(EntityType.WITHER_SKELETON, "wither_skeleton");
+        HumanoidLimbs.register(EntityType.PIGLIN, "piglin");
+        HumanoidLimbs.register(EntityType.PIGLIN_BRUTE, "piglin_brute");
+        HumanoidLimbs.register(EntityType.ZOMBIFIED_PIGLIN, "zombified_piglin");
+        HumanoidLimbs.register(EntityType.PILLAGER, "pillager");
+        HumanoidLimbs.register(EntityType.VINDICATOR, "vindicator");
+        HumanoidLimbs.register(EntityType.EVOKER, "evoker");
+        HumanoidLimbs.register(EntityType.ILLUSIONER, "illusioner");
+
+        // Vanilla quadrupeds (and creeper, which shares the QuadrupedModel-style part naming)
+        QuadrupedLimbs.register(EntityType.COW, "cow");
+        QuadrupedLimbs.register(EntityType.PIG, "pig");
+        QuadrupedLimbs.register(EntityType.CREEPER, "creeper");
     }
 
     private AlienLimbDefinitions() {}
