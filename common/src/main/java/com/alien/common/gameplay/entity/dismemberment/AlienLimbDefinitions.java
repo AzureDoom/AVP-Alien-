@@ -12,7 +12,7 @@ public final class AlienLimbDefinitions {
 
     public static void initialize() {
         // AVP entities
-        DroneLimbDefinitions.initialize();
+        QueenLimbDefinitions.initialize();
         registerXenomorphs();
 
         // Vanilla humanoid hostile mobs
@@ -38,6 +38,13 @@ public final class AlienLimbDefinitions {
     }
 
     private static void registerXenomorphs() {
+        XenomorphLimbs.register(
+            "drone",
+            AlienEntityTypes.DRONE,
+            AlienEntityTypes.ABERRANT_DRONE,
+            AlienEntityTypes.NETHER_DRONE,
+            AlienEntityTypes.IRRADIATED_DRONE
+        );
         XenomorphLimbs.register(
             "warrior",
             AlienEntityTypes.WARRIOR,
@@ -126,13 +133,6 @@ public final class AlienLimbDefinitions {
             AlienEntityTypes.ABERRANT_BURSTER,
             AlienEntityTypes.NETHER_BURSTER,
             AlienEntityTypes.IRRADIATED_BURSTER
-        );
-        XenomorphLimbs.register(
-            "queen",
-            AlienEntityTypes.QUEEN,
-            AlienEntityTypes.ABERRANT_QUEEN,
-            AlienEntityTypes.NETHER_QUEEN,
-            AlienEntityTypes.IRRADIATED_QUEEN
         );
         XenomorphLimbs.register(
             "empress",

@@ -9,35 +9,30 @@ import com.blib.api.common.registry.v1.BLibHolder;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.Vec3;
 
-public final class DroneLimbDefinitions {
+public final class QueenLimbDefinitions {
 
     public static final LimbDefinition HEAD = LimbDefinition.builder(
-        AlienResources.location("drone_head"),
+        AlienResources.location("queen_head"),
         "gHead",
         LimbCategories.HEAD
     )
-        // Lift the rendered head so it sits inside the limb entity's hitbox
-        // rather than penetrating the ground.
-        .renderOffset(0.0, 0.125, 0.0)
-        // Spawn at the drone's eye height so the head pops off where it
-        // visually was on the body, not the entity's centre.
+        .renderOffset(0.0, 0.375, 0.0)
+        .renderRotation(-60.0, 0.0, 0.0)
         .spawnAtEyeHeight()
         .build();
 
     public static final LimbDefinition LEFT_ARM = LimbDefinition.builder(
-        AlienResources.location("drone_left_arm"),
+        AlienResources.location("queen_left_arm"),
         "gLeftShoulder",
         LimbCategories.ARM
     )
         .renderOffset(0.0, 0.25, 0.0)
-        // Arms hang downward in bind pose; pitch them backward so they lie
-        // along the ground instead of standing up from the shoulder.
         .renderRotation(-135.0, 0.0, 0.0)
         .spawnOffset(entity -> new Vec3(0.0, entity.getBbHeight() * 0.75, 0.0))
         .build();
 
     public static final LimbDefinition RIGHT_ARM = LimbDefinition.builder(
-        AlienResources.location("drone_right_arm"),
+        AlienResources.location("queen_right_arm"),
         "gRightShoulder",
         LimbCategories.ARM
     )
@@ -47,7 +42,7 @@ public final class DroneLimbDefinitions {
         .build();
 
     public static final LimbDefinition LEFT_LEG = LimbDefinition.builder(
-        AlienResources.location("drone_left_leg"),
+        AlienResources.location("queen_left_leg"),
         "gLeftLeg",
         LimbCategories.LEG
     )
@@ -57,7 +52,7 @@ public final class DroneLimbDefinitions {
         .build();
 
     public static final LimbDefinition RIGHT_LEG = LimbDefinition.builder(
-        AlienResources.location("drone_right_leg"),
+        AlienResources.location("queen_right_leg"),
         "gRightLeg",
         LimbCategories.LEG
     )
@@ -67,17 +62,17 @@ public final class DroneLimbDefinitions {
         .build();
 
     public static final LimbDefinition TAIL = LimbDefinition.builder(
-        AlienResources.location("drone_tail"),
+        AlienResources.location("queen_tail"),
         "gTail1",
         LimbCategories.TAIL
     )
         .build();
 
     public static void initialize() {
-        registerFor(AlienEntityTypes.DRONE);
-        registerFor(AlienEntityTypes.NETHER_DRONE);
-        registerFor(AlienEntityTypes.ABERRANT_DRONE);
-        registerFor(AlienEntityTypes.IRRADIATED_DRONE);
+        registerFor(AlienEntityTypes.QUEEN);
+        registerFor(AlienEntityTypes.ABERRANT_QUEEN);
+        registerFor(AlienEntityTypes.NETHER_QUEEN);
+        registerFor(AlienEntityTypes.IRRADIATED_QUEEN);
     }
 
     private static void registerFor(BLibHolder<? extends EntityType<?>> entityType) {
@@ -89,5 +84,5 @@ public final class DroneLimbDefinitions {
         LimbDefinitionRegistry.register(entityType, TAIL);
     }
 
-    private DroneLimbDefinitions() {}
+    private QueenLimbDefinitions() {}
 }
