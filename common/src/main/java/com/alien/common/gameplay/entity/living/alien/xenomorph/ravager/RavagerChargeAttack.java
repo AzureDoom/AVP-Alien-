@@ -1,5 +1,6 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.ravager;
 
+import com.alien.common.gameplay.entity.dismemberment.RavagerHeadDismemberment;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackExecutor;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.DamageApplicator;
@@ -129,6 +130,7 @@ public final class RavagerChargeAttack {
 
                 if (isSmallerThanRavager(ravager, target)) {
                     target.hurt(damageSource, Float.MAX_VALUE);
+                    RavagerHeadDismemberment.tryDismemberHead(target);
                 } else {
                     target.hurt(damageSource, target.getMaxHealth() * 0.25F);
                 }
