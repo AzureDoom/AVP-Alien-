@@ -2,6 +2,7 @@ package com.alien;
 
 import com.alien.common.data.AlienReloadListeners;
 import com.alien.common.data.fixer.migration.AlienDataMigrations;
+import com.alien.common.gameplay.entity.dismemberment.AlienLimbDefinitions;
 import com.alien.common.gameplay.hive.HiveRegistry;
 import com.alien.common.gameplay.level.saveddata.QueenSpawnChunkData;
 import com.alien.common.property.AlienPropertyAccess;
@@ -111,6 +112,9 @@ public class Alien {
         AlienDataSyncKeys.initialize();
         AlienEntitySpawns.initialize();
         AlienFactionDataTypes.initialize();
+
+        // Depends on entity types.
+        AlienLimbDefinitions.initialize();
 
         AlienCommands.initialize();
 

@@ -15,6 +15,8 @@ import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
+import com.blib.api.common.dismemberment.v1.Dismemberable;
+import com.blib.api.common.dismemberment.v1.DismembermentManager;
 import com.blib.api.common.entity.v1.EntityUtil;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.goap.v1.GOAPUser;
@@ -33,7 +35,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
 
-public class Drone extends Xenomorph implements EggCarrier, GOAPUser<Drone>, VentBuilder {
+public class Drone extends Xenomorph implements Dismemberable, EggCarrier, GOAPUser<Drone>, VentBuilder {
 
     public static final AttackType CLAW = AttackType.builder("drone_claw")
         .defaultDurationInTicks(10)
@@ -67,6 +69,8 @@ public class Drone extends Xenomorph implements EggCarrier, GOAPUser<Drone>, Ven
 
     private final VentData ventData;
 
+    private final DismembermentManager dismembermentManager;
+
     public Drone(EntityType<? extends Drone> entityType, Level level) {
         super(
             entityType,
@@ -84,6 +88,12 @@ public class Drone extends Xenomorph implements EggCarrier, GOAPUser<Drone>, Ven
         this.animationDispatcher = new DroneAnimationDispatcher(this);
         this.eggPickupManager = new EggPickupManager(this);
         this.ventData = new VentData();
+        this.dismembermentManager = new DismembermentManager(this);
+    }
+
+    @Override
+    public DismembermentManager getDismembermentManager() {
+        return dismembermentManager;
     }
 
     @Override
@@ -139,12 +149,14 @@ public class Drone extends Xenomorph implements EggCarrier, GOAPUser<Drone>, Ven
     public void readAdditionalSaveData(@NotNull CompoundTag compoundTag) {
         super.readAdditionalSaveData(compoundTag);
         ventData.load(compoundTag);
+        dismembermentManager.load(compoundTag);
     }
 
     @Override
     public void addAdditionalSaveData(@NotNull CompoundTag compoundTag) {
         super.addAdditionalSaveData(compoundTag);
         ventData.save(compoundTag);
+        dismembermentManager.save(compoundTag);
     }
 
     public DroneAnimationDispatcher getAnimationDispatcher() {
