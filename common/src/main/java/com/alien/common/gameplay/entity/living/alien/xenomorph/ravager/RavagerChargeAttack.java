@@ -128,21 +128,16 @@ public final class RavagerChargeAttack {
                     continue;
                 }
 
-                if (isSmallerThanRavager(ravager, target)) {
+                if (RavagerAreaAttackUtil.isSmallerThanRavager(ravager, target)) {
                     target.hurt(damageSource, Float.MAX_VALUE);
-                    RavagerHeadDismemberment.tryDismemberHead(target);
+                    RavagerHeadDismemberment.tryDismemberHead(
+                        target,
+                        RavagerHeadDismemberment.knockbackAwayFrom(ravager)
+                    );
                 } else {
                     target.hurt(damageSource, target.getMaxHealth() * 0.25F);
                 }
             }
-        }
-
-        private static boolean isSmallerThanRavager(Ravager ravager, LivingEntity target) {
-            return getSize(target) < getSize(ravager);
-        }
-
-        private static double getSize(LivingEntity entity) {
-            return entity.getBbWidth() * entity.getBbWidth() * entity.getBbHeight();
         }
 
         private static float computeYawTowards(Xenomorph entity, LivingEntity target) {

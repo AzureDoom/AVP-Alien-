@@ -34,6 +34,7 @@ public final class QuadrupedLimbs {
             "head",
             LimbCategories.HEAD
         )
+            .renderOffset(0.0, 0.25, 0.0)
             .spawnAtEyeHeight()
             .build();
     }

@@ -42,6 +42,16 @@ public class RavagerAreaAttackUtil {
         return new Vec3(forward.x, 0, forward.z).normalize();
     }
 
+    /**
+     * True when {@code target}'s bounding-box height is less than the ravager's. Used as the gate for
+     * dismemberment-on-strike behaviours so the ravager can only tear limbs off things shorter than itself; volume
+     * was misleading for stockier mobs (cow, sheep) that read as "small" to the eye but had similar mass to the
+     * ravager once width was squared.
+     */
+    public static boolean isSmallerThanRavager(Ravager ravager, LivingEntity target) {
+        return target.getBbHeight() < ravager.getBbHeight();
+    }
+
     private RavagerAreaAttackUtil() {
         throw new UnsupportedOperationException();
     }

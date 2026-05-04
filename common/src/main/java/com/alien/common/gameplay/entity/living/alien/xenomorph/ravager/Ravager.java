@@ -33,24 +33,32 @@ public class Ravager extends Xenomorph implements GOAPUser<Ravager> {
 
     private static final int ATTACK_DURATION_MULTIPLIER = 3;
 
-    private static final DamageApplicator CLAW_AOE_APPLICATOR = (xenomorph, target) -> {
+    private static final DamageApplicator SINGLE_CLAW_APPLICATOR = (xenomorph, target) -> {
         if (!(xenomorph instanceof Ravager ravager)) {
             return;
         }
         ravager.swing(InteractionHand.MAIN_HAND);
-        RavagerClawAttackActions.damageEntitiesInFront(ravager);
+        RavagerClawAttackActions.singleClaw(ravager);
+    };
+
+    private static final DamageApplicator DOUBLE_CLAW_APPLICATOR = (xenomorph, target) -> {
+        if (!(xenomorph instanceof Ravager ravager)) {
+            return;
+        }
+        ravager.swing(InteractionHand.MAIN_HAND);
+        RavagerClawAttackActions.doubleClaw(ravager);
     };
 
     public static final AttackType CLAW = AttackType.builder("ravager_claw")
         .defaultDurationInTicks(10 * ATTACK_DURATION_MULTIPLIER)
         .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
-        .damageApplicator(CLAW_AOE_APPLICATOR)
+        .damageApplicator(SINGLE_CLAW_APPLICATOR)
         .build();
 
     public static final AttackType CLAW_DOUBLE = AttackType.builder("ravager_claw_double")
         .defaultDurationInTicks(10 * ATTACK_DURATION_MULTIPLIER)
         .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
-        .damageApplicator(CLAW_AOE_APPLICATOR)
+        .damageApplicator(DOUBLE_CLAW_APPLICATOR)
         .build();
 
     public static final AttackType BITE = AttackType.builder("ravager_bite")
