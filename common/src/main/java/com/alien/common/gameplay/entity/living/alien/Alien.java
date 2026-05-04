@@ -375,6 +375,15 @@ public abstract class Alien extends Monster implements DataUser {
     /** Bonus chance per limb scaled by how much of the alien's max health the explosion consumed (capped at 1×). */
     private static final float EXPLOSION_LIMB_DAMAGE_BONUS = 0.40F;
 
+    /** Floor chance per leg for a fall to break it off, applied even on shallow drops that still register damage. */
+    private static final float FALL_LEG_BASE_CHANCE = 0.05F;
+
+    /** Bonus chance per leg scaled by how much of the alien's max health the fall consumed (capped at 1×). */
+    private static final float FALL_LEG_DAMAGE_BONUS = 0.30F;
+
+    /** Bonus chance per leg scaled by how depleted the alien's health is post-fall (capped at 1×). */
+    private static final float FALL_LEG_LOW_HEALTH_BONUS = 0.30F;
+
     @Override
     public boolean hurt(@NotNull DamageSource damageSource, float damage) {
         var healthBefore = getHealth();
@@ -408,6 +417,14 @@ public abstract class Alien extends Monster implements DataUser {
 
                 if (damageDealt > 0F) {
                     rollExplosionDismemberment(damageDealt);
+                }
+            }
+
+            if (!level().isClientSide && damageSource.is(DamageTypeTags.IS_FALL)) {
+                var damageDealt = Math.max(0F, healthBefore - getHealth());
+
+                if (damageDealt > 0F) {
+                    rollFallLegDismemberment(damageDealt);
                 }
             }
         }
@@ -474,6 +491,61 @@ public abstract class Alien extends Monster implements DataUser {
             }
 
             if (random.nextFloat() < perLimbChance) {
+                LimbDismemberer.detach(this, definition.id(), null);
+            }
+        }
+    }
+
+    /**
+     * Rolls each leg-category limb independently for fall-driven dismemberment. Only crawl-capable xenomorphs are
+     * eligible — losing a leg forces them into a crawl, so a mob that can't crawl would otherwise be stuck. Probability
+     * scales with both the fraction of max health the fall consumed and how depleted the alien's remaining health is,
+     * so a beat-up xeno hitting the ground hard is far more likely to come up missing a leg than a healthy one taking a
+     * shallow drop.
+     */
+    private void rollFallLegDismemberment(float damageDealt) {
+        if (!(this instanceof Xenomorph xeno) || !xeno.getCrawlingManager().canCrawl()) {
+            return;
+        }
+
+        if (!(this instanceof Dismemberable dismemberable)) {
+            return;
+        }
+
+        var manager = dismemberable.getDismembermentManager();
+
+        if (manager == null) {
+            return;
+        }
+
+        var legDefinitions = LimbDefinitionRegistry.getDefinitionsByCategory(getType(), LimbCategories.LEG);
+
+        if (legDefinitions.isEmpty()) {
+            return;
+        }
+
+        var maxHealth = getMaxHealth();
+
+        if (maxHealth <= 0F) {
+            return;
+        }
+
+        var damageRatio = Mth.clamp(damageDealt / maxHealth, 0F, 1F);
+        var lowHealthRatio = Mth.clamp(1F - getHealth() / maxHealth, 0F, 1F);
+        var perLegChance = Mth.clamp(
+            FALL_LEG_BASE_CHANCE
+                + FALL_LEG_DAMAGE_BONUS * damageRatio
+                + FALL_LEG_LOW_HEALTH_BONUS * lowHealthRatio,
+            0F,
+            1F
+        );
+
+        for (var definition : legDefinitions) {
+            if (manager.isDetached(definition)) {
+                continue;
+            }
+
+            if (random.nextFloat() < perLegChance) {
                 LimbDismemberer.detach(this, definition.id(), null);
             }
         }
