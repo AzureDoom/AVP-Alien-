@@ -42,6 +42,7 @@ import com.alien.client.render.entity.head.EntityHeadDataCache;
 import com.alien.client.render.entity.parasite.attachment.AlienParasiteHeadAttachmentOffsetData;
 import com.alien.client.render.entity.parasite.attachment.ParasiteHeadAttachmentOffsetDataCache;
 import com.alien.client.render.entity.parasite.facehugger.FacehuggerRenderer;
+import com.alien.client.render.item.QueenHeadShieldItemRenderer;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienParticleTypes;
 import com.alien.common.registry.init.block.AberrantAlienResinBlocks;
@@ -50,6 +51,7 @@ import com.alien.common.registry.init.block.AlienResinBlocks;
 import com.alien.common.registry.init.block.IrradiatedAlienResinBlocks;
 import com.alien.common.registry.init.block.NetherAlienResinBlocks;
 import com.alien.common.registry.init.item.AlienArmorItems;
+import com.alien.common.registry.init.item.AlienItems;
 import com.blib.api.client.mod.v1.BLibClientMod;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.entity.EntityType;
@@ -68,6 +70,7 @@ public class AlienClient {
         registerArmorRenderers();
         registerBlockRenderLayers();
         registerEntityRenderers();
+        registerItemRenderers();
         registerParticleProviderFactories();
 
         MOD.events().onClientSetup().register(() -> {
@@ -356,6 +359,10 @@ public class AlienClient {
         ParasiteHeadAttachmentOffsetDataCache.put(EntityType.WOLF, AlienParasiteHeadAttachmentOffsetData.WOLF);
         ParasiteHeadAttachmentOffsetDataCache.put(EntityType.ZOGLIN, AlienParasiteHeadAttachmentOffsetData.HOGLIN);
         ParasiteHeadAttachmentOffsetDataCache.put(EntityType.ZOMBIE_VILLAGER, AlienParasiteHeadAttachmentOffsetData.VILLAGER);
+    }
+
+    private static void registerItemRenderers() {
+        MOD.registries().registerItemRenderer(AlienItems.QUEEN_HEAD_SHIELD, name -> QueenHeadShieldItemRenderer::new);
     }
 
     private static void registerParticleProviderFactories() {
