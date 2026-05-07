@@ -2,9 +2,5 @@
   "from": "avp_alien:aberrant_adolescent",
   "growthTimeInTicks": 3000,
   "hostTypePredicate": "#avp_alien:runner_hosts",
-  "to": "avp_alien:aberrant_runner",
-  "cocooning": {
-    "sourceTimeInTicks": 600,
-    "destinationTimeInTicks": 600
-  }
+  "to": "avp_alien:aberrant_runner"
 }

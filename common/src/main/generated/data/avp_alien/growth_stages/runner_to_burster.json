@@ -6,9 +6,5 @@
       "effect": "avp_alien:scourge"
     }
   ],
-  "to": "avp_alien:burster",
-  "cocooning": {
-    "sourceTimeInTicks": 600,
-    "destinationTimeInTicks": 600
-  }
+  "to": "avp_alien:burster"
 }

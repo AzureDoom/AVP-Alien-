@@ -1,9 +1,5 @@
 {
   "from": "avp_alien:chestburster",
   "growthTimeInTicks": 6000,
-  "to": "avp_alien:adolescent",
-  "cocooning": {
-    "sourceTimeInTicks": 600,
-    "destinationTimeInTicks": 600
-  }
+  "to": "avp_alien:adolescent"
 }

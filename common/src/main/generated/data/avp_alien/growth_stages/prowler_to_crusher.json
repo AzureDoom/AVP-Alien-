@@ -6,9 +6,5 @@
       "effect": "avp_alien:metamorphosis"
     }
   ],
-  "to": "avp_alien:crusher",
-  "cocooning": {
-    "sourceTimeInTicks": 600,
-    "destinationTimeInTicks": 600
-  }
+  "to": "avp_alien:crusher"
 }

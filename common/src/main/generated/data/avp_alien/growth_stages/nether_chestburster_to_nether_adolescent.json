@@ -1,9 +1,5 @@
 {
   "from": "avp_alien:nether_chestburster",
   "growthTimeInTicks": 6000,
-  "to": "avp_alien:nether_adolescent",
-  "cocooning": {
-    "sourceTimeInTicks": 600,
-    "destinationTimeInTicks": 600
-  }
+  "to": "avp_alien:nether_adolescent"
 }
