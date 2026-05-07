@@ -12,7 +12,6 @@ import com.alien.client.render.armor.PlatedAberrantChitinArmorRenderer;
 import com.alien.client.render.armor.PlatedChitinArmorRenderer;
 import com.alien.client.render.armor.PlatedIrradiatedChitinArmorRenderer;
 import com.alien.client.render.armor.PlatedNetherChitinArmorRenderer;
-import com.alien.client.render.dismemberment.AlienLimbModelResolvers;
 import com.alien.client.render.entity.AcidRenderer;
 import com.alien.client.render.entity.AcidSpitRenderer;
 import com.alien.client.render.entity.AdolescentRenderer;
@@ -70,7 +69,6 @@ public class AlienClient {
         registerBlockRenderLayers();
         registerEntityRenderers();
         registerParticleProviderFactories();
-        AlienLimbModelResolvers.initialize();
 
         MOD.events().onClientSetup().register(() -> {
             registerEntityHeadData();

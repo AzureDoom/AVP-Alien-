@@ -45,6 +45,7 @@ public final class XenomorphLimbs {
         )
             .renderOffset(0.0, 0.125, 0.0)
             .spawnAtEyeHeight()
+            .fatal()
             .build();
     }
 

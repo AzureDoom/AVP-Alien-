@@ -6,7 +6,6 @@ import com.alien.client.render.layer.MoltLayer;
 import com.alien.client.render.layer.RadiationGlowLayer;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
 import com.alien.common.model.alien.variant.AlienVariant;
-import com.blib.api.client.render.v1.dismemberment.DismembermentBoneVisibilityFilter;
 import com.blib.api.client.render.v1.entity.AzEntityRenderer;
 import com.blib.api.client.render.v1.entity.AzEntityRendererConfig;
 import net.minecraft.client.renderer.RenderType;
@@ -27,7 +26,6 @@ public class RunnerRenderer extends AzEntityRenderer<Runner> {
                 .addRenderLayer(new RadiationGlowLayer<>())
                 .addRenderLayer(new MoltLayer<>())
                 .setShadowRadius(0.5F)
-                .setBoneVisibilityFilter(new DismembermentBoneVisibilityFilter<>())
                 .build(),
             context
         );

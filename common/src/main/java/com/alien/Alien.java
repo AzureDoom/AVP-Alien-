@@ -4,7 +4,6 @@ import com.alien.common.data.AlienReloadListeners;
 import com.alien.common.data.fixer.migration.AlienDataMigrations;
 import com.alien.common.gameplay.entity.dismemberment.AlienLimbDefinitions;
 import com.alien.common.gameplay.entity.dismemberment.AlienLimbDrops;
-import com.alien.common.gameplay.entity.dismemberment.VanillaMobLimbDrops;
 import com.alien.common.gameplay.hive.HiveRegistry;
 import com.alien.common.gameplay.level.saveddata.QueenSpawnChunkData;
 import com.alien.common.property.AlienPropertyAccess;
@@ -118,7 +117,6 @@ public class Alien {
         // Depends on entity types.
         AlienLimbDefinitions.initialize();
         AlienLimbDrops.initialize();
-        VanillaMobLimbDrops.initialize();
 
         AlienCommands.initialize();
 

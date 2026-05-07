@@ -19,6 +19,7 @@ public final class QueenLimbDefinitions {
         .renderOffset(0.0, 0.375, 0.0)
         .renderRotation(-60.0, 0.0, 0.0)
         .spawnAtEyeHeight()
+        .fatal()
         .build();
 
     public static final LimbDefinition LEFT_ARM = LimbDefinition.builder(
