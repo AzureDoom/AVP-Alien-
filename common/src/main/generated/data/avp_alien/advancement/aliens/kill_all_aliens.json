@@ -71,6 +71,20 @@
       },
       "trigger": "minecraft:player_killed_entity"
     },
+    "avp_alien:aberrant_empress": {
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "avp_alien:aberrant_empress"
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:player_killed_entity"
+    },
     "avp_alien:aberrant_facehugger": {
       "conditions": {
         "entity": [
@@ -177,20 +191,6 @@
             "entity": "this",
             "predicate": {
               "type": "avp_alien:aberrant_queen"
-            }
-          }
-        ]
-      },
-      "trigger": "minecraft:player_killed_entity"
-    },
-    "avp_alien:aberrant_empress": {
-      "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "type": "avp_alien:aberrant_empress"
             }
           }
         ]
@@ -309,6 +309,20 @@
       },
       "trigger": "minecraft:player_killed_entity"
     },
+    "avp_alien:empress": {
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "avp_alien:empress"
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:player_killed_entity"
+    },
     "avp_alien:facehugger": {
       "conditions": {
         "entity": [
@@ -387,6 +401,20 @@
             "entity": "this",
             "predicate": {
               "type": "avp_alien:nether_drone"
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:player_killed_entity"
+    },
+    "avp_alien:nether_empress": {
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "avp_alien:nether_empress"
             }
           }
         ]
@@ -499,20 +527,6 @@
             "entity": "this",
             "predicate": {
               "type": "avp_alien:nether_queen"
-            }
-          }
-        ]
-      },
-      "trigger": "minecraft:player_killed_entity"
-    },
-    "avp_alien:nether_empress": {
-      "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "type": "avp_alien:nether_empress"
             }
           }
         ]
@@ -653,20 +667,6 @@
             "entity": "this",
             "predicate": {
               "type": "avp_alien:queen"
-            }
-          }
-        ]
-      },
-      "trigger": "minecraft:player_killed_entity"
-    },
-    "avp_alien:empress": {
-      "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "type": "avp_alien:empress"
             }
           }
         ]

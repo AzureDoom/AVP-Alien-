@@ -2,6 +2,7 @@ package com.alien.fabric.data.tag;
 
 import com.alien.common.registry.key.AlienDamageTypeKeys;
 import com.alien.common.registry.tag.AlienDamageTypesTags;
+import com.blib.api.common.tag.v1.BLibDamageTypeTags;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.core.HolderLookup;
@@ -21,8 +22,14 @@ public class AlienDamageTypeTagProvider extends FabricTagProvider<DamageType> {
     @Override
     protected void addTags(HolderLookup.Provider wrapperLookup) {
         getOrCreateTagBuilder(DamageTypeTags.BYPASSES_ARMOR)
+            .add(AlienDamageTypeKeys.CHESTBURSTING);
+
+        // Ravager attacks rip through armor but should still be blockable by a raised shield. Vanilla's
+        // bypasses_armor implies bypasses_shield (it's listed as a sub-tag value in the vanilla
+        // bypasses_shield JSON), so we use BLib's bypasses_armor_only tag — which has the armor-skipping
+        // behavior wired through MixinLivingEntity_BypassesArmorOnly without the shield-bypass inheritance.
+        getOrCreateTagBuilder(BLibDamageTypeTags.BYPASSES_ARMOR_ONLY)
             .add(
-                AlienDamageTypeKeys.CHESTBURSTING,
                 AlienDamageTypeKeys.RAVAGER_CLAW,
                 AlienDamageTypeKeys.RAVAGER_SPECIAL
             );
