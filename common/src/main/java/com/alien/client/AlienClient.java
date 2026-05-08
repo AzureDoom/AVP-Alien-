@@ -368,24 +368,29 @@ public class AlienClient {
     }
 
     private static void registerItemRenderers() {
-        // Wearable trophy variants (no shield behavior).
-        registerQueenHeadRenderer(AlienItems.QUEEN_HEAD, "queen", "queen_head");
-        registerQueenHeadRenderer(AlienItems.ABERRANT_QUEEN_HEAD, "aberrant_queen", "aberrant_queen_head");
-        registerQueenHeadRenderer(AlienItems.IRRADIATED_QUEEN_HEAD, "irradiated_queen", "irradiated_queen_head");
-        registerQueenHeadRenderer(AlienItems.NETHER_QUEEN_HEAD, "nether_queen", "nether_queen_head");
+        // Wearable trophy variants. Use the trophy factory so they don't get the shield's blocking
+        // transforms — they look like a head being held, not a shield being held.
+        registerQueenHeadTrophyRenderer(AlienItems.QUEEN_HEAD, "queen", "queen_head");
+        registerQueenHeadTrophyRenderer(AlienItems.ABERRANT_QUEEN_HEAD, "aberrant_queen", "aberrant_queen_head");
+        registerQueenHeadTrophyRenderer(AlienItems.IRRADIATED_QUEEN_HEAD, "irradiated_queen", "irradiated_queen_head");
+        registerQueenHeadTrophyRenderer(AlienItems.NETHER_QUEEN_HEAD, "nether_queen", "nether_queen_head");
 
-        // Shield variants (held to block — crafted from queen head + vanilla shield). Reuses the same
-        // renderer factory; the BLib renderer's blocking-transform path activates only for shield items
-        // since the predicate checks `player.isUsingItem()` which is gated on the BLibShieldItem mixin.
-        registerQueenHeadRenderer(AlienItems.QUEEN_HEAD_SHIELD, "queen", "queen_head_shield");
-        registerQueenHeadRenderer(AlienItems.ABERRANT_QUEEN_HEAD_SHIELD, "aberrant_queen", "aberrant_queen_head_shield");
-        registerQueenHeadRenderer(AlienItems.IRRADIATED_QUEEN_HEAD_SHIELD, "irradiated_queen", "irradiated_queen_head_shield");
-        registerQueenHeadRenderer(AlienItems.NETHER_QUEEN_HEAD_SHIELD, "nether_queen", "nether_queen_head_shield");
+        // Shield variants — separate transform set so in-hand shield poses can be tuned independently of
+        // the trophy poses, plus a blocking-transform set for the raised-shield animation.
+        registerQueenHeadShieldRenderer(AlienItems.QUEEN_HEAD_SHIELD, "queen", "queen_head_shield");
+        registerQueenHeadShieldRenderer(AlienItems.ABERRANT_QUEEN_HEAD_SHIELD, "aberrant_queen", "aberrant_queen_head_shield");
+        registerQueenHeadShieldRenderer(AlienItems.IRRADIATED_QUEEN_HEAD_SHIELD, "irradiated_queen", "irradiated_queen_head_shield");
+        registerQueenHeadShieldRenderer(AlienItems.NETHER_QUEEN_HEAD_SHIELD, "nether_queen", "nether_queen_head_shield");
     }
 
-    private static void registerQueenHeadRenderer(BLibHolder<Item> holder, String textureEntityName, String itemPath) {
+    private static void registerQueenHeadTrophyRenderer(BLibHolder<Item> holder, String textureEntityName, String itemPath) {
         var itemId = AlienResources.location(itemPath);
-        MOD.registries().registerItemRenderer(holder, name -> () -> QueenHeadRenderers.create(itemId, textureEntityName));
+        MOD.registries().registerItemRenderer(holder, name -> () -> QueenHeadRenderers.createTrophy(itemId, textureEntityName));
+    }
+
+    private static void registerQueenHeadShieldRenderer(BLibHolder<Item> holder, String textureEntityName, String itemPath) {
+        var itemId = AlienResources.location(itemPath);
+        MOD.registries().registerItemRenderer(holder, name -> () -> QueenHeadRenderers.createShield(itemId, textureEntityName));
     }
 
     private static void registerBlockEntityRenderers() {
