@@ -10,12 +10,12 @@ import com.blib.api.client.render.v1.item.BLibTunableItemTransforms;
 import net.minecraft.resources.ResourceLocation;
 
 /**
- * Factory for queen-head shield renderers. The four variants (queen / nether / aberrant / irradiated) all
- * render the same {@code gHead} bone of the queen geo at the same idle / blocking poses; only the texture
- * and the per-item tuner key differ. {@link #create} parameterizes those, so a new variant is one call site
- * away rather than a new subclass.
+ * Factory for queen-head renderers. The four variants (queen / nether / aberrant / irradiated) all render
+ * the same {@code gHead} bone of the queen geo at the same idle / blocking poses; only the texture and the
+ * per-item tuner key differ. {@link #create} parameterizes those, so a new variant is one call site away
+ * rather than a new subclass.
  */
-public final class QueenHeadShieldRenderers {
+public final class QueenHeadRenderers {
 
     private static final String QUEEN_GEO_NAME = "queen";
 
@@ -39,7 +39,7 @@ public final class QueenHeadShieldRenderers {
         .mirrorFirstPersonRightToLeft()
         .build();
 
-    private QueenHeadShieldRenderers() {
+    private QueenHeadRenderers() {
         throw new UnsupportedOperationException();
     }
 

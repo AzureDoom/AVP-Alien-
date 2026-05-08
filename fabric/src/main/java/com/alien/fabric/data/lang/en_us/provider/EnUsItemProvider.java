@@ -71,6 +71,10 @@ public class EnUsItemProvider {
         addItem(builder, AlienItems.IRRADIATED_RESIN_BALL, "Irradiated Resin Ball");
         addItem(builder, AlienItems.IRRADIATED_CHITIN, "Irradiated Chitin");
         addItem(builder, AlienItems.PLATED_IRRADIATED_CHITIN, "Plated Irradiated Chitin");
+        addItem(builder, AlienItems.QUEEN_HEAD, "Queen Head");
+        addItem(builder, AlienItems.ABERRANT_QUEEN_HEAD, "Aberrant Queen Head");
+        addItem(builder, AlienItems.IRRADIATED_QUEEN_HEAD, "Irradiated Queen Head");
+        addItem(builder, AlienItems.NETHER_QUEEN_HEAD, "Nether Queen Head");
 
         // Spawn Egg Items
         addItem(builder, AlienSpawnEggItems.ABERRANT_ADOLESCENT_SPAWN_EGG, "Aberrant Adolescent Spawn Egg");

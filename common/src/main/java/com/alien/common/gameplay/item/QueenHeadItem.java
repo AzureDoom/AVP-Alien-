@@ -1,5 +1,7 @@
 package com.alien.common.gameplay.item;
 
+import com.alien.common.registry.key.AlienDamageTypeKeys;
+import com.alien.common.registry.tag.AlienDamageTypesTags;
 import com.blib.api.common.shield.v1.BLibShieldConfig;
 import com.blib.api.common.shield.v1.BLibShieldItem;
 import com.blib.api.common.shield.v1.BlockResult;
@@ -12,8 +14,9 @@ import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.Equipable;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
-public class QueenHeadShieldItem extends Item implements BLibShieldItem, Equipable {
+public class QueenHeadItem extends Item implements BLibShieldItem, Equipable {
 
     private static final BLibShieldConfig CONFIG = new BLibShieldConfig(
         72000,
@@ -21,7 +24,7 @@ public class QueenHeadShieldItem extends Item implements BLibShieldItem, Equipab
         SoundEvents.SHIELD_BLOCK
     );
 
-    public QueenHeadShieldItem(Properties properties) {
+    public QueenHeadItem(Properties properties) {
         super(properties);
     }
 
@@ -31,12 +34,17 @@ public class QueenHeadShieldItem extends Item implements BLibShieldItem, Equipab
     }
 
     @Override
-    public EquipmentSlot getEquipmentSlot() {
+    public @NotNull EquipmentSlot getEquipmentSlot() {
         return EquipmentSlot.HEAD;
     }
 
     @Override
     public BlockResult onBlocked(LivingEntity user, ItemStack stack, DamageSource source, float damage) {
+        // Xenomorph shields resist acid spit for free with no damage applied.
+        if (source.is(AlienDamageTypeKeys.ACID_SPIT)) {
+            return BlockResult.fullBlock();
+        }
+
         var damageDealt = (int) Math.max(1, Math.ceil(damage));
         stack.hurtAndBreak(damageDealt, user, EquipmentSlot.MAINHAND);
 

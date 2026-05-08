@@ -2,7 +2,7 @@ package com.alien.common.registry.init.item;
 
 import com.alien.Alien;
 import com.alien.common.gameplay.item.PoisonJellyItem;
-import com.alien.common.gameplay.item.QueenHeadShieldItem;
+import com.alien.common.gameplay.item.QueenHeadItem;
 import com.alien.common.registry.key.AlienJukeboxSongKeys;
 import com.blib.api.common.registry.v1.BLibHolder;
 import com.blib.api.common.registry.v1.BLibRegistry;
@@ -74,24 +74,24 @@ public class AlienItems {
 
     public static final BLibHolder<Item> POISON_JELLY = create("poison_jelly", PoisonJellyItem::new);
 
-    public static final BLibHolder<Item> QUEEN_HEAD_SHIELD = create(
-        "queen_head_shield",
-        () -> new QueenHeadShieldItem(new Item.Properties().stacksTo(1).durability(512))
+    public static final BLibHolder<Item> QUEEN_HEAD = create(
+        "queen_head",
+        () -> new QueenHeadItem(new Item.Properties().stacksTo(1).durability(512))
     );
 
-    public static final BLibHolder<Item> ABERRANT_QUEEN_HEAD_SHIELD = create(
-        "aberrant_queen_head_shield",
-        () -> new QueenHeadShieldItem(new Item.Properties().stacksTo(1).durability(512))
+    public static final BLibHolder<Item> ABERRANT_QUEEN_HEAD = create(
+        "aberrant_queen_head",
+        () -> new QueenHeadItem(new Item.Properties().stacksTo(1).durability(512))
     );
 
-    public static final BLibHolder<Item> IRRADIATED_QUEEN_HEAD_SHIELD = create(
-        "irradiated_queen_head_shield",
-        () -> new QueenHeadShieldItem(new Item.Properties().stacksTo(1).durability(512))
+    public static final BLibHolder<Item> IRRADIATED_QUEEN_HEAD = create(
+        "irradiated_queen_head",
+        () -> new QueenHeadItem(new Item.Properties().stacksTo(1).durability(512))
     );
 
-    public static final BLibHolder<Item> NETHER_QUEEN_HEAD_SHIELD = create(
-        "nether_queen_head_shield",
-        () -> new QueenHeadShieldItem(new Item.Properties().stacksTo(1).durability(512).fireResistant())
+    public static final BLibHolder<Item> NETHER_QUEEN_HEAD = create(
+        "nether_queen_head",
+        () -> new QueenHeadItem(new Item.Properties().stacksTo(1).durability(512).fireResistant())
     );
 
     public static final BLibHolder<Item> RAW_ROYAL_JELLY = create("raw_royal_jelly");
