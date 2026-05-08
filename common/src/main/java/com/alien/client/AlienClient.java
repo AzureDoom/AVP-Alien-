@@ -43,7 +43,9 @@ import com.alien.client.render.entity.parasite.attachment.AlienParasiteHeadAttac
 import com.alien.client.render.entity.parasite.attachment.ParasiteHeadAttachmentOffsetDataCache;
 import com.alien.client.render.entity.parasite.facehugger.FacehuggerRenderer;
 import com.alien.AlienResources;
+import com.alien.client.render.block.QueenHeadBlockEntityRenderer;
 import com.alien.client.render.item.QueenHeadRenderers;
+import com.alien.common.registry.init.AlienBlockEntityTypes;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienParticleTypes;
 import com.alien.common.registry.init.block.AberrantAlienResinBlocks;
@@ -74,6 +76,7 @@ public class AlienClient {
         registerBlockRenderLayers();
         registerEntityRenderers();
         registerItemRenderers();
+        registerBlockEntityRenderers();
         registerParticleProviderFactories();
 
         MOD.events().onClientSetup().register(() -> {
@@ -365,15 +368,31 @@ public class AlienClient {
     }
 
     private static void registerItemRenderers() {
+        // Wearable trophy variants (no shield behavior).
         registerQueenHeadRenderer(AlienItems.QUEEN_HEAD, "queen", "queen_head");
         registerQueenHeadRenderer(AlienItems.ABERRANT_QUEEN_HEAD, "aberrant_queen", "aberrant_queen_head");
         registerQueenHeadRenderer(AlienItems.IRRADIATED_QUEEN_HEAD, "irradiated_queen", "irradiated_queen_head");
         registerQueenHeadRenderer(AlienItems.NETHER_QUEEN_HEAD, "nether_queen", "nether_queen_head");
+
+        // Shield variants (held to block — crafted from queen head + vanilla shield). Reuses the same
+        // renderer factory; the BLib renderer's blocking-transform path activates only for shield items
+        // since the predicate checks `player.isUsingItem()` which is gated on the BLibShieldItem mixin.
+        registerQueenHeadRenderer(AlienItems.QUEEN_HEAD_SHIELD, "queen", "queen_head_shield");
+        registerQueenHeadRenderer(AlienItems.ABERRANT_QUEEN_HEAD_SHIELD, "aberrant_queen", "aberrant_queen_head_shield");
+        registerQueenHeadRenderer(AlienItems.IRRADIATED_QUEEN_HEAD_SHIELD, "irradiated_queen", "irradiated_queen_head_shield");
+        registerQueenHeadRenderer(AlienItems.NETHER_QUEEN_HEAD_SHIELD, "nether_queen", "nether_queen_head_shield");
     }
 
     private static void registerQueenHeadRenderer(BLibHolder<Item> holder, String textureEntityName, String itemPath) {
         var itemId = AlienResources.location(itemPath);
         MOD.registries().registerItemRenderer(holder, name -> () -> QueenHeadRenderers.create(itemId, textureEntityName));
+    }
+
+    private static void registerBlockEntityRenderers() {
+        MOD.registries().registerBlockEntityRenderer(
+            AlienBlockEntityTypes.QUEEN_HEAD,
+            ctx -> new QueenHeadBlockEntityRenderer()
+        );
     }
 
     private static void registerParticleProviderFactories() {

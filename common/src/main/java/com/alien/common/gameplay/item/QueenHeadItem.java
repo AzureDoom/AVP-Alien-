@@ -1,67 +1,30 @@
 package com.alien.common.gameplay.item;
 
-import com.alien.common.registry.key.AlienDamageTypeKeys;
-import com.alien.common.registry.tag.AlienDamageTypesTags;
-import com.blib.api.common.shield.v1.BLibShieldConfig;
-import com.blib.api.common.shield.v1.BLibShieldItem;
-import com.blib.api.common.shield.v1.BlockResult;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.tags.DamageTypeTags;
-import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.core.Direction;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.Equipable;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.StandingAndWallBlockItem;
+import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
 
-public class QueenHeadItem extends Item implements BLibShieldItem, Equipable {
+/**
+ * Wearable + placeable trophy variant of the queen head. Extends
+ * {@link StandingAndWallBlockItem} so vanilla's standing-vs-wall placement logic picks the floor or wall
+ * block based on which face the player clicks (rejecting up-facing surfaces by passing
+ * {@link Direction#DOWN} as the disallowed face — heads can't sit on ceilings).
+ * <p>
+ * Implements {@link Equipable} for the head armor slot — drag onto the helmet slot in the inventory to
+ * wear it. Right-click in the world places the block; right-click in the air does nothing (no shield use,
+ * since this trophy variant doesn't implement {@code BLibShieldItem}).
+ */
+public class QueenHeadItem extends StandingAndWallBlockItem implements Equipable {
 
-    private static final BLibShieldConfig CONFIG = new BLibShieldConfig(
-        72000,
-        180f,
-        SoundEvents.SHIELD_BLOCK
-    );
-
-    public QueenHeadItem(Properties properties) {
-        super(properties);
-    }
-
-    @Override
-    public BLibShieldConfig getShieldConfig() {
-        return CONFIG;
+    public QueenHeadItem(Block standingBlock, Block wallBlock, Properties properties) {
+        super(standingBlock, wallBlock, properties, Direction.DOWN);
     }
 
     @Override
     public @NotNull EquipmentSlot getEquipmentSlot() {
         return EquipmentSlot.HEAD;
-    }
-
-    @Override
-    public BlockResult onBlocked(LivingEntity user, ItemStack stack, DamageSource source, float damage) {
-        // Xenomorph shields resist acid spit for free with no damage applied.
-        if (source.is(AlienDamageTypeKeys.ACID_SPIT)) {
-            return BlockResult.fullBlock();
-        }
-
-        var damageDealt = (int) Math.max(1, Math.ceil(damage));
-        stack.hurtAndBreak(damageDealt, user, EquipmentSlot.MAINHAND);
-
-        if (source.is(DamageTypeTags.IS_EXPLOSION)) {
-            return BlockResult.blockedAndDisabled(60);
-        }
-
-        if (
-            source.getDirectEntity() instanceof LivingEntity attacker
-            && (
-                attacker.getMainHandItem().getItem() instanceof AxeItem
-                    || attacker.canDisableShield()
-            )
-        ) {
-            return BlockResult.blockedAndDisabled(100);
-        }
-
-        return BlockResult.fullBlock();
     }
 }

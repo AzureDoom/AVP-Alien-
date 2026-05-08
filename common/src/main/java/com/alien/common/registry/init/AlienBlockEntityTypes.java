@@ -1,9 +1,11 @@
 package com.alien.common.registry.init;
 
 import com.alien.Alien;
+import com.alien.common.gameplay.block.entity.queen.QueenHeadBlockEntity;
 import com.alien.common.gameplay.block.entity.resin.node.ResinNodeBlockEntity;
 import com.alien.common.gameplay.block.entity.resin.vent.ResinVentBlockEntity;
 import com.alien.common.registry.init.block.AberrantAlienResinBlocks;
+import com.alien.common.registry.init.block.AlienBlocks;
 import com.alien.common.registry.init.block.AlienResinBlocks;
 import com.alien.common.registry.init.block.IrradiatedAlienResinBlocks;
 import com.alien.common.registry.init.block.NetherAlienResinBlocks;
@@ -38,6 +40,21 @@ public class AlienBlockEntityTypes {
             AberrantAlienResinBlocks.ABERRANT_RESIN_VENT.get(),
             NetherAlienResinBlocks.NETHER_RESIN_VENT.get(),
             AlienResinBlocks.RESIN_VENT.get()
+        )
+    );
+
+    public static final BLibHolder<BlockEntityType<QueenHeadBlockEntity>> QUEEN_HEAD = create(
+        "queen_head",
+        () -> BlockEntityType.Builder.of(
+            QueenHeadBlockEntity::new,
+            AlienBlocks.QUEEN_HEAD.get(),
+            AlienBlocks.QUEEN_WALL_HEAD.get(),
+            AlienBlocks.ABERRANT_QUEEN_HEAD.get(),
+            AlienBlocks.ABERRANT_QUEEN_WALL_HEAD.get(),
+            AlienBlocks.IRRADIATED_QUEEN_HEAD.get(),
+            AlienBlocks.IRRADIATED_QUEEN_WALL_HEAD.get(),
+            AlienBlocks.NETHER_QUEEN_HEAD.get(),
+            AlienBlocks.NETHER_QUEEN_WALL_HEAD.get()
         )
     );
 

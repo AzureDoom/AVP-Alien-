@@ -56,6 +56,32 @@ public class MiscellaneousRecipeProvider {
             .withCategory(RecipeCategory.MISC)
             .requires(9, AlienItems.ALIEN_MUSIC_DISC_1_FRAGMENT)
             .into(1, AlienItems.ALIEN_MUSIC_DISC_1);
+
+        // Queen head trophy + vanilla shield -> queen head shield. One-way conversion: there's no recipe
+        // back to the wearable head, so crafting commits to the combat utility.
+        builder.shapeless()
+            .withCategory(RecipeCategory.COMBAT)
+            .requires(1, AlienItems.QUEEN_HEAD)
+            .requires(1, Items.SHIELD)
+            .into(1, AlienItems.QUEEN_HEAD_SHIELD);
+
+        builder.shapeless()
+            .withCategory(RecipeCategory.COMBAT)
+            .requires(1, AlienItems.ABERRANT_QUEEN_HEAD)
+            .requires(1, Items.SHIELD)
+            .into(1, AlienItems.ABERRANT_QUEEN_HEAD_SHIELD);
+
+        builder.shapeless()
+            .withCategory(RecipeCategory.COMBAT)
+            .requires(1, AlienItems.IRRADIATED_QUEEN_HEAD)
+            .requires(1, Items.SHIELD)
+            .into(1, AlienItems.IRRADIATED_QUEEN_HEAD_SHIELD);
+
+        builder.shapeless()
+            .withCategory(RecipeCategory.COMBAT)
+            .requires(1, AlienItems.NETHER_QUEEN_HEAD)
+            .requires(1, Items.SHIELD)
+            .into(1, AlienItems.NETHER_QUEEN_HEAD_SHIELD);
     }
 
     private static void provideMiscellaneousNetherRecipes(RecipeBuilder builder) {

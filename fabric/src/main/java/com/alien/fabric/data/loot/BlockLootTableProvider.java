@@ -54,6 +54,17 @@ public class BlockLootTableProvider extends FabricBlockLootTableProvider {
         dropOther(AlienResinBlocks.RESIN_VEIN, AlienItems.RESIN_BALL);
         dropOther(AlienResinBlocks.RESIN_VENT, AlienResinBlocks.RESIN);
         dropOther(AlienResinBlocks.RESIN_WEB, AlienItems.RESIN_BALL);
+
+        // Queen head blocks (floor + wall) drop the matching head item. Both block forms map to the same
+        // item — `StandingAndWallBlockItem` placement re-derives floor-vs-wall from the placement context.
+        dropOther(AlienBlocks.QUEEN_HEAD, AlienItems.QUEEN_HEAD);
+        dropOther(AlienBlocks.QUEEN_WALL_HEAD, AlienItems.QUEEN_HEAD);
+        dropOther(AlienBlocks.ABERRANT_QUEEN_HEAD, AlienItems.ABERRANT_QUEEN_HEAD);
+        dropOther(AlienBlocks.ABERRANT_QUEEN_WALL_HEAD, AlienItems.ABERRANT_QUEEN_HEAD);
+        dropOther(AlienBlocks.IRRADIATED_QUEEN_HEAD, AlienItems.IRRADIATED_QUEEN_HEAD);
+        dropOther(AlienBlocks.IRRADIATED_QUEEN_WALL_HEAD, AlienItems.IRRADIATED_QUEEN_HEAD);
+        dropOther(AlienBlocks.NETHER_QUEEN_HEAD, AlienItems.NETHER_QUEEN_HEAD);
+        dropOther(AlienBlocks.NETHER_QUEEN_WALL_HEAD, AlienItems.NETHER_QUEEN_HEAD);
     }
 
     private void generateSelfDrops() {

@@ -29,7 +29,8 @@ public final class QueenHeadRenderers {
         .head(BLibTransform.of(-0.0414f, 0.2145f, 0.4564f, -80.7772f, 0.0f, 0.0f, 1.3f))
         .gui(BLibTransform.of(-0.125f, -0.15f, 0.0f, 285.0f, 0.0f, 165.0f, 0.275f))
         .ground(BLibTransform.of(0.0f, 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.25f))
-        .fixed(BLibTransform.of(0f, 0f, 0f, 0f, 0f, 0f, 1f))
+        .fixed(BLibTransform.of(0.0f, 0.3514f, -0.1618f, -61.2633f, 0.0f, 0.0f, 1.0f))
+        .fixedWall(BLibTransform.of(0.0f, 0.5f, 0.1307f, -150.3086f, 0.0f, 0.0f, 1.0f))
         .build();
 
     public static final BLibItemTransforms BLOCKING_TRANSFORMS = BLibItemTransforms.builder()
