@@ -42,7 +42,8 @@ import com.alien.client.render.entity.head.EntityHeadDataCache;
 import com.alien.client.render.entity.parasite.attachment.AlienParasiteHeadAttachmentOffsetData;
 import com.alien.client.render.entity.parasite.attachment.ParasiteHeadAttachmentOffsetDataCache;
 import com.alien.client.render.entity.parasite.facehugger.FacehuggerRenderer;
-import com.alien.client.render.item.QueenHeadShieldItemRenderer;
+import com.alien.AlienResources;
+import com.alien.client.render.item.QueenHeadShieldRenderers;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienParticleTypes;
 import com.alien.common.registry.init.block.AberrantAlienResinBlocks;
@@ -53,8 +54,10 @@ import com.alien.common.registry.init.block.NetherAlienResinBlocks;
 import com.alien.common.registry.init.item.AlienArmorItems;
 import com.alien.common.registry.init.item.AlienItems;
 import com.blib.api.client.mod.v1.BLibClientMod;
+import com.blib.api.common.registry.v1.BLibHolder;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
 
 import java.util.List;
 
@@ -362,7 +365,15 @@ public class AlienClient {
     }
 
     private static void registerItemRenderers() {
-        MOD.registries().registerItemRenderer(AlienItems.QUEEN_HEAD_SHIELD, name -> QueenHeadShieldItemRenderer::new);
+        registerQueenHeadShieldRenderer(AlienItems.QUEEN_HEAD_SHIELD, "queen", "queen_head_shield");
+        registerQueenHeadShieldRenderer(AlienItems.ABERRANT_QUEEN_HEAD_SHIELD, "aberrant_queen", "aberrant_queen_head_shield");
+        registerQueenHeadShieldRenderer(AlienItems.IRRADIATED_QUEEN_HEAD_SHIELD, "irradiated_queen", "irradiated_queen_head_shield");
+        registerQueenHeadShieldRenderer(AlienItems.NETHER_QUEEN_HEAD_SHIELD, "nether_queen", "nether_queen_head_shield");
+    }
+
+    private static void registerQueenHeadShieldRenderer(BLibHolder<Item> holder, String textureEntityName, String itemPath) {
+        var itemId = AlienResources.location(itemPath);
+        MOD.registries().registerItemRenderer(holder, name -> () -> QueenHeadShieldRenderers.create(itemId, textureEntityName));
     }
 
     private static void registerParticleProviderFactories() {

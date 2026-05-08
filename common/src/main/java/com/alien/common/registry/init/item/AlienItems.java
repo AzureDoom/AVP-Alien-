@@ -79,6 +79,21 @@ public class AlienItems {
         () -> new QueenHeadShieldItem(new Item.Properties().stacksTo(1).durability(512))
     );
 
+    public static final BLibHolder<Item> ABERRANT_QUEEN_HEAD_SHIELD = create(
+        "aberrant_queen_head_shield",
+        () -> new QueenHeadShieldItem(new Item.Properties().stacksTo(1).durability(512))
+    );
+
+    public static final BLibHolder<Item> IRRADIATED_QUEEN_HEAD_SHIELD = create(
+        "irradiated_queen_head_shield",
+        () -> new QueenHeadShieldItem(new Item.Properties().stacksTo(1).durability(512))
+    );
+
+    public static final BLibHolder<Item> NETHER_QUEEN_HEAD_SHIELD = create(
+        "nether_queen_head_shield",
+        () -> new QueenHeadShieldItem(new Item.Properties().stacksTo(1).durability(512).fireResistant())
+    );
+
     public static final BLibHolder<Item> RAW_ROYAL_JELLY = create("raw_royal_jelly");
 
     public static final BLibHolder<Item> RAW_SCOURGE_JELLY = create("raw_scourge_jelly");
