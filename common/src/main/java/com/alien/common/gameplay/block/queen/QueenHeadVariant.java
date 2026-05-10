@@ -1,8 +1,8 @@
 package com.alien.common.gameplay.block.queen;
 
 /**
- * Identifies which queen-texture variant a queen-head block / block-entity uses for rendering. Matches
- * the {@code textures/entity/<entityName>.png} stem the existing {@link com.alien.client.render.item.QueenHeadRenderers}
+ * Identifies which queen-texture variant a queen-head block / block-entity uses for rendering. Matches the
+ * {@code textures/entity/<entityName>.png} stem the existing {@link com.alien.client.render.item.QueenHeadRenderers}
  * already references for items, so the block renderer can reuse the same texture resolution path.
  */
 public enum QueenHeadVariant {

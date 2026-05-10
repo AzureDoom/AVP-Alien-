@@ -14,12 +14,12 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * The shield variant crafted from a {@link QueenHeadItem} + vanilla shield. Pure shield behavior — held to block, takes
- * durability damage on block, can be disabled by axes / explosions / shield-disabling attacks. Not wearable (no head
- * slot) and not placeable (no block form). Conversion is one-way: there's no recipe to revert this back into a wearable
- * {@link QueenHeadItem}.
+ * The shield variant crafted from a {@link CrusherHeadItem} + vanilla shield. Pure shield behavior — held to block,
+ * takes durability damage on block, can be disabled by axes / explosions / shield-disabling attacks. Not wearable (no
+ * head slot) and not placeable (no block form). Conversion is one-way: there's no recipe to revert this back into a
+ * wearable {@link CrusherHeadItem}.
  */
-public class QueenHeadShieldItem extends Item implements BLibShieldItem {
+public class CrusherHeadShieldItem extends Item implements BLibShieldItem {
 
     private static final BLibShieldConfig CONFIG = new BLibShieldConfig(
         72000,
@@ -27,7 +27,7 @@ public class QueenHeadShieldItem extends Item implements BLibShieldItem {
         SoundEvents.SHIELD_BLOCK
     );
 
-    public QueenHeadShieldItem(Properties properties) {
+    public CrusherHeadShieldItem(Properties properties) {
         super(properties);
     }
 

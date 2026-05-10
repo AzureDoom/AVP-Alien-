@@ -1,6 +1,9 @@
 package com.alien.common.registry.init.block;
 
 import com.alien.Alien;
+import com.alien.common.gameplay.block.crusher.CrusherHeadBlock;
+import com.alien.common.gameplay.block.crusher.CrusherHeadVariant;
+import com.alien.common.gameplay.block.crusher.CrusherWallHeadBlock;
 import com.alien.common.gameplay.block.jelly.JellyBlock;
 import com.alien.common.gameplay.block.queen.QueenHeadBlock;
 import com.alien.common.gameplay.block.queen.QueenHeadVariant;
@@ -71,12 +74,65 @@ public class AlienBlocks {
         () -> new QueenWallHeadBlock(QueenHeadVariant.NETHER, queenHeadProperties())
     );
 
+    public static final BLibHolder<CrusherHeadBlock> CRUSHER_HEAD = create(
+        "crusher_head",
+        () -> new CrusherHeadBlock(CrusherHeadVariant.CRUSHER, crusherHeadProperties())
+    );
+
+    public static final BLibHolder<CrusherWallHeadBlock> CRUSHER_WALL_HEAD = create(
+        "crusher_wall_head",
+        () -> new CrusherWallHeadBlock(CrusherHeadVariant.CRUSHER, crusherHeadProperties())
+    );
+
+    public static final BLibHolder<CrusherHeadBlock> ABERRANT_CRUSHER_HEAD = create(
+        "aberrant_crusher_head",
+        () -> new CrusherHeadBlock(CrusherHeadVariant.ABERRANT, crusherHeadProperties())
+    );
+
+    public static final BLibHolder<CrusherWallHeadBlock> ABERRANT_CRUSHER_WALL_HEAD = create(
+        "aberrant_crusher_wall_head",
+        () -> new CrusherWallHeadBlock(CrusherHeadVariant.ABERRANT, crusherHeadProperties())
+    );
+
+    public static final BLibHolder<CrusherHeadBlock> IRRADIATED_CRUSHER_HEAD = create(
+        "irradiated_crusher_head",
+        () -> new CrusherHeadBlock(CrusherHeadVariant.IRRADIATED, crusherHeadProperties())
+    );
+
+    public static final BLibHolder<CrusherWallHeadBlock> IRRADIATED_CRUSHER_WALL_HEAD = create(
+        "irradiated_crusher_wall_head",
+        () -> new CrusherWallHeadBlock(CrusherHeadVariant.IRRADIATED, crusherHeadProperties())
+    );
+
+    public static final BLibHolder<CrusherHeadBlock> NETHER_CRUSHER_HEAD = create(
+        "nether_crusher_head",
+        () -> new CrusherHeadBlock(CrusherHeadVariant.NETHER, crusherHeadProperties())
+    );
+
+    public static final BLibHolder<CrusherWallHeadBlock> NETHER_CRUSHER_WALL_HEAD = create(
+        "nether_crusher_wall_head",
+        () -> new CrusherWallHeadBlock(CrusherHeadVariant.NETHER, crusherHeadProperties())
+    );
+
     /**
-     * Block properties shared by all queen-head variants — strength values mirror vanilla skull blocks
-     * (1.0F to break by hand in ~1.5s, no resistance, instrument NONE), and {@code noOcclusion} since the
-     * BE renderer paints a non-cube shape that doesn't fill the full 1x1x1 voxel.
+     * Block properties shared by all queen-head variants — strength values mirror vanilla skull blocks (1.0F to break
+     * by hand in ~1.5s, no resistance, instrument NONE), and {@code noOcclusion} since the BE renderer paints a
+     * non-cube shape that doesn't fill the full 1x1x1 voxel.
      */
     private static BlockBehaviour.Properties queenHeadProperties() {
+        return BlockBehaviour.Properties.of()
+            .mapColor(MapColor.COLOR_GRAY)
+            .strength(1.0F)
+            .sound(SoundType.BONE_BLOCK)
+            .noOcclusion();
+    }
+
+    /**
+     * Block properties shared by all crusher-head variants. Same shape as {@link #queenHeadProperties()} — skull-like
+     * strength, bone-block sound, no occlusion. Kept as a separate helper so the two head families can diverge later
+     * without disturbing each other (e.g. if the crusher head should weigh more or sound different).
+     */
+    private static BlockBehaviour.Properties crusherHeadProperties() {
         return BlockBehaviour.Properties.of()
             .mapColor(MapColor.COLOR_GRAY)
             .strength(1.0F)

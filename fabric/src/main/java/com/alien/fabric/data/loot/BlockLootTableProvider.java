@@ -65,6 +65,15 @@ public class BlockLootTableProvider extends FabricBlockLootTableProvider {
         dropOther(AlienBlocks.IRRADIATED_QUEEN_WALL_HEAD, AlienItems.IRRADIATED_QUEEN_HEAD);
         dropOther(AlienBlocks.NETHER_QUEEN_HEAD, AlienItems.NETHER_QUEEN_HEAD);
         dropOther(AlienBlocks.NETHER_QUEEN_WALL_HEAD, AlienItems.NETHER_QUEEN_HEAD);
+
+        dropOther(AlienBlocks.CRUSHER_HEAD, AlienItems.CRUSHER_HEAD);
+        dropOther(AlienBlocks.CRUSHER_WALL_HEAD, AlienItems.CRUSHER_HEAD);
+        dropOther(AlienBlocks.ABERRANT_CRUSHER_HEAD, AlienItems.ABERRANT_CRUSHER_HEAD);
+        dropOther(AlienBlocks.ABERRANT_CRUSHER_WALL_HEAD, AlienItems.ABERRANT_CRUSHER_HEAD);
+        dropOther(AlienBlocks.IRRADIATED_CRUSHER_HEAD, AlienItems.IRRADIATED_CRUSHER_HEAD);
+        dropOther(AlienBlocks.IRRADIATED_CRUSHER_WALL_HEAD, AlienItems.IRRADIATED_CRUSHER_HEAD);
+        dropOther(AlienBlocks.NETHER_CRUSHER_HEAD, AlienItems.NETHER_CRUSHER_HEAD);
+        dropOther(AlienBlocks.NETHER_CRUSHER_WALL_HEAD, AlienItems.NETHER_CRUSHER_HEAD);
     }
 
     private void generateSelfDrops() {

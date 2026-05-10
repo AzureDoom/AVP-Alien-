@@ -8,7 +8,7 @@ import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Wearable + placeable trophy variant of the queen head. Extends {@link StandingAndWallBlockItem} so vanilla's
+ * Wearable + placeable trophy variant of the crusher head. Extends {@link StandingAndWallBlockItem} so vanilla's
  * standing-vs-wall placement logic picks the floor or wall block based on which face the player clicks (rejecting
  * up-facing surfaces by passing {@link Direction#DOWN} as the disallowed face — heads can't sit on ceilings).
  * <p>
@@ -16,9 +16,9 @@ import org.jetbrains.annotations.NotNull;
  * Right-click in the world places the block; right-click in the air does nothing (no shield use, since this trophy
  * variant doesn't implement {@code BLibShieldItem}).
  */
-public class QueenHeadItem extends StandingAndWallBlockItem implements Equipable {
+public class CrusherHeadItem extends StandingAndWallBlockItem implements Equipable {
 
-    public QueenHeadItem(Block standingBlock, Block wallBlock, Properties properties) {
+    public CrusherHeadItem(Block standingBlock, Block wallBlock, Properties properties) {
         super(standingBlock, wallBlock, properties, Direction.DOWN);
     }
 

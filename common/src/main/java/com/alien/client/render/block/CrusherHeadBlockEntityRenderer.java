@@ -1,9 +1,9 @@
 package com.alien.client.render.block;
 
-import com.alien.common.gameplay.block.entity.queen.QueenHeadBlockEntity;
-import com.alien.common.gameplay.block.queen.QueenHeadBlock;
-import com.alien.common.gameplay.block.queen.QueenHeadVariant;
-import com.alien.common.gameplay.block.queen.QueenWallHeadBlock;
+import com.alien.common.gameplay.block.crusher.CrusherHeadBlock;
+import com.alien.common.gameplay.block.crusher.CrusherHeadVariant;
+import com.alien.common.gameplay.block.crusher.CrusherWallHeadBlock;
+import com.alien.common.gameplay.block.entity.crusher.CrusherHeadBlockEntity;
 import com.alien.common.registry.init.item.AlienItems;
 import com.blib.api.client.render.v1.item.BLibItemTransformOverrides;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.state.properties.RotationSegment;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Renders placed {@link QueenHeadBlockEntity}s by reusing the corresponding queen-head item's
+ * Renders placed {@link CrusherHeadBlockEntity}s by reusing the corresponding crusher-head item's
  * {@link com.blib.api.client.render.v1.item.BLibGeoBoneItemRenderer} pipeline. We delegate to
  * {@link net.minecraft.client.renderer.entity.ItemRenderer#renderStatic} with {@link ItemDisplayContext#FIXED}, which
  * is the closest semantic for "stationary item display in the world." The user can tune {@code FIXED} via the regular
@@ -28,9 +28,9 @@ import org.jetbrains.annotations.NotNull;
  * increment from {@code FACING}, plus a translate so the head visually sticks out of the wall instead of sitting at the
  * block's volumetric center.
  */
-public class QueenHeadBlockEntityRenderer implements BlockEntityRenderer<QueenHeadBlockEntity> {
+public class CrusherHeadBlockEntityRenderer implements BlockEntityRenderer<CrusherHeadBlockEntity> {
 
-    public QueenHeadBlockEntityRenderer() {
+    public CrusherHeadBlockEntityRenderer() {
         // Block entity renderer providers pass a Context arg in MC 1.21; we don't need anything from it,
         // but having a default constructor (or one that accepts and ignores Context) keeps the registration
         // call site simple — the loader-specific hooks instantiate the renderer per-block-entity-type.
@@ -38,7 +38,7 @@ public class QueenHeadBlockEntityRenderer implements BlockEntityRenderer<QueenHe
 
     @Override
     public void render(
-        @NotNull QueenHeadBlockEntity entity,
+        @NotNull CrusherHeadBlockEntity entity,
         float partialTick,
         @NotNull PoseStack poseStack,
         @NotNull MultiBufferSource source,
@@ -58,21 +58,21 @@ public class QueenHeadBlockEntityRenderer implements BlockEntityRenderer<QueenHe
 
         poseStack.pushPose();
 
-        if (block instanceof QueenHeadBlock) {
+        if (block instanceof CrusherHeadBlock) {
             // Floor: center yaw at block center, rotate by ROTATION_16 segments to match player facing
             // at placement time. The rest of the pose comes from the renderer's `.fixed(...)` transform.
             poseStack.translate(0.5, 0.0, 0.5);
-            int seg = state.getValue(QueenHeadBlock.ROTATION);
+            int seg = state.getValue(CrusherHeadBlock.ROTATION);
             float yawDeg = RotationSegment.convertToDegrees(seg);
             poseStack.mulPose(Axis.YP.rotationDegrees(-yawDeg));
             isWall = false;
-        } else if (block instanceof QueenWallHeadBlock) {
+        } else if (block instanceof CrusherWallHeadBlock) {
             // Wall: anchor at block center on the wall side. The wall-specific tilt and finer
             // positioning come entirely from the renderer's `.fixedWall(...)` transform (selected by
             // BLib when RENDER_AS_WALL_BLOCK is true), so this pose stack just establishes the block
             // location and faces the head outward.
             poseStack.translate(0.5, 0.5, 0.5);
-            Direction facing = state.getValue(QueenWallHeadBlock.FACING);
+            Direction facing = state.getValue(CrusherWallHeadBlock.FACING);
             float yawDeg = facing.toYRot();
             poseStack.mulPose(Axis.YP.rotationDegrees(180f - yawDeg));
             isWall = true;
@@ -112,12 +112,12 @@ public class QueenHeadBlockEntityRenderer implements BlockEntityRenderer<QueenHe
         poseStack.popPose();
     }
 
-    private static ItemStack itemStackFor(QueenHeadVariant variant) {
+    private static ItemStack itemStackFor(CrusherHeadVariant variant) {
         return switch (variant) {
-            case QUEEN -> new ItemStack(AlienItems.QUEEN_HEAD.get());
-            case ABERRANT -> new ItemStack(AlienItems.ABERRANT_QUEEN_HEAD.get());
-            case IRRADIATED -> new ItemStack(AlienItems.IRRADIATED_QUEEN_HEAD.get());
-            case NETHER -> new ItemStack(AlienItems.NETHER_QUEEN_HEAD.get());
+            case CRUSHER -> new ItemStack(AlienItems.CRUSHER_HEAD.get());
+            case ABERRANT -> new ItemStack(AlienItems.ABERRANT_CRUSHER_HEAD.get());
+            case IRRADIATED -> new ItemStack(AlienItems.IRRADIATED_CRUSHER_HEAD.get());
+            case NETHER -> new ItemStack(AlienItems.NETHER_CRUSHER_HEAD.get());
         };
     }
 }

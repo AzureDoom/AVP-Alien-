@@ -82,6 +82,31 @@ public class MiscellaneousRecipeProvider {
             .requires(1, AlienItems.NETHER_QUEEN_HEAD)
             .requires(1, Items.SHIELD)
             .into(1, AlienItems.NETHER_QUEEN_HEAD_SHIELD);
+
+        // Crusher head trophy + vanilla shield -> crusher head shield. Mirrors the queen recipe family.
+        builder.shapeless()
+            .withCategory(RecipeCategory.COMBAT)
+            .requires(1, AlienItems.CRUSHER_HEAD)
+            .requires(1, Items.SHIELD)
+            .into(1, AlienItems.CRUSHER_HEAD_SHIELD);
+
+        builder.shapeless()
+            .withCategory(RecipeCategory.COMBAT)
+            .requires(1, AlienItems.ABERRANT_CRUSHER_HEAD)
+            .requires(1, Items.SHIELD)
+            .into(1, AlienItems.ABERRANT_CRUSHER_HEAD_SHIELD);
+
+        builder.shapeless()
+            .withCategory(RecipeCategory.COMBAT)
+            .requires(1, AlienItems.IRRADIATED_CRUSHER_HEAD)
+            .requires(1, Items.SHIELD)
+            .into(1, AlienItems.IRRADIATED_CRUSHER_HEAD_SHIELD);
+
+        builder.shapeless()
+            .withCategory(RecipeCategory.COMBAT)
+            .requires(1, AlienItems.NETHER_CRUSHER_HEAD)
+            .requires(1, Items.SHIELD)
+            .into(1, AlienItems.NETHER_CRUSHER_HEAD_SHIELD);
     }
 
     private static void provideMiscellaneousNetherRecipes(RecipeBuilder builder) {

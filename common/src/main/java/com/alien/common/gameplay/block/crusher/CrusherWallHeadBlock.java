@@ -1,6 +1,6 @@
-package com.alien.common.gameplay.block.queen;
+package com.alien.common.gameplay.block.crusher;
 
-import com.alien.common.gameplay.block.entity.queen.QueenHeadBlockEntity;
+import com.alien.common.gameplay.block.entity.crusher.CrusherHeadBlockEntity;
 import com.google.common.collect.Maps;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
@@ -25,13 +25,14 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 
 /**
- * Wall-mounted queen head — hangs out from a vertical surface, four cardinal facings (no up/down). Uses
+ * Wall-mounted crusher head — hangs out from a vertical surface, four cardinal facings (no up/down). Uses
  * {@link HorizontalDirectionalBlock#FACING} to track which way the head sticks out, and a per-direction
  * {@link VoxelShape} so the head's collision box only occupies the wall side.
  * <p>
- * Like {@link QueenHeadBlock}, all visible geometry comes from the block-entity renderer; this block has no cube model.
+ * Like {@link CrusherHeadBlock}, all visible geometry comes from the block-entity renderer; this block has no cube
+ * model.
  */
-public class QueenWallHeadBlock extends BaseEntityBlock {
+public class CrusherWallHeadBlock extends BaseEntityBlock {
 
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 
@@ -53,15 +54,15 @@ public class QueenWallHeadBlock extends BaseEntityBlock {
         )
     );
 
-    private final QueenHeadVariant variant;
+    private final CrusherHeadVariant variant;
 
-    public QueenWallHeadBlock(QueenHeadVariant variant, BlockBehaviour.Properties properties) {
+    public CrusherWallHeadBlock(CrusherHeadVariant variant, BlockBehaviour.Properties properties) {
         super(properties);
         this.variant = variant;
         this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH));
     }
 
-    public QueenHeadVariant variant() {
+    public CrusherHeadVariant variant() {
         return variant;
     }
 
@@ -75,7 +76,7 @@ public class QueenWallHeadBlock extends BaseEntityBlock {
 
     @Override
     protected @NotNull MapCodec<? extends BaseEntityBlock> codec() {
-        return simpleCodec(properties -> new QueenWallHeadBlock(variant, properties));
+        return simpleCodec(properties -> new CrusherWallHeadBlock(variant, properties));
     }
 
     @Override
@@ -90,7 +91,7 @@ public class QueenWallHeadBlock extends BaseEntityBlock {
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        // Honor the side of the block being clicked, but reject up/down (queen heads can't sit on
+        // Honor the side of the block being clicked, but reject up/down (crusher heads can't sit on
         // ceilings or be placed flat-on-top of a block — those scenarios route to the floor block via
         // StandingAndWallBlockItem's selection logic).
         var clickedFace = context.getClickedFace();
@@ -120,6 +121,6 @@ public class QueenWallHeadBlock extends BaseEntityBlock {
 
     @Override
     public BlockEntity newBlockEntity(@NotNull BlockPos pos, @NotNull BlockState state) {
-        return new QueenHeadBlockEntity(pos, state);
+        return new CrusherHeadBlockEntity(pos, state);
     }
 }

@@ -1,6 +1,7 @@
 package com.alien.common.registry.init;
 
 import com.alien.Alien;
+import com.alien.common.gameplay.block.entity.crusher.CrusherHeadBlockEntity;
 import com.alien.common.gameplay.block.entity.queen.QueenHeadBlockEntity;
 import com.alien.common.gameplay.block.entity.resin.node.ResinNodeBlockEntity;
 import com.alien.common.gameplay.block.entity.resin.vent.ResinVentBlockEntity;
@@ -55,6 +56,21 @@ public class AlienBlockEntityTypes {
             AlienBlocks.IRRADIATED_QUEEN_WALL_HEAD.get(),
             AlienBlocks.NETHER_QUEEN_HEAD.get(),
             AlienBlocks.NETHER_QUEEN_WALL_HEAD.get()
+        )
+    );
+
+    public static final BLibHolder<BlockEntityType<CrusherHeadBlockEntity>> CRUSHER_HEAD = create(
+        "crusher_head",
+        () -> BlockEntityType.Builder.of(
+            CrusherHeadBlockEntity::new,
+            AlienBlocks.CRUSHER_HEAD.get(),
+            AlienBlocks.CRUSHER_WALL_HEAD.get(),
+            AlienBlocks.ABERRANT_CRUSHER_HEAD.get(),
+            AlienBlocks.ABERRANT_CRUSHER_WALL_HEAD.get(),
+            AlienBlocks.IRRADIATED_CRUSHER_HEAD.get(),
+            AlienBlocks.IRRADIATED_CRUSHER_WALL_HEAD.get(),
+            AlienBlocks.NETHER_CRUSHER_HEAD.get(),
+            AlienBlocks.NETHER_CRUSHER_WALL_HEAD.get()
         )
     );
 

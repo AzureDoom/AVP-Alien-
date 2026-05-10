@@ -1,6 +1,8 @@
 package com.alien.common.registry.init.item;
 
 import com.alien.Alien;
+import com.alien.common.gameplay.item.CrusherHeadItem;
+import com.alien.common.gameplay.item.CrusherHeadShieldItem;
 import com.alien.common.gameplay.item.PoisonJellyItem;
 import com.alien.common.gameplay.item.QueenHeadItem;
 import com.alien.common.gameplay.item.QueenHeadShieldItem;
@@ -130,6 +132,62 @@ public class AlienItems {
     public static final BLibHolder<Item> NETHER_QUEEN_HEAD_SHIELD = create(
         "nether_queen_head_shield",
         () -> new QueenHeadShieldItem(new Item.Properties().stacksTo(1).durability(512).fireResistant())
+    );
+
+    public static final BLibHolder<Item> CRUSHER_HEAD = create(
+        "crusher_head",
+        () -> new CrusherHeadItem(
+            AlienBlocks.CRUSHER_HEAD.get(),
+            AlienBlocks.CRUSHER_WALL_HEAD.get(),
+            new Item.Properties().stacksTo(1)
+        )
+    );
+
+    public static final BLibHolder<Item> ABERRANT_CRUSHER_HEAD = create(
+        "aberrant_crusher_head",
+        () -> new CrusherHeadItem(
+            AlienBlocks.ABERRANT_CRUSHER_HEAD.get(),
+            AlienBlocks.ABERRANT_CRUSHER_WALL_HEAD.get(),
+            new Item.Properties().stacksTo(1)
+        )
+    );
+
+    public static final BLibHolder<Item> IRRADIATED_CRUSHER_HEAD = create(
+        "irradiated_crusher_head",
+        () -> new CrusherHeadItem(
+            AlienBlocks.IRRADIATED_CRUSHER_HEAD.get(),
+            AlienBlocks.IRRADIATED_CRUSHER_WALL_HEAD.get(),
+            new Item.Properties().stacksTo(1)
+        )
+    );
+
+    public static final BLibHolder<Item> NETHER_CRUSHER_HEAD = create(
+        "nether_crusher_head",
+        () -> new CrusherHeadItem(
+            AlienBlocks.NETHER_CRUSHER_HEAD.get(),
+            AlienBlocks.NETHER_CRUSHER_WALL_HEAD.get(),
+            new Item.Properties().stacksTo(1).fireResistant()
+        )
+    );
+
+    public static final BLibHolder<Item> CRUSHER_HEAD_SHIELD = create(
+        "crusher_head_shield",
+        () -> new CrusherHeadShieldItem(new Item.Properties().stacksTo(1).durability(512))
+    );
+
+    public static final BLibHolder<Item> ABERRANT_CRUSHER_HEAD_SHIELD = create(
+        "aberrant_crusher_head_shield",
+        () -> new CrusherHeadShieldItem(new Item.Properties().stacksTo(1).durability(512))
+    );
+
+    public static final BLibHolder<Item> IRRADIATED_CRUSHER_HEAD_SHIELD = create(
+        "irradiated_crusher_head_shield",
+        () -> new CrusherHeadShieldItem(new Item.Properties().stacksTo(1).durability(512))
+    );
+
+    public static final BLibHolder<Item> NETHER_CRUSHER_HEAD_SHIELD = create(
+        "nether_crusher_head_shield",
+        () -> new CrusherHeadShieldItem(new Item.Properties().stacksTo(1).durability(512).fireResistant())
     );
 
     public static final BLibHolder<Item> RAW_ROYAL_JELLY = create("raw_royal_jelly");

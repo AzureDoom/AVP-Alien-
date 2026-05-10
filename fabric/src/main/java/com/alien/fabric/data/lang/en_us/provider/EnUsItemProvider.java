@@ -79,6 +79,14 @@ public class EnUsItemProvider {
         addItem(builder, AlienItems.ABERRANT_QUEEN_HEAD_SHIELD, "Aberrant Queen Head Shield");
         addItem(builder, AlienItems.IRRADIATED_QUEEN_HEAD_SHIELD, "Irradiated Queen Head Shield");
         addItem(builder, AlienItems.NETHER_QUEEN_HEAD_SHIELD, "Nether Queen Head Shield");
+        addItem(builder, AlienItems.CRUSHER_HEAD, "Crusher Head");
+        addItem(builder, AlienItems.ABERRANT_CRUSHER_HEAD, "Aberrant Crusher Head");
+        addItem(builder, AlienItems.IRRADIATED_CRUSHER_HEAD, "Irradiated Crusher Head");
+        addItem(builder, AlienItems.NETHER_CRUSHER_HEAD, "Nether Crusher Head");
+        addItem(builder, AlienItems.CRUSHER_HEAD_SHIELD, "Crusher Head Shield");
+        addItem(builder, AlienItems.ABERRANT_CRUSHER_HEAD_SHIELD, "Aberrant Crusher Head Shield");
+        addItem(builder, AlienItems.IRRADIATED_CRUSHER_HEAD_SHIELD, "Irradiated Crusher Head Shield");
+        addItem(builder, AlienItems.NETHER_CRUSHER_HEAD_SHIELD, "Nether Crusher Head Shield");
 
         // Spawn Egg Items
         addItem(builder, AlienSpawnEggItems.ABERRANT_ADOLESCENT_SPAWN_EGG, "Aberrant Adolescent Spawn Egg");
