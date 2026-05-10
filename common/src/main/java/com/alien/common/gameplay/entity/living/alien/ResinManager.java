@@ -1,6 +1,7 @@
 package com.alien.common.gameplay.entity.living.alien;
 
 import com.alien.common.data.AlienVariantTypes;
+import com.alien.common.gameplay.hive2.spawning.HiveLocationSpawnGate;
 import com.alien.common.gameplay.level.gameevent.listener.ResinSpreadListener;
 import com.alien.common.model.resin.ResinData;
 import com.blib.api.common.nbt.v1.model.NBTSerializable;
@@ -110,19 +111,34 @@ public class ResinManager implements GameEventListener.Provider<ResinSpreadListe
 
     private boolean canSpreadResinAtAlienPosition() {
         // Alien must not be exposed to skylight...
-        return alien.level().getBrightness(LightLayer.SKY, alien.blockPosition()) == 0
-            // AND alien must not have an attack target...
-            && alien.getTarget() == null
-            && !alien.isUnderWater()
-            // AND alien must have not been hurt for more than 10 seconds...
-            && alien.tickCount > alien.getLastHurtTimeInTicks() + (10 * 20)
-            // AND alien hive conditions must be met...
-            && alien.getHiveManager()
-                .hive()
-                // Where the alien's hive is not angry AND the alien is within range of the hive...
-                .filter(hive -> !hive.isAngry() && hive.getSpaceManager().isEntityWithinHive(alien))
-                // AND the alien must be in a hive for the hive conditions to be true.
-                .isSome();
+        if (alien.level().getBrightness(LightLayer.SKY, alien.blockPosition()) != 0) {
+            return false;
+        }
+        // AND alien must not have an attack target...
+        if (alien.getTarget() != null) {
+            return false;
+        }
+        if (alien.isUnderWater()) {
+            return false;
+        }
+        // AND alien must have not been hurt for more than 10 seconds...
+        if (alien.tickCount <= alien.getLastHurtTimeInTicks() + (10 * 20)) {
+            return false;
+        }
+        return isInsideHiveForResinSpread();
+    }
+
+    /**
+     * "Is in a hive that's calm enough to spread resin." Under hive2, "in a hive" means inside a claimed chunk of any
+     * location; the angry check is the location's boss-bar angry state.
+     */
+    private boolean isInsideHiveForResinSpread() {
+        var location = HiveLocationSpawnGate.locationContaining(alien.level(), alien.blockPosition());
+        if (location == null) {
+            return false;
+        }
+        var bossBar = location.bossBar();
+        return bossBar == null || !bossBar.isAngry();
     }
 
     private Option<BlockPos> findSuitableResinNodeBlockPos(Level level, TagKey<Block> replaceableTagKey) {

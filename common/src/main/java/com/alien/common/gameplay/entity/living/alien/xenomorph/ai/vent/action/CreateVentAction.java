@@ -99,11 +99,13 @@ public class CreateVentAction {
 
             var hitPos = blockHitResult.getBlockPos();
 
-            var ventAlreadyExists = xenomorph.getHiveManager()
-                .hive()
-                .isSomeAnd(hive -> !hive.getVentManager().getVentsWithinSection(hitPos).isEmpty());
-
-            if (ventAlreadyExists) {
+            // Reject if a vent already exists in the hive2 location that owns this chunk. (If no location owns it,
+            // there's nothing to dedupe against — let the build proceed.)
+            var owningLocation = com.alien.common.gameplay.hive2.location.HiveLocationRegistry.INSTANCE.getByChunk(
+                xenomorph.level().dimension(),
+                new net.minecraft.world.level.ChunkPos(hitPos)
+            );
+            if (owningLocation != null && !owningLocation.ventManager().getVentsWithinSection(hitPos).isEmpty()) {
                 continue;
             }
 

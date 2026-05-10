@@ -4,7 +4,9 @@ import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
-import com.alien.common.gameplay.hive.HiveRegistry;
+import com.alien.common.gameplay.hive2.faction.LineageFactionData;
+import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
+import com.alien.common.gameplay.hive2.location.HivePoolCascade;
 import com.alien.common.gameplay.level.saveddata.StrainLeakData;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienDataSyncKeys;
@@ -148,12 +150,8 @@ public abstract class Alien extends Monster implements DataUser {
     @Override
     public void setTarget(@Nullable LivingEntity livingEntity) {
         super.setTarget(livingEntity);
-
-        if (livingEntity instanceof ServerPlayer player) {
-            hiveManager.hive()
-                .filter(hive -> hive.getSpaceManager().isEntityWithinHive(player))
-                .ifSome(hive -> hive.getBossBarManager().trackPlayer(player));
-        }
+        // Hive2: the per-location boss bar auto-adds in-range players via HiveLocationBossBar.updateTrackingPlayers
+        // every 20 ticks; no manual track-on-target hook needed.
     }
 
     public AlienVariant getVariant() {
@@ -233,27 +231,30 @@ public abstract class Alien extends Monster implements DataUser {
         @NotNull MobSpawnType spawnType,
         @Nullable SpawnGroupData spawnGroupData
     ) {
-        var alienVariantType = AlienVariantTypes.getFor(getVariant());
+        // Hive2: variant-faction join is event-driven. finalizeSpawn fires once per fresh-spawned alien
+        // (natural, spawn egg, command). Idempotent — see HiveManager.ensureVariantFactionMembership.
+        hiveManager.ensureVariantFactionMembership();
 
-        var nearestHive = HiveRegistry.INSTANCE.findNearestHive(
-            blockPosition(),
+        // Hive2: if this alien spawned inside a location that has it in its reserves, decrement the reserves and
+        // copy genes from the location's leader (preserves the legacy "spawned alien inherits leader's genes"
+        // behavior).
+        var locationAtPos = HiveLocationRegistry.INSTANCE.getByChunk(
             level.getLevel().dimension(),
-            hive -> Objects.equals(hive.getVariant(), alienVariantType.variant())
+            new net.minecraft.world.level.ChunkPos(blockPosition())
         );
+        if (locationAtPos != null && locationAtPos.isAlive()) {
+            if (locationAtPos.localReserves().getCount(getType()) > 0) {
+                locationAtPos.localReserves().trySpawn(getType());
+            }
 
-        if (nearestHive != null) {
-            var joinedHiveSuccessfully = hiveManager.tryJoinHive(nearestHive);
-
-            if (joinedHiveSuccessfully) {
-                nearestHive.getReserveManager().add(getType(), -1);
-
-                nearestHive.getLeadershipManager()
-                    .getLeader(level.getLevel().getServer())
-                    .map(GeneManagerProxy::getOrCreate)
-                    .ifSome(leaderGeneContainer -> {
-                        var selfGeneContainer = GeneManagerProxy.getOrCreate(this);
-                        leaderGeneContainer.transfer(selfGeneContainer, true);
-                    });
+            var leaderId = locationAtPos.leadership().getLeaderIdOrNull();
+            if (leaderId != null) {
+                var leaderEntity = level.getLevel().getEntity(leaderId);
+                if (leaderEntity instanceof Alien leaderAlien) {
+                    var leaderGeneContainer = GeneManagerProxy.getOrCreate(leaderAlien);
+                    var selfGeneContainer = GeneManagerProxy.getOrCreate(this);
+                    leaderGeneContainer.transfer(selfGeneContainer, true);
+                }
             }
         }
 
@@ -345,9 +346,12 @@ public abstract class Alien extends Monster implements DataUser {
                 && AlienVariantTypes.getFor(getVariant()).canReproduce()
                 // AND the entity killed was not an alien (hive wars shouldn't result in endless growth)...
                 && !entity.getType().is(AlienEntityTypeTags.ALIENS)
-            // TODO: Only "wild" hives should have spontaneous growth from mob kills.
         ) {
-            hiveManager.hive().ifSome(hive -> {
+            // Hive2: add a bonus drone or runner (depending on host type) to the reserves of the location whose
+            // chunk this alien is standing in. No-op when the alien is outside any claimed chunk — feral aliens
+            // don't generate reserves.
+            var location = HiveLocationRegistry.INSTANCE.getByChunk(level.dimension(), chunkPosition());
+            if (location != null && location.isAlive()) {
                 var wasRunnerHostKilled = entity.getType().is(AlienEntityTypeTags.RUNNER_HOSTS);
 
                 var bonusCount = switch (getGeneManager()) {
@@ -359,11 +363,11 @@ public abstract class Alien extends Monster implements DataUser {
                 };
 
                 var alienEntityType = wasRunnerHostKilled
-                    ? Runner.getType(hive.getVariant())
-                    : Drone.getType(hive.getVariant());
+                    ? Runner.getType(getVariant())
+                    : Drone.getType(getVariant());
 
-                hive.getReserveManager().add(alienEntityType, bonusCount);
-            });
+                location.localReserves().tryAdd((EntityType<?>) alienEntityType, bonusCount);
+            }
         }
 
         return killedEntity;
@@ -595,15 +599,19 @@ public abstract class Alien extends Monster implements DataUser {
 
     @Override
     public boolean isPersistenceRequired() {
-        return super.isPersistenceRequired()
-            || hiveManager.hive()
-                .filter(
-                    // If the hive is angry, then the alien shouldn't despawn.
-                    hive -> hive.isAngry()
-                        // OR if this alien is the hive leader, then they shouldn't despawn, either.
-                        || hive.getLeadershipManager().isLeader(this)
-                )
-                .isSome();
+        if (super.isPersistenceRequired()) {
+            return true;
+        }
+        // Hive2: an alien is persistent if it's standing in a hive2 location and either (a) the location's boss bar
+        // is angry (an active fight), or (b) it's the location's current leader.
+        var location = HiveLocationRegistry.INSTANCE.getByChunk(level().dimension(), chunkPosition());
+        if (location == null) {
+            return false;
+        }
+        var bossBar = location.bossBar();
+        var bossBarAngry = bossBar != null && bossBar.isAngry();
+        var isLeader = location.leadership().isLeader(this);
+        return bossBarAngry || isLeader;
     }
 
     @Override
@@ -618,13 +626,30 @@ public abstract class Alien extends Monster implements DataUser {
     }
 
     private void onDespawned() {
-        hiveManager.hive().ifSome(hive -> {
-            if (hive.getSpaceManager().isEntityWithinHive(this)) {
-                hive.getReserveManager().add(getType(), 1);
+        // Hive2: feed the location's reserves on despawn (overflow cascades to lineage / variant pool). When the
+        // alien isn't in any tracked chunk, it counts as a strain leak instead.
+        if (getType().is(AlienEntityTypeTags.XENOMORPHS)) {
+            var location = HiveLocationRegistry.INSTANCE.getByChunk(level().dimension(), chunkPosition());
+            if (location != null) {
+                feedHive2OnDespawn();
             } else {
                 onStrainLeak();
             }
-        });
+        }
+    }
+
+    private void feedHive2OnDespawn() {
+        var location = HiveLocationRegistry.INSTANCE.getByChunk(level().dimension(), chunkPosition());
+        if (location == null) {
+            return;
+        }
+
+        var faction = com.alien.Alien.MOD.factions().get(location.lineageFactionId());
+        if (faction == null || !(faction.data() instanceof LineageFactionData lineage)) {
+            return;
+        }
+
+        HivePoolCascade.addToLocationCascading(location, lineage, getType(), 1);
     }
 
     private void onStrainLeak() {
@@ -660,10 +685,68 @@ public abstract class Alien extends Monster implements DataUser {
     @Override
     public void remove(@NotNull RemovalReason removalReason) {
         super.remove(removalReason);
+        // Hive2: BLib's faction system handles removal cleanup automatically when the entity is killed or
+        // discarded — no manual hive.removeHiveMember call needed.
+    }
 
-        switch (removalReason) {
-            case KILLED, DISCARDED -> hiveManager.hive().ifSome(hive -> hive.removeHiveMember(this));
-            case UNLOADED_TO_CHUNK, UNLOADED_WITH_PLAYER, CHANGED_DIMENSION -> { /* NO-OP */ }
+    @Override
+    public void die(@NotNull DamageSource damageSource) {
+        // Hive2 raid attribution: if a player gets the kill credit, record it against every lineage this alien
+        // belongs to. Defers to vanilla's getKillCredit so indirect kills (TNT, fall damage from broken block,
+        // etc) count when vanilla counts them.
+        if (getType().is(AlienEntityTypeTags.XENOMORPHS)) {
+            var killer = getKillCredit();
+            if (killer instanceof ServerPlayer player && level() instanceof ServerLevel serverLevel) {
+                attributeKillToLineages(player.getUUID(), serverLevel.getGameTime());
+            }
+            // Hive2 empress death → civil-war flag consumed by CivilWarHandler.
+            if (getType().is(AlienEntityTypeTags.EMPRESSES)) {
+                onEmpressDied();
+            }
+        }
+
+        super.die(damageSource);
+    }
+
+    private void onEmpressDied() {
+        for (var factionId : com.alien.Alien.MOD.factions().getFactionIds(getUUID())) {
+            if (!com.alien.common.gameplay.hive2.id.LineageIds.isLineageId(factionId)) {
+                continue;
+            }
+            var faction = com.alien.Alien.MOD.factions().get(factionId);
+            if (faction == null || !(faction.data() instanceof LineageFactionData lineage)) {
+                continue;
+            }
+            // Multi-location lineage with empress dying → civil war queued for Phase 11.
+            // Single-location lineage just loses its empress (no civil war; she stays as a forager record).
+            if (lineage.locationsById().size() >= 2) {
+                lineage.setPendingCivilWar(true);
+            }
+            // Either way, clear the empress slot so the next emergence ritual can fire.
+            if (getUUID().equals(lineage.empressId())) {
+                lineage.setEmpressId(null);
+            }
+            com.alien.Alien.LOGGER.info(
+                "Hive2: empress {} died — lineage {} has {} location(s); pendingCivilWar={}",
+                getUUID(),
+                factionId,
+                lineage.locationsById().size(),
+                lineage.pendingCivilWar()
+            );
+        }
+    }
+
+    private void attributeKillToLineages(java.util.UUID playerId, long currentTick) {
+        var aggroWindow = com.alien.common.gameplay.hive2.location.HiveLocationRegistry.INSTANCE.config().raidAggroWindowTicks();
+        for (var factionId : com.alien.Alien.MOD.factions().getFactionIds(getUUID())) {
+            if (!com.alien.common.gameplay.hive2.id.LineageIds.isLineageId(factionId)) {
+                continue;
+            }
+            var faction = com.alien.Alien.MOD.factions().get(factionId);
+            if (faction == null || !(faction.data() instanceof LineageFactionData lineage)) {
+                continue;
+            }
+            lineage.recordKillByPlayer(playerId, currentTick, aggroWindow);
         }
     }
 

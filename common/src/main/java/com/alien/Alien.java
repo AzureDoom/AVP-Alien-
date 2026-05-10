@@ -4,7 +4,9 @@ import com.alien.common.data.AlienReloadListeners;
 import com.alien.common.data.fixer.migration.AlienDataMigrations;
 import com.alien.common.gameplay.entity.dismemberment.AlienLimbDefinitions;
 import com.alien.common.gameplay.entity.dismemberment.AlienLimbDrops;
-import com.alien.common.gameplay.hive.HiveRegistry;
+import com.alien.common.gameplay.hive2.growth.ResinDecorator;
+import com.alien.common.gameplay.hive2.lifecycle.QueenSettlementDetector;
+import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.gameplay.level.saveddata.QueenSpawnChunkData;
 import com.alien.common.property.AlienPropertyAccess;
 import com.alien.common.registry.GrowthStageRegistry;
@@ -126,16 +128,56 @@ public class Alien {
         // Listeners/Events
         AlienReloadListeners.initialize();
 
-        MOD.events().postLevelTick().register(Alien::tickHives);
+        MOD.events().postLevelTick().register(Alien::tickHive2Registry);
         MOD.events().postLevelTick().register(Alien::tickQueenSpawnCooldown);
         MOD.events().onTagsUpdated().register(Alien::onTagsUpdated);
 
-        MOD.events().onServerStarted().register(HiveRegistry.INSTANCE::onServerStarted);
-        MOD.events().onServerStopped().register(HiveRegistry.INSTANCE::onServerStopped);
-        MOD.events().onFactionRemove().register(HiveRegistry.INSTANCE::onFactionRemoved);
+        MOD.events().onServerStarted().register(server -> {
+            // Phase 12 migrator: convert any legacy avp_alien:hive/* factions into the new lineage + location
+            // structure before the registry rebuilds. Idempotent — does nothing on a clean hive2-only world.
+            com.alien.common.gameplay.hive2.migration.OldHiveMigrator.run(server);
+            HiveLocationRegistry.INSTANCE.rebuildFromFactions();
+        });
+        MOD.events().onServerStopped().register(server -> HiveLocationRegistry.INSTANCE.clear());
+
+        // Hive2: defensive cleanup when any lineage faction is removed (admin removal, civil war, absorption, etc.).
+        MOD.events()
+            .onFactionRemove()
+            .register(com.alien.common.gameplay.hive2.lifecycle.Hive2FactionRemoveListener::onFactionRemoved);
+        MOD.events().onServerStopped().register(server -> QueenSettlementDetector.clear());
+        MOD.events()
+            .onServerStopped()
+            .register(server -> com.alien.common.gameplay.hive2.convoy.ReinforcementDispatcher.clear());
+        MOD.events()
+            .onServerStopped()
+            .register(server -> com.alien.common.gameplay.hive2.convoy.RaidDispatch.clear());
+        MOD.events()
+            .onServerStopped()
+            .register(server -> com.alien.common.gameplay.hive2.empress.EmpressEmergenceRitual.clear());
+
+        // Hive2: variant-faction join is event-driven. Catches every alien that loads from disk
+        // (the finalizeSpawn hook covers fresh spawns). Idempotent — see
+        // HiveManager.ensureVariantFactionMembership.
+        MOD.events().onEntityLoad().register(Alien::onAlienEntityLoaded);
+
+        // Hive2: chunk-load decoration + on-demand catch-up. Fires for every loaded chunk; the decorator
+        // exits early for chunks not owned by any location.
+        MOD.events()
+            .onChunkLoad()
+            .register((level, chunk) -> ResinDecorator.onChunkLoad(level, chunk.getPos()));
     }
 
-    private static void tickHives(Level level) {
+    private static void onAlienEntityLoaded(net.minecraft.world.entity.Entity entity) {
+        if (entity instanceof com.alien.common.gameplay.entity.living.alien.Alien alien) {
+            alien.getHiveManager().ensureVariantFactionMembership();
+        }
+    }
+
+    /**
+     * Single per-server-tick driver for the new hive system. Gated to Overworld so it fires once per server tick total;
+     * the registry itself iterates every dimension internally (fixes {@code HIVE_SYSTEM_ANALYSIS.md} § 9.1.2).
+     */
+    private static void tickHive2Registry(Level level) {
         if (level.isClientSide || !level.dimension().equals(Level.OVERWORLD)) {
             return;
         }
@@ -143,7 +185,7 @@ public class Alien {
         var server = level.getServer();
 
         if (server != null) {
-            HiveRegistry.INSTANCE.tick(server);
+            HiveLocationRegistry.INSTANCE.tick(server);
         }
     }
 
