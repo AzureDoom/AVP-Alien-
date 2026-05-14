@@ -24,7 +24,15 @@ public class AlienSpawning {
         mobSpawnType,
         blockPos,
         randomSource
-    ) -> {
+    ) -> canSpawnAt(entityType, serverLevelAccessor, mobSpawnType, blockPos, randomSource);
+
+    public static boolean canSpawnAt(
+        EntityType<? extends Alien> entityType,
+        ServerLevelAccessor serverLevelAccessor,
+        MobSpawnType mobSpawnType,
+        BlockPos blockPos,
+        RandomSource randomSource
+    ) {
         var belowState = serverLevelAccessor.getBlockState(blockPos.below());
         var alienVariantTypeOption = AlienVariantTypes.getFor(entityType)
             .map(AlienVariantType::resinBlockTag);
@@ -33,7 +41,7 @@ public class AlienSpawning {
 
         return isValidResinPos
             && checkSpawnRules(entityType, serverLevelAccessor, mobSpawnType, blockPos, randomSource);
-    };
+    }
 
     public static boolean checkSpawnRules(
         EntityType<? extends Monster> entityType,

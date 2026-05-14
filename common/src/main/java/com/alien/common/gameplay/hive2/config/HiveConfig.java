@@ -105,9 +105,13 @@ public record HiveConfig(
     long lastGrowthTickDirtyThreshold,
     int poolDirtyThreshold,
 
-    // ---------- § 13 Population + jelly economy ----------
+    // ---------- § 13 Population, spawning + jelly economy ----------
     int populationPerChunk,
     double minimumPopulationRatioForClaiming,
+    int hiveSpawnerMinimumLoadedXenomorphs,
+    long hiveSpawnerIntervalTicks,
+    int hiveSpawnerMaxSpawnAttemptsPerLocation,
+    int hiveSpawnerMaxSpawnsPerLocation,
     long royalJellyTicksPerProduction,
     long scourgeJellyTicksPerQueenProduction,
     long scourgeJellyTicksPerHarbingerProduction
@@ -215,9 +219,13 @@ public record HiveConfig(
             30L * TICKS_PER_MINUTE, // lastGrowthTickDirtyThreshold (30 min)
             5, // poolDirtyThreshold (±5)
 
-            // § 13 Population + jelly economy
+            // § 13 Population, spawning + jelly economy
             8, // populationPerChunk
             0.8, // minimumPopulationRatioForClaiming
+            20, // hiveSpawnerMinimumLoadedXenomorphs
+            TICKS_PER_SECOND, // hiveSpawnerIntervalTicks
+            32, // hiveSpawnerMaxSpawnAttemptsPerLocation
+            4, // hiveSpawnerMaxSpawnsPerLocation
             TICKS_PER_MINUTE, // royalJellyTicksPerProduction (1 game-min per queen)
             100L * TICKS_PER_MINUTE, // scourgeJellyTicksPerQueenProduction (100 game-min per queen)
             TICKS_PER_MINUTE // scourgeJellyTicksPerHarbingerProduction (1 game-min per harbinger)

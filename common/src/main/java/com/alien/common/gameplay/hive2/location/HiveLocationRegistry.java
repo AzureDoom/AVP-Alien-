@@ -65,6 +65,8 @@ public final class HiveLocationRegistry {
 
     private long ticksSinceLastReservePromotion = 0L;
 
+    private long ticksSinceLastHiveSpawn = 0L;
+
     private HiveLocationRegistry() {}
 
     /**
@@ -247,6 +249,7 @@ public final class HiveLocationRegistry {
         ticksSinceLastScan = 0L;
         ticksSinceLastDispatch = 0L;
         ticksSinceLastReservePromotion = 0L;
+        ticksSinceLastHiveSpawn = 0L;
 
         var allIds = Alien.MOD.factions().getAllIds();
         var lineageIdCount = 0;
@@ -422,6 +425,12 @@ public final class HiveLocationRegistry {
         com.alien.common.gameplay.hive2.economy.JellyProduction.scanAndProduce(server);
         com.alien.common.gameplay.hive2.economy.HiveBalanceTask.scanAll(server);
 
+        ticksSinceLastHiveSpawn++;
+        if (ticksSinceLastHiveSpawn >= config.hiveSpawnerIntervalTicks()) {
+            ticksSinceLastHiveSpawn = 0L;
+            com.alien.common.gameplay.hive2.spawning.HiveLoadedSpawner.scanAndSpawn(server);
+        }
+
         ticksSinceLastDispatch++;
         if (ticksSinceLastDispatch >= REINFORCEMENT_DISPATCH_INTERVAL_TICKS) {
             ticksSinceLastDispatch = 0L;
@@ -559,6 +568,7 @@ public final class HiveLocationRegistry {
         ticksSinceLastScan = 0L;
         ticksSinceLastDispatch = 0L;
         ticksSinceLastReservePromotion = 0L;
+        ticksSinceLastHiveSpawn = 0L;
     }
 
     public int locationCount() {
