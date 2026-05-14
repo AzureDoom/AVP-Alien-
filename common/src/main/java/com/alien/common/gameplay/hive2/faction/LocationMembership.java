@@ -40,13 +40,6 @@ public final class LocationMembership {
         }
 
         if (!FactionVariantPolicy.variantMatches(entity, lineage.variant())) {
-            Alien.LOGGER.debug(
-                "Hive2: LocationMembership.join — variant mismatch: entity {} (type={}) doesn't match lineage {} variant {}; skipping",
-                entity.getUUID(),
-                entity.getType(),
-                location.lineageFactionId(),
-                lineage.variant()
-            );
             return;
         }
 

@@ -268,21 +268,8 @@ public final class LineageAbsorptionHandler {
                     convoy.composition().add(type, -count);
                 }
             }
-            // Sanity log: sourceLocationId/destinationLocationId now belong to a dead lineage.
-            logRemap(convoy, weakerId, strongerId);
         }
         weaker.convoys().clear();
-    }
-
-    private static void logRemap(Convoy convoy, ResourceLocation weakerId, ResourceLocation strongerId) {
-        if (Alien.LOGGER.isDebugEnabled()) {
-            Alien.LOGGER.debug(
-                "Hive2: absorption disbanded convoy {} from {} into stronger {} pool",
-                convoy.id(),
-                weakerId,
-                strongerId
-            );
-        }
     }
 
     /**

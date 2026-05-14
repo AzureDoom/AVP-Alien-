@@ -13,9 +13,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * Shared scaffolding for the three AVP hive inspector sections. Polls the server once per client game tick for a fresh
  * snapshot while the inspector is open, plus an immediate refresh whenever the selection swaps; the cached snapshot is
@@ -31,12 +28,6 @@ public abstract class AbstractHiveInspectorSection implements InspectorSection<F
     private @Nullable ResourceLocation lastRequestedFactionId;
 
     private long lastRequestGameTick = Long.MIN_VALUE;
-
-    /** Dedup the "first request fired" log so we get one line per (section, factionId) — not one per frame. */
-    private final Set<ResourceLocation> loggedFirstRequest = new HashSet<>();
-
-    /** Dedup the early-return-because-no-generic-snapshot log similarly. */
-    private final Set<ResourceLocation> loggedBlockedOnGeneric = new HashSet<>();
 
     /** Typed faction-type id this section renders for (e.g. {@code avp_alien:location}). */
     protected abstract ResourceLocation supportedFactionTypeId();
@@ -72,24 +63,12 @@ public abstract class AbstractHiveInspectorSection implements InspectorSection<F
         // don't paint over the wrong faction's details if the directory entry's type hasn't loaded yet.
         var generic = FactionInspectionView.current();
         if (generic == null || !generic.factionId().equals(factionId) || !generic.typeId().equals(supportedFactionTypeId())) {
-            if (loggedBlockedOnGeneric.add(factionId)) {
-                Alien.LOGGER.info(
-                    "[AVP hive-debug] section {} BLOCKED for factionId={}: generic={}, generic.factionId={}, generic.typeId={}, supportedTypeId={}",
-                    snapshotKind(),
-                    factionId,
-                    generic == null ? "null" : "present",
-                    generic == null ? "-" : generic.factionId(),
-                    generic == null ? "-" : generic.typeId(),
-                    supportedFactionTypeId()
-                );
-            }
             // Re-arm so a back-and-forth selection still triggers a fresh request the next time this faction is picked.
             if (lastRequestedFactionId != null && !lastRequestedFactionId.equals(factionId)) {
                 lastRequestedFactionId = null;
             }
             return y;
         }
-        loggedBlockedOnGeneric.remove(factionId);
 
         // Poll once per client game tick (≈20 Hz) so live state (biomass / jelly / population / etc.) tracks in real
         // time. Render frames can run faster than ticks; gating on getGameTime() keeps the request rate bounded to the
@@ -99,9 +78,6 @@ public abstract class AbstractHiveInspectorSection implements InspectorSection<F
         var currentTick = level != null ? level.getGameTime() : 0L;
         var selectionChanged = !factionId.equals(lastRequestedFactionId);
         if (selectionChanged || currentTick != lastRequestGameTick) {
-            if (loggedFirstRequest.add(factionId)) {
-                Alien.LOGGER.info("[AVP hive-debug] section {} REQUESTING for factionId={}", snapshotKind(), factionId);
-            }
             Alien.MOD.networking().sendToServer(new C2SRequestHiveInspectionPayload(factionId));
             lastRequestedFactionId = factionId;
             lastRequestGameTick = currentTick;

@@ -1,6 +1,5 @@
 package com.alien.common.network.handler;
 
-import com.alien.Alien;
 import com.alien.common.client.inspector.ClientHiveInspectionCache;
 import com.alien.common.network.payload.S2CHiveInspectionPayload;
 import net.minecraft.world.entity.player.Player;
@@ -16,11 +15,6 @@ public final class AlienClientPacketListener {
 
     /** Server-pushed hive inspection snapshot for the currently-selected AVP faction. */
     public static void handleHiveInspection(S2CHiveInspectionPayload payload, Player player) {
-        Alien.LOGGER.info(
-            "[AVP hive-debug] client received: kind={}, factionId={}",
-            payload.kind(),
-            payload.factionId()
-        );
         ClientHiveInspectionCache.apply(payload);
     }
 }

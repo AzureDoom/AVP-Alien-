@@ -90,13 +90,7 @@ public class HiveManager implements NBTSerializable {
         }
 
         var result = SpreadZoneCheck.evaluate(queen, settlementPos);
-        if (result instanceof SpreadZoneResult.Blocked blocked) {
-            Alien.LOGGER.debug(
-                "Hive2: queen {} settlement at {} blocked: {}",
-                queen.getUUID(),
-                settlementPos,
-                blocked.reason()
-            );
+        if (result instanceof SpreadZoneResult.Blocked) {
             return;
         }
 
