@@ -24,6 +24,7 @@ public record HiveConfig(
     long angryGraceTicks,
     long contestTickWindow,
     int minimumHiveLocationDistanceChunks,
+    int initialHiveLocationClaimRadiusChunks,
 
     // ---------- § 3 Reserves ----------
     long shedGraceTicks,
@@ -134,6 +135,7 @@ public record HiveConfig(
             60L * TICKS_PER_SECOND, // angryGraceTicks: 60s
             60L * TICKS_PER_SECOND, // contestTickWindow: 60s
             4, // minimumHiveLocationDistanceChunks
+            1, // initialHiveLocationClaimRadiusChunks: 3x3
 
             // § 3 Reserves
             5L * TICKS_PER_MINUTE, // shedGraceTicks: 5 min

@@ -170,8 +170,7 @@ public final class AbstractSpreadAttempt {
             null // No founder — minted abstractly without a queen entity.
         );
 
-        // Initial claim: just the center chunk, filed under the lineage faction id.
-        HiveLocationClaims.claim(level, location, candidate, currentTick);
+        claimInitialCore(level, location, candidate, currentTick);
 
         // Bootstrap reserves: 1 drone, 1 runner per spec (08 § 4). Variant-matched.
         var droneType = Drone.getType(lineage.variant());
@@ -190,6 +189,19 @@ public final class AbstractSpreadAttempt {
         HiveLocationRegistry.INSTANCE.register(location);
 
         return locationId;
+    }
+
+    private static void claimInitialCore(ServerLevel level, HiveLocation location, ChunkPos centerChunk, long currentTick) {
+        var radius = HiveLocationRegistry.INSTANCE.config().initialHiveLocationClaimRadiusChunks();
+        for (var dx = -radius; dx <= radius; dx++) {
+            for (var dz = -radius; dz <= radius; dz++) {
+                var chunk = new ChunkPos(centerChunk.x + dx, centerChunk.z + dz);
+                if (HiveLocationRegistry.INSTANCE.getByChunk(level.dimension(), chunk) != null) {
+                    continue;
+                }
+                HiveLocationClaims.claim(level, location, chunk, currentTick);
+            }
+        }
     }
 
     private static void decrementQueenFromPool(LineageFactionData lineage) {

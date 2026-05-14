@@ -146,19 +146,13 @@ public final class HiveLocationFoundingService {
         lineageData.addLocation(location);
         HiveLocationRegistry.INSTANCE.register(location);
 
-        // Claim the center chunk through HiveLocationClaims so all three sources of truth (location set,
+        // Claim the initial core through HiveLocationClaims so all three sources of truth (location set,
         // registry byChunk index, BLib territory map) stay synchronized. Direct claimedChunks().add(...)
-        // would miss the BLib territory addClaim and leave the center chunk unclaimed in the UI.
+        // would miss the BLib territory addClaim and leave the core chunks unclaimed in the UI.
         if (queen.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
-            com.alien.common.gameplay.hive2.growth.HiveLocationClaims.claim(
-                serverLevel,
-                location,
-                centerChunk,
-                currentGameTime
-            );
+            claimInitialCore(serverLevel, location, centerChunk, currentGameTime);
         } else {
-            location.claimedChunks().add(centerChunk);
-            location.chunkClaimTicks().put(centerChunk, currentGameTime);
+            addInitialCoreOffline(location, centerChunk, currentGameTime);
         }
 
         // Provision the per-location faction at founding so it exists from t=0; the founder is added by the caller
@@ -178,6 +172,40 @@ public final class HiveLocationFoundingService {
         );
 
         return location;
+    }
+
+    private static void claimInitialCore(
+        net.minecraft.server.level.ServerLevel level,
+        HiveLocation location,
+        ChunkPos centerChunk,
+        long currentGameTime
+    ) {
+        var radius = HiveLocationRegistry.INSTANCE.config().initialHiveLocationClaimRadiusChunks();
+        for (var dx = -radius; dx <= radius; dx++) {
+            for (var dz = -radius; dz <= radius; dz++) {
+                var chunk = new ChunkPos(centerChunk.x + dx, centerChunk.z + dz);
+                if (HiveLocationRegistry.INSTANCE.getByChunk(level.dimension(), chunk) != null) {
+                    continue;
+                }
+                com.alien.common.gameplay.hive2.growth.HiveLocationClaims.claim(
+                    level,
+                    location,
+                    chunk,
+                    currentGameTime
+                );
+            }
+        }
+    }
+
+    private static void addInitialCoreOffline(HiveLocation location, ChunkPos centerChunk, long currentGameTime) {
+        var radius = HiveLocationRegistry.INSTANCE.config().initialHiveLocationClaimRadiusChunks();
+        for (var dx = -radius; dx <= radius; dx++) {
+            for (var dz = -radius; dz <= radius; dz++) {
+                var chunk = new ChunkPos(centerChunk.x + dx, centerChunk.z + dz);
+                location.claimedChunks().add(chunk);
+                location.chunkClaimTicks().put(chunk, currentGameTime);
+            }
+        }
     }
 
     /**
