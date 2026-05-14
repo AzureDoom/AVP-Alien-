@@ -238,20 +238,15 @@ public abstract class Alien extends Monster implements DataUser {
         // (natural, spawn egg, command). Idempotent — see HiveManager.ensureVariantFactionMembership.
         hiveManager.ensureVariantFactionMembership();
 
-        // Hive2: if this alien spawned inside a location that has it in reserves, decrement the selected reserve pool
-        // and copy genes from the location's leader (preserves the legacy "spawned alien inherits leader's genes"
-        // behavior). Arrival reserves are only used by the abstract-spread bootstrap spawner.
+        // Hive2: if this alien spawned inside a location that has it in its reserves, decrement the reserves and
+        // copy genes from the location's leader (preserves the legacy "spawned alien inherits leader's genes"
+        // behavior).
         var locationAtPos = HiveLocationRegistry.INSTANCE.getByChunk(
             level.getLevel().dimension(),
             new net.minecraft.world.level.ChunkPos(blockPosition())
         );
         if (locationAtPos != null && locationAtPos.isAlive()) {
-            var reserveSource = ReserveSpawnUtil.activeSpawnSource();
-            if (reserveSource == ReserveSpawnUtil.ReserveSpawnSource.ARRIVAL) {
-                if (locationAtPos.arrivalReserves().trySpawn(getType())) {
-                    ReserveSpawnUtil.markSpawnedFromReserves(this);
-                }
-            } else if (locationAtPos.localReserves().getCount(getType()) > 0) {
+            if (locationAtPos.localReserves().getCount(getType()) > 0) {
                 if (locationAtPos.localReserves().trySpawn(getType())) {
                     ReserveSpawnUtil.markSpawnedFromReserves(this);
                 }

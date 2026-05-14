@@ -113,7 +113,7 @@ public final class HiveInspectionSnapshot {
 
     public static final String K_RESERVES_BY_TYPE = "ReservesByType";
 
-    public static final String K_ARRIVAL_RESERVES_BY_TYPE = "ArrivalReservesByType";
+    public static final String K_PENDING_FOUNDER_QUEEN = "PendingFounderQueen";
 
     public static final String K_LINEAGE_MEMBER_COUNT = "LineageMembers";
 
@@ -262,6 +262,7 @@ public final class HiveInspectionSnapshot {
         var claimedChunks = location.claimedChunks();
         tag.putInt(K_CLAIMED_CHUNKS, claimedChunks.size());
         tag.putInt(K_DECORATED_CHUNKS, location.decoratedChunks().size());
+        tag.putBoolean(K_PENDING_FOUNDER_QUEEN, location.pendingFounderQueen());
 
         var serverLevel = server != null ? server.getLevel(location.dimension()) : null;
         var chunksLoaded = countLoadedChunks(location, serverLevel);
@@ -307,7 +308,6 @@ public final class HiveInspectionSnapshot {
         tag.put(K_LOADED_BY_TYPE, loadedList);
 
         tag.put(K_RESERVES_BY_TYPE, reserveRows(location.localReserves().underlying()));
-        tag.put(K_ARRIVAL_RESERVES_BY_TYPE, reserveRows(location.arrivalReserves().underlying()));
 
         var locationFaction = Alien.MOD.factions().get(locationFactionId);
         var locationFactionMembers = locationFaction != null ? locationFaction.membership().getMembers().size() : 0;

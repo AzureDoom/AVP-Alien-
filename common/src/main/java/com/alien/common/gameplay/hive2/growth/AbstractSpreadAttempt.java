@@ -24,9 +24,9 @@ import java.util.Random;
 /**
  * Unloaded spread per {@code HIVE_REDESIGN_08_LINEAGE_SPREAD.md} § 3.
  * <p>
- * Drives "the lineage conquers an unattended dimension over real-world weeks" without spawning queen entities. Folded
- * into {@link com.alien.common.gameplay.hive2.tick.LineageGrowthScanTask}'s loop — runs once per scan tick per lineage
- * when conditions allow.
+ * Drives "the lineage conquers an unattended dimension over real-world weeks" without forcing queen entities into
+ * unloaded chunks. Folded into {@link com.alien.common.gameplay.hive2.tick.LineageGrowthScanTask}'s loop — runs once
+ * per scan tick per lineage when conditions allow.
  * <p>
  * Conditions (must all hold):
  * <ul>
@@ -165,14 +165,16 @@ public final class AbstractSpreadAttempt {
 
         claimInitialCore(level, location, candidate, currentTick);
 
-        // Bootstrap arrivals: these founders may materialize once with a resin seed when the location first loads.
+        location.setPendingFounderQueen(true);
+
+        // Bootstrap workers. The pending founder queen will pull them into the world when she materializes.
         var droneType = Drone.getType(lineage.variant());
         var runnerType = Runner.getType(lineage.variant());
         if (droneType != null) {
-            location.arrivalReserves().tryAdd((EntityType<?>) droneType, 1);
+            location.localReserves().tryAdd((EntityType<?>) droneType, 1);
         }
         if (runnerType != null) {
-            location.arrivalReserves().tryAdd((EntityType<?>) runnerType, 1);
+            location.localReserves().tryAdd((EntityType<?>) runnerType, 1);
         }
 
         location.setBiomass(0);

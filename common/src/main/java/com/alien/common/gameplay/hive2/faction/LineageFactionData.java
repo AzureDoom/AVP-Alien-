@@ -478,7 +478,6 @@ public class LineageFactionData extends FactionData {
                 var locationTag = listTag.getCompound(i);
                 var location = HiveLocation.load(locationTag);
                 removedMismatchedReserveEntries += location.localReserves().removeVariantMismatches(variant);
-                removedMismatchedReserveEntries += location.arrivalReserves().removeVariantMismatches(variant);
                 locationsById.put(location.id(), location);
             }
         }

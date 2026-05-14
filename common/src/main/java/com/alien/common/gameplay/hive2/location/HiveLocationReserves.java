@@ -96,16 +96,6 @@ public final class HiveLocationReserves {
             .toList();
     }
 
-    public void transferAllTo(HiveLocationReserves destination) {
-        for (var type : new ArrayList<>(getAvailableEntityTypes())) {
-            var count = getCount(type);
-            if (count <= 0 || !destination.tryAdd(type, count)) {
-                continue;
-            }
-            underlying.add(type, -count);
-        }
-    }
-
     /** Direct access for callers that need to interoperate with raw BLib APIs. */
     public EntityReserves underlying() {
         return underlying;

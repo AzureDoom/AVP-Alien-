@@ -91,7 +91,6 @@ public final class LineageInvariantTask {
                 mismatchedUuids.addAll(entry.getValue());
             }
             removedReserveEntries += location.localReserves().removeVariantMismatches(lineageVariant);
-            removedReserveEntries += location.arrivalReserves().removeVariantMismatches(lineageVariant);
         }
 
         if (removedReserveEntries > 0) {
