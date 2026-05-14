@@ -194,7 +194,8 @@ public record HiveConfig(
             256, // maxChunksPerLocation
             10000, // maxChunksPerLineage
             16, // maxLineagesPerDimensionPerVariant
-            20, // maxClaimsPerScan
+            64, // maxClaimsPerScan (enough to complete a 7x7 ring boundary in one scan, so partial fills
+            //                       align with ring boundaries instead of breaking mid-ring)
             24L * TICKS_PER_HOUR, // resinFullDensityTicks
 
             // § 11 Biomass

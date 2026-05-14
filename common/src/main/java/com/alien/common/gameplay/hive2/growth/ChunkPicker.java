@@ -39,10 +39,14 @@ public final class ChunkPicker {
             return null;
         }
 
+        // Tiebreak (Chebyshev, Manhattan, x, z): within a ring, axial extremes (e.g., (2,0)) come before
+        // corners (e.g., (2,2)), so partial fills are rotationally symmetric — a cross filling out toward a
+        // square, rather than a square with one column missing.
         return frontier
             .stream()
             .min(
                 Comparator.<ChunkPos>comparingInt(c -> chebyshev(c, centerChunk))
+                    .thenComparingInt(c -> manhattan(c, centerChunk))
                     .thenComparingInt(c -> c.x)
                     .thenComparingInt(c -> c.z)
             )
@@ -79,5 +83,9 @@ public final class ChunkPicker {
 
     private static int chebyshev(ChunkPos a, ChunkPos b) {
         return Math.max(Math.abs(a.x - b.x), Math.abs(a.z - b.z));
+    }
+
+    private static int manhattan(ChunkPos a, ChunkPos b) {
+        return Math.abs(a.x - b.x) + Math.abs(a.z - b.z);
     }
 }
