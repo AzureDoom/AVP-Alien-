@@ -395,7 +395,8 @@ public final class HiveLocationRegistry {
         com.alien.common.gameplay.hive2.lifecycle.LocationDormancyTask.scanAll(server);
         com.alien.common.gameplay.hive2.lifecycle.LineageDeathHandler.scanAndKill(server);
 
-        // § 13 economy: balance buys + jelly production. Per-tick, no throttling.
+        // § 13 economy: jelly production then balance buys. Per-tick, no throttling.
+        com.alien.common.gameplay.hive2.economy.JellyProduction.scanAndProduce(server);
         com.alien.common.gameplay.hive2.economy.HiveBalanceTask.scanAll(server);
 
         ticksSinceLastDispatch++;

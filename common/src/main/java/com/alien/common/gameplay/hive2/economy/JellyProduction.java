@@ -1,0 +1,110 @@
+package com.alien.common.gameplay.hive2.economy;
+
+import com.alien.Alien;
+import com.alien.common.gameplay.hive2.faction.LineageFactionData;
+import com.alien.common.gameplay.hive2.id.LineageIds;
+import com.alien.common.gameplay.hive2.location.HiveLocation;
+import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
+import com.alien.common.registry.tag.AlienEntityTypeTags;
+import net.minecraft.server.MinecraftServer;
+
+import java.util.ArrayList;
+
+/**
+ * Per-tick jelly production. For each location:
+ * <ul>
+ * <li>{@code royalJellyAccumulator += loaded queen count}. At
+ * {@link com.alien.common.gameplay.hive2.config.HiveConfig#royalJellyTicksPerProduction()}, grant +1 royal jelly.</li>
+ * <li>{@code queenScourgeAccumulator += loaded queen count}. At
+ * {@link com.alien.common.gameplay.hive2.config.HiveConfig#scourgeJellyTicksPerQueenProduction()}, grant +1 scourge
+ * jelly.</li>
+ * <li>{@code harbingerScourgeAccumulator += loaded harbinger count}. At
+ * {@link com.alien.common.gameplay.hive2.config.HiveConfig#scourgeJellyTicksPerHarbingerProduction()}, grant +1
+ * scourge.</li>
+ * </ul>
+ * Grants are capped by {@code royalJellyCap} / {@code scourgeJellyCap}; overflow is discarded (the accumulator is still
+ * subtracted so the same tick budget isn't re-banked into the next minute).
+ * <p>
+ * Unloaded producers don't contribute — only what's in {@code loadedMembersByType} this tick. Matches the project's
+ * no-throttling / observed-only stance for instant economy effects.
+ */
+public final class JellyProduction {
+
+    private JellyProduction() {}
+
+    public static void scanAndProduce(MinecraftServer server) {
+        var config = HiveLocationRegistry.INSTANCE.config();
+
+        for (var factionId : new ArrayList<>(Alien.MOD.factions().getAllIds())) {
+            if (!LineageIds.isLineageId(factionId)) {
+                continue;
+            }
+            var faction = Alien.MOD.factions().get(factionId);
+            if (faction == null || !(faction.data() instanceof LineageFactionData lineage) || !lineage.isAlive()) {
+                continue;
+            }
+            for (var location : new ArrayList<>(lineage.locationsById().values())) {
+                if (!location.isAlive()) {
+                    continue;
+                }
+                tick(location, config);
+            }
+        }
+    }
+
+    private static void tick(
+        HiveLocation location,
+        com.alien.common.gameplay.hive2.config.HiveConfig config
+    ) {
+        var queenCount = countLoadedTagged(location, AlienEntityTypeTags.QUEENS);
+        var harbingerCount = countLoadedTagged(location, AlienEntityTypeTags.HARBINGERS);
+
+        if (queenCount > 0) {
+            var nextRoyal = location.royalJellyAccumulator() + queenCount;
+            var royalThreshold = config.royalJellyTicksPerProduction();
+            if (nextRoyal >= royalThreshold) {
+                grantRoyal(location, (int) (nextRoyal / royalThreshold), config.royalJellyCap());
+                nextRoyal %= royalThreshold;
+            }
+            location.setRoyalJellyAccumulator(nextRoyal);
+
+            var nextQueenScourge = location.queenScourgeAccumulator() + queenCount;
+            var queenScourgeThreshold = config.scourgeJellyTicksPerQueenProduction();
+            if (nextQueenScourge >= queenScourgeThreshold) {
+                grantScourge(location, (int) (nextQueenScourge / queenScourgeThreshold), config.scourgeJellyCap());
+                nextQueenScourge %= queenScourgeThreshold;
+            }
+            location.setQueenScourgeAccumulator(nextQueenScourge);
+        }
+
+        if (harbingerCount > 0) {
+            var nextHarbScourge = location.harbingerScourgeAccumulator() + harbingerCount;
+            var harbScourgeThreshold = config.scourgeJellyTicksPerHarbingerProduction();
+            if (nextHarbScourge >= harbScourgeThreshold) {
+                grantScourge(location, (int) (nextHarbScourge / harbScourgeThreshold), config.scourgeJellyCap());
+                nextHarbScourge %= harbScourgeThreshold;
+            }
+            location.setHarbingerScourgeAccumulator(nextHarbScourge);
+        }
+    }
+
+    private static int countLoadedTagged(HiveLocation location, net.minecraft.tags.TagKey<net.minecraft.world.entity.EntityType<?>> tag) {
+        var count = 0;
+        for (var entry : location.loadedMembersByType().entrySet()) {
+            if (entry.getKey().is(tag)) {
+                count += entry.getValue().size();
+            }
+        }
+        return count;
+    }
+
+    private static void grantRoyal(HiveLocation location, int amount, int cap) {
+        var newAmount = Math.min(cap, location.royalJelly() + amount);
+        location.setRoyalJelly(newAmount);
+    }
+
+    private static void grantScourge(HiveLocation location, int amount, int cap) {
+        var newAmount = Math.min(cap, location.scourgeJelly() + amount);
+        location.setScourgeJelly(newAmount);
+    }
+}
