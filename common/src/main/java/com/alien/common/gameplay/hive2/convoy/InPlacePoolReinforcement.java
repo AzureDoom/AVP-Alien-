@@ -3,6 +3,7 @@ package com.alien.common.gameplay.hive2.convoy;
 import com.alien.Alien;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
+import com.alien.common.gameplay.hive2.spawning.ReserveSpawnUtil;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobSpawnType;
@@ -45,6 +46,8 @@ public final class InPlacePoolReinforcement {
         if (spawned == null) {
             return false;
         }
+
+        ReserveSpawnUtil.markSpawnedFromReserves(spawned);
 
         // Decrement the pool. EntityReserves.add(type, -1) clamps at 0, so we're safe even if the count
         // raced to zero between the check and the decrement.

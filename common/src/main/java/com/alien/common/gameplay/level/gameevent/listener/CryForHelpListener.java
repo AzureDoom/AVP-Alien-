@@ -6,6 +6,7 @@ import com.alien.common.gameplay.block.entity.resin.vent.ResinVentBlockEntity;
 import com.alien.common.gameplay.hive2.convoy.InPlacePoolReinforcement;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
+import com.alien.common.gameplay.hive2.spawning.ReserveSpawnUtil;
 import com.alien.common.registry.tag.AlienBlockTags;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.spatial.v1.block.BlockPosUtil;
@@ -158,6 +159,7 @@ public class CryForHelpListener implements GameEventListener {
             return false;
         }
 
+        ReserveSpawnUtil.markSpawnedFromReserves(summoned);
         location.localReserves().trySpawn(randomType);
         vent.getAlienSpawnCooldown().reset();
         retargetIfPossible(sourceEntity, summoned);
@@ -196,6 +198,7 @@ public class CryForHelpListener implements GameEventListener {
             return false;
         }
 
+        ReserveSpawnUtil.markSpawnedFromReserves(summoned);
         lineage.lineagePool().add(randomType, -1);
         lineage.markDirty();
         vent.getAlienSpawnCooldown().reset();

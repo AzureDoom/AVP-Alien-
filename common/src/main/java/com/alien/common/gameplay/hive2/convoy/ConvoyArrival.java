@@ -5,6 +5,7 @@ import com.alien.common.gameplay.hive2.config.HiveConfig;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.gameplay.hive2.location.HivePoolCascade;
+import com.alien.common.gameplay.hive2.spawning.ReserveSpawnUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.MobSpawnType;
@@ -166,6 +167,7 @@ public final class ConvoyArrival {
             for (var i = 0; i < count; i++) {
                 var spawned = entityType.spawn(serverLevel, spawnPos, MobSpawnType.MOB_SUMMONED);
                 if (spawned != null) {
+                    ReserveSpawnUtil.markSpawnedFromReserves(spawned);
                     spawnedCount++;
                 }
             }

@@ -8,6 +8,7 @@ import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.faction.LocationMembership;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.gameplay.hive2.location.HivePoolCascade;
+import com.alien.common.gameplay.hive2.spawning.ReserveSpawnUtil;
 import com.alien.common.gameplay.level.saveddata.StrainLeakData;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienDataSyncKeys;
@@ -245,7 +246,9 @@ public abstract class Alien extends Monster implements DataUser {
         );
         if (locationAtPos != null && locationAtPos.isAlive()) {
             if (locationAtPos.localReserves().getCount(getType()) > 0) {
-                locationAtPos.localReserves().trySpawn(getType());
+                if (locationAtPos.localReserves().trySpawn(getType())) {
+                    ReserveSpawnUtil.markSpawnedFromReserves(this);
+                }
             }
 
             var leaderId = locationAtPos.leadership().getLeaderIdOrNull();
