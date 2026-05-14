@@ -9,6 +9,7 @@ import com.alien.common.gameplay.hive2.id.HiveLocationId;
 import com.alien.common.gameplay.hive2.id.HiveLocationIds;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
+import com.alien.common.gameplay.hive2.location.HiveLocationSpacing;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -88,7 +89,7 @@ public final class AbstractSpreadAttempt {
             return null;
         }
 
-        if (!isCandidateValid(lineage, candidateChunk)) {
+        if (!isCandidateValid(lineage, candidateChunk, config)) {
             return null;
         }
 
@@ -124,10 +125,20 @@ public final class AbstractSpreadAttempt {
         return new ChunkPos(sourceChunk.x + dx, sourceChunk.z + dz);
     }
 
-    private static boolean isCandidateValid(LineageFactionData lineage, ChunkPos candidate) {
+    private static boolean isCandidateValid(LineageFactionData lineage, ChunkPos candidate, HiveConfig config) {
         // Reject any chunk owned by any existing location.
         var occupant = HiveLocationRegistry.INSTANCE.getByChunk(lineage.dimension(), candidate);
         if (occupant != null) {
+            return false;
+        }
+
+        if (
+            !HiveLocationSpacing.isFarEnoughFromExistingLocations(
+                lineage.dimension(),
+                candidate,
+                config.minimumHiveLocationDistanceChunks()
+            )
+        ) {
             return false;
         }
 

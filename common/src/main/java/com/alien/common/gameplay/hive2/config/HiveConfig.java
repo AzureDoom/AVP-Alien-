@@ -23,6 +23,7 @@ public record HiveConfig(
     int bossBarDisplayRadiusBlocks,
     long angryGraceTicks,
     long contestTickWindow,
+    int minimumHiveLocationDistanceChunks,
 
     // ---------- § 3 Reserves ----------
     long shedGraceTicks,
@@ -132,6 +133,7 @@ public record HiveConfig(
             96, // bossBarDisplayRadiusBlocks
             60L * TICKS_PER_SECOND, // angryGraceTicks: 60s
             60L * TICKS_PER_SECOND, // contestTickWindow: 60s
+            4, // minimumHiveLocationDistanceChunks
 
             // § 3 Reserves
             5L * TICKS_PER_MINUTE, // shedGraceTicks: 5 min

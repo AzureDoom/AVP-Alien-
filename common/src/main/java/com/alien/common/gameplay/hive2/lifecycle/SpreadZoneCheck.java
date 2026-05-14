@@ -6,6 +6,7 @@ import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.id.LineageIds;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
+import com.alien.common.gameplay.hive2.location.HiveLocationSpacing;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ChunkPos;
@@ -36,7 +37,20 @@ public final class SpreadZoneCheck {
         }
 
         var queenVariant = queen.getVariant();
-        var maxSpread = HiveLocationRegistry.INSTANCE.config().maxLineageSpreadChunks();
+        var config = HiveLocationRegistry.INSTANCE.config();
+        if (
+            !HiveLocationSpacing.isFarEnoughFromExistingLocations(
+                dimension,
+                candidateChunk,
+                config.minimumHiveLocationDistanceChunks()
+            )
+        ) {
+            return new SpreadZoneResult.Blocked(
+                "chunk " + candidateChunk + " is too close to an existing hive location"
+            );
+        }
+
+        var maxSpread = config.maxLineageSpreadChunks();
 
         // Rule 2: collect this queen's lineage memberships (filtered to lineages of her variant + dimension).
         ResourceLocation ownLineageInRange = null;
