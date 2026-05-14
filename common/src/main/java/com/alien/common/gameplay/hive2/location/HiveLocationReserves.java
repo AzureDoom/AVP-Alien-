@@ -95,6 +95,29 @@ public final class HiveLocationReserves {
     }
 
     /**
+     * Returns already-owned live members to this location. This intentionally bypasses the reserve cap: caps gate new
+     * purchases/spawns, while despawn/shed return should preserve a hive's existing population.
+     */
+    public boolean addReturningMember(EntityType<?> type, int count) {
+        if (count <= 0) {
+            return false;
+        }
+        if (!accepts(type)) {
+            var required = variantSupplier.get();
+            Alien.LOGGER.warn(
+                "Hive2: rejected returning {} reserve member(s) of {} because it does not match location variant {}.",
+                count,
+                BuiltInRegistries.ENTITY_TYPE.getKey(type),
+                required
+            );
+            return false;
+        }
+
+        underlying.add(type, count);
+        return true;
+    }
+
+    /**
      * Unconditional spawn-side decrement. Returns true if a unit was successfully consumed; false if the type had zero.
      */
     public boolean trySpawn(EntityType<?> type) {

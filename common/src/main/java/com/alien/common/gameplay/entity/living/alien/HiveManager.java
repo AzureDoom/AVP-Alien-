@@ -2,6 +2,7 @@ package com.alien.common.gameplay.entity.living.alien;
 
 import com.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
+import com.alien.common.gameplay.hive2.faction.HiveMemberLocationResolver;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.faction.VariantFactionRegistry;
 import com.alien.common.gameplay.hive2.id.LineageIds;
@@ -10,7 +11,6 @@ import com.alien.common.gameplay.hive2.lifecycle.QueenSettlementDetector;
 import com.alien.common.gameplay.hive2.lifecycle.SpreadZoneCheck;
 import com.alien.common.gameplay.hive2.lifecycle.SpreadZoneResult;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
-import com.alien.common.gameplay.hive2.location.HivePoolCascade;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.faction.v1.FactionMember;
 import com.blib.api.common.nbt.v1.model.NBTSerializable;
@@ -18,8 +18,6 @@ import com.just.core.functional.option.Option;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ChunkPos;
-
-import java.util.ArrayList;
 
 /**
  * Per-alien hive2 manager. Drives:
@@ -161,9 +159,8 @@ public class HiveManager implements NBTSerializable {
     }
 
     /**
-     * Per-lineage shed check. For each lineage this alien belongs to, evaluates the conditions in
-     * {@code HIVE_REDESIGN_05_RESERVES.md} § 5; if all hold, removes the alien from that lineage's membership, adds +1
-     * of its type to the lineage pool (cascading through to the variant pool on overflow), and discards the entity.
+     * Per-lineage shed check. If this alien has stayed outside its lineage territory long enough, remove its live entity
+     * and return the unit to its owning hive location reserves.
      * <p>
      * Empresses and location leaders are exempt. Playable xenomorphs (parked future direction) will be exempt via a
      * one-line {@code instanceof Player} check that's currently unreachable since {@link Alien} doesn't extend Player.
@@ -182,47 +179,41 @@ public class HiveManager implements NBTSerializable {
             return false;
         }
 
-        var memberFactions = new ArrayList<>(Alien.MOD.factions().getFactionIds(alien.getUUID()));
-        var shedAny = false;
-
-        for (var factionId : memberFactions) {
-            if (!LineageIds.isLineageId(factionId)) {
-                continue;
-            }
-
-            var faction = Alien.MOD.factions().get(factionId);
-            if (faction == null || !(faction.data() instanceof LineageFactionData lineage)) {
-                continue;
-            }
-
-            if (!shouldShed(lineage, currentTick, config.minLineageAgeForShedding())) {
-                continue;
-            }
-
-            // Drop the alien from every location faction owned by this lineage first (preserving the
-            // location ⊆ lineage invariant); idempotent for locations the alien wasn't a member of.
-            for (var location : lineage.locationsById().values()) {
-                var locationFaction = Alien.MOD.factions().get(location.id().value());
-                if (locationFaction != null) {
-                    locationFaction.membership().removeMember(FactionMember.entity(alien));
-                }
-            }
-
-            // Remove from lineage membership (BLib will fire onMemberRemoved which clears
-            // loadedMembersByType for us via Phase 3's hook).
-            faction.membership().removeMember(FactionMember.entity(alien));
-
-            // Body becomes a count in the pool (HIVE_REDESIGN_05_RESERVES § 5 step 3).
-            HivePoolCascade.addToLineageCascading(lineage, alien.getType(), 1);
-            shedAny = true;
+        var returnLocation = HiveMemberLocationResolver.reserveReturnLocation(alien);
+        if (returnLocation == null) {
+            return false;
         }
 
-        if (shedAny) {
-            // Despawn the entity entirely — the alien is now "in pool form."
-            alien.discard();
+        var faction = Alien.MOD.factions().get(returnLocation.lineageFactionId());
+        if (faction == null || !(faction.data() instanceof LineageFactionData lineage)) {
+            return false;
         }
 
-        return shedAny;
+        if (!shouldShed(lineage, currentTick, config.minLineageAgeForShedding())) {
+            return false;
+        }
+
+        if (!returnLocation.localReserves().addReturningMember(alien.getType(), 1)) {
+            return false;
+        }
+
+        // Drop the alien from every location faction owned by this lineage first (preserving the
+        // location subset lineage invariant); idempotent for locations the alien wasn't a member of.
+        for (var location : lineage.locationsById().values()) {
+            var locationFaction = Alien.MOD.factions().get(location.id().value());
+            if (locationFaction != null) {
+                locationFaction.membership().removeMember(FactionMember.entity(alien));
+            }
+        }
+
+        // Remove from lineage membership (BLib will fire onMemberRemoved which clears
+        // loadedMembersByType for us via Phase 3's hook).
+        faction.membership().removeMember(FactionMember.entity(alien));
+
+        // Despawn the entity entirely; the unit is now stored in the hive location reserves.
+        alien.discard();
+
+        return true;
     }
 
     private boolean shouldShed(LineageFactionData lineage, long currentTick, long minLineageAge) {

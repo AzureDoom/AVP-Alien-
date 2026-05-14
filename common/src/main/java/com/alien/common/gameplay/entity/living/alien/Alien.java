@@ -4,10 +4,11 @@ import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
+import com.alien.common.gameplay.hive2.faction.HiveMemberLocationResolver;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.faction.LocationMembership;
+import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
-import com.alien.common.gameplay.hive2.location.HivePoolCascade;
 import com.alien.common.gameplay.hive2.spawning.ReserveSpawnUtil;
 import com.alien.common.gameplay.level.saveddata.StrainLeakData;
 import com.alien.common.model.alien.variant.AlienVariant;
@@ -630,39 +631,40 @@ public abstract class Alien extends Monster implements DataUser {
     @Override
     public void checkDespawn() {
         var wasAlive = isAlive() && !isRemoved();
+        var returnLocation = wasAlive && getType().is(AlienEntityTypeTags.XENOMORPHS)
+            ? reserveReturnLocation()
+            : null;
 
         super.checkDespawn();
 
         if (wasAlive && isRemoved()) {
-            onDespawned();
+            onDespawned(returnLocation);
         }
     }
 
-    private void onDespawned() {
-        // Hive2: feed the location's reserves on despawn (overflow cascades to lineage / variant pool). When the
-        // alien isn't in any tracked chunk, it counts as a strain leak instead.
+    private void onDespawned(@Nullable HiveLocation returnLocation) {
+        // Hive2: hive-owned xenomorphs always return to their owning location's reserves when vanilla despawns them,
+        // even if they wandered into an unclaimed chunk. Feral xenomorphs still count as strain leaks.
         if (getType().is(AlienEntityTypeTags.XENOMORPHS)) {
-            var location = HiveLocationRegistry.INSTANCE.getByChunk(level().dimension(), chunkPosition());
-            if (location != null) {
-                feedHive2OnDespawn();
-            } else {
-                onStrainLeak();
+            if (returnLocation != null && returnToHiveLocation(returnLocation)) {
+                return;
             }
+
+            onStrainLeak();
         }
     }
 
-    private void feedHive2OnDespawn() {
-        var location = HiveLocationRegistry.INSTANCE.getByChunk(level().dimension(), chunkPosition());
-        if (location == null) {
-            return;
+    private @Nullable HiveLocation reserveReturnLocation() {
+        var ownedLocation = HiveMemberLocationResolver.reserveReturnLocation(this);
+        if (ownedLocation != null) {
+            return ownedLocation;
         }
 
-        var faction = com.alien.Alien.MOD.factions().get(location.lineageFactionId());
-        if (faction == null || !(faction.data() instanceof LineageFactionData lineage)) {
-            return;
-        }
+        return HiveLocationRegistry.INSTANCE.getByChunk(level().dimension(), chunkPosition());
+    }
 
-        HivePoolCascade.addToLocationCascading(location, lineage, getType(), 1);
+    private boolean returnToHiveLocation(HiveLocation location) {
+        return location.localReserves().addReturningMember(getType(), 1);
     }
 
     private void onStrainLeak() {
