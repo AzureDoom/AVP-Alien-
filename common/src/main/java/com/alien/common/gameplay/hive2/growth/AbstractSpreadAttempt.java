@@ -165,14 +165,14 @@ public final class AbstractSpreadAttempt {
 
         claimInitialCore(level, location, candidate, currentTick);
 
-        // Bootstrap reserves: 1 drone, 1 runner per spec (08 § 4). Variant-matched.
+        // Bootstrap arrivals: these founders may materialize once with a resin seed when the location first loads.
         var droneType = Drone.getType(lineage.variant());
         var runnerType = Runner.getType(lineage.variant());
         if (droneType != null) {
-            location.localReserves().tryAdd((EntityType<?>) droneType, 1);
+            location.arrivalReserves().tryAdd((EntityType<?>) droneType, 1);
         }
         if (runnerType != null) {
-            location.localReserves().tryAdd((EntityType<?>) runnerType, 1);
+            location.arrivalReserves().tryAdd((EntityType<?>) runnerType, 1);
         }
 
         location.setBiomass(0);

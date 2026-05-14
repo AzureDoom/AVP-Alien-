@@ -272,6 +272,17 @@ public final class LocationFactionInspectorSection extends AbstractHiveInspector
             }
         }
 
+        var arrivals = listOrEmpty(s, HiveInspectionSnapshot.K_ARRIVAL_RESERVES_BY_TYPE);
+        if (!arrivals.isEmpty()) {
+            rowY += InspectorStyle.ROW_GAP;
+            var arrivalSection = drawCollapsibleSectionHeader(graphics, font, x, rowY, width, "arrival_reserves", "Arrivals", mouseX, mouseY);
+            rowY = arrivalSection.nextY();
+            if (arrivalSection.expanded()) {
+                rowY += InspectorStyle.CONTENT_PADDING / 2;
+                rowY = drawCountRows(graphics, font, x, rowY, width, arrivals);
+            }
+        }
+
         return rowY;
     }
 

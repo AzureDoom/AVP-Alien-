@@ -9,8 +9,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Snapshot of a location's per-caste population: loaded live members + local reserves, summed by entity-type tag. Used
- * by {@link HiveBalanceTask} to compute deficits and by recipe-condition checks.
+ * Snapshot of a location's per-caste population: loaded live members + local reserves + pending arrivals, summed by
+ * entity-type tag. Used by {@link HiveBalanceTask} to compute deficits and by recipe-condition checks.
  * <p>
  * Unloaded members don't contribute — they're not visible in {@code loadedMembersByType} and the faction-tier UUID-only
  * set doesn't carry entity-type info. This is a known approximation; the population cap is enforced against what we can
@@ -64,14 +64,15 @@ public final class CastePopulation {
             }
         }
         count += location.localReserves().getCountMatching(type -> type.is(caste));
+        count += location.arrivalReserves().getCountMatching(type -> type.is(caste));
         return count;
     }
 
-    /** Count of one concrete entity type (live loaded + reserves) in this location. */
+    /** Count of one concrete entity type (live loaded + reserves + pending arrivals) in this location. */
     public static int countEntity(HiveLocation location, EntityType<?> entityType) {
         var loaded = location.loadedMembersByType()
             .getOrDefault(entityType, java.util.Set.of())
             .size();
-        return loaded + location.localReserves().getCount(entityType);
+        return loaded + location.localReserves().getCount(entityType) + location.arrivalReserves().getCount(entityType);
     }
 }

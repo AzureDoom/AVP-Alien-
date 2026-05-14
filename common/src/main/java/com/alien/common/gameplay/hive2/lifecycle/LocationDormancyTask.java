@@ -89,10 +89,10 @@ public final class LocationDormancyTask {
             return true;
         }
 
-        // Rule 2: location faction empty AND local reserves empty → die.
+        // Rule 2: location faction empty AND no stored population → die.
         var locationFaction = Alien.MOD.factions().get(location.id().value());
         var locationMemberCount = locationFaction != null ? locationFaction.membership().getMembers().size() : 0;
-        var reservesCount = location.localReserves().getCount();
+        var reservesCount = location.localReserves().getCount() + location.arrivalReserves().getCount();
         if (locationMemberCount == 0 && reservesCount == 0) {
             LocationDeathHandler.killNaturalDecay(level, location, lineage);
             return true;

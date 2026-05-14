@@ -87,6 +87,10 @@ public final class HiveLocation {
 
     private static final String NBT_LOCAL_RESERVES = "LocalReserves";
 
+    private static final String NBT_ARRIVAL_RESERVES = "ArrivalReserves";
+
+    private static final String NBT_ARRIVAL_BOOTSTRAP_CONSUMED = "ArrivalBootstrapConsumed";
+
     private static final String NBT_LEADERSHIP = "Leadership";
 
     private static final String NBT_REMOVAL_REASON = "RemovalReason";
@@ -176,6 +180,10 @@ public final class HiveLocation {
 
     private final HiveLocationReserves localReserves;
 
+    private final HiveLocationReserves arrivalReserves;
+
+    private boolean arrivalBootstrapConsumed;
+
     private final HiveLocationLeadership leadership;
 
     private final com.alien.common.gameplay.hive2.vent.HiveVentManager ventManager;
@@ -225,6 +233,8 @@ public final class HiveLocation {
         this.chunkClaimTicks = new HashMap<>();
         this.decoratedChunks = new HashSet<>();
         this.localReserves = new HiveLocationReserves(this::lineageVariantOrNull);
+        this.arrivalReserves = new HiveLocationReserves(this::lineageVariantOrNull);
+        this.arrivalBootstrapConsumed = false;
         this.leadership = new HiveLocationLeadership();
         this.ventManager = new com.alien.common.gameplay.hive2.vent.HiveVentManager();
         this.loadedMembersByType = new HashMap<>();
@@ -404,6 +414,18 @@ public final class HiveLocation {
         return localReserves;
     }
 
+    public HiveLocationReserves arrivalReserves() {
+        return arrivalReserves;
+    }
+
+    public boolean arrivalBootstrapConsumed() {
+        return arrivalBootstrapConsumed;
+    }
+
+    public void setArrivalBootstrapConsumed(boolean arrivalBootstrapConsumed) {
+        this.arrivalBootstrapConsumed = arrivalBootstrapConsumed;
+    }
+
     public HiveLocationLeadership leadership() {
         return leadership;
     }
@@ -543,6 +565,15 @@ public final class HiveLocation {
         localReserves.save(reservesTag);
         tag.put(NBT_LOCAL_RESERVES, reservesTag);
 
+        if (arrivalReserves.getCount() > 0) {
+            var arrivalReservesTag = new CompoundTag();
+            arrivalReserves.save(arrivalReservesTag);
+            tag.put(NBT_ARRIVAL_RESERVES, arrivalReservesTag);
+        }
+        if (arrivalBootstrapConsumed) {
+            tag.putBoolean(NBT_ARRIVAL_BOOTSTRAP_CONSUMED, true);
+        }
+
         var leadershipTag = new CompoundTag();
         leadership.save(leadershipTag);
         tag.put(NBT_LEADERSHIP, leadershipTag);
@@ -622,6 +653,11 @@ public final class HiveLocation {
         if (tag.contains(NBT_LOCAL_RESERVES)) {
             location.localReserves.load(tag.getCompound(NBT_LOCAL_RESERVES));
         }
+
+        if (tag.contains(NBT_ARRIVAL_RESERVES)) {
+            location.arrivalReserves.load(tag.getCompound(NBT_ARRIVAL_RESERVES));
+        }
+        location.arrivalBootstrapConsumed = tag.getBoolean(NBT_ARRIVAL_BOOTSTRAP_CONSUMED);
 
         if (tag.contains(NBT_LEADERSHIP)) {
             location.leadership.load(tag.getCompound(NBT_LEADERSHIP));

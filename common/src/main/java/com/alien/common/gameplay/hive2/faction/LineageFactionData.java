@@ -478,12 +478,13 @@ public class LineageFactionData extends FactionData {
                 var locationTag = listTag.getCompound(i);
                 var location = HiveLocation.load(locationTag);
                 removedMismatchedReserveEntries += location.localReserves().removeVariantMismatches(variant);
+                removedMismatchedReserveEntries += location.arrivalReserves().removeVariantMismatches(variant);
                 locationsById.put(location.id(), location);
             }
         }
         if (removedMismatchedReserveEntries > 0) {
             Alien.LOGGER.warn(
-                "Hive2: removed {} variant-mismatched local reserve entries while loading lineage {} (variant={})",
+                "Hive2: removed {} variant-mismatched reserve entries while loading lineage {} (variant={})",
                 removedMismatchedReserveEntries,
                 factionId,
                 variant

@@ -91,12 +91,13 @@ public final class LineageInvariantTask {
                 mismatchedUuids.addAll(entry.getValue());
             }
             removedReserveEntries += location.localReserves().removeVariantMismatches(lineageVariant);
+            removedReserveEntries += location.arrivalReserves().removeVariantMismatches(lineageVariant);
         }
 
         if (removedReserveEntries > 0) {
             lineage.markDirty();
             Alien.LOGGER.info(
-                "Hive2: LineageInvariantTask removed {} variant-mismatched local reserve entries from lineage variant={}",
+                "Hive2: LineageInvariantTask removed {} variant-mismatched reserve entries from lineage variant={}",
                 removedReserveEntries,
                 lineageVariant
             );

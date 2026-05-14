@@ -104,13 +104,14 @@ public final class HiveLocationBossBar {
     private int updateProgress(LineageFactionData lineage) {
         var loadedHere = countMatchingLoadedMembers(XENOMORPH_PREDICATE);
         var inReserves = location.localReserves().getCountMatching(XENOMORPH_PREDICATE);
+        var arriving = location.arrivalReserves().getCountMatching(XENOMORPH_PREDICATE);
 
         // Reference `lineage` to satisfy the param contract; future lineage-level display rules may use it.
         if (lineage == null) {
             return 0;
         }
 
-        var total = loadedHere + inReserves;
+        var total = loadedHere + inReserves + arriving;
         var peak = Math.max(location.peakXenomorphCount(), Math.max(1, total));
         location.setPeakXenomorphCount(peak);
         bossEvent.setProgress(total / (float) peak);
