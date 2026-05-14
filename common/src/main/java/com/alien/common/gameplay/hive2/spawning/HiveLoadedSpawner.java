@@ -3,6 +3,7 @@ package com.alien.common.gameplay.hive2.spawning;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.AlienSpawning;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
+import com.alien.common.gameplay.hive2.location.HiveLocationReserves;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.gameplay.hive2.location.HiveLocationSpacing;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
@@ -10,8 +11,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.ChunkPos;
 import org.jetbrains.annotations.Nullable;
 
@@ -60,18 +63,10 @@ public final class HiveLoadedSpawner {
             ) {
                 attempts++;
 
-                var type = pickWeightedReserveType(level, location);
-                if (type == null) {
-                    return;
+                var entity = trySpawnLocalReserve(level, location, players);
+                if (entity == null) {
+                    entity = trySpawnArrivalBootstrap(level, location, players);
                 }
-
-                var player = players.get(level.random.nextInt(players.size()));
-                var pos = pickSpawnPosition(level, location, player, type);
-                if (pos == null) {
-                    continue;
-                }
-
-                var entity = type.spawn(level, pos, MobSpawnType.NATURAL);
                 if (entity != null) {
                     spawned++;
                 }
@@ -98,16 +93,66 @@ public final class HiveLoadedSpawner {
             .toList();
     }
 
-    private static @Nullable EntityType<?> pickWeightedReserveType(ServerLevel level, HiveLocation location) {
+    private static @Nullable Entity trySpawnLocalReserve(
+        ServerLevel level,
+        HiveLocation location,
+        List<ServerPlayer> players
+    ) {
+        var type = pickWeightedReserveType(level, location.localReserves());
+        if (type == null) {
+            return null;
+        }
+
+        var player = players.get(level.random.nextInt(players.size()));
+        var pos = pickSpawnPosition(level, location, player, type, SpawnMode.LOCAL_RESIN);
+        if (pos == null) {
+            return null;
+        }
+
+        return type.spawn(level, pos, MobSpawnType.NATURAL);
+    }
+
+    private static @Nullable Entity trySpawnArrivalBootstrap(
+        ServerLevel level,
+        HiveLocation location,
+        List<ServerPlayer> players
+    ) {
+        if (location.arrivalBootstrapConsumed()) {
+            return null;
+        }
+
+        var type = pickWeightedReserveType(level, location.arrivalReserves());
+        if (type == null) {
+            return null;
+        }
+
+        var player = players.get(level.random.nextInt(players.size()));
+        var pos = pickSpawnPosition(level, location, player, type, SpawnMode.BOOTSTRAP_ARRIVAL);
+        if (pos == null || !BootstrapResinSeeder.seedAt(level, pos, type)) {
+            return null;
+        }
+
+        var entity = ReserveSpawnUtil.withReserveSpawnSource(
+            ReserveSpawnUtil.ReserveSpawnSource.ARRIVAL,
+            () -> type.spawn(level, pos, MobSpawnType.NATURAL)
+        );
+        if (entity != null) {
+            location.arrivalReserves().transferAllTo(location.localReserves());
+            location.setArrivalBootstrapConsumed(true);
+        }
+        return entity;
+    }
+
+    private static @Nullable EntityType<?> pickWeightedReserveType(ServerLevel level, HiveLocationReserves reserves) {
         var weightedTypes = new ArrayList<WeightedType>();
         var totalWeight = 0;
 
-        for (var type : location.localReserves().getAvailableEntityTypes()) {
+        for (var type : reserves.getAvailableEntityTypes()) {
             if (!type.is(AlienEntityTypeTags.XENOMORPHS)) {
                 continue;
             }
 
-            var reserveCount = location.localReserves().getCount(type);
+            var reserveCount = reserves.getCount(type);
             var weight = weightFor(type) * Math.max(1, reserveCount);
             if (weight <= 0) {
                 continue;
@@ -166,9 +211,14 @@ public final class HiveLoadedSpawner {
         ServerLevel level,
         HiveLocation location,
         ServerPlayer player,
-        EntityType<?> type
+        EntityType<?> type,
+        SpawnMode mode
     ) {
-        var candidateChunks = candidateChunks(location, player, requiresCoreSpawn(type));
+        var candidateChunks = candidateChunks(
+            location,
+            player,
+            mode == SpawnMode.BOOTSTRAP_ARRIVAL || requiresCoreSpawn(type)
+        );
         if (candidateChunks.isEmpty()) {
             return null;
         }
@@ -182,7 +232,7 @@ public final class HiveLoadedSpawner {
             for (var dy = -8; dy <= 8; dy++) {
                 var y = Math.clamp(baseY + dy, level.getMinBuildHeight() + 1, level.getMaxBuildHeight() - 1);
                 var pos = new BlockPos(x, y, z);
-                if (isValidSpawnPosition(level, pos, type)) {
+                if (isValidSpawnPosition(level, location, pos, type, mode)) {
                     return pos;
                 }
             }
@@ -211,12 +261,33 @@ public final class HiveLoadedSpawner {
     }
 
     @SuppressWarnings("unchecked")
-    private static boolean isValidSpawnPosition(ServerLevel level, BlockPos pos, EntityType<?> rawType) {
+    private static boolean isValidSpawnPosition(
+        ServerLevel level,
+        HiveLocation location,
+        BlockPos pos,
+        EntityType<?> rawType,
+        SpawnMode mode
+    ) {
         if (!isValidPlayerDistance(level, pos)) {
             return false;
         }
         if (!level.noCollision(rawType.getSpawnAABB(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5))) {
             return false;
+        }
+        if (mode == SpawnMode.BOOTSTRAP_ARRIVAL) {
+            if (HiveLocationSpawnGate.locationContaining(level, pos) != location) {
+                return false;
+            }
+            if (!BootstrapResinSeeder.canSeedAt(level, pos, rawType)) {
+                return false;
+            }
+            return Monster.checkAnyLightMonsterSpawnRules(
+                (EntityType<? extends Monster>) rawType,
+                level,
+                MobSpawnType.NATURAL,
+                pos,
+                level.random
+            );
         }
         if (!AlienSpawning.canSpawnAt((EntityType<? extends Alien>) rawType, level, MobSpawnType.NATURAL, pos, level.random)) {
             return false;
@@ -243,4 +314,9 @@ public final class HiveLoadedSpawner {
     }
 
     private record WeightedType(EntityType<?> type, int weight) {}
+
+    private enum SpawnMode {
+        LOCAL_RESIN,
+        BOOTSTRAP_ARRIVAL
+    }
 }
