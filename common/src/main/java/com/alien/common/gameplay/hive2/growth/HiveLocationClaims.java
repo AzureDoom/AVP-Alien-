@@ -45,6 +45,23 @@ public final class HiveLocationClaims {
      * wasn't in the location's set.
      */
     public static boolean release(ServerLevel level, HiveLocation location, ChunkPos chunk) {
+        return release(level, location, chunk, false);
+    }
+
+    /**
+     * Releases {@code chunk} from {@code location}. Center chunks are protected unless {@code allowCenterChunk} is
+     * true, which is reserved for full location removal.
+     */
+    public static boolean release(
+        ServerLevel level,
+        HiveLocation location,
+        ChunkPos chunk,
+        boolean allowCenterChunk
+    ) {
+        if (!allowCenterChunk && chunk.equals(new ChunkPos(location.centerPos()))) {
+            return false;
+        }
+
         if (!location.claimedChunks().remove(chunk)) {
             return false;
         }

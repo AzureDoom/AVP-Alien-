@@ -33,7 +33,7 @@ public final class LocationRemovalHelper {
         // Snapshot the claimed chunks before iterating — release() mutates the set.
         var chunksToRelease = new HashSet<>(location.claimedChunks());
         for (var chunk : chunksToRelease) {
-            HiveLocationClaims.release(level, location, chunk);
+            HiveLocationClaims.release(level, location, chunk, true);
         }
 
         location.setRemovalReason(reason);
