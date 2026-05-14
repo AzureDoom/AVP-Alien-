@@ -18,7 +18,6 @@ import com.alien.common.registry.init.AlienCommands;
 import com.alien.common.registry.init.AlienCompostingChances;
 import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienDecoratedPotPatterns;
-import com.alien.common.registry.init.AlienEntitySpawns;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienFactionDataTypes;
 import com.alien.common.registry.init.AlienGameEvents;
@@ -114,7 +113,6 @@ public class Alien {
         AlienDecoratedPotPatterns.initialize();
         AlienCompostingChances.initialize();
         AlienDataSyncKeys.initialize();
-        AlienEntitySpawns.initialize();
         AlienFactionDataTypes.initialize();
 
         // Depends on entity types.
