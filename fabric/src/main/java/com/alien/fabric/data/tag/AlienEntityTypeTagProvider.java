@@ -43,6 +43,7 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
         addScourgeAliens();
         addRunnerHosts();
         addHosts();
+        addIgnoredByXenomorphs();
         addIrradiatedAliens();
         addNetherAliens();
         addNormalAliens();
@@ -265,6 +266,11 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
                 EntityType.WANDERING_TRADER,
                 EntityType.WITCH
             );
+    }
+
+    private void addIgnoredByXenomorphs() {
+        getOrCreateTagBuilder(AlienEntityTypeTags.IGNORED_BY_XENOMORPHS)
+            .add(EntityType.BAT, EntityType.CREEPER);
     }
 
     private void addIrradiatedAliens() {

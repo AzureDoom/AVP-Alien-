@@ -39,6 +39,8 @@ public class AlienEntityTypeTags {
 
     public static final TagKey<EntityType<?>> HOSTS = create("hosts");
 
+    public static final TagKey<EntityType<?>> IGNORED_BY_XENOMORPHS = create("ignored_by_xenomorphs");
+
     public static final TagKey<EntityType<?>> IRRADIATED_ALIENS = create("irradiated_aliens");
 
     public static final TagKey<EntityType<?>> NETHER_ALIENS = create("nether_aliens");
