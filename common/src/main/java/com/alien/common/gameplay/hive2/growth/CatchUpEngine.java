@@ -1,6 +1,7 @@
 package com.alien.common.gameplay.hive2.growth;
 
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
+import com.alien.common.gameplay.hive2.economy.CastePopulation;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import net.minecraft.server.level.ServerLevel;
@@ -71,6 +72,10 @@ public final class CatchUpEngine {
                 && location.claimedChunks().size() < config.maxChunksPerLocation()
                 && lineageTotal < config.maxChunksPerLineage()
         ) {
+            if (!hasEnoughPopulationToClaim(location, config)) {
+                return;
+            }
+
             var cost = BiomassIncome.claimCost(location, config);
             if (location.biomass() < cost) {
                 return;
@@ -86,5 +91,18 @@ public final class CatchUpEngine {
             claimsThisRun++;
             lineageTotal++;
         }
+    }
+
+    private static boolean hasEnoughPopulationToClaim(
+        HiveLocation location,
+        com.alien.common.gameplay.hive2.config.HiveConfig config
+    ) {
+        var cap = location.claimedChunks().size() * config.populationPerChunk();
+        if (cap <= 0) {
+            return false;
+        }
+
+        var requiredPopulation = (int) Math.ceil(cap * config.minimumPopulationRatioForClaiming());
+        return CastePopulation.totalTrackedPopulation(location) >= requiredPopulation;
     }
 }

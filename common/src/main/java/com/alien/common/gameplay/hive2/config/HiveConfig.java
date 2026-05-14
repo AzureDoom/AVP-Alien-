@@ -105,6 +105,7 @@ public record HiveConfig(
 
     // ---------- § 13 Population + jelly economy ----------
     int populationPerChunk,
+    double minimumPopulationRatioForClaiming,
     long royalJellyTicksPerProduction,
     long scourgeJellyTicksPerQueenProduction,
     long scourgeJellyTicksPerHarbingerProduction,
@@ -214,6 +215,7 @@ public record HiveConfig(
 
             // § 13 Population + jelly economy
             8, // populationPerChunk
+            0.8, // minimumPopulationRatioForClaiming
             TICKS_PER_MINUTE, // royalJellyTicksPerProduction (1 game-min per queen)
             100L * TICKS_PER_MINUTE, // scourgeJellyTicksPerQueenProduction (100 game-min per queen)
             TICKS_PER_MINUTE, // scourgeJellyTicksPerHarbingerProduction (1 game-min per harbinger)
