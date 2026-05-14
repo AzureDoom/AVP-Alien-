@@ -13,8 +13,8 @@ import net.minecraft.server.MinecraftServer;
  * every loaded lineage and runs {@link CatchUpEngine#catchUpTo} on each of its locations — applying abstract biomass
  * income for the elapsed period and looping batched claim attempts.
  * <p>
- * Phase 7 wires the catch-up engine. Phase 11 layers abstract-spread (empress-gated unloaded founding of new locations)
- * on top per {@code HIVE_REDESIGN_08_LINEAGE_SPREAD.md} § 3.
+ * Phase 7 wires the catch-up engine. Phase 11 layers abstract spread for unloaded founding of new locations on top per
+ * {@code HIVE_REDESIGN_08_LINEAGE_SPREAD.md} § 3.
  */
 public final class LineageGrowthScanTask {
 
@@ -46,8 +46,8 @@ public final class LineageGrowthScanTask {
                 CatchUpEngine.catchUpTo(level, location, lineage, currentTick);
             }
 
-            // Phase 11: empress-gated abstract spread per scan. The attempt itself is gated by cooldown +
-            // empress liveness + max-locations cap, so calling unconditionally is cheap and idempotent.
+            // Phase 11: abstract spread per scan. The attempt itself is gated by cooldown + max-locations cap, so
+            // calling unconditionally is cheap and idempotent.
             AbstractSpreadAttempt.tryRun(server, factionId, lineage, currentTick);
         }
     }

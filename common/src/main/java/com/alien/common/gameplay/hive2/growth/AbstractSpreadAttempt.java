@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /**
- * Empress-gated unloaded spread per {@code HIVE_REDESIGN_08_LINEAGE_SPREAD.md} § 3.
+ * Unloaded spread per {@code HIVE_REDESIGN_08_LINEAGE_SPREAD.md} § 3.
  * <p>
  * Drives "the lineage conquers an unattended dimension over real-world weeks" without spawning queen entities. Folded
  * into {@link com.alien.common.gameplay.hive2.tick.LineageGrowthScanTask}'s loop — runs once per scan tick per lineage
@@ -30,7 +30,6 @@ import java.util.Random;
  * <p>
  * Conditions (must all hold):
  * <ul>
- * <li>Empress is alive.</li>
  * <li>{@code currentTick - lineage.lastSpreadTick >= lineageSpreadCooldownTicks} (default 30 minutes).</li>
  * <li>Lineage hasn't hit {@code maxLocationsPerLineage}.</li>
  * </ul>
@@ -56,11 +55,6 @@ public final class AbstractSpreadAttempt {
         long currentTick
     ) {
         var config = HiveLocationRegistry.INSTANCE.config();
-
-        // Empress required.
-        if (lineage.empressId() == null || lineage.pendingEmpressEmergence()) {
-            return null;
-        }
 
         // Cooldown.
         if (currentTick - lineage.lastSpreadTick() < config.lineageSpreadCooldownTicks()) {

@@ -128,7 +128,7 @@ public record HiveConfig(
             96, // bossBarDisplayRadiusBlocks
             60L * TICKS_PER_SECOND, // angryGraceTicks: 60s
             60L * TICKS_PER_SECOND, // contestTickWindow: 60s
-            4, // minimumHiveLocationDistanceChunks
+            16, // minimumHiveLocationDistanceChunks
             1, // initialHiveLocationClaimRadiusChunks: 3x3
 
             // § 3 Reserves
@@ -172,7 +172,7 @@ public record HiveConfig(
             // § 9 Lineage spread
             32, // maxLineageSpreadChunks
             30L * TICKS_PER_MINUTE, // lineageSpreadCooldownTicks
-            64, // maxLocationsPerLineage
+            16, // maxLocationsPerLineage
             30L * TICKS_PER_SECOND, // foragerJoinTicks
 
             // § 10 Growth
