@@ -162,7 +162,7 @@ public final class HiveBalanceTask {
         desired.put(AlienEntityTypeTags.PRAETORIANS, warrior / 12);
         desired.put(AlienEntityTypeTags.CRUSHERS, runner / 12);
         desired.put(AlienEntityTypeTags.RAVAGERS, warrior / 8);
-        desired.put(AlienEntityTypeTags.HARBINGERS, totalPop >= 100 ? Math.max(1, harbinger) : 0);
+        desired.put(AlienEntityTypeTags.HARBINGERS, totalPop >= 100 && harbinger == 0 ? 1 : 0);
 
         var deficits = new LinkedHashMap<TagKey<EntityType<?>>, Integer>();
         for (var entry : desired.entrySet()) {
