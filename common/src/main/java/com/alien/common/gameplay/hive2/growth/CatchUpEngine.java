@@ -76,7 +76,7 @@ public final class CatchUpEngine {
                 return;
             }
 
-            var nextChunk = ChunkPicker.pickNextChunk(location, config);
+            var nextChunk = ChunkPicker.pickNextChunk(level, location, config);
             if (nextChunk == null) {
                 return;
             }

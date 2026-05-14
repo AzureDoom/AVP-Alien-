@@ -1,8 +1,11 @@
 package com.alien.common.gameplay.hive2.growth;
 
+import com.alien.Alien;
 import com.alien.common.gameplay.hive2.config.HiveConfig;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
+import com.blib.api.common.faction.v1.FactionMember;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,12 +16,14 @@ import java.util.Set;
 /**
  * Picks the next chunk a location should try to claim. Walks the cardinal-adjacent frontier of its current
  * {@code claimedChunks}, filters out chunks owned by any other registered location, and returns the candidate closest
- * to the location's center (Chebyshev distance). Returns {@code null} when the location is hemmed in.
+ * to the location's center (Chebyshev distance). Returns {@code null} when the location is hemmed in or no candidate
+ * has a loaded xenomorph member of this location standing in it.
  * <p>
- * See {@code HIVE_REDESIGN_09_GROWTH.md} § 3.2.
+ * The "loaded xeno present in the candidate" gate means hive growth is xenomorph-driven: the hive can't passively print
+ * territory; an actual unit has to be out exploring an adjacent unclaimed chunk for it to be claimed.
  * <p>
- * Phase 7 uses the strict "any occupant blocks" rule. Same-variant cross-lineage <em>contests</em> per
- * {@code 03_LOCATIONS} § 3 are deferred to Phase 11; until then no overlapping claims are minted.
+ * See {@code HIVE_REDESIGN_09_GROWTH.md} § 3.2. Same-variant cross-lineage <em>contests</em> per {@code 03_LOCATIONS} §
+ * 3 are deferred; until then no overlapping claims are minted.
  */
 public final class ChunkPicker {
 
@@ -26,14 +31,13 @@ public final class ChunkPicker {
 
     private ChunkPicker() {}
 
-    public static @Nullable ChunkPos pickNextChunk(HiveLocation location, HiveConfig config) {
+    public static @Nullable ChunkPos pickNextChunk(ServerLevel level, HiveLocation location, HiveConfig config) {
         if (location.claimedChunks().size() >= config.maxChunksPerLocation()) {
             return null;
         }
 
-        var dimension = location.dimension();
         var centerChunk = new ChunkPos(location.centerPos());
-        var frontier = collectFrontier(location, dimension);
+        var frontier = collectFrontier(level, location);
 
         if (frontier.isEmpty()) {
             return null;
@@ -53,11 +57,10 @@ public final class ChunkPicker {
             .orElse(null);
     }
 
-    private static Set<ChunkPos> collectFrontier(
-        HiveLocation location,
-        net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension
-    ) {
+    private static Set<ChunkPos> collectFrontier(ServerLevel level, HiveLocation location) {
+        var dimension = location.dimension();
         var frontier = new HashSet<ChunkPos>();
+        var locationFaction = Alien.MOD.factions().get(location.id().value());
 
         for (var owned : location.claimedChunks()) {
             for (var offset : CARDINAL_OFFSETS) {
@@ -67,10 +70,20 @@ public final class ChunkPicker {
                     continue;
                 }
 
-                // Reject any chunk owned by another location (any lineage). Same-variant contests
-                // are deferred to Phase 11; for now we bake in the no-overlap rule.
+                // Reject any chunk owned by another location (any lineage).
                 var occupant = HiveLocationRegistry.INSTANCE.getByChunk(dimension, candidate);
                 if (occupant != null) {
+                    continue;
+                }
+
+                // Candidate must be loaded.
+                if (!level.getChunkSource().hasChunk(candidate.x, candidate.z)) {
+                    continue;
+                }
+
+                // At least one location-faction member must be standing in the candidate chunk. This makes hive
+                // growth contingent on a xenomorph actually exploring outward.
+                if (!hasMemberInChunk(level, locationFaction, candidate)) {
                     continue;
                 }
 
@@ -79,6 +92,29 @@ public final class ChunkPicker {
         }
 
         return frontier;
+    }
+
+    private static boolean hasMemberInChunk(
+        ServerLevel level,
+        @Nullable com.blib.api.common.faction.v1.Faction<?> locationFaction,
+        ChunkPos chunk
+    ) {
+        if (locationFaction == null) {
+            return false;
+        }
+        for (var member : locationFaction.membership().getMembers()) {
+            if (!(member instanceof FactionMember.Entity entityMember)) {
+                continue;
+            }
+            var entity = level.getEntity(entityMember.uuid());
+            if (entity == null) {
+                continue;
+            }
+            if (new ChunkPos(entity.blockPosition()).equals(chunk)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static int chebyshev(ChunkPos a, ChunkPos b) {
