@@ -57,15 +57,6 @@ public final class HiveLocationBossBar {
             )
         );
 
-    private static final Map<AlienVariant, Component> VARIANT_TITLE_COMPONENTS = VARIANT_TITLE_KEYS.entrySet()
-        .stream()
-        .collect(
-            Collectors.toMap(
-                Map.Entry::getKey,
-                entry -> Component.translatable(entry.getValue())
-            )
-        );
-
     private final HiveLocation location;
 
     private final Supplier<HiveConfig> configSupplier;
@@ -76,7 +67,7 @@ public final class HiveLocationBossBar {
         this.location = location;
         this.configSupplier = configSupplier;
         this.bossEvent = (ServerBossEvent) new ServerBossEvent(
-            VARIANT_TITLE_COMPONENTS.get(variant),
+            titleComponent(variant, 0, false),
             AlienVariantTypes.getFor(variant).bossBarColor(),
             BossEvent.BossBarOverlay.PROGRESS
         ).setDarkenScreen(AlienPropertyAccess.INSTANCE.getOrThrow(AlienProperties.Hive.DARKEN_SCREEN));
@@ -85,8 +76,8 @@ public final class HiveLocationBossBar {
     public void tick(MinecraftServer server, AlienVariant variant, LineageFactionData lineage) {
         decayPeak();
         decayEvacuating();
-        updateProgress(lineage);
-        updateColorAndTitle(variant);
+        var xenomorphCount = updateProgress(lineage);
+        updateColorAndTitle(variant, xenomorphCount);
         updateTrackingPlayers(server, variant);
     }
 
@@ -110,20 +101,21 @@ public final class HiveLocationBossBar {
         }
     }
 
-    private void updateProgress(LineageFactionData lineage) {
+    private int updateProgress(LineageFactionData lineage) {
         var loadedHere = countMatchingLoadedMembers(XENOMORPH_PREDICATE);
         var inReserves = location.localReserves().getCountMatching(XENOMORPH_PREDICATE);
 
         // Reference `lineage` to satisfy the param contract — Phase 4+ may need
         // pool-aware adjustments here.
         if (lineage == null) {
-            return;
+            return 0;
         }
 
         var total = loadedHere + inReserves;
         var peak = Math.max(location.peakXenomorphCount(), Math.max(1, total));
         location.setPeakXenomorphCount(peak);
         bossEvent.setProgress(total / (float) peak);
+        return total;
     }
 
     private int countMatchingLoadedMembers(Predicate<EntityType<?>> predicate) {
@@ -136,16 +128,25 @@ public final class HiveLocationBossBar {
         return count;
     }
 
-    private void updateColorAndTitle(AlienVariant variant) {
-        if (location.evacuatingRemainingTicks() > 0) {
+    private void updateColorAndTitle(AlienVariant variant, int xenomorphCount) {
+        var evacuating = location.evacuatingRemainingTicks() > 0;
+        if (evacuating) {
             bossEvent.setColor(BossEvent.BossBarColor.YELLOW);
-            bossEvent.setName(
-                Component.translatable(VARIANT_TITLE_KEYS.get(variant)).append(Component.literal(" (Evacuating)"))
-            );
         } else {
             bossEvent.setColor(AlienVariantTypes.getFor(variant).bossBarColor());
-            bossEvent.setName(VARIANT_TITLE_COMPONENTS.get(variant));
         }
+        bossEvent.setName(titleComponent(variant, xenomorphCount, evacuating));
+    }
+
+    private static Component titleComponent(AlienVariant variant, int xenomorphCount, boolean evacuating) {
+        var title = Component.translatable(VARIANT_TITLE_KEYS.get(variant))
+            .append(Component.literal(" - " + xenomorphCount));
+
+        if (evacuating) {
+            title.append(Component.literal(" (Evacuating)"));
+        }
+
+        return title;
     }
 
     private void updateTrackingPlayers(MinecraftServer server, AlienVariant variant) {
