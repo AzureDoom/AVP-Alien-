@@ -1,0 +1,23 @@
+{
+  "biomass": 200,
+  "conditions": [
+    {
+      "type": "min_population",
+      "value": 100
+    },
+    {
+      "type": "max_caste_count_in_location",
+      "caste": "avp_alien:harbingers",
+      "value": 1
+    }
+  ],
+  "input_castes": [
+    {
+      "caste": "avp_alien:warriors",
+      "count": 1
+    }
+  ],
+  "output_caste": "avp_alien:harbingers",
+  "royal_jelly": 4,
+  "scourge_jelly": 4
+}

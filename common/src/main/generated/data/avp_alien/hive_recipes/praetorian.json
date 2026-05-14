@@ -1,0 +1,10 @@
+{
+  "input_castes": [
+    {
+      "caste": "avp_alien:warriors",
+      "count": 1
+    }
+  ],
+  "output_caste": "avp_alien:praetorians",
+  "royal_jelly": 1
+}

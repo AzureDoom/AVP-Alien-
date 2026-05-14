@@ -1,0 +1,10 @@
+{
+  "input_castes": [
+    {
+      "caste": "avp_alien:runners",
+      "count": 1
+    }
+  ],
+  "output_caste": "avp_alien:razor_claws",
+  "scourge_jelly": 1
+}

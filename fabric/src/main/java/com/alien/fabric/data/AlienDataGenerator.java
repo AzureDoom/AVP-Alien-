@@ -69,6 +69,7 @@ public class AlienDataGenerator implements DataGeneratorEntrypoint {
 
         pack.addProvider(FormSizeScaleSubProvider::new);
         pack.addProvider(GrowthStageSubProvider::new);
+        pack.addProvider(com.alien.fabric.data.hive_recipe.HiveRecipeDataProvider::new);
         pack.addProvider(InfectionSubProvider::new);
     }
 
