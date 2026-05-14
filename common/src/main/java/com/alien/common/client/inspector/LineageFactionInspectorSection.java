@@ -48,6 +48,7 @@ public final class LineageFactionInspectorSection extends AbstractHiveInspectorS
             if (s.contains(HiveInspectionSnapshot.K_REMOVAL_REASON)) {
                 rowY = HiveInspectorRender.drawRow(graphics, font, x, rowY, width, "Removal", s.getString(HiveInspectionSnapshot.K_REMOVAL_REASON));
             }
+            rowY = HiveInspectorRender.drawClippedRow(graphics, font, x, rowY, width, "ID", s.getString(HiveInspectionSnapshot.K_FACTION_ID));
             rowY = HiveInspectorRender.drawRow(graphics, font, x, rowY, width, "Variant", s.getString(HiveInspectionSnapshot.K_VARIANT_NAME));
             rowY = HiveInspectorRender.drawRow(graphics, font, x, rowY, width, "Dimension", s.getString(HiveInspectionSnapshot.K_DIMENSION));
             rowY = HiveInspectorRender.drawMetricStrip(
@@ -58,7 +59,10 @@ public final class LineageFactionInspectorSection extends AbstractHiveInspectorS
                 width,
                 metric("Lineage #", String.valueOf(s.getLong(HiveInspectionSnapshot.K_LINEAGE_NUMBER))),
                 metric("Age", HiveInspectorRender.formatTicks(s.getLong(HiveInspectionSnapshot.K_AGE_TICKS))),
-                metric("Members", String.valueOf(s.getInt(HiveInspectionSnapshot.K_LINEAGE_MEMBER_TOTAL)))
+                metric("Members", String.valueOf(s.getInt(HiveInspectionSnapshot.K_LINEAGE_MEMBER_TOTAL))),
+                metric("Locations", String.valueOf(s.getInt(HiveInspectionSnapshot.K_LOCATION_COUNT))),
+                metric("Next loc #", String.valueOf(s.getLong(HiveInspectionSnapshot.K_NEXT_LOCATION_NUMBER))),
+                metric("Convoys", String.valueOf(s.getInt(HiveInspectionSnapshot.K_CONVOY_COUNT)))
             );
             if (s.hasUUID(HiveInspectionSnapshot.K_FOUNDER_ID)) {
                 rowY = HiveInspectorRender.drawRow(
@@ -111,10 +115,152 @@ public final class LineageFactionInspectorSection extends AbstractHiveInspectorS
                 x,
                 rowY,
                 width,
-                "Population",
+                "Location pop",
                 s.getLong(HiveInspectionSnapshot.K_AGG_TOTAL_POP),
                 s.getLong(HiveInspectionSnapshot.K_AGG_POP_CAP)
             );
+            rowY = HiveInspectorRender.drawMetricStrip(
+                graphics,
+                font,
+                x,
+                rowY,
+                width,
+                metric("Loaded", String.valueOf(s.getLong(HiveInspectionSnapshot.K_AGG_LOADED_MEMBERS))),
+                metric("Local res", String.valueOf(s.getLong(HiveInspectionSnapshot.K_AGG_LOCAL_RESERVES))),
+                metric("Lineage pool", String.valueOf(s.getInt(HiveInspectionSnapshot.K_LINEAGE_POOL_TOTAL))),
+                metric("Convoy pop", String.valueOf(s.getInt(HiveInspectionSnapshot.K_CONVOY_MEMBER_TOTAL))),
+                metric("Loc members", String.valueOf(s.getLong(HiveInspectionSnapshot.K_AGG_LOCATION_MEMBERS))),
+                metric(
+                    "Chunks",
+                    s.getLong(HiveInspectionSnapshot.K_AGG_CHUNKS_LOADED) + "/" + s.getLong(HiveInspectionSnapshot.K_AGG_CLAIMED_CHUNKS)
+                )
+            );
+        }
+
+        rowY += InspectorStyle.ROW_GAP;
+        var poolRows = listOrEmpty(s, HiveInspectionSnapshot.K_LINEAGE_POOL_BY_TYPE);
+        var lineagePool = drawCollapsibleSectionHeader(
+            graphics,
+            font,
+            x,
+            rowY,
+            width,
+            "lineage_pool",
+            "Lineage Pool (" + s.getInt(HiveInspectionSnapshot.K_LINEAGE_POOL_TOTAL) + ")",
+            mouseX,
+            mouseY
+        );
+        rowY = lineagePool.nextY();
+        if (lineagePool.expanded()) {
+            rowY += InspectorStyle.CONTENT_PADDING / 2;
+            if (poolRows.isEmpty()) {
+                rowY = HiveInspectorRender.drawNote(graphics, font, x, rowY, width, "(empty - no pooled lineage reserves)");
+            } else {
+                rowY = HiveInspectorRender.drawCountRows(
+                    graphics,
+                    font,
+                    x,
+                    rowY,
+                    width,
+                    poolRows,
+                    HiveInspectionSnapshot.K_KEY,
+                    HiveInspectionSnapshot.K_VALUE
+                );
+            }
+        }
+
+        rowY += InspectorStyle.ROW_GAP;
+        var convoyRows = listOrEmpty(s, HiveInspectionSnapshot.K_CONVOYS);
+        var convoys = drawCollapsibleSectionHeader(
+            graphics,
+            font,
+            x,
+            rowY,
+            width,
+            "convoys",
+            "Convoys (" + s.getInt(HiveInspectionSnapshot.K_CONVOY_COUNT) + ")",
+            mouseX,
+            mouseY
+        );
+        rowY = convoys.nextY();
+        if (convoys.expanded()) {
+            rowY += InspectorStyle.CONTENT_PADDING / 2;
+            if (convoyRows.isEmpty()) {
+                rowY = HiveInspectorRender.drawNote(graphics, font, x, rowY, width, "(none - no population is in transit)");
+            } else {
+                for (var i = 0; i < convoyRows.size(); i++) {
+                    var row = convoyRows.getCompound(i);
+                    rowY = HiveInspectorRender.drawItemHeader(
+                        graphics,
+                        font,
+                        x,
+                        rowY,
+                        width,
+                        row.getString(HiveInspectionSnapshot.K_TYPE),
+                        "total " + row.getInt(HiveInspectionSnapshot.K_VALUE)
+                    );
+                    rowY = HiveInspectorRender.drawMetricStrip(
+                        graphics,
+                        font,
+                        x,
+                        rowY,
+                        width,
+                        metric("Dim", row.getString(HiveInspectionSnapshot.K_DIMENSION)),
+                        metric("Current", coords(row, HiveInspectionSnapshot.K_CURRENT_X, HiveInspectionSnapshot.K_CURRENT_Y, HiveInspectionSnapshot.K_CURRENT_Z)),
+                        metric("Target", coords(row, HiveInspectionSnapshot.K_DEST_X, HiveInspectionSnapshot.K_DEST_Y, HiveInspectionSnapshot.K_DEST_Z)),
+                        metric("Dispatched", String.valueOf(row.getLong(HiveInspectionSnapshot.K_DISPATCHED_TICK))),
+                        metric("Biomass", String.valueOf(row.getInt(HiveInspectionSnapshot.K_BIOMASS_PAYLOAD))),
+                        metric("Empress", row.getBoolean(HiveInspectionSnapshot.K_CARRIES_EMPRESS) ? "yes" : "no")
+                    );
+                    if (row.contains(HiveInspectionSnapshot.K_SOURCE_LOCATION_ID)) {
+                        rowY = HiveInspectorRender.drawClippedRow(
+                            graphics,
+                            font,
+                            x,
+                            rowY,
+                            width,
+                            "Source",
+                            row.getString(HiveInspectionSnapshot.K_SOURCE_LOCATION_ID)
+                        );
+                    }
+                    if (row.contains(HiveInspectionSnapshot.K_DESTINATION_LOCATION_ID)) {
+                        rowY = HiveInspectorRender.drawClippedRow(
+                            graphics,
+                            font,
+                            x,
+                            rowY,
+                            width,
+                            "Destination",
+                            row.getString(HiveInspectionSnapshot.K_DESTINATION_LOCATION_ID)
+                        );
+                    }
+                    if (row.hasUUID(HiveInspectionSnapshot.K_TARGET_PLAYER_ID)) {
+                        rowY = HiveInspectorRender.drawRow(
+                            graphics,
+                            font,
+                            x,
+                            rowY,
+                            width,
+                            "Target",
+                            HiveInspectorRender.shortUuid(row.getUUID(HiveInspectionSnapshot.K_TARGET_PLAYER_ID))
+                        );
+                    }
+                    var composition = listOrEmpty(row, HiveInspectionSnapshot.K_RESERVES_BY_TYPE);
+                    if (!composition.isEmpty()) {
+                        rowY = HiveInspectorRender.drawCountRows(
+                            graphics,
+                            font,
+                            x,
+                            rowY,
+                            width,
+                            composition,
+                            HiveInspectionSnapshot.K_KEY,
+                            HiveInspectionSnapshot.K_VALUE
+                        );
+                    }
+                    rowY += InspectorStyle.ROW_GAP;
+                }
+            }
         }
 
         rowY += InspectorStyle.ROW_GAP;
@@ -129,7 +275,19 @@ public final class LineageFactionInspectorSection extends AbstractHiveInspectorS
                 for (var i = 0; i < locations.size(); i++) {
                     var row = locations.getCompound(i);
                     var label = row.getString(HiveInspectionSnapshot.K_LOCATION_ID);
-                    rowY = HiveInspectorRender.drawItemHeader(graphics, font, x, rowY, width, "Location", label);
+                    if (row.contains(HiveInspectionSnapshot.K_REMOVAL_REASON)) {
+                        label = label + " (" + row.getString(HiveInspectionSnapshot.K_REMOVAL_REASON) + ")";
+                    }
+                    var locationNumber = row.getLong(HiveInspectionSnapshot.K_LOCATION_NUMBER);
+                    rowY = HiveInspectorRender.drawItemHeader(
+                        graphics,
+                        font,
+                        x,
+                        rowY,
+                        width,
+                        locationNumber >= 0 ? "Location #" + locationNumber : "Location",
+                        label
+                    );
                     rowY = HiveInspectorRender.drawMetricStrip(
                         graphics,
                         font,
@@ -137,9 +295,34 @@ public final class LineageFactionInspectorSection extends AbstractHiveInspectorS
                         rowY,
                         width,
                         metric("Pop", row.getInt(HiveInspectionSnapshot.K_TOTAL_POP) + "/" + row.getInt(HiveInspectionSnapshot.K_POP_CAP)),
+                        metric("Loaded", String.valueOf(row.getInt(HiveInspectionSnapshot.K_LOADED_MEMBER_TOTAL))),
+                        metric("Reserves", String.valueOf(row.getInt(HiveInspectionSnapshot.K_LOCAL_RESERVE_TOTAL))),
+                        metric("Members", String.valueOf(row.getInt(HiveInspectionSnapshot.K_LOCATION_FACTION_MEMBER_COUNT))),
                         metric("Biomass", String.valueOf(row.getInt(HiveInspectionSnapshot.K_BIOMASS))),
-                        metric("Chunks", String.valueOf(row.getInt(HiveInspectionSnapshot.K_CLAIMED_CHUNKS))),
-                        metric("Age", HiveInspectorRender.formatTicks(row.getLong(HiveInspectionSnapshot.K_AGE_TICKS)))
+                        metric("Royal", String.valueOf(row.getInt(HiveInspectionSnapshot.K_ROYAL_JELLY))),
+                        metric("Scourge", String.valueOf(row.getInt(HiveInspectionSnapshot.K_SCOURGE_JELLY))),
+                        metric(
+                            "Chunks",
+                            row.getInt(HiveInspectionSnapshot.K_CHUNKS_LOADED) + "/" + row.getInt(HiveInspectionSnapshot.K_CLAIMED_CHUNKS)
+                        ),
+                        metric("Age", HiveInspectorRender.formatTicks(row.getLong(HiveInspectionSnapshot.K_AGE_TICKS))),
+                        metric("No contact", HiveInspectorRender.formatTicks(row.getLong(HiveInspectionSnapshot.K_NO_CONTACT_TICKS))),
+                        metric("Evac", HiveInspectorRender.formatTicks(row.getLong(HiveInspectionSnapshot.K_EVACUATING_TICKS))),
+                        metric(
+                            "Leader",
+                            row.hasUUID(HiveInspectionSnapshot.K_LEADER_ID)
+                                ? HiveInspectorRender.shortUuid(row.getUUID(HiveInspectionSnapshot.K_LEADER_ID))
+                                : "none"
+                        )
+                    );
+                    rowY = HiveInspectorRender.drawRow(
+                        graphics,
+                        font,
+                        x,
+                        rowY,
+                        width,
+                        "Center",
+                        coords(row, HiveInspectionSnapshot.K_CENTER_X, HiveInspectionSnapshot.K_CENTER_Y, HiveInspectionSnapshot.K_CENTER_Z)
                     );
                     rowY += InspectorStyle.ROW_GAP;
                 }
@@ -147,5 +330,9 @@ public final class LineageFactionInspectorSection extends AbstractHiveInspectorS
         }
 
         return rowY;
+    }
+
+    private static String coords(CompoundTag tag, String xKey, String yKey, String zKey) {
+        return tag.getInt(xKey) + ", " + tag.getInt(yKey) + ", " + tag.getInt(zKey);
     }
 }

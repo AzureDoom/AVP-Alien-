@@ -3,11 +3,13 @@ package com.alien.common.gameplay.hive2.inspection;
 import com.alien.Alien;
 import com.alien.common.gameplay.hive2.economy.CastePopulation;
 import com.alien.common.gameplay.hive2.economy.JellyProduction;
+import com.alien.common.gameplay.hive2.convoy.Convoy;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.faction.VariantFactionData;
 import com.alien.common.gameplay.hive2.growth.BiomassIncome;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
+import com.blib.api.common.entity.v1.EntityReserves;
 import com.blib.api.common.faction.v1.Faction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -15,6 +17,9 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Comparator;
 
 /**
  * Server-side builder for the hive2 inspection panel's data feed. Produces a {@link CompoundTag} per kind of selected
@@ -47,6 +52,8 @@ public final class HiveInspectionSnapshot {
 
     // Location keys
     public static final String K_LOCATION_ID = "LocationId";
+
+    public static final String K_LOCATION_NUMBER = "LocationNumber";
 
     public static final String K_LINEAGE_FACTION_ID = "LineageFactionId";
 
@@ -125,6 +132,22 @@ public final class HiveInspectionSnapshot {
 
     public static final String K_LINEAGE_MEMBER_TOTAL = "LineageMemberTotal";
 
+    public static final String K_LOCATION_COUNT = "LocationCount";
+
+    public static final String K_LINEAGE_POOL_TOTAL = "LineagePoolTotal";
+
+    public static final String K_LINEAGE_POOL_BY_TYPE = "LineagePoolByType";
+
+    public static final String K_LOCAL_RESERVE_TOTAL = "LocalReserveTotal";
+
+    public static final String K_LOADED_MEMBER_TOTAL = "LoadedMemberTotal";
+
+    public static final String K_CONVOY_COUNT = "ConvoyCount";
+
+    public static final String K_CONVOY_MEMBER_TOTAL = "ConvoyMemberTotal";
+
+    public static final String K_CONVOYS = "Convoys";
+
     public static final String K_LOCATIONS = "Locations";
 
     public static final String K_AGG_BIOMASS = "AggBiomass";
@@ -137,6 +160,28 @@ public final class HiveInspectionSnapshot {
 
     public static final String K_AGG_POP_CAP = "AggPopCap";
 
+    public static final String K_AGG_LOCAL_RESERVES = "AggLocalReserves";
+
+    public static final String K_AGG_LOADED_MEMBERS = "AggLoadedMembers";
+
+    public static final String K_AGG_LOCATION_MEMBERS = "AggLocationMembers";
+
+    public static final String K_AGG_LINEAGE_MEMBERS = "AggLineageMembers";
+
+    public static final String K_AGG_LINEAGE_POOLS = "AggLineagePools";
+
+    public static final String K_AGG_VARIANT_POOLS = "AggVariantPools";
+
+    public static final String K_AGG_CONVOYS = "AggConvoys";
+
+    public static final String K_AGG_CONVOY_MEMBERS = "AggConvoyMembers";
+
+    public static final String K_AGG_CLAIMED_CHUNKS = "AggClaimedChunks";
+
+    public static final String K_AGG_CHUNKS_LOADED = "AggChunksLoaded";
+
+    public static final String K_AGG_LOCATIONS = "AggLocations";
+
     // Variant keys
     public static final String K_NEXT_LINEAGE_NUMBER = "NextLineageNumber";
 
@@ -144,12 +189,48 @@ public final class HiveInspectionSnapshot {
 
     public static final String K_VARIANT_MEMBERS = "VariantMembers";
 
+    public static final String K_VARIANT_POOL_TOTAL = "VariantPoolTotal";
+
+    public static final String K_VARIANT_POOLS = "VariantPools";
+
+    public static final String K_QUEEN_MOTHERS = "QueenMothers";
+
     // Per-entry keys (used inside nested lists)
     public static final String K_KEY = "Key";
 
     public static final String K_VALUE = "Value";
 
+    public static final String K_UUID = "Uuid";
+
     public static final String K_LOADED = "Loaded";
+
+    public static final String K_TYPE = "Type";
+
+    public static final String K_SOURCE_LOCATION_ID = "SourceLocationId";
+
+    public static final String K_DESTINATION_LOCATION_ID = "DestinationLocationId";
+
+    public static final String K_TARGET_PLAYER_ID = "TargetPlayerId";
+
+    public static final String K_CURRENT_X = "CurrentX";
+
+    public static final String K_CURRENT_Y = "CurrentY";
+
+    public static final String K_CURRENT_Z = "CurrentZ";
+
+    public static final String K_DEST_X = "DestinationX";
+
+    public static final String K_DEST_Y = "DestinationY";
+
+    public static final String K_DEST_Z = "DestinationZ";
+
+    public static final String K_BIOMASS_PAYLOAD = "BiomassPayload";
+
+    public static final String K_CARRIES_EMPRESS = "CarriesEmpress";
+
+    public static final String K_DISPATCHED_TICK = "DispatchedTick";
+
+    public static final String K_EXPIRES_AT_TICK = "ExpiresAtTick";
 
     private HiveInspectionSnapshot() {}
 
@@ -161,6 +242,7 @@ public final class HiveInspectionSnapshot {
 
         tag.putString(K_FACTION_ID, locationFactionId.toString());
         tag.putString(K_LOCATION_ID, location.id().value().toString());
+        tag.putLong(K_LOCATION_NUMBER, location.locationNumber());
         tag.putString(K_LINEAGE_FACTION_ID, location.lineageFactionId().toString());
         tag.putString(K_DIMENSION, location.dimension().location().toString());
 
@@ -234,15 +316,7 @@ public final class HiveInspectionSnapshot {
         }
         tag.put(K_LOADED_BY_TYPE, loadedList);
 
-        var reservesList = new ListTag();
-        for (var entry : location.localReserves().underlying().getBackingMap().entrySet()) {
-            var typeId = BuiltInRegistries.ENTITY_TYPE.getKey(entry.getKey());
-            var row = new CompoundTag();
-            row.putString(K_KEY, typeId.toString());
-            row.putInt(K_VALUE, entry.getValue());
-            reservesList.add(row);
-        }
-        tag.put(K_RESERVES_BY_TYPE, reservesList);
+        tag.put(K_RESERVES_BY_TYPE, reserveRows(location.localReserves().underlying()));
 
         var locationFaction = Alien.MOD.factions().get(locationFactionId);
         var locationFactionMembers = locationFaction != null ? locationFaction.membership().getMembers().size() : 0;
@@ -287,12 +361,23 @@ public final class HiveInspectionSnapshot {
 
         var memberCount = faction.membership().getMembers().size();
         tag.putInt(K_LINEAGE_MEMBER_TOTAL, memberCount);
+        tag.putInt(K_LOCATION_COUNT, data.locationsById().size());
+        tag.putInt(K_LINEAGE_POOL_TOTAL, data.lineagePool().getCount());
+        tag.put(K_LINEAGE_POOL_BY_TYPE, reserveRows(data.lineagePool()));
+        tag.putInt(K_CONVOY_COUNT, data.convoys().size());
+        tag.putInt(K_CONVOY_MEMBER_TOTAL, convoyMemberTotal(data));
+        tag.put(K_CONVOYS, convoyRows(data));
 
         long aggBiomass = 0L;
         long aggRoyalJelly = 0L;
         long aggScourgeJelly = 0L;
         long aggPop = 0L;
         long aggPopCap = 0L;
+        long aggLocalReserves = 0L;
+        long aggLoadedMembers = 0L;
+        long aggLocationMembers = 0L;
+        long aggClaimedChunks = 0L;
+        long aggChunksLoaded = 0L;
 
         var locationsList = new ListTag();
         for (var location : data.locationsById().values()) {
@@ -301,16 +386,46 @@ public final class HiveInspectionSnapshot {
             aggScourgeJelly += location.scourgeJelly();
             var locTotalPop = CastePopulation.totalTrackedPopulation(location);
             var locPopCap = config.populationPerChunk() * Math.max(1, location.claimedChunks().size());
+            var locLocalReserves = location.localReserves().getCount();
+            var locLoadedMembers = loadedMemberTotal(location);
+            var locLocationMembers = locationFactionMemberCount(location);
+            var locServerLevel = server != null ? server.getLevel(location.dimension()) : null;
+            var locChunksLoaded = countLoadedChunks(location, locServerLevel);
             aggPop += locTotalPop;
             aggPopCap += locPopCap;
+            aggLocalReserves += locLocalReserves;
+            aggLoadedMembers += locLoadedMembers;
+            aggLocationMembers += locLocationMembers;
+            aggClaimedChunks += location.claimedChunks().size();
+            aggChunksLoaded += locChunksLoaded;
 
             var row = new CompoundTag();
             row.putString(K_LOCATION_ID, location.id().value().toString());
+            row.putLong(K_LOCATION_NUMBER, location.locationNumber());
+            row.putString(K_DIMENSION, location.dimension().location().toString());
+            row.putInt(K_CENTER_X, location.centerPos().getX());
+            row.putInt(K_CENTER_Y, location.centerPos().getY());
+            row.putInt(K_CENTER_Z, location.centerPos().getZ());
             row.putLong(K_AGE_TICKS, location.ageInTicks());
             row.putInt(K_BIOMASS, location.biomass());
+            row.putInt(K_ROYAL_JELLY, location.royalJelly());
+            row.putInt(K_SCOURGE_JELLY, location.scourgeJelly());
             row.putInt(K_CLAIMED_CHUNKS, location.claimedChunks().size());
+            row.putInt(K_CHUNKS_LOADED, locChunksLoaded);
             row.putInt(K_TOTAL_POP, locTotalPop);
             row.putInt(K_POP_CAP, locPopCap);
+            row.putInt(K_LOCAL_RESERVE_TOTAL, locLocalReserves);
+            row.putInt(K_LOADED_MEMBER_TOTAL, locLoadedMembers);
+            row.putInt(K_LOCATION_FACTION_MEMBER_COUNT, locLocationMembers);
+            row.putLong(K_NO_CONTACT_TICKS, location.noContactTicksAccrued());
+            row.putLong(K_EVACUATING_TICKS, location.evacuatingRemainingTicks());
+            var leaderId = location.leadership().getLeaderIdOrNull();
+            if (leaderId != null) {
+                row.putUUID(K_LEADER_ID, leaderId);
+            }
+            if (location.removalReason() != null) {
+                row.putString(K_REMOVAL_REASON, location.removalReason().typeKind());
+            }
             locationsList.add(row);
         }
         tag.put(K_LOCATIONS, locationsList);
@@ -320,6 +435,12 @@ public final class HiveInspectionSnapshot {
         tag.putLong(K_AGG_SCOURGE_JELLY, aggScourgeJelly);
         tag.putLong(K_AGG_TOTAL_POP, aggPop);
         tag.putLong(K_AGG_POP_CAP, aggPopCap);
+        tag.putLong(K_AGG_LOCAL_RESERVES, aggLocalReserves);
+        tag.putLong(K_AGG_LOADED_MEMBERS, aggLoadedMembers);
+        tag.putLong(K_AGG_LOCATION_MEMBERS, aggLocationMembers);
+        tag.putLong(K_AGG_CLAIMED_CHUNKS, aggClaimedChunks);
+        tag.putLong(K_AGG_CHUNKS_LOADED, aggChunksLoaded);
+        tag.putLong(K_AGG_LOCATIONS, data.locationsById().size());
 
         if (data.removalReason() != null) {
             tag.putString(K_REMOVAL_REASON, data.removalReason().typeKind());
@@ -344,12 +465,26 @@ public final class HiveInspectionSnapshot {
         tag.putLong(K_AGE_TICKS, data.ageInTicks());
         tag.putLong(K_NEXT_LINEAGE_NUMBER, data.nextLineageNumber());
         tag.putInt(K_VARIANT_MEMBERS, faction.membership().getMembers().size());
+        var variantPools = variantPoolRows(data);
+        tag.put(K_VARIANT_POOLS, variantPools);
+        tag.putInt(K_VARIANT_POOL_TOTAL, variantPoolTotal(data));
+        tag.put(K_QUEEN_MOTHERS, queenMotherRows(data));
 
         long aggBiomass = 0L;
         long aggRoyalJelly = 0L;
         long aggScourgeJelly = 0L;
         long aggPop = 0L;
         long aggPopCap = 0L;
+        long aggLocalReserves = 0L;
+        long aggLoadedMembers = 0L;
+        long aggLocationMembers = 0L;
+        long aggLineageMembers = 0L;
+        long aggLineagePools = 0L;
+        long aggConvoys = 0L;
+        long aggConvoyMembers = 0L;
+        long aggClaimedChunks = 0L;
+        long aggChunksLoaded = 0L;
+        long aggLocations = 0L;
         var lineagesList = new ListTag();
 
         // Walk every registered faction and collect lineages whose parent variant is this one.
@@ -362,29 +497,83 @@ public final class HiveInspectionSnapshot {
                 continue;
             }
             long lineageBiomass = 0L;
+            long lineageRoyalJelly = 0L;
+            long lineageScourgeJelly = 0L;
             long lineagePop = 0L;
             long lineagePopCap = 0L;
+            long lineageLocalReserves = 0L;
+            long lineageLoadedMembers = 0L;
+            long lineageLocationMembers = 0L;
+            long lineageClaimedChunks = 0L;
+            long lineageChunksLoaded = 0L;
             for (var loc : lineage.locationsById().values()) {
                 lineageBiomass += loc.biomass();
+                lineageRoyalJelly += loc.royalJelly();
+                lineageScourgeJelly += loc.scourgeJelly();
                 aggBiomass += loc.biomass();
                 aggRoyalJelly += loc.royalJelly();
                 aggScourgeJelly += loc.scourgeJelly();
                 var locPop = CastePopulation.totalTrackedPopulation(loc);
                 var locCap = config.populationPerChunk() * Math.max(1, loc.claimedChunks().size());
+                var locLocalReserves = loc.localReserves().getCount();
+                var locLoadedMembers = loadedMemberTotal(loc);
+                var locLocationMembers = locationFactionMemberCount(loc);
+                var locServerLevel = server != null ? server.getLevel(loc.dimension()) : null;
+                var locChunksLoaded = countLoadedChunks(loc, locServerLevel);
                 lineagePop += locPop;
                 lineagePopCap += locCap;
+                lineageLocalReserves += locLocalReserves;
+                lineageLoadedMembers += locLoadedMembers;
+                lineageLocationMembers += locLocationMembers;
+                lineageClaimedChunks += loc.claimedChunks().size();
+                lineageChunksLoaded += locChunksLoaded;
                 aggPop += locPop;
                 aggPopCap += locCap;
+                aggLocalReserves += locLocalReserves;
+                aggLoadedMembers += locLoadedMembers;
+                aggLocationMembers += locLocationMembers;
+                aggClaimedChunks += loc.claimedChunks().size();
+                aggChunksLoaded += locChunksLoaded;
+                aggLocations++;
             }
+            var lineageMembers = f.membership().getMembers().size();
+            var lineagePoolTotal = lineage.lineagePool().getCount();
+            var convoyCount = lineage.convoys().size();
+            var convoyMemberTotal = convoyMemberTotal(lineage);
+            aggLineageMembers += lineageMembers;
+            aggLineagePools += lineagePoolTotal;
+            aggConvoys += convoyCount;
+            aggConvoyMembers += convoyMemberTotal;
+
             var row = new CompoundTag();
             row.putString(K_FACTION_ID, f.id().toString());
             row.putString(K_DISPLAY_NAME, f.name());
             row.putString(K_DIMENSION, lineage.dimension().location().toString());
             row.putLong(K_LINEAGE_NUMBER, lineage.lineageNumber());
-            row.putInt(K_CLAIMED_CHUNKS, lineage.locationsById().size());
+            row.putInt(K_LOCATION_COUNT, lineage.locationsById().size());
+            row.putInt(K_CLAIMED_CHUNKS, (int) lineageClaimedChunks);
+            row.putInt(K_CHUNKS_LOADED, (int) lineageChunksLoaded);
             row.putLong(K_BIOMASS, lineageBiomass);
+            row.putLong(K_ROYAL_JELLY, lineageRoyalJelly);
+            row.putLong(K_SCOURGE_JELLY, lineageScourgeJelly);
             row.putLong(K_TOTAL_POP, lineagePop);
             row.putLong(K_POP_CAP, lineagePopCap);
+            row.putInt(K_LINEAGE_MEMBER_TOTAL, lineageMembers);
+            row.putInt(K_LINEAGE_POOL_TOTAL, lineagePoolTotal);
+            row.putInt(K_LOCAL_RESERVE_TOTAL, (int) lineageLocalReserves);
+            row.putInt(K_LOADED_MEMBER_TOTAL, (int) lineageLoadedMembers);
+            row.putInt(K_LOCATION_FACTION_MEMBER_COUNT, (int) lineageLocationMembers);
+            row.putInt(K_CONVOY_COUNT, convoyCount);
+            row.putInt(K_CONVOY_MEMBER_TOTAL, convoyMemberTotal);
+            if (lineage.founderId() != null) {
+                row.putUUID(K_FOUNDER_ID, lineage.founderId());
+            }
+            if (lineage.empressId() != null) {
+                row.putUUID(K_EMPRESS_ID, lineage.empressId());
+            }
+            if (lineage.removalReason() != null) {
+                row.putString(K_REMOVAL_REASON, lineage.removalReason().typeKind());
+            }
             row.putBoolean(K_PENDING_EMPRESS, lineage.pendingEmpressEmergence());
             row.putBoolean(K_PENDING_CIVIL_WAR, lineage.pendingCivilWar());
             lineagesList.add(row);
@@ -396,8 +585,146 @@ public final class HiveInspectionSnapshot {
         tag.putLong(K_AGG_SCOURGE_JELLY, aggScourgeJelly);
         tag.putLong(K_AGG_TOTAL_POP, aggPop);
         tag.putLong(K_AGG_POP_CAP, aggPopCap);
+        tag.putLong(K_AGG_LOCAL_RESERVES, aggLocalReserves);
+        tag.putLong(K_AGG_LOADED_MEMBERS, aggLoadedMembers);
+        tag.putLong(K_AGG_LOCATION_MEMBERS, aggLocationMembers);
+        tag.putLong(K_AGG_LINEAGE_MEMBERS, aggLineageMembers);
+        tag.putLong(K_AGG_LINEAGE_POOLS, aggLineagePools);
+        tag.putLong(K_AGG_VARIANT_POOLS, data.variantPoolsByDimension().values().stream().mapToInt(EntityReserves::getCount).sum());
+        tag.putLong(K_AGG_CONVOYS, aggConvoys);
+        tag.putLong(K_AGG_CONVOY_MEMBERS, aggConvoyMembers);
+        tag.putLong(K_AGG_CLAIMED_CHUNKS, aggClaimedChunks);
+        tag.putLong(K_AGG_CHUNKS_LOADED, aggChunksLoaded);
+        tag.putLong(K_AGG_LOCATIONS, aggLocations);
 
         return tag;
+    }
+
+    private static ListTag reserveRows(EntityReserves reserves) {
+        var rows = new ListTag();
+        var entries = new ArrayList<>(reserves.getBackingMap().entrySet());
+        entries.sort(Comparator.comparing(entry -> BuiltInRegistries.ENTITY_TYPE.getKey(entry.getKey()).toString()));
+        for (var entry : entries) {
+            if (entry.getValue() <= 0) {
+                continue;
+            }
+            var typeId = BuiltInRegistries.ENTITY_TYPE.getKey(entry.getKey());
+            var row = new CompoundTag();
+            row.putString(K_KEY, typeId.toString());
+            row.putInt(K_VALUE, entry.getValue());
+            rows.add(row);
+        }
+        return rows;
+    }
+
+    private static ListTag variantPoolRows(VariantFactionData data) {
+        var rows = new ListTag();
+        var entries = new ArrayList<>(data.variantPoolsByDimension().entrySet());
+        entries.sort(Comparator.comparing(entry -> entry.getKey().location().toString()));
+        for (var entry : entries) {
+            var reserves = entry.getValue();
+            var row = new CompoundTag();
+            row.putString(K_DIMENSION, entry.getKey().location().toString());
+            row.putInt(K_VALUE, reserves.getCount());
+            row.put(K_RESERVES_BY_TYPE, reserveRows(reserves));
+            rows.add(row);
+        }
+        return rows;
+    }
+
+    private static int variantPoolTotal(VariantFactionData data) {
+        var total = 0;
+        for (var reserves : data.variantPoolsByDimension().values()) {
+            total += reserves.getCount();
+        }
+        return total;
+    }
+
+    private static ListTag queenMotherRows(VariantFactionData data) {
+        var rows = new ListTag();
+        var entries = new ArrayList<>(data.queenMotherIdsByDimension().entrySet());
+        entries.sort(Comparator.comparing(entry -> entry.getKey().location().toString()));
+        for (var entry : entries) {
+            var row = new CompoundTag();
+            row.putString(K_DIMENSION, entry.getKey().location().toString());
+            row.putUUID(K_UUID, entry.getValue());
+            rows.add(row);
+        }
+        return rows;
+    }
+
+    private static int loadedMemberTotal(HiveLocation location) {
+        var total = 0;
+        for (var members : location.loadedMembersByType().values()) {
+            total += members.size();
+        }
+        return total;
+    }
+
+    private static int locationFactionMemberCount(HiveLocation location) {
+        var locationFaction = Alien.MOD.factions().get(location.id().value());
+        return locationFaction != null ? locationFaction.membership().getMembers().size() : 0;
+    }
+
+    private static int convoyMemberTotal(LineageFactionData data) {
+        var total = 0;
+        for (var convoy : data.convoys()) {
+            total += convoy.composition().getCount();
+        }
+        return total;
+    }
+
+    private static ListTag convoyRows(LineageFactionData data) {
+        var rows = new ListTag();
+        for (var convoy : data.convoys()) {
+            var row = new CompoundTag();
+            row.putString(K_TYPE, convoyType(convoy));
+            row.putString(K_DIMENSION, convoy.dimension().location().toString());
+            row.putInt(K_VALUE, convoy.composition().getCount());
+            row.putLong(K_DISPATCHED_TICK, convoy.dispatchedTick());
+            row.putInt(K_CURRENT_X, (int) Math.floor(convoy.currentPos().x));
+            row.putInt(K_CURRENT_Y, (int) Math.floor(convoy.currentPos().y));
+            row.putInt(K_CURRENT_Z, (int) Math.floor(convoy.currentPos().z));
+            row.put(K_RESERVES_BY_TYPE, reserveRows(convoy.composition()));
+
+            if (convoy instanceof Convoy.Reinforcement reinforcement) {
+                row.putString(K_SOURCE_LOCATION_ID, reinforcement.sourceLocationId().value().toString());
+                row.putString(K_DESTINATION_LOCATION_ID, reinforcement.destinationLocationId().value().toString());
+                putDestination(row, reinforcement.destinationPos());
+            } else if (convoy instanceof Convoy.Migration migration) {
+                row.putString(K_SOURCE_LOCATION_ID, migration.sourceLocationId().value().toString());
+                row.putString(K_DESTINATION_LOCATION_ID, migration.destinationLocationId().value().toString());
+                row.putInt(K_BIOMASS_PAYLOAD, migration.biomassPayload());
+                row.putBoolean(K_CARRIES_EMPRESS, migration.carriesEmpress());
+                putDestination(row, migration.destinationPos());
+            } else if (convoy instanceof Convoy.Raid raid) {
+                row.putString(K_SOURCE_LOCATION_ID, raid.sourceLocationId().value().toString());
+                row.putUUID(K_TARGET_PLAYER_ID, raid.targetPlayerId());
+                row.putLong(K_EXPIRES_AT_TICK, raid.expiresAtTick());
+                putDestination(row, raid.lastKnownTargetPos());
+            }
+            rows.add(row);
+        }
+        return rows;
+    }
+
+    private static String convoyType(Convoy convoy) {
+        if (convoy instanceof Convoy.Reinforcement) {
+            return "reinforcement";
+        }
+        if (convoy instanceof Convoy.Migration) {
+            return "migration";
+        }
+        if (convoy instanceof Convoy.Raid) {
+            return "raid";
+        }
+        return "unknown";
+    }
+
+    private static void putDestination(CompoundTag tag, net.minecraft.core.BlockPos pos) {
+        tag.putInt(K_DEST_X, pos.getX());
+        tag.putInt(K_DEST_Y, pos.getY());
+        tag.putInt(K_DEST_Z, pos.getZ());
     }
 
     private static int countLoadedChunks(HiveLocation location, @Nullable ServerLevel level) {

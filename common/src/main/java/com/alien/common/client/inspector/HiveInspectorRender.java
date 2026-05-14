@@ -121,6 +121,43 @@ public final class HiveInspectorRender {
         return drawCountRow(graphics, font, x, y, width, entityId, count, countColumns(width, font.width(entityId), font.width(count)));
     }
 
+    /** Indented entity/count rows with one count column shared across the whole group. */
+    public static int drawCountRows(
+        GuiGraphics graphics,
+        Font font,
+        int x,
+        int y,
+        int width,
+        net.minecraft.nbt.ListTag rows,
+        String keyName,
+        String valueName
+    ) {
+        var widestEntityWidth = 0;
+        var widestCountWidth = 0;
+        for (var i = 0; i < rows.size(); i++) {
+            var row = rows.getCompound(i);
+            widestEntityWidth = Math.max(widestEntityWidth, font.width(row.getString(keyName)));
+            widestCountWidth = Math.max(widestCountWidth, font.width(String.valueOf(row.getInt(valueName))));
+        }
+        var columns = countColumns(width, widestEntityWidth, widestCountWidth);
+
+        var rowY = y;
+        for (var i = 0; i < rows.size(); i++) {
+            var row = rows.getCompound(i);
+            rowY = drawCountRow(
+                graphics,
+                font,
+                x,
+                rowY,
+                width,
+                row.getString(keyName),
+                String.valueOf(row.getInt(valueName)),
+                columns
+            );
+        }
+        return rowY;
+    }
+
     /** Solo line of muted text — used for "(loading…)" and empty-state hints. */
     public static int drawNote(GuiGraphics graphics, Font font, int x, int y, String text) {
         UiText.drawClipped(
