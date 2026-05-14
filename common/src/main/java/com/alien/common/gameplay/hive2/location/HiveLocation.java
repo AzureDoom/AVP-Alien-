@@ -58,7 +58,7 @@ public final class HiveLocation {
 
     private static final String NBT_EVACUATING_REMAINING = "EvacuatingRemainingTicks";
 
-    private static final String NBT_DORMANT_SINCE_TICK = "DormantSinceTick";
+    private static final String NBT_NO_CONTACT_TICKS_ACCRUED = "NoContactTicksAccrued";
 
     private static final String NBT_QUEENLESS_MATURATION_LAST_ADVANCE = "QueenlessMaturationLastAdvanceTick";
 
@@ -103,12 +103,15 @@ public final class HiveLocation {
     private long evacuatingRemainingTicks;
 
     /**
-     * Tick at which this location went dormant (no xenomorphs in territory). {@link Long#MIN_VALUE} means "not
-     * currently dormant." Drives the {@code LOCATION_DECAY_TICKS} grace period in
-     * {@link com.alien.common.gameplay.hive2.lifecycle.LocationDormancyTask} per {@code HIVE_REDESIGN_03_LOCATIONS.md}
-     * § 10.
+     * Accrued ticks during which this location has had no loaded location-faction member in any of its claimed
+     * chunks while at least one claimed chunk was loaded. Drives the no-contact safety-net kill in
+     * {@link com.alien.common.gameplay.hive2.lifecycle.LocationDormancyTask}: when this exceeds
+     * {@code config.locationMaxNoContactTicks()} the location dies.
+     * <p>
+     * Pauses (neither advances nor resets) when no claimed chunk is loaded; resets to 0 when a member is observed
+     * inside the territory. Persisted across restarts.
      */
-    private long dormantSinceTick;
+    private long noContactTicksAccrued;
 
     /**
      * Tick at which {@link com.alien.common.gameplay.hive2.lifecycle.QueenlessMaturationTask} last advanced this
@@ -166,7 +169,7 @@ public final class HiveLocation {
         this.peakXenomorphCount = 1;
         this.peakDecayElapsedTicks = 0L;
         this.evacuatingRemainingTicks = 0L;
-        this.dormantSinceTick = Long.MIN_VALUE;
+        this.noContactTicksAccrued = 0L;
         this.queenlessMaturationLastAdvanceTick = Long.MIN_VALUE;
         this.queenlessLeaderSnapshot = null;
         this.biomass = 0;
@@ -252,12 +255,12 @@ public final class HiveLocation {
         this.evacuatingRemainingTicks = Math.max(0L, evacuatingRemainingTicks);
     }
 
-    public long dormantSinceTick() {
-        return dormantSinceTick;
+    public long noContactTicksAccrued() {
+        return noContactTicksAccrued;
     }
 
-    public void setDormantSinceTick(long dormantSinceTick) {
-        this.dormantSinceTick = dormantSinceTick;
+    public void setNoContactTicksAccrued(long noContactTicksAccrued) {
+        this.noContactTicksAccrued = Math.max(0L, noContactTicksAccrued);
     }
 
     public long queenlessMaturationLastAdvanceTick() {
@@ -377,8 +380,8 @@ public final class HiveLocation {
         tag.putInt(NBT_PEAK_XENOMORPH_COUNT, peakXenomorphCount);
         tag.putLong(NBT_PEAK_DECAY_ELAPSED, peakDecayElapsedTicks);
         tag.putLong(NBT_EVACUATING_REMAINING, evacuatingRemainingTicks);
-        if (dormantSinceTick != Long.MIN_VALUE) {
-            tag.putLong(NBT_DORMANT_SINCE_TICK, dormantSinceTick);
+        if (noContactTicksAccrued > 0L) {
+            tag.putLong(NBT_NO_CONTACT_TICKS_ACCRUED, noContactTicksAccrued);
         }
         if (queenlessMaturationLastAdvanceTick != Long.MIN_VALUE) {
             tag.putLong(NBT_QUEENLESS_MATURATION_LAST_ADVANCE, queenlessMaturationLastAdvanceTick);
@@ -455,9 +458,9 @@ public final class HiveLocation {
         location.peakXenomorphCount = Math.max(1, tag.getInt(NBT_PEAK_XENOMORPH_COUNT));
         location.peakDecayElapsedTicks = Math.max(0L, tag.getLong(NBT_PEAK_DECAY_ELAPSED));
         location.evacuatingRemainingTicks = Math.max(0L, tag.getLong(NBT_EVACUATING_REMAINING));
-        location.dormantSinceTick = tag.contains(NBT_DORMANT_SINCE_TICK)
-            ? tag.getLong(NBT_DORMANT_SINCE_TICK)
-            : Long.MIN_VALUE;
+        location.noContactTicksAccrued = tag.contains(NBT_NO_CONTACT_TICKS_ACCRUED)
+            ? Math.max(0L, tag.getLong(NBT_NO_CONTACT_TICKS_ACCRUED))
+            : 0L;
         location.queenlessMaturationLastAdvanceTick = tag.contains(NBT_QUEENLESS_MATURATION_LAST_ADVANCE)
             ? tag.getLong(NBT_QUEENLESS_MATURATION_LAST_ADVANCE)
             : Long.MIN_VALUE;

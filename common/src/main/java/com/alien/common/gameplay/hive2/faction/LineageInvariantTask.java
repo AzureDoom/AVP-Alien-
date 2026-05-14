@@ -6,8 +6,6 @@ import com.alien.common.gameplay.hive2.growth.ContestResolutionTask;
 import com.alien.common.gameplay.hive2.id.LineageIds;
 import com.alien.common.gameplay.hive2.lifecycle.CivilWarHandler;
 import com.alien.common.gameplay.hive2.lifecycle.LineageAbsorptionTask;
-import com.alien.common.gameplay.hive2.lifecycle.LineageDeathHandler;
-import com.alien.common.gameplay.hive2.lifecycle.LocationDormancyTask;
 import com.alien.common.gameplay.hive2.lifecycle.QueenlessMaturationTask;
 import com.blib.api.common.faction.v1.FactionMember;
 import net.minecraft.server.MinecraftServer;
@@ -41,15 +39,17 @@ public final class LineageInvariantTask {
     }
 
     /**
-     * Full scan including all Phase 11 lifecycle dispatches. Called from
-     * {@link com.alien.common.gameplay.hive2.location.HiveLocationRegistry#tick} on the slow cadence.
+     * Slow-cadence scan: variant invariants, civil war, maturation, absorption, contests. Called from
+     * {@link com.alien.common.gameplay.hive2.location.HiveLocationRegistry#tick} every
+     * {@code lineageScanIntervalTicks}. Per-tick death checks (location dormancy, lineage death) run independently
+     * every tick from {@code HiveLocationRegistry.tick} directly — they are NOT routed through this method.
      */
     public static void scanAllWithLifecycle(MinecraftServer server) {
         // 1. Variant invariants — evict variant-mismatched members.
         scanVariantInvariants();
 
-        // 2. Civil war first — must run before absorption / dormancy so the new successor lineages enter the rest of
-        // the pipeline cleanly.
+        // 2. Civil war first — must run before absorption so the new successor lineages enter the rest of the
+        // pipeline cleanly.
         CivilWarHandler.scanAndHandle(server);
 
         // 3. Queenless lineage maturation — lets civil-war successors (and any other queenless lineage) advance
@@ -57,18 +57,11 @@ public final class LineageInvariantTask {
         // successor lineages get tagged on the same scan.
         QueenlessMaturationTask.scanAll(server);
 
-        // 4. Location dormancy + death cascade. Runs before lineage death so a 0-locations lineage gets one tick of
-        // grace before LineageDeathHandler picks it up.
-        LocationDormancyTask.scanAll(server);
-
-        // 5. Lineage absorption — same-variant cross-lineage merging.
+        // 4. Lineage absorption — same-variant cross-lineage merging.
         LineageAbsorptionTask.scanAll(server);
 
-        // 6. Contested chunk resolution.
+        // 5. Contested chunk resolution.
         ContestResolutionTask.scanAll(server);
-
-        // 7. Lineage death — picks up 0-locations lineages whose grace period has elapsed.
-        LineageDeathHandler.scanAndKill(server);
     }
 
     private static void scanVariantInvariants() {

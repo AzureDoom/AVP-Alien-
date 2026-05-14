@@ -6,9 +6,9 @@ import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.registry.init.AlienFactionDataTypes;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.faction.v1.FactionMember;
-import net.minecraft.server.level.ServerLevelAccessor;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.ServerLevelAccessor;
 
 /**
  * Helpers for the location-tier faction. Centralizes the lineage-superset invariant

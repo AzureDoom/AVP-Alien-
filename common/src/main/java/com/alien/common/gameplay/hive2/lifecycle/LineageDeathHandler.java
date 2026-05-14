@@ -5,44 +5,38 @@ import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.faction.LineageRemovalReason;
 import com.alien.common.gameplay.hive2.faction.VariantFactionData;
 import com.alien.common.gameplay.hive2.id.LineageIds;
-import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 
 import java.util.ArrayList;
 
 /**
- * Lineage-tier death: a lineage with zero locations for {@code LINEAGE_DECAY_TICKS} (default 1 hour) gets removed.
- * <p>
- * Per {@code HIVE_REDESIGN_02_FACTION_LIFECYCLES.md} § 4. The grace period gives surviving members time to refound a
- * location before the lineage formally dies — so a lineage that just lost its last location stays in a "zero-locations"
- * pending state rather than being killed instantly.
- * <p>
- * On death:
+ * Per-tick lineage death check. No grace periods — runs every server tick from
+ * {@link com.alien.common.gameplay.hive2.location.HiveLocationRegistry#tick}.
  * <ul>
- * <li>Lineage pool overflows into the dimension's variant pool (with default-uncapped variant pool, no actual
- * loss).</li>
- * <li>Members (including any empress) lose lineage membership when BLib removes the faction. They become foragers.</li>
- * <li>{@link LineageRemovalReason.NoLocationsRemain} is recorded.</li>
- * <li>BLib {@code factions().remove(lineageId)} fires; the {@code BLibFactionRemoveEvent} listener (Phase 11) handles
- * defensive cleanup.</li>
+ * <li><b>Members empty AND locationsById non-empty</b> → cascade-kill every owned location via
+ * {@link LocationDeathHandler#killNaturalDecay}. The natural-decay path drains each location's reserves into the
+ * lineage pool, removes the per-location faction, and releases chunks.</li>
+ * <li><b>Members empty AND locationsById empty</b> → kill the lineage immediately. Drains the lineage pool into the
+ * variant pool, sets {@link LineageRemovalReason.NoLocationsRemain}, and calls
+ * {@code Alien.MOD.factions().remove(lineageId)}.</li>
  * </ul>
+ * <p>
+ * The shed path ({@code HiveManager.tryShedFromLineages}) removes the last alien synchronously, then discards the
+ * entity — so the cascade fires on the very next tick when {@code members().isEmpty()} is observed. Accepted: this is
+ * correct for the genuine shed case. Civil war successor wipes (unloaded ex-members never join successor lineages)
+ * are a known deferred concern; if observed in playtest, fix in {@code CivilWarHandler} rather than reintroducing
+ * global throttling.
  */
 public final class LineageDeathHandler {
 
     private LineageDeathHandler() {}
 
-    /**
-     * Walk every lineage; advance the 0-locations grace period; kill any whose grace has elapsed. Called from
-     * {@link com.alien.common.gameplay.hive2.faction.LineageInvariantTask} on the slow scan cadence.
-     */
+    /** Per-tick scan: cascade-kill locations of empty lineages, kill empty+locationless lineages. */
     public static void scanAndKill(MinecraftServer server) {
-        var currentTick = server.overworld().getGameTime();
-        var config = HiveLocationRegistry.INSTANCE.config();
-
         var deathQueue = new ArrayList<ResourceLocation>();
 
-        for (var factionId : Alien.MOD.factions().getAllIds()) {
+        for (var factionId : new ArrayList<>(Alien.MOD.factions().getAllIds())) {
             if (!LineageIds.isLineageId(factionId)) {
                 continue;
             }
@@ -51,35 +45,54 @@ public final class LineageDeathHandler {
                 continue;
             }
 
-            var locationCount = lineage.locationsById().size();
-
-            if (locationCount > 0) {
-                // Lineage has locations — clear any pending grace timestamp (a refound rescued it).
-                if (lineage.zeroLocationsSinceTick() != Long.MIN_VALUE) {
-                    lineage.setZeroLocationsSinceTick(Long.MIN_VALUE);
-                }
+            if (!faction.membership().getMembers().isEmpty()) {
                 continue;
             }
 
-            // Zero locations.
-            if (lineage.zeroLocationsSinceTick() == Long.MIN_VALUE) {
-                lineage.setZeroLocationsSinceTick(currentTick);
-                Alien.LOGGER.info(
-                    "Hive2: lineage {} dropped to 0 locations; grace period until tick {}",
-                    factionId,
-                    currentTick + config.lineageDecayTicks()
-                );
-                continue;
+            if (!lineage.locationsById().isEmpty()) {
+                // Cascade: kill all owned locations. They drain into the lineage pool, then the lineage itself
+                // becomes 0-locations and will be killed on the next branch (same tick if rescanned, or next tick).
+                cascadeKillLocations(server, factionId, lineage);
             }
 
-            var elapsed = currentTick - lineage.zeroLocationsSinceTick();
-            if (elapsed >= config.lineageDecayTicks()) {
+            // After cascade (or if locations were already empty), the lineage is dead.
+            if (lineage.locationsById().isEmpty()) {
                 deathQueue.add(factionId);
             }
         }
 
         for (var lineageId : deathQueue) {
             kill(lineageId);
+        }
+    }
+
+    private static void cascadeKillLocations(
+        MinecraftServer server,
+        ResourceLocation lineageId,
+        LineageFactionData lineage
+    ) {
+        var serverLevel = server.getLevel(lineage.dimension());
+        if (serverLevel == null) {
+            Alien.LOGGER.warn(
+                "Hive2: lineage {} has 0 members but its dimension {} is not loaded — skipping cascade kill",
+                lineageId,
+                lineage.dimension().location()
+            );
+            return;
+        }
+
+        var snapshot = new ArrayList<>(lineage.locationsById().values());
+        Alien.LOGGER.info(
+            "Hive2: lineage {} has 0 members; cascade-killing {} location(s)",
+            lineageId,
+            snapshot.size()
+        );
+
+        for (var location : snapshot) {
+            if (!location.isAlive()) {
+                continue;
+            }
+            LocationDeathHandler.killNaturalDecay(serverLevel, location, lineage);
         }
     }
 

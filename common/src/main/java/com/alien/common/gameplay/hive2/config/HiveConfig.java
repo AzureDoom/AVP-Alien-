@@ -13,14 +13,13 @@ package com.alien.common.gameplay.hive2.config;
  */
 public record HiveConfig(
     // ---------- § 1 Faction lifecycle ----------
-    long lineageDecayTicks,
     long lineageAbsorptionAdjacencyTicks,
     long protoHiveStageInterval,
     long lineageReservePromotionInterval,
 
     // ---------- § 2 Locations ----------
     long settlementTicks,
-    long locationDecayTicks,
+    long locationMaxNoContactTicks,
     int bossBarDisplayRadiusBlocks,
     long angryGraceTicks,
     long contestTickWindow,
@@ -120,14 +119,13 @@ public record HiveConfig(
     public static HiveConfig defaults() {
         return new HiveConfig(
             // § 1 Faction lifecycle
-            TICKS_PER_HOUR, // lineageDecayTicks: 1 hour
             5L * TICKS_PER_MINUTE, // lineageAbsorptionAdjacencyTicks: 5 min
             5L * TICKS_PER_MINUTE, // protoHiveStageInterval: 5 min between drone→warrior→praetorian→queen advances
             1L * TICKS_PER_MINUTE, // lineageReservePromotionInterval: 1 min between queen-driven reserve promotions
 
             // § 2 Locations
             60L * TICKS_PER_SECOND, // settlementTicks: 60s
-            24L * TICKS_PER_HOUR, // locationDecayTicks: 24h game time
+            7L * 24L * TICKS_PER_HOUR, // locationMaxNoContactTicks: 7 game-days of loaded-no-contact time
             96, // bossBarDisplayRadiusBlocks
             60L * TICKS_PER_SECOND, // angryGraceTicks: 60s
             60L * TICKS_PER_SECOND, // contestTickWindow: 60s

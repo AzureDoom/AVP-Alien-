@@ -64,8 +64,6 @@ public class LineageFactionData extends FactionData {
 
     private static final String NBT_PENDING_CIVIL_WAR = "PendingCivilWar";
 
-    private static final String NBT_ZERO_LOCATIONS_SINCE_TICK = "ZeroLocationsSinceTick";
-
     private static final String NBT_LINEAGE_POOL = "LineagePool";
 
     private static final String NBT_LOCATIONS = "Locations";
@@ -95,14 +93,6 @@ public class LineageFactionData extends FactionData {
     private boolean pendingEmpressEmergence;
 
     private boolean pendingCivilWar;
-
-    /**
-     * Tick at which {@link #locationsById} dropped to empty. {@link Long#MIN_VALUE} means "not currently in the
-     * 0-locations state." Drives the {@code LINEAGE_DECAY_TICKS} grace period in
-     * {@link com.alien.common.gameplay.hive2.lifecycle.LineageDeathHandler} per
-     * {@code HIVE_REDESIGN_02_FACTION_LIFECYCLES.md} § 4.
-     */
-    private long zeroLocationsSinceTick;
 
     private final EntityReserves lineagePool;
 
@@ -139,7 +129,6 @@ public class LineageFactionData extends FactionData {
         this.lastSpreadTick = 0L;
         this.pendingEmpressEmergence = false;
         this.pendingCivilWar = false;
-        this.zeroLocationsSinceTick = Long.MIN_VALUE;
         this.lineagePool = new EntityReserves();
         this.locationsById = new LinkedHashMap<>();
         this.convoys = new ArrayList<>();
@@ -316,15 +305,6 @@ public class LineageFactionData extends FactionData {
         markDirty();
     }
 
-    public long zeroLocationsSinceTick() {
-        return zeroLocationsSinceTick;
-    }
-
-    public void setZeroLocationsSinceTick(long zeroLocationsSinceTick) {
-        this.zeroLocationsSinceTick = zeroLocationsSinceTick;
-        markDirty();
-    }
-
     public EntityReserves lineagePool() {
         return lineagePool;
     }
@@ -452,9 +432,6 @@ public class LineageFactionData extends FactionData {
         this.lastSpreadTick = tag.getLong(NBT_LAST_SPREAD_TICK);
         this.pendingEmpressEmergence = tag.getBoolean(NBT_PENDING_EMPRESS_EMERGENCE);
         this.pendingCivilWar = tag.getBoolean(NBT_PENDING_CIVIL_WAR);
-        this.zeroLocationsSinceTick = tag.contains(NBT_ZERO_LOCATIONS_SINCE_TICK)
-            ? tag.getLong(NBT_ZERO_LOCATIONS_SINCE_TICK)
-            : Long.MIN_VALUE;
 
         if (tag.contains(NBT_LINEAGE_POOL)) {
             EntityReserves.CODEC.decode(BLibCodecs.Schema.NBT, tag.getCompound(NBT_LINEAGE_POOL))
@@ -521,9 +498,6 @@ public class LineageFactionData extends FactionData {
         tag.putLong(NBT_LAST_SPREAD_TICK, lastSpreadTick);
         tag.putBoolean(NBT_PENDING_EMPRESS_EMERGENCE, pendingEmpressEmergence);
         tag.putBoolean(NBT_PENDING_CIVIL_WAR, pendingCivilWar);
-        if (zeroLocationsSinceTick != Long.MIN_VALUE) {
-            tag.putLong(NBT_ZERO_LOCATIONS_SINCE_TICK, zeroLocationsSinceTick);
-        }
 
         tag.put(NBT_LINEAGE_POOL, EntityReserves.CODEC.encode(BLibCodecs.Schema.NBT, lineagePool));
 

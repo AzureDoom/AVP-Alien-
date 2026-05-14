@@ -328,6 +328,12 @@ public final class HiveLocationRegistry {
         // Phase 10: empress emergence per-tick advancement. Cheap when no queens are emerging.
         com.alien.common.gameplay.hive2.empress.EmpressEmergenceRitual.tick(server);
 
+        // Location + lineage death checks run every tick — no throttling. See HIVE_REDESIGN_02_FACTION_LIFECYCLES.
+        // Order matters: location dormancy first so per-location rules fire before the lineage-empty cascade picks
+        // up newly-zero-location lineages this tick.
+        com.alien.common.gameplay.hive2.lifecycle.LocationDormancyTask.scanAll(server);
+        com.alien.common.gameplay.hive2.lifecycle.LineageDeathHandler.scanAndKill(server);
+
         ticksSinceLastDispatch++;
         if (ticksSinceLastDispatch >= REINFORCEMENT_DISPATCH_INTERVAL_TICKS) {
             ticksSinceLastDispatch = 0L;
