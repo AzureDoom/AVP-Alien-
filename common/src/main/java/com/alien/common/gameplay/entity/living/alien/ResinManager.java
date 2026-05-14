@@ -11,7 +11,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.gameevent.DynamicGameEventListener;
 import net.minecraft.world.level.gameevent.EntityPositionSource;
@@ -110,11 +109,7 @@ public class ResinManager implements GameEventListener.Provider<ResinSpreadListe
     }
 
     private boolean canSpreadResinAtAlienPosition() {
-        // Alien must not be exposed to skylight...
-        if (alien.level().getBrightness(LightLayer.SKY, alien.blockPosition()) != 0) {
-            return false;
-        }
-        // AND alien must not have an attack target...
+        // Alien must not have an attack target...
         if (alien.getTarget() != null) {
             return false;
         }
