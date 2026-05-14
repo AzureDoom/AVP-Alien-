@@ -7,6 +7,10 @@ import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.HashSet;
+
 /**
  * Atomic claim/release helpers for {@link HiveLocation}. Each call:
  * <ul>
@@ -20,6 +24,8 @@ import net.minecraft.world.level.ChunkPos;
  * BLib territory, in-memory chunk index) stay synchronized.
  */
 public final class HiveLocationClaims {
+
+    private static final int[][] CARDINAL_OFFSETS = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
 
     private HiveLocationClaims() {}
 
@@ -58,6 +64,16 @@ public final class HiveLocationClaims {
         ChunkPos chunk,
         boolean allowCenterChunk
     ) {
+        return release(level, location, chunk, allowCenterChunk, !allowCenterChunk);
+    }
+
+    private static boolean release(
+        ServerLevel level,
+        HiveLocation location,
+        ChunkPos chunk,
+        boolean allowCenterChunk,
+        boolean pruneDisconnected
+    ) {
         if (!allowCenterChunk && chunk.equals(new ChunkPos(location.centerPos()))) {
             return false;
         }
@@ -71,7 +87,103 @@ public final class HiveLocationClaims {
 
         Alien.MOD.territory().removeClaim(level, chunk, location.lineageFactionId());
 
+        if (pruneDisconnected && location.claimedChunks().contains(new ChunkPos(location.centerPos()))) {
+            releaseDisconnectedClaims(level, location);
+        }
+
         return true;
+    }
+
+    /**
+     * Releases any claimed chunk that no longer has a cardinally-adjacent path back to the location center. Returns the
+     * number of extra chunks released.
+     */
+    public static int releaseDisconnectedClaims(ServerLevel level, HiveLocation location) {
+        var centerChunk = new ChunkPos(location.centerPos());
+        if (!location.claimedChunks().contains(centerChunk)) {
+            return 0;
+        }
+
+        var connected = connectedClaims(location, centerChunk);
+        if (connected.size() == location.claimedChunks().size()) {
+            return 0;
+        }
+
+        var disconnected = new ArrayList<ChunkPos>();
+        for (var chunk : location.claimedChunks()) {
+            if (!connected.contains(chunk)) {
+                disconnected.add(chunk);
+            }
+        }
+
+        for (var chunk : disconnected) {
+            release(level, location, chunk, false, false);
+        }
+
+        if (!disconnected.isEmpty()) {
+            Alien.LOGGER.info(
+                "Hive2: released {} disconnected chunk claims from location {}",
+                disconnected.size(),
+                location.id().value()
+            );
+        }
+
+        return disconnected.size();
+    }
+
+    public static boolean wouldRemainConnectedAfterRelease(HiveLocation location, ChunkPos releasedChunk) {
+        var centerChunk = new ChunkPos(location.centerPos());
+        if (releasedChunk.equals(centerChunk)) {
+            return false;
+        }
+        if (!location.claimedChunks().contains(releasedChunk)) {
+            return true;
+        }
+        if (!location.claimedChunks().contains(centerChunk)) {
+            return false;
+        }
+
+        var remainingClaims = location.claimedChunks().size() - 1;
+        if (remainingClaims <= 1) {
+            return true;
+        }
+
+        return connectedClaims(location, centerChunk, releasedChunk).size() == remainingClaims;
+    }
+
+    private static HashSet<ChunkPos> connectedClaims(HiveLocation location, ChunkPos centerChunk) {
+        return connectedClaims(location, centerChunk, null);
+    }
+
+    private static HashSet<ChunkPos> connectedClaims(
+        HiveLocation location,
+        ChunkPos centerChunk,
+        ChunkPos excludedChunk
+    ) {
+        var connected = new HashSet<ChunkPos>();
+        if (centerChunk.equals(excludedChunk) || !location.claimedChunks().contains(centerChunk)) {
+            return connected;
+        }
+
+        var queue = new ArrayDeque<ChunkPos>();
+        queue.add(centerChunk);
+        connected.add(centerChunk);
+
+        while (!queue.isEmpty()) {
+            var current = queue.removeFirst();
+            for (var offset : CARDINAL_OFFSETS) {
+                var neighbor = new ChunkPos(current.x + offset[0], current.z + offset[1]);
+                if (neighbor.equals(excludedChunk)
+                    || connected.contains(neighbor)
+                    || !location.claimedChunks().contains(neighbor)) {
+                    continue;
+                }
+                connected.add(neighbor);
+                queue.add(neighbor);
+            }
+        }
+
+        return connected;
     }
 
     /**

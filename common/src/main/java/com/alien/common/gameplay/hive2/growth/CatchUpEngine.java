@@ -28,6 +28,8 @@ public final class CatchUpEngine {
 
     public static void catchUpTo(ServerLevel level, HiveLocation location, LineageFactionData lineage, long currentTick) {
         var config = HiveLocationRegistry.INSTANCE.config();
+        HiveLocationClaims.releaseDisconnectedClaims(level, location);
+
         var elapsed = currentTick - location.lastGrowthTick();
 
         if (elapsed > 0) {

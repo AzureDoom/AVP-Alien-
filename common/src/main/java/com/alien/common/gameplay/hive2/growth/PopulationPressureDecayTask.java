@@ -26,8 +26,10 @@ public final class PopulationPressureDecayTask {
                 continue;
             }
 
+            HiveLocationClaims.releaseDisconnectedClaims(level, location);
+
             while (location.claimedChunks().size() > 1 && isBelowPopulationRatio(location, config)) {
-                var chunk = pickOutermostChunk(location);
+                var chunk = pickOutermostReleasableChunk(location);
                 if (chunk == null) {
                     break;
                 }
@@ -49,12 +51,13 @@ public final class PopulationPressureDecayTask {
         return CastePopulation.totalTrackedPopulation(location) < requiredPopulation;
     }
 
-    private static @Nullable ChunkPos pickOutermostChunk(HiveLocation location) {
+    private static @Nullable ChunkPos pickOutermostReleasableChunk(HiveLocation location) {
         var centerChunk = new ChunkPos(location.centerPos());
 
         return location.claimedChunks()
             .stream()
             .filter(chunk -> !chunk.equals(centerChunk))
+            .filter(chunk -> HiveLocationClaims.wouldRemainConnectedAfterRelease(location, chunk))
             .max(
                 Comparator.<ChunkPos>comparingInt(chunk -> chebyshev(chunk, centerChunk))
                     .thenComparingInt(chunk -> manhattan(chunk, centerChunk))
