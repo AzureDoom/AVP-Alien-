@@ -15,14 +15,13 @@ import java.util.ArrayList;
  * Per-tick location death check. Replaces the legacy 24h dormancy timer with three accuracy-first rules:
  * <ol>
  * <li>Zero claimed chunks → kill (preserved from the legacy behavior).</li>
- * <li>Location faction empty AND local reserves empty → kill (membership is BLib-persistent so this is reliable
- * across chunk unloads).</li>
- * <li>Parent lineage faction empty → kill (defensive cascade — also fired from
- * {@link LineageDeathHandler}).</li>
- * <li>No-contact safety net: {@link HiveLocation#noContactTicksAccrued()} accumulates while ≥1 claimed chunk is
- * loaded AND no location-faction member is currently in any claimed chunk. Pauses when nothing is loaded; resets
- * when contact is observed; triggers a kill at
- * {@link com.alien.common.gameplay.hive2.config.HiveConfig#locationMaxNoContactTicks()} (default 7 game-days).</li>
+ * <li>Location faction empty AND local reserves empty → kill (membership is BLib-persistent so this is reliable across
+ * chunk unloads).</li>
+ * <li>Parent lineage faction empty → kill (defensive cascade — also fired from {@link LineageDeathHandler}).</li>
+ * <li>No-contact safety net: {@link HiveLocation#noContactTicksAccrued()} accumulates while ≥1 claimed chunk is loaded
+ * AND no location-faction member is currently in any claimed chunk. Pauses when nothing is loaded; resets when contact
+ * is observed; triggers a kill at {@link com.alien.common.gameplay.hive2.config.HiveConfig#locationMaxNoContactTicks()}
+ * (default 7 game-days).</li>
  * </ol>
  * <p>
  * Runs every server tick from {@link HiveLocationRegistry#tick}; no scan-cadence throttling. If this becomes a perf

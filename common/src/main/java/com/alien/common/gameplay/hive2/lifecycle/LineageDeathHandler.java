@@ -24,9 +24,9 @@ import java.util.ArrayList;
  * <p>
  * The shed path ({@code HiveManager.tryShedFromLineages}) removes the last alien synchronously, then discards the
  * entity — so the cascade fires on the very next tick when {@code members().isEmpty()} is observed. Accepted: this is
- * correct for the genuine shed case. Civil war successor wipes (unloaded ex-members never join successor lineages)
- * are a known deferred concern; if observed in playtest, fix in {@code CivilWarHandler} rather than reintroducing
- * global throttling.
+ * correct for the genuine shed case. Civil war successor wipes (unloaded ex-members never join successor lineages) are
+ * a known deferred concern; if observed in playtest, fix in {@code CivilWarHandler} rather than reintroducing global
+ * throttling.
  */
 public final class LineageDeathHandler {
 

@@ -12,8 +12,8 @@ import net.minecraft.world.level.ServerLevelAccessor;
 
 /**
  * Helpers for the location-tier faction. Centralizes the lineage-superset invariant
- * ({@code location.members() ⊆ lineage.members()}) so callers can't accidentally add to a location faction without
- * also being in the parent lineage.
+ * ({@code location.members() ⊆ lineage.members()}) so callers can't accidentally add to a location faction without also
+ * being in the parent lineage.
  */
 public final class LocationMembership {
 

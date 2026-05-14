@@ -18,6 +18,7 @@ import com.alien.common.gameplay.hive2.id.HiveLocationId;
 import com.alien.common.gameplay.hive2.id.HiveLocationIds;
 import com.alien.common.gameplay.hive2.id.LineageIds;
 import com.alien.common.gameplay.hive2.id.VariantIds;
+import com.alien.common.gameplay.hive2.lifecycle.LocationDeathHandler;
 import com.alien.common.gameplay.hive2.lifecycle.QueenSettlementDetector;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
@@ -68,6 +69,13 @@ public final class Hive2DebugCommands {
                     .then(
                         Commands.argument(LOCATION_ID_ARG, ResourceLocationArgument.id())
                             .executes(Hive2DebugCommands::inspectLocation)
+                    )
+            )
+            .then(
+                Commands.literal("kill_location")
+                    .then(
+                        Commands.argument(LOCATION_ID_ARG, ResourceLocationArgument.id())
+                            .executes(Hive2DebugCommands::killLocation)
                     )
             )
             .then(
@@ -382,6 +390,30 @@ public final class Hive2DebugCommands {
                 }
             }
         }
+
+        // Location faction (per-tick death key) + no-contact safety net status.
+        var locationFaction = Alien.MOD.factions().get(location.id().value());
+        var locationMemberCount = locationFaction != null ? locationFaction.membership().getMembers().size() : 0;
+        var serverLevel = ctx.getSource().getServer().getLevel(location.dimension());
+        var chunksLoaded = 0;
+        if (serverLevel != null) {
+            for (var chunk : location.claimedChunks()) {
+                if (serverLevel.getChunkSource().hasChunk(chunk.x, chunk.z)) {
+                    chunksLoaded++;
+                }
+            }
+        }
+        final var finalChunksLoaded = chunksLoaded;
+        ctx.getSource()
+            .sendSuccess(
+                () -> Component.literal(
+                    "  location-faction members=" + locationMemberCount
+                        + ", noContactTicksAccrued=" + location.noContactTicksAccrued()
+                        + "/" + HiveLocationRegistry.INSTANCE.config().locationMaxNoContactTicks()
+                        + ", chunksLoaded=" + finalChunksLoaded + "/" + location.claimedChunks().size()
+                ),
+                false
+            );
 
         // Also list the lineage's BLib membership so you can compare with what's actually routed
         // into the location. A UUID in lineage membership but not in loadedHere means the entity
@@ -868,6 +900,34 @@ public final class Hive2DebugCommands {
         }
 
         return snapshot.size();
+    }
+
+    private static int killLocation(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
+        var locationId = ResourceLocationArgument.getId(ctx, LOCATION_ID_ARG);
+        var location = HiveLocationRegistry.INSTANCE.get(HiveLocationId.of(locationId));
+
+        if (location == null) {
+            ctx.getSource().sendFailure(Component.literal("No hive location with id " + locationId));
+            return 0;
+        }
+
+        var faction = Alien.MOD.factions().get(location.lineageFactionId());
+        if (faction == null || !(faction.data() instanceof LineageFactionData lineage)) {
+            ctx.getSource().sendFailure(Component.literal("Owning lineage missing for " + locationId));
+            return 0;
+        }
+
+        var serverLevel = ctx.getSource().getServer().getLevel(location.dimension());
+        if (serverLevel == null) {
+            ctx.getSource().sendFailure(Component.literal("Dimension not loaded: " + location.dimension().location()));
+            return 0;
+        }
+
+        LocationDeathHandler.killAdmin(serverLevel, location, lineage, "kill_location debug command");
+
+        ctx.getSource()
+            .sendSuccess(() -> Component.literal("Killed location " + locationId), true);
+        return 1;
     }
 
     private static int forceGrowLocation(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {

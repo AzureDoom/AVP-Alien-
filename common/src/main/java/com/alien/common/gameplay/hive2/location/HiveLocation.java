@@ -103,8 +103,8 @@ public final class HiveLocation {
     private long evacuatingRemainingTicks;
 
     /**
-     * Accrued ticks during which this location has had no loaded location-faction member in any of its claimed
-     * chunks while at least one claimed chunk was loaded. Drives the no-contact safety-net kill in
+     * Accrued ticks during which this location has had no loaded location-faction member in any of its claimed chunks
+     * while at least one claimed chunk was loaded. Drives the no-contact safety-net kill in
      * {@link com.alien.common.gameplay.hive2.lifecycle.LocationDormancyTask}: when this exceeds
      * {@code config.locationMaxNoContactTicks()} the location dies.
      * <p>

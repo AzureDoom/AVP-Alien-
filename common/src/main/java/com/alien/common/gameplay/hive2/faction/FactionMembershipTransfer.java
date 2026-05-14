@@ -12,13 +12,14 @@ import java.util.Set;
 
 /**
  * Carries hive2 faction membership (lineage + location tiers) across an
- * {@link com.blib.api.common.entity.v1.EntityTransitionUtil#transitionInto entity transition}, which mints a fresh
- * UUID and would otherwise silently drop the molting alien from every faction it belonged to.
+ * {@link com.blib.api.common.entity.v1.EntityTransitionUtil#transitionInto entity transition}, which mints a fresh UUID
+ * and would otherwise silently drop the molting alien from every faction it belonged to.
  * <p>
  * Two-phase: snapshot the old entity's faction ids <em>before</em> calling {@code transitionInto}, then apply to the
  * new entity after a {@code Success} result. The snapshot is needed because {@code transitionInto} discards the old
  * entity internally before returning, which BLib treats as a member removal — so by the time the caller sees the
  * {@code Success}, the old UUID is no longer in any faction.
+ *
  * <pre>{@code
  * var snapshot = FactionMembershipTransfer.snapshot(oldEntity);
  * var result = EntityTransitionUtil.transitionInto(oldEntity, newType);
@@ -31,7 +32,9 @@ public final class FactionMembershipTransfer {
 
     private FactionMembershipTransfer() {}
 
-    /** Returns the set of lineage + location faction ids the entity is currently a member of. Order is insertion-stable. */
+    /**
+     * Returns the set of lineage + location faction ids the entity is currently a member of. Order is insertion-stable.
+     */
     public static Set<ResourceLocation> snapshot(Entity entity) {
         var snapshot = new LinkedHashSet<ResourceLocation>();
         for (var factionId : Alien.MOD.factions().getFactionIds(entity.getUUID())) {

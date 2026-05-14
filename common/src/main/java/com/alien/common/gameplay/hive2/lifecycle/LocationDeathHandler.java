@@ -23,9 +23,8 @@ import java.util.UUID;
  * player-caused.</li>
  * <li>Releases every claimed chunk through BLib's territory manager.</li>
  * <li>Removes the location from its lineage's {@code locationsById} and from the {@link HiveLocationRegistry}.</li>
- * <li>Removes the per-location BLib faction. Members of the location-tier faction lose location membership but
- * stay in their parent lineage (no "convert to forager" eviction — loading state should not affect lineage
- * membership).</li>
+ * <li>Removes the per-location BLib faction. Members of the location-tier faction lose location membership but stay in
+ * their parent lineage (no "convert to forager" eviction — loading state should not affect lineage membership).</li>
  * </ul>
  * <p>
  * Doesn't trigger lineage death directly — the per-tick {@link LineageDeathHandler#scanAndKill} picks up empty or

@@ -38,8 +38,10 @@ public class AlienTransitionUtil {
 
         var result = EntityTransitionUtil.transitionInto(alien, variantType);
 
-        if (result instanceof EntityTransitionUtil.EntityTransitionResult.Success<?> success
-            && level instanceof ServerLevel serverLevel) {
+        if (
+            result instanceof EntityTransitionUtil.EntityTransitionResult.Success<?> success
+                && level instanceof ServerLevel serverLevel
+        ) {
             FactionMembershipTransfer.apply(factionSnapshot, success.newEntity());
             LocationMembership.autoJoinAtPosition(success.newEntity(), serverLevel);
         }

@@ -15,16 +15,14 @@ import net.minecraft.nbt.CompoundTag;
  * <p>
  * Stateless. All location data (claimed chunks, reserves, leadership, no-contact counter) lives on
  * {@link com.alien.common.gameplay.hive2.location.HiveLocation}. The parent lineage id is derived on demand from
- * {@link com.alien.common.gameplay.hive2.location.HiveLocationRegistry#get} so absorption and civil-war transfers
- * don't have to keep a denormalized copy in sync.
+ * {@link com.alien.common.gameplay.hive2.location.HiveLocationRegistry#get} so absorption and civil-war transfers don't
+ * have to keep a denormalized copy in sync.
  */
 public class LocationFactionData extends FactionData {
 
     @Override
-    public void load(CompoundTag tag) {
-    }
+    public void load(CompoundTag tag) {}
 
     @Override
-    public void save(CompoundTag tag) {
-    }
+    public void save(CompoundTag tag) {}
 }
