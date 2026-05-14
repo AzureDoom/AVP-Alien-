@@ -1,4 +1,4 @@
 {
-  "biomass": 60,
-  "output_caste": "avp_alien:runners"
+  "biomass": 40,
+  "output_entity": "avp_alien:runner"
 }

@@ -25,7 +25,8 @@ import java.util.Map;
  * praetorian/crusher gates use the recipe-input caste so the buy stabilizes — gating praetorians on drones (recipe
  * consumes warriors) creates a slow refill cycle that doesn't violate the cap but keeps the buy task firing.</li>
  * <li>Picks the caste with the largest deficit. Tiebreak: order in {@link CastePopulation#TRACKED_CASTES}.</li>
- * <li>Resolves the recipe for that caste, checks conditions + resources + inputs, commits on success.</li>
+ * <li>Resolves the concrete entity recipe for that caste, checks conditions + resources + inputs, commits on
+ * success.</li>
  * </ol>
  * Runs every server tick from {@link HiveLocationRegistry#tick}. Per-location body is cheap (a few sums and a single
  * recipe lookup); no throttling per the project's correctness-over-cadence preference.
@@ -85,12 +86,18 @@ public final class HiveBalanceTask {
             return;
         }
 
-        var recipe = HiveRecipeRegistry.forOutputCaste(chosen);
+        var variant = lineage.variant();
+        var outputType = CasteResolver.entityTypeForCaste(variant, chosen);
+        if (outputType == null) {
+            return;
+        }
+
+        var recipe = HiveRecipeRegistry.forOutputEntity(outputType);
         if (recipe == null) {
             return;
         }
 
-        if (!conditionsHold(recipe, location, pop, totalPop)) {
+        if (!conditionsHold(recipe, location, totalPop)) {
             return;
         }
 
@@ -102,20 +109,17 @@ public final class HiveBalanceTask {
             return;
         }
 
-        var variant = lineage.variant();
-
-        // Resolve every input caste to a concrete entity type and confirm reserves cover it.
-        var inputTypes = new ArrayList<EntityType<?>>(recipe.inputCastes().size());
-        for (var input : recipe.inputCastes()) {
-            var type = CasteResolver.entityTypeForCaste(variant, input.caste());
-            if (type == null || location.localReserves().getCount(type) < input.count()) {
+        // Confirm the concrete input entity reserves cover the recipe.
+        var inputTypes = new ArrayList<EntityType<?>>(recipe.inputEntities().size());
+        for (var input : recipe.inputEntities()) {
+            var type = input.entity();
+            if (location.localReserves().getCount(type) < input.count()) {
                 return;
             }
             inputTypes.add(type);
         }
 
-        var outputType = CasteResolver.entityTypeForCaste(variant, recipe.outputCaste());
-        if (outputType == null) {
+        if (!location.localReserves().accepts(recipe.outputEntity())) {
             return;
         }
 
@@ -124,16 +128,16 @@ public final class HiveBalanceTask {
         location.setRoyalJelly(location.royalJelly() - recipe.royalJelly());
         location.setScourgeJelly(location.scourgeJelly() - recipe.scourgeJelly());
 
-        for (var i = 0; i < recipe.inputCastes().size(); i++) {
-            var count = recipe.inputCastes().get(i).count();
+        for (var i = 0; i < recipe.inputEntities().size(); i++) {
+            var count = recipe.inputEntities().get(i).count();
             location.localReserves().underlying().add(inputTypes.get(i), -count);
         }
-        location.localReserves().tryAdd(outputType, 1);
+        location.localReserves().tryAdd(recipe.outputEntity(), 1);
 
         Alien.LOGGER.debug(
             "Hive2: balance buy at {} → +1 {} (cost: {} biomass, {} royal, {} scourge)",
             location.id(),
-            outputType.builtInRegistryHolder().key().location(),
+            recipe.outputEntity().builtInRegistryHolder().key().location(),
             recipe.biomass(),
             recipe.royalJelly(),
             recipe.scourgeJelly()
@@ -178,7 +182,6 @@ public final class HiveBalanceTask {
     private static boolean conditionsHold(
         HiveRecipe recipe,
         HiveLocation location,
-        Map<TagKey<EntityType<?>>, Integer> pop,
         int totalPop
     ) {
         for (var condition : recipe.conditions()) {
@@ -188,12 +191,14 @@ public final class HiveBalanceTask {
                         return false;
                     }
                 }
-                case HiveRecipeCondition.MaxCasteCountInLocation max -> {
-                    var current = pop.getOrDefault(max.caste(), 0);
-                    if (max.caste() != null && !pop.containsKey(max.caste())) {
-                        // Caste not in TRACKED_CASTES — fall back to a direct count.
-                        current = CastePopulation.countCaste(location, max.caste());
+                case HiveRecipeCondition.MinEntityCountInLocation min -> {
+                    var current = CastePopulation.countEntity(location, min.entity());
+                    if (current < min.value()) {
+                        return false;
                     }
+                }
+                case HiveRecipeCondition.MaxEntityCountInLocation max -> {
+                    var current = CastePopulation.countEntity(location, max.entity());
                     if (current >= max.value()) {
                         return false;
                     }

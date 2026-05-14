@@ -3,8 +3,7 @@ package com.alien.common.gameplay.hive2.economy;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.tags.TagKey;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 
 /**
@@ -23,7 +22,8 @@ public sealed interface HiveRecipeCondition {
     private static MapCodec<? extends HiveRecipeCondition> mapCodecByType(String typeId) {
         return switch (typeId) {
             case MinPopulation.TYPE -> MinPopulation.MAP_CODEC;
-            case MaxCasteCountInLocation.TYPE -> MaxCasteCountInLocation.MAP_CODEC;
+            case MinEntityCountInLocation.TYPE -> MinEntityCountInLocation.MAP_CODEC;
+            case MaxEntityCountInLocation.TYPE -> MaxEntityCountInLocation.MAP_CODEC;
             default -> throw new IllegalArgumentException("Unknown HiveRecipeCondition type: " + typeId);
         };
     }
@@ -45,19 +45,40 @@ public sealed interface HiveRecipeCondition {
         }
     }
 
-    /** Count of {@code caste} members in this location must be strictly less than {@code value}. */
-    record MaxCasteCountInLocation(
-        TagKey<EntityType<?>> caste,
+    /** Count of {@code entity} members in this location must be at least {@code value}. */
+    record MinEntityCountInLocation(
+        EntityType<?> entity,
         int value
     ) implements HiveRecipeCondition {
 
-        public static final String TYPE = "max_caste_count_in_location";
+        public static final String TYPE = "min_entity_count_in_location";
 
-        public static final MapCodec<MaxCasteCountInLocation> MAP_CODEC = RecordCodecBuilder.mapCodec(
+        public static final MapCodec<MinEntityCountInLocation> MAP_CODEC = RecordCodecBuilder.mapCodec(
             instance -> instance.group(
-                TagKey.codec(Registries.ENTITY_TYPE).fieldOf("caste").forGetter(MaxCasteCountInLocation::caste),
-                Codec.INT.fieldOf("value").forGetter(MaxCasteCountInLocation::value)
-            ).apply(instance, MaxCasteCountInLocation::new)
+                BuiltInRegistries.ENTITY_TYPE.byNameCodec().fieldOf("entity").forGetter(MinEntityCountInLocation::entity),
+                Codec.INT.fieldOf("value").forGetter(MinEntityCountInLocation::value)
+            ).apply(instance, MinEntityCountInLocation::new)
+        );
+
+        @Override
+        public String typeId() {
+            return TYPE;
+        }
+    }
+
+    /** Count of {@code entity} members in this location must be strictly less than {@code value}. */
+    record MaxEntityCountInLocation(
+        EntityType<?> entity,
+        int value
+    ) implements HiveRecipeCondition {
+
+        public static final String TYPE = "max_entity_count_in_location";
+
+        public static final MapCodec<MaxEntityCountInLocation> MAP_CODEC = RecordCodecBuilder.mapCodec(
+            instance -> instance.group(
+                BuiltInRegistries.ENTITY_TYPE.byNameCodec().fieldOf("entity").forGetter(MaxEntityCountInLocation::entity),
+                Codec.INT.fieldOf("value").forGetter(MaxEntityCountInLocation::value)
+            ).apply(instance, MaxEntityCountInLocation::new)
         );
 
         @Override

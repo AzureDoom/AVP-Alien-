@@ -1,10 +1,10 @@
 {
-  "input_castes": [
+  "input_entities": [
     {
-      "caste": "avp_alien:drones",
-      "count": 1
+      "count": 1,
+      "entity": "avp_alien:drone"
     }
   ],
-  "output_caste": "avp_alien:warriors",
+  "output_entity": "avp_alien:warrior",
   "royal_jelly": 1
 }

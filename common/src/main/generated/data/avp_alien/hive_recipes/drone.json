@@ -1,4 +1,4 @@
 {
   "biomass": 50,
-  "output_caste": "avp_alien:drones"
+  "output_entity": "avp_alien:drone"
 }
