@@ -35,7 +35,9 @@ public final class LocationDormancyTask {
         var config = HiveLocationRegistry.INSTANCE.config();
         var maxNoContact = config.locationMaxNoContactTicks();
 
-        for (var factionId : Alien.MOD.factions().getAllIds()) {
+        // Snapshot ids before iteration — LocationDeathHandler.kill removes the per-location faction, which mutates
+        // the underlying registry that getAllIds() returns a view of.
+        for (var factionId : new ArrayList<>(Alien.MOD.factions().getAllIds())) {
             if (!LineageIds.isLineageId(factionId)) {
                 continue;
             }
