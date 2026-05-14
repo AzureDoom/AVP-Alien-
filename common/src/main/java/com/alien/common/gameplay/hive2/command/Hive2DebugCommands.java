@@ -519,11 +519,15 @@ public final class Hive2DebugCommands {
         var centerPos = centerChunk.getMiddleBlockPosition(player.blockPosition().getY());
         var location = new HiveLocation(locationId, lineageId, level.dimension(), centerPos, player.getUUID());
 
-        location.claimedChunks().add(centerChunk);
-        location.chunkClaimTicks().put(centerChunk, level.getGameTime());
-
         lineageData.addLocation(location);
         HiveLocationRegistry.INSTANCE.register(location);
+
+        com.alien.common.gameplay.hive2.growth.HiveLocationClaims.claim(
+            level,
+            location,
+            centerChunk,
+            level.getGameTime()
+        );
 
         ctx.getSource()
             .sendSuccess(
@@ -564,11 +568,15 @@ public final class Hive2DebugCommands {
         var centerPos = centerChunk.getMiddleBlockPosition(player.blockPosition().getY());
         var location = new HiveLocation(locationId, lineageFactionId, level.dimension(), centerPos, player.getUUID());
 
-        location.claimedChunks().add(centerChunk);
-        location.chunkClaimTicks().put(centerChunk, level.getGameTime());
-
         lineageData.addLocation(location);
         HiveLocationRegistry.INSTANCE.register(location);
+
+        com.alien.common.gameplay.hive2.growth.HiveLocationClaims.claim(
+            level,
+            location,
+            centerChunk,
+            level.getGameTime()
+        );
 
         var locationNumber = lineageData.allocateLocationNumber();
         location.setLocationNumber(locationNumber);
@@ -860,14 +868,18 @@ public final class Hive2DebugCommands {
         }
 
         var centerChunk = new ChunkPos(location.centerPos());
+        var serverLevel = ctx.getSource().getLevel();
         var added = 0;
 
         for (var dx = -radius; dx <= radius; dx++) {
             for (var dz = -radius; dz <= radius; dz++) {
                 var chunk = new ChunkPos(centerChunk.x + dx, centerChunk.z + dz);
-                if (location.claimedChunks().add(chunk)) {
-                    location.chunkClaimTicks().put(chunk, ctx.getSource().getLevel().getGameTime());
-                    HiveLocationRegistry.INSTANCE.onChunkClaimed(location, chunk);
+                if (com.alien.common.gameplay.hive2.growth.HiveLocationClaims.claim(
+                    serverLevel,
+                    location,
+                    chunk,
+                    serverLevel.getGameTime()
+                )) {
                     added++;
                 }
             }
