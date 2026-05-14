@@ -3,7 +3,9 @@ package com.alien.common.gameplay.hive2.empress;
 import com.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.empress.Empress;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
+import com.alien.common.gameplay.hive2.faction.FactionMembershipTransfer;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
+import com.alien.common.gameplay.hive2.faction.LocationMembership;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -146,6 +148,10 @@ public final class EmpressEmergenceRitual {
             return;
         }
 
+        // Snapshot the queen's hive2 factions before discard. EntityType.spawn calls finalizeSpawn which auto-joins
+        // the empress if she's in a claimed chunk, but the carry-over also handles the (rare) out-of-territory case.
+        var factionSnapshot = FactionMembershipTransfer.snapshot(queen);
+
         var spawnPos = queen.blockPosition();
         var empress = empressType.spawn(serverLevel, spawnPos, MobSpawnType.MOB_SUMMONED);
         if (empress == null) {
@@ -161,10 +167,11 @@ public final class EmpressEmergenceRitual {
         // Move the queen out of the world. The empress takes her place at the same position.
         queen.discard();
 
-        // Wire the new empress into the lineage.
+        // Wire the new empress into the lineage and apply the carried-over membership.
         lineage.setEmpressId(empress.getUUID());
         lineage.setPendingEmpressEmergence(false);
-        faction.membership().addEntity(empress);
+        FactionMembershipTransfer.apply(factionSnapshot, empress);
+        LocationMembership.autoJoinAtPosition(empress, serverLevel);
 
         Alien.LOGGER.info(
             "Hive2: empress emergence completed — queen {} → empress {} (variant {}, lineage {})",

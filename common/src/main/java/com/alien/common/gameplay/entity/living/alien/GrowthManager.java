@@ -1,6 +1,8 @@
 package com.alien.common.gameplay.entity.living.alien;
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.boiler.Boiler;
+import com.alien.common.gameplay.hive2.faction.FactionMembershipTransfer;
+import com.alien.common.gameplay.hive2.faction.LocationMembership;
 import com.alien.common.model.lifecycle.growth.GrowthRequirement;
 import com.alien.common.model.lifecycle.growth.GrowthStage;
 import com.alien.common.registry.GrowthStageRegistry;
@@ -215,6 +217,10 @@ public class GrowthManager implements NBTSerializable {
             return GrowthResult.CocoonStarted.INSTANCE;
         }
 
+        // Snapshot hive2 faction membership before the transition discards the old entity (UUID is in the default
+        // blacklist, so the new entity has a fresh id and wouldn't otherwise inherit membership).
+        var factionSnapshot = FactionMembershipTransfer.snapshot(entity);
+
         var transitionResult = EntityTransitionUtil.transitionInto(entity, nextFormType, TRANSITION_NBT_KEY_BLACKLIST);
 
         Entity nextForm = null;
@@ -225,6 +231,13 @@ public class GrowthManager implements NBTSerializable {
 
         if (nextForm == null) {
             return new GrowthResult.FailedTransitionResult(transitionResult);
+        }
+
+        // Carry over hive2 membership, and auto-join the parent location if the new form is a xenomorph in territory
+        // (covers the chestburster -> adolescent case where the old form wasn't a faction member).
+        FactionMembershipTransfer.apply(factionSnapshot, nextForm);
+        if (entity.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+            LocationMembership.autoJoinAtPosition(nextForm, serverLevel);
         }
 
         return new GrowthResult.Success(nextForm);
