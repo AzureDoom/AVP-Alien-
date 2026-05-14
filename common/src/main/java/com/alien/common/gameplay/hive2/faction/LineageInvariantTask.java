@@ -1,7 +1,6 @@
 package com.alien.common.gameplay.hive2.faction;
 
 import com.alien.Alien;
-import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.hive2.growth.ContestResolutionTask;
 import com.alien.common.gameplay.hive2.id.LineageIds;
 import com.alien.common.gameplay.hive2.lifecycle.CivilWarHandler;
@@ -9,7 +8,6 @@ import com.alien.common.gameplay.hive2.lifecycle.LineageAbsorptionTask;
 import com.alien.common.gameplay.hive2.lifecycle.QueenlessMaturationTask;
 import com.blib.api.common.faction.v1.FactionMember;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.entity.EntityType;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -83,14 +81,25 @@ public final class LineageInvariantTask {
     ) {
         var lineageVariant = lineage.variant();
         var mismatchedUuids = new HashSet<UUID>();
+        var removedReserveEntries = 0;
 
         for (var location : lineage.locationsById().values()) {
             for (var entry : location.loadedMembersByType().entrySet()) {
-                if (variantMatches(entry.getKey(), lineageVariant)) {
+                if (FactionVariantPolicy.variantMatches(entry.getKey(), lineageVariant)) {
                     continue;
                 }
                 mismatchedUuids.addAll(entry.getValue());
             }
+            removedReserveEntries += location.localReserves().removeVariantMismatches(lineageVariant);
+        }
+
+        if (removedReserveEntries > 0) {
+            lineage.markDirty();
+            Alien.LOGGER.info(
+                "Hive2: LineageInvariantTask removed {} variant-mismatched local reserve entries from lineage variant={}",
+                removedReserveEntries,
+                lineageVariant
+            );
         }
 
         if (mismatchedUuids.isEmpty()) {
@@ -98,15 +107,6 @@ public final class LineageInvariantTask {
         }
 
         evictAll(membership, mismatchedUuids, lineage);
-    }
-
-    private static boolean variantMatches(EntityType<?> type, com.alien.common.model.alien.variant.AlienVariant lineageVariant) {
-        var variantTypeOption = AlienVariantTypes.getFor(type);
-        if (variantTypeOption.isNone()) {
-            // Non-alien entity type ended up in our membership somehow — treat as mismatch (will be evicted).
-            return false;
-        }
-        return variantTypeOption.unwrap().variant() == lineageVariant;
     }
 
     private static void evictAll(

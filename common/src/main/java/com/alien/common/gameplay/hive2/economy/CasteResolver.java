@@ -10,8 +10,8 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Maps {@code (caste tag, variant)} pairs to a concrete {@link EntityType}. Each xenomorph variant tags exactly one
  * entity type into a given caste tag (e.g., normal drones are in both {@link AlienEntityTypeTags#DRONES} and
- * {@link AlienEntityTypeTags#NORMAL_ALIENS}), so the resolver walks the caste tag's contents and returns the one
- * whose type belongs to the variant's all-aliens tag.
+ * {@link AlienEntityTypeTags#NORMAL_ALIENS}), so the resolver walks the caste tag's contents and returns the one whose
+ * type belongs to the variant's all-aliens tag.
  */
 public final class CasteResolver {
 

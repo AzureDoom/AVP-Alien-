@@ -2,11 +2,15 @@ package com.alien.common.gameplay.hive2.location;
 
 import com.alien.Alien;
 import com.alien.common.gameplay.hive2.config.HiveConfig;
+import com.alien.common.gameplay.hive2.faction.FactionVariantPolicy;
+import com.alien.common.model.alien.variant.AlienVariant;
 import com.blib.api.common.codec.v1.BLibCodecs;
 import com.blib.api.common.entity.v1.EntityReserves;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.IntSupplier;
 import java.util.function.Predicate;
@@ -37,10 +41,17 @@ public final class HiveLocationReserves {
 
     private final Supplier<HiveConfig> configSupplier;
 
-    public HiveLocationReserves(IntSupplier claimedChunkCountSupplier, Supplier<HiveConfig> configSupplier) {
+    private final Supplier<AlienVariant> variantSupplier;
+
+    public HiveLocationReserves(
+        IntSupplier claimedChunkCountSupplier,
+        Supplier<HiveConfig> configSupplier,
+        Supplier<AlienVariant> variantSupplier
+    ) {
         this.underlying = new EntityReserves();
         this.claimedChunkCountSupplier = claimedChunkCountSupplier;
         this.configSupplier = configSupplier;
+        this.variantSupplier = variantSupplier;
     }
 
     /**
@@ -60,6 +71,16 @@ public final class HiveLocationReserves {
         if (count <= 0) {
             return 0;
         }
+        if (!accepts(type)) {
+            var required = variantSupplier.get();
+            Alien.LOGGER.warn(
+                "Hive2: rejected {} local reserve add of {} because it does not match location variant {}.",
+                count,
+                BuiltInRegistries.ENTITY_TYPE.getKey(type),
+                required
+            );
+            return count;
+        }
 
         var current = underlying.getCount(type);
         var cap = capFor(type);
@@ -77,7 +98,7 @@ public final class HiveLocationReserves {
      * Unconditional spawn-side decrement. Returns true if a unit was successfully consumed; false if the type had zero.
      */
     public boolean trySpawn(EntityType<?> type) {
-        if (underlying.getCount(type) <= 0) {
+        if (!canSpawn(type)) {
             return false;
         }
         underlying.add(type, -1);
@@ -85,15 +106,15 @@ public final class HiveLocationReserves {
     }
 
     public boolean canSpawn(EntityType<?> type) {
-        return underlying.getCount(type) > 0;
+        return accepts(type) && underlying.getCount(type) > 0;
     }
 
     public int getCount(EntityType<?> type) {
-        return underlying.getCount(type);
+        return accepts(type) ? underlying.getCount(type) : 0;
     }
 
     public int getCountMatching(Predicate<EntityType<?>> predicate) {
-        return underlying.getCountMatching(predicate);
+        return underlying.getCountMatching(type -> accepts(type) && predicate.test(type));
     }
 
     public int getCount() {
@@ -101,7 +122,10 @@ public final class HiveLocationReserves {
     }
 
     public List<EntityType<?>> getAvailableEntityTypes() {
-        return underlying.getAvailableEntityTypes();
+        return underlying.getAvailableEntityTypes()
+            .stream()
+            .filter(this::accepts)
+            .toList();
     }
 
     /** Direct access for callers that need to interoperate with raw BLib APIs. */
@@ -120,6 +144,46 @@ public final class HiveLocationReserves {
 
         EntityReserves.CODEC.decode(BLibCodecs.Schema.NBT, tag.getCompound(NBT_KEY))
             .inspectErr(failure -> Alien.LOGGER.error("Failed to load HiveLocationReserves: {}", failure))
-            .ifOk(loaded -> underlying.putAll(loaded.getBackingMap()));
+            .ifOk(loaded -> {
+                var rejected = 0;
+                for (var entry : loaded.getBackingMap().entrySet()) {
+                    var count = Math.max(0, entry.getValue());
+                    if (count <= 0) {
+                        continue;
+                    }
+                    if (accepts(entry.getKey())) {
+                        underlying.add(entry.getKey(), count);
+                    } else {
+                        rejected += count;
+                    }
+                }
+                if (rejected > 0) {
+                    Alien.LOGGER.warn(
+                        "Hive2: discarded {} variant-mismatched local reserve entries while loading a hive location.",
+                        rejected
+                    );
+                }
+            });
+    }
+
+    public boolean accepts(EntityType<?> type) {
+        var required = variantSupplier.get();
+        return required == null || FactionVariantPolicy.variantMatches(type, required);
+    }
+
+    public int removeVariantMismatches(AlienVariant required) {
+        var removed = 0;
+        for (var entry : new ArrayList<>(underlying.getBackingMap().entrySet())) {
+            if (FactionVariantPolicy.variantMatches(entry.getKey(), required)) {
+                continue;
+            }
+            var count = Math.max(0, entry.getValue());
+            if (count <= 0) {
+                continue;
+            }
+            underlying.add(entry.getKey(), -count);
+            removed += count;
+        }
+        return removed;
     }
 }

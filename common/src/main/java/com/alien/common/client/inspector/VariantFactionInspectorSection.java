@@ -1,0 +1,139 @@
+package com.alien.common.client.inspector;
+
+import com.alien.common.gameplay.hive2.inspection.HiveInspectionSnapshot;
+import com.alien.common.registry.init.AlienFactionDataTypes;
+import com.blib.engine.ui.panel.details.InspectorStyle;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+
+import static com.alien.common.client.inspector.HiveInspectorRender.metric;
+
+/**
+ * Inspector section for AVP {@code avp_alien:variant} factions — top-level species umbrella showing variant metadata,
+ * aggregates across every lineage of this variant, and a per-lineage summary list with health-at-a-glance rows.
+ */
+public final class VariantFactionInspectorSection extends AbstractHiveInspectorSection {
+
+    @Override
+    public String id() {
+        return "avp_alien:hive_variant_inspector";
+    }
+
+    @Override
+    public int order() {
+        return 100;
+    }
+
+    @Override
+    protected ResourceLocation supportedFactionTypeId() {
+        return AlienFactionDataTypes.VARIANT.getResourceLocation();
+    }
+
+    @Override
+    protected String snapshotKind() {
+        return HiveInspectionSnapshot.KIND_VARIANT;
+    }
+
+    @Override
+    protected int renderSnapshot(GuiGraphics graphics, Font font, int x, int y, int width, CompoundTag s, int mouseX, int mouseY) {
+        var rowY = y;
+
+        var identity = drawCollapsibleSectionHeader(graphics, font, x, rowY, width, "variant", "Variant", mouseX, mouseY);
+        rowY = identity.nextY();
+        if (identity.expanded()) {
+            rowY += InspectorStyle.CONTENT_PADDING / 2;
+
+            rowY = HiveInspectorRender.drawRow(graphics, font, x, rowY, width, "Variant", s.getString(HiveInspectionSnapshot.K_VARIANT_NAME));
+            rowY = HiveInspectorRender.drawMetricStrip(
+                graphics,
+                font,
+                x,
+                rowY,
+                width,
+                metric("Age", HiveInspectorRender.formatTicks(s.getLong(HiveInspectionSnapshot.K_AGE_TICKS))),
+                metric("Next #", String.valueOf(s.getLong(HiveInspectionSnapshot.K_NEXT_LINEAGE_NUMBER))),
+                metric("Members", String.valueOf(s.getInt(HiveInspectionSnapshot.K_VARIANT_MEMBERS)))
+            );
+        }
+
+        rowY += InspectorStyle.ROW_GAP;
+        var aggregate = drawCollapsibleSectionHeader(graphics, font, x, rowY, width, "aggregate", "Aggregate", mouseX, mouseY);
+        rowY = aggregate.nextY();
+        if (aggregate.expanded()) {
+            rowY += InspectorStyle.CONTENT_PADDING / 2;
+            rowY = HiveInspectorRender.drawMetricStrip(
+                graphics,
+                font,
+                x,
+                rowY,
+                width,
+                metric("Biomass", String.valueOf(s.getLong(HiveInspectionSnapshot.K_AGG_BIOMASS))),
+                metric("Royal", String.valueOf(s.getLong(HiveInspectionSnapshot.K_AGG_ROYAL_JELLY))),
+                metric("Scourge", String.valueOf(s.getLong(HiveInspectionSnapshot.K_AGG_SCOURGE_JELLY)))
+            );
+            rowY = HiveInspectorRender.drawBarRow(
+                graphics,
+                font,
+                x,
+                rowY,
+                width,
+                "Population",
+                s.getLong(HiveInspectionSnapshot.K_AGG_TOTAL_POP),
+                s.getLong(HiveInspectionSnapshot.K_AGG_POP_CAP)
+            );
+        }
+
+        rowY += InspectorStyle.ROW_GAP;
+        var lineages = listOrEmpty(s, HiveInspectionSnapshot.K_LINEAGES);
+        var lineagesSection = drawCollapsibleSectionHeader(graphics, font, x, rowY, width, "lineages", "Lineages (" + lineages.size() + ")", mouseX, mouseY);
+        rowY = lineagesSection.nextY();
+        if (lineagesSection.expanded()) {
+            rowY += InspectorStyle.CONTENT_PADDING / 2;
+            if (lineages.isEmpty()) {
+                rowY = HiveInspectorRender.drawNote(graphics, font, x, rowY, width, "(none - variant has no lineages)");
+            } else {
+                for (var i = 0; i < lineages.size(); i++) {
+                    var row = lineages.getCompound(i);
+                    var label = "#" + row.getLong(HiveInspectionSnapshot.K_LINEAGE_NUMBER);
+                    var title = row.getString(HiveInspectionSnapshot.K_DISPLAY_NAME);
+                    if (title.isBlank()) {
+                        title = row.getString(HiveInspectionSnapshot.K_FACTION_ID);
+                    }
+                    rowY = HiveInspectorRender.drawItemHeader(graphics, font, x, rowY, width, label, title);
+                    rowY = HiveInspectorRender.drawMetricStrip(
+                        graphics,
+                        font,
+                        x,
+                        rowY,
+                        width,
+                        metric("Dim", row.getString(HiveInspectionSnapshot.K_DIMENSION)),
+                        metric("Locs", String.valueOf(row.getInt(HiveInspectionSnapshot.K_CLAIMED_CHUNKS))),
+                        metric("Biomass", String.valueOf(row.getLong(HiveInspectionSnapshot.K_BIOMASS))),
+                        metric("Pop", row.getLong(HiveInspectionSnapshot.K_TOTAL_POP) + "/" + row.getLong(HiveInspectionSnapshot.K_POP_CAP)),
+                        metric("State", lineageState(row))
+                    );
+                    rowY += InspectorStyle.ROW_GAP;
+                }
+            }
+        }
+
+        return rowY;
+    }
+
+    private static String lineageState(CompoundTag row) {
+        var pendingEmpress = row.getBoolean(HiveInspectionSnapshot.K_PENDING_EMPRESS);
+        var pendingCivilWar = row.getBoolean(HiveInspectionSnapshot.K_PENDING_CIVIL_WAR);
+        if (pendingEmpress && pendingCivilWar) {
+            return "empress, civil war";
+        }
+        if (pendingEmpress) {
+            return "empress";
+        }
+        if (pendingCivilWar) {
+            return "civil war";
+        }
+        return "stable";
+    }
+}

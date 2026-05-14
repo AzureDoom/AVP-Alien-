@@ -20,8 +20,10 @@ import java.util.Map;
  * <ol>
  * <li>Counts tracked castes (loaded + reserves) and totalsthe population.</li>
  * <li>Skips if total population is at or beyond the per-chunk cap (overencumbered — convoys may have pushed past).</li>
- * <li>Computes desired counts from policy ratios (drone↔warrior 1:1, prowler↔runner 1:4, praetorian = drones/12,
- * crusher = runners/12, ravager = warriors/8, harbinger = 1 when pop ≥ 100, runner baseline = 1 + chunks/4).</li>
+ * <li>Computes desired counts from policy ratios (drone↔warrior 1:1, prowler↔runner 1:4, praetorian = warriors/12,
+ * crusher = runners/12, ravager = warriors/8, harbinger = 1 when pop ≥ 100, runner baseline = 1 + chunks/4). The
+ * praetorian/crusher gates use the recipe-input caste so the buy stabilizes — gating praetorians on drones (recipe
+ * consumes warriors) creates a slow refill cycle that doesn't violate the cap but keeps the buy task firing.</li>
  * <li>Picks the caste with the largest deficit. Tiebreak: order in {@link CastePopulation#TRACKED_CASTES}.</li>
  * <li>Resolves the recipe for that caste, checks conditions + resources + inputs, commits on success.</li>
  * </ol>
@@ -154,7 +156,7 @@ public final class HiveBalanceTask {
         desired.put(AlienEntityTypeTags.WARRIORS, Math.max(drone, warrior));
         desired.put(AlienEntityTypeTags.RUNNERS, Math.max(runner, 1 + chunks / 4));
         desired.put(AlienEntityTypeTags.PROWLERS, Math.max(prowler, runner / 4));
-        desired.put(AlienEntityTypeTags.PRAETORIANS, drone / 12);
+        desired.put(AlienEntityTypeTags.PRAETORIANS, warrior / 12);
         desired.put(AlienEntityTypeTags.CRUSHERS, runner / 12);
         desired.put(AlienEntityTypeTags.RAVAGERS, warrior / 8);
         desired.put(AlienEntityTypeTags.HARBINGERS, totalPop >= 100 ? Math.max(1, harbinger) : 0);

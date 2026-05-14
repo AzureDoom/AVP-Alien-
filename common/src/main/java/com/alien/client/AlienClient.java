@@ -2,6 +2,7 @@ package com.alien.client;
 
 import com.alien.Alien;
 import com.alien.AlienResources;
+import com.alien.client.inspector.AlienInspectorSections;
 import com.alien.client.particle.AcidParticleProvider;
 import com.alien.client.particle.BlueAcidParticleProvider;
 import com.alien.client.particle.IrradiatedAcidParticleProvider;
@@ -78,6 +79,10 @@ public class AlienClient {
         registerItemRenderers();
         registerBlockEntityRenderers();
         registerParticleProviderFactories();
+
+        // Engine workspace: add hive-specific inspector sections under the generic faction inspector so picking an AVP
+        // faction in the FactionBrowser reveals biomass/jelly/caste/territory/leadership/vigilance data.
+        AlienInspectorSections.register();
 
         MOD.events().onClientSetup().register(() -> {
             registerEntityHeadData();

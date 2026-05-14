@@ -42,7 +42,7 @@ public class AlienSpawning {
         BlockPos blockPos,
         RandomSource randomSource
     ) {
-        return Monster.checkMonsterSpawnRules(
+        return Monster.checkAnyLightMonsterSpawnRules(
             entityType,
             serverLevelAccessor,
             mobSpawnType,

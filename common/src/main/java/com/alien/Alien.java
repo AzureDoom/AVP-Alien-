@@ -8,6 +8,7 @@ import com.alien.common.gameplay.hive2.growth.ResinDecorator;
 import com.alien.common.gameplay.hive2.lifecycle.QueenSettlementDetector;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.gameplay.level.saveddata.QueenSpawnChunkData;
+import com.alien.common.network.AlienNetworking;
 import com.alien.common.property.AlienPropertyAccess;
 import com.alien.common.registry.GrowthStageRegistry;
 import com.alien.common.registry.InfectionRegistry;
@@ -121,6 +122,9 @@ public class Alien {
         AlienLimbDrops.initialize();
 
         AlienCommands.initialize();
+
+        // Networking: hive inspection payloads (request/reply) for the engine workspace inspector.
+        AlienNetworking.initialize();
 
         // Data Migration
         AlienDataMigrations.initialize();

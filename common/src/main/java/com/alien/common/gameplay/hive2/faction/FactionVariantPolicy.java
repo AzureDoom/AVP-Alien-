@@ -3,6 +3,7 @@ package com.alien.common.gameplay.hive2.faction;
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.model.alien.variant.AlienVariant;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -18,7 +19,12 @@ public final class FactionVariantPolicy {
 
     /** Returns the variant of an entity, or null if the entity type isn't a known alien variant type. */
     public static @Nullable AlienVariant variantOf(Entity entity) {
-        var opt = AlienVariantTypes.getFor(entity.getType());
+        return variantOf(entity.getType());
+    }
+
+    /** Returns the variant of an entity type, or null if the type isn't a known alien variant type. */
+    public static @Nullable AlienVariant variantOf(EntityType<?> type) {
+        var opt = AlienVariantTypes.getFor(type);
         return opt.isSome() ? opt.unwrap().variant() : null;
     }
 
@@ -27,7 +33,11 @@ public final class FactionVariantPolicy {
      * variant.
      */
     public static boolean variantMatches(Entity entity, AlienVariant required) {
-        var v = variantOf(entity);
+        return variantMatches(entity.getType(), required);
+    }
+
+    public static boolean variantMatches(EntityType<?> type, AlienVariant required) {
+        var v = variantOf(type);
         return v != null && v == required;
     }
 }

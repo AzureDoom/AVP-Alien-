@@ -23,14 +23,6 @@ public record HiveConfig(
     int bossBarDisplayRadiusBlocks,
     long angryGraceTicks,
     long contestTickWindow,
-    int queenRangeChunksMin,
-    int queenRangeChunksMax,
-    int praetorianRangeChunksMin,
-    int praetorianRangeChunksMax,
-    int droneRangeChunksMin,
-    int droneRangeChunksMax,
-    int warriorRangeChunksMin,
-    int warriorRangeChunksMax,
 
     // ---------- § 3 Reserves ----------
     long shedGraceTicks,
@@ -137,14 +129,6 @@ public record HiveConfig(
             96, // bossBarDisplayRadiusBlocks
             60L * TICKS_PER_SECOND, // angryGraceTicks: 60s
             60L * TICKS_PER_SECOND, // contestTickWindow: 60s
-            0,
-            0, // queen range: center chunk only
-            0,
-            2, // praetorian range: 0–2 chunks
-            0,
-            6, // drone range: 0–6 chunks
-            2,
-            10, // warrior range: 2–10 chunks
 
             // § 3 Reserves
             5L * TICKS_PER_MINUTE, // shedGraceTicks: 5 min

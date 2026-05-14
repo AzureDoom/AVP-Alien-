@@ -9,17 +9,16 @@ import net.minecraft.world.level.LevelAccessor;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Replaces the legacy {@code HiveSpaceManager} as the spawn-gating layer for the new system. Combines three checks:
+ * Replaces the legacy {@code HiveSpaceManager} as the spawn-gating layer for the new system. Combines two checks:
  * <ol>
  * <li><b>Containment</b> — the position is inside one of the location's claimed chunks.</li>
- * <li><b>Caste distance</b> — the entity type's chunk-distance range from the location's center allows the spawn (per
- * {@link CasteDistanceRule}).</li>
  * <li><b>Reserves</b> — the location has at least one of the requested entity type in its local reserves.</li>
  * </ol>
  * <p>
- * Returns the matching {@link HiveLocation} on success so callers can decrement reserves on the actual spawn.
+ * Caste-distance restrictions were removed because they conflicted with surface spawning expectations — castes can
+ * now spawn anywhere within the location's claimed chunks subject only to reserves and vanilla monster rules.
  * <p>
- * See {@code HIVE_REDESIGN_03_LOCATIONS.md} § 4 and {@code HIVE_REDESIGN_05_RESERVES.md} § 4.
+ * Returns the matching {@link HiveLocation} on success so callers can decrement reserves on the actual spawn.
  */
 public final class HiveLocationSpawnGate {
 
@@ -38,17 +37,6 @@ public final class HiveLocationSpawnGate {
             return null;
         }
 
-        var config = HiveLocationRegistry.INSTANCE.config();
-        var range = CasteDistanceRule.rangeFor(entityType, config);
-        if (range == null) {
-            return null;
-        }
-
-        var distance = chunkDistance(location.centerPos(), pos);
-        if (!range.contains(distance)) {
-            return null;
-        }
-
         if (!location.localReserves().canSpawn(entityType)) {
             return null;
         }
@@ -58,7 +46,7 @@ public final class HiveLocationSpawnGate {
 
     /**
      * Lightweight containment check used by "is in a hive" predicates (egg laying, resin spread, despawn-into-reserves
-     * routing). No reserves or caste-distance check — just "does some location own this chunk."
+     * routing). No reserves check — just "does some location own this chunk."
      */
     public static @Nullable HiveLocation locationContaining(LevelAccessor level, BlockPos pos) {
         if (!(level instanceof Level concreteLevel)) {
@@ -70,12 +58,5 @@ public final class HiveLocationSpawnGate {
             return null;
         }
         return hit;
-    }
-
-    private static int chunkDistance(BlockPos a, BlockPos b) {
-        var dx = Math.abs((a.getX() >> 4) - (b.getX() >> 4));
-        var dz = Math.abs((a.getZ() >> 4) - (b.getZ() >> 4));
-        // Chebyshev — the caste range is a square band, matching how chunk distances feel in-game.
-        return Math.max(dx, dz);
     }
 }

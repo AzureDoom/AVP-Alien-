@@ -4,6 +4,7 @@ import com.alien.Alien;
 import com.alien.common.gameplay.hive2.config.HiveConfig;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.id.HiveLocationId;
+import com.alien.common.gameplay.hive2.id.HiveLocationIds;
 import com.alien.common.gameplay.hive2.id.LineageIds;
 import com.alien.common.gameplay.hive2.tick.HiveLocationLoadedTickTask;
 import com.alien.common.gameplay.hive2.tick.LineageConvoyTickTask;
@@ -355,12 +356,34 @@ public final class HiveLocationRegistry {
             }
         }
 
+        // Self-heal: delete any LocationFactionData whose backing HiveLocation is missing. These orphans accumulate
+        // when older code paths removed a HiveLocation without deleting its BLib faction; left in place they show up
+        // in the FactionBrowser and make the inspector hang on "(loading…)" since the request handler can't resolve
+        // them. (Fixed at the source in LocationRemovalHelper.remove(); this is the catch-up pass for existing saves.)
+        var orphanLocationFactions = 0;
+        for (var factionId : new java.util.ArrayList<>(allIds)) {
+            if (!HiveLocationIds.isHiveLocationId(factionId)) {
+                continue;
+            }
+            if (byId.containsKey(HiveLocationId.of(factionId))) {
+                continue;
+            }
+            Alien.LOGGER.warn(
+                "HiveLocationRegistry rebuild: deleting orphan location faction {} (no backing HiveLocation)",
+                factionId
+            );
+            Alien.MOD.factions().remove(factionId);
+            orphanLocationFactions++;
+        }
+
         Alien.LOGGER.info(
-            "HiveLocationRegistry rebuilt: scanned {} factions, found {} lineage ids, registered {} locations across {} lineages",
+            "HiveLocationRegistry rebuilt: scanned {} factions, found {} lineage ids, registered {} locations across "
+                + "{} lineages, pruned {} orphan location factions",
             allIds.size(),
             lineageIdCount,
             locationCount,
-            byLineage.size()
+            byLineage.size(),
+            orphanLocationFactions
         );
     }
 
@@ -429,6 +452,8 @@ public final class HiveLocationRegistry {
      * <ul>
      * <li>Orphan lineages — registered locations whose owning lineage faction no longer exists in BLib. Their locations
      * are unregistered.</li>
+     * <li>Orphan location factions — BLib {@code LocationFactionData} factions whose backing {@link HiveLocation} is
+     * missing. Deleted so the FactionBrowser stops listing them and inspector requests don't hang.</li>
      * <li>{@code byChunk} drift — every chunk in every location's {@code claimedChunks} should be reflected in the
      * per-dim chunk index. Missing entries are repaired.</li>
      * <li>{@code byCenterDim} drift — every location should be in the per-dim spatial bucket. Missing entries are
@@ -456,6 +481,28 @@ public final class HiveLocationRegistry {
             for (var orphan : Set.copyOf(byLineage.get(lineageId))) {
                 unregister(orphan);
             }
+        }
+
+        var orphanLocationFactions = 0;
+        for (var factionId : new java.util.ArrayList<>(Alien.MOD.factions().getAllIds())) {
+            if (!HiveLocationIds.isHiveLocationId(factionId)) {
+                continue;
+            }
+            if (byId.containsKey(HiveLocationId.of(factionId))) {
+                continue;
+            }
+            Alien.LOGGER.warn(
+                "HiveLocationRegistry.validate: deleting orphan location faction {} (no backing HiveLocation)",
+                factionId
+            );
+            Alien.MOD.factions().remove(factionId);
+            orphanLocationFactions++;
+        }
+        if (orphanLocationFactions > 0) {
+            Alien.LOGGER.warn(
+                "HiveLocationRegistry.validate: pruned {} orphan location factions",
+                orphanLocationFactions
+            );
         }
 
         var chunkRepairs = 0;

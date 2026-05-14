@@ -523,13 +523,24 @@ public class LineageFactionData extends FactionData {
         }
 
         locationsById.clear();
+        var removedMismatchedReserveEntries = 0;
         if (tag.contains(NBT_LOCATIONS)) {
             var listTag = tag.getList(NBT_LOCATIONS, Tag.TAG_COMPOUND);
             for (var i = 0; i < listTag.size(); i++) {
                 var locationTag = listTag.getCompound(i);
                 var location = HiveLocation.load(locationTag);
+                removedMismatchedReserveEntries += location.localReserves().removeVariantMismatches(variant);
                 locationsById.put(location.id(), location);
             }
+        }
+        if (removedMismatchedReserveEntries > 0) {
+            Alien.LOGGER.warn(
+                "Hive2: removed {} variant-mismatched local reserve entries while loading lineage {} (variant={})",
+                removedMismatchedReserveEntries,
+                factionId,
+                variant
+            );
+            markDirty();
         }
 
         convoys.clear();

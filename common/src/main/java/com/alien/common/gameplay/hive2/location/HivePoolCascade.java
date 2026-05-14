@@ -1,8 +1,10 @@
 package com.alien.common.gameplay.hive2.location;
 
 import com.alien.Alien;
+import com.alien.common.gameplay.hive2.faction.FactionVariantPolicy;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.faction.VariantFactionData;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 
 /**
@@ -29,6 +31,9 @@ public final class HivePoolCascade {
         if (count <= 0) {
             return 0;
         }
+        if (!variantMatches(lineage, type)) {
+            return count;
+        }
 
         var afterLocal = location.localReserves().tryAdd(type, count);
         if (afterLocal == 0) {
@@ -45,6 +50,9 @@ public final class HivePoolCascade {
     public static int addToLineageCascading(LineageFactionData lineage, EntityType<?> type, int count) {
         if (count <= 0) {
             return 0;
+        }
+        if (!variantMatches(lineage, type)) {
+            return count;
         }
 
         var afterLineage = lineage.tryAddToLineagePool(type, count);
@@ -74,5 +82,17 @@ public final class HivePoolCascade {
         }
 
         return variantData.tryAddToVariantPool(lineage.dimension(), type, afterLineage);
+    }
+
+    private static boolean variantMatches(LineageFactionData lineage, EntityType<?> type) {
+        if (FactionVariantPolicy.variantMatches(type, lineage.variant())) {
+            return true;
+        }
+        Alien.LOGGER.warn(
+            "Hive2: rejected reserve cascade of {} into lineage variant {} because the entity type variant differs.",
+            BuiltInRegistries.ENTITY_TYPE.getKey(type),
+            lineage.variant()
+        );
+        return false;
     }
 }

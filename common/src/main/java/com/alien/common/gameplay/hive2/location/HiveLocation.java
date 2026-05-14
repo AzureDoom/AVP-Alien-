@@ -3,6 +3,7 @@ package com.alien.common.gameplay.hive2.location;
 import com.alien.Alien;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.id.HiveLocationId;
+import com.alien.common.model.alien.variant.AlienVariant;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -225,7 +226,8 @@ public final class HiveLocation {
         this.decoratedChunks = new HashSet<>();
         this.localReserves = new HiveLocationReserves(
             () -> claimedChunks.size(),
-            () -> HiveLocationRegistry.INSTANCE.config()
+            () -> HiveLocationRegistry.INSTANCE.config(),
+            this::lineageVariantOrNull
         );
         this.leadership = new HiveLocationLeadership();
         this.ventManager = new com.alien.common.gameplay.hive2.vent.HiveVentManager();
@@ -240,6 +242,14 @@ public final class HiveLocation {
 
     public ResourceLocation lineageFactionId() {
         return lineageFactionId;
+    }
+
+    private @Nullable AlienVariant lineageVariantOrNull() {
+        var faction = Alien.MOD.factions().get(lineageFactionId);
+        if (faction == null || !(faction.data() instanceof LineageFactionData lineage)) {
+            return null;
+        }
+        return lineage.variant();
     }
 
     public void setLineageFactionId(ResourceLocation lineageFactionId) {
