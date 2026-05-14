@@ -7,7 +7,6 @@ import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.gameplay.hive2.location.HiveLocationRemovalReason;
 import com.alien.common.gameplay.hive2.location.HivePoolCascade;
-import com.blib.api.common.faction.v1.FactionMember;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
@@ -18,18 +17,19 @@ import java.util.UUID;
 /**
  * Full {@link HiveLocation} death cascade. Per {@code HIVE_REDESIGN_03_LOCATIONS.md} § 10:
  * <ul>
- * <li>Releases every claimed chunk through BLib's territory manager.</li>
- * <li>Converts loaded members in the territory to foragers (removes them from lineage membership but leaves them in the
- * variant faction; entities themselves stay in the world).</li>
  * <li>Local reserves overflow into the lineage pool with cascade to the variant pool per
  * {@code HIVE_REDESIGN_05_RESERVES.md} § 6.</li>
  * <li>Fires the {@link AlienAdvancements#KILL_A_HIVE} advancement to nearby players, but only when the death was
  * player-caused.</li>
+ * <li>Releases every claimed chunk through BLib's territory manager.</li>
  * <li>Removes the location from its lineage's {@code locationsById} and from the {@link HiveLocationRegistry}.</li>
+ * <li>Removes the per-location BLib faction. Members of the location-tier faction lose location membership but
+ * stay in their parent lineage (no "convert to forager" eviction — loading state should not affect lineage
+ * membership).</li>
  * </ul>
  * <p>
- * Doesn't trigger lineage death directly — the {@link LineageDeathHandler}'s scan picks up 0-location lineages on the
- * next slow scan.
+ * Doesn't trigger lineage death directly — the per-tick {@link LineageDeathHandler#scanAndKill} picks up empty or
+ * 0-location lineages on the next tick.
  */
 public final class LocationDeathHandler {
 
@@ -70,16 +70,17 @@ public final class LocationDeathHandler {
         // 1. Drain local reserves into the lineage pool with cascade (overflow → variant pool).
         drainReservesToCascade(location, lineage);
 
-        // 2. Convert loaded members in the territory to foragers — drop them from BLib lineage membership only.
-        evictTerritoryMembersFromLineage(location, lineage);
-
-        // 3. Fire advancement BEFORE we release chunks so the territory check still works.
+        // 2. Fire advancement BEFORE we release chunks so the territory check still works.
         if (fireAdvancement) {
             fireKillAHiveAdvancement(level, location);
         }
 
-        // 4. Release every claimed chunk via BLib + reset local indexes (LocationRemovalHelper handles BLib release).
+        // 3. Release every claimed chunk via BLib + reset local indexes (LocationRemovalHelper handles BLib release).
         LocationRemovalHelper.remove(level, location, lineage, reason);
+
+        // 4. Drop the per-location BLib faction. Members of this faction lose location-tier membership but stay in
+        // the parent lineage (no eviction-on-load — loading state should not affect lineage membership).
+        Alien.MOD.factions().remove(location.id().value());
 
         Alien.LOGGER.info(
             "Hive2: location {} death complete (reason={}); lineage {} now has {} location(s)",
@@ -101,23 +102,6 @@ public final class LocationDeathHandler {
             // addToLocationCascading because we're killing the location.
             reserves.underlying().add(type, -count);
             HivePoolCascade.addToLineageCascading(lineage, type, count);
-        }
-    }
-
-    private static void evictTerritoryMembersFromLineage(HiveLocation location, LineageFactionData lineage) {
-        var faction = Alien.MOD.factions().get(location.lineageFactionId());
-        if (faction == null) {
-            return;
-        }
-
-        // Snapshot UUIDs before mutating membership (onMemberRemoved sweeps loadedMembersByType).
-        var uuidsToEvict = new ArrayList<UUID>();
-        for (var perTypeSet : location.loadedMembersByType().values()) {
-            uuidsToEvict.addAll(perTypeSet);
-        }
-
-        for (var uuid : uuidsToEvict) {
-            faction.membership().removeMember(FactionMember.entity(uuid));
         }
     }
 

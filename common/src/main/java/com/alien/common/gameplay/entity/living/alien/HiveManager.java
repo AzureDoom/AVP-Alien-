@@ -205,6 +205,15 @@ public class HiveManager implements NBTSerializable {
                 continue;
             }
 
+            // Drop the alien from every location faction owned by this lineage first (preserving the
+            // location ⊆ lineage invariant); idempotent for locations the alien wasn't a member of.
+            for (var location : lineage.locationsById().values()) {
+                var locationFaction = Alien.MOD.factions().get(location.id().value());
+                if (locationFaction != null) {
+                    locationFaction.membership().removeMember(FactionMember.entity(alien));
+                }
+            }
+
             // Remove from lineage membership (BLib will fire onMemberRemoved which clears
             // loadedMembersByType for us via Phase 3's hook).
             faction.membership().removeMember(FactionMember.entity(alien));
