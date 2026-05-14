@@ -2,6 +2,7 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.empress;
 
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.entity.living.alien.ovipositor.Ovipositor;
+import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
@@ -61,6 +62,10 @@ public class EmpressOvipositorManager implements NBTSerializable {
             return;
         }
 
+        if (!tryPayCreationCost()) {
+            return;
+        }
+
         createOvipositor();
         ovipositorCreationCooldown.reset();
     }
@@ -106,13 +111,23 @@ public class EmpressOvipositorManager implements NBTSerializable {
             && AlienVariantTypes.getFor(empress.getVariant()).canReproduce()
             && !empress.isPoisoned()
             && !ovipositorCreationCooldown.isActive()
+            && isStandingOnVariantResin()
             && hasEnoughLocalSupport()
             && canOvipositorFit();
     }
 
+    private boolean isStandingOnVariantResin() {
+        return empress.level()
+            .getBlockState(empress.blockPosition().below())
+            .is(AlienVariantTypes.getFor(empress.getVariant()).resinBlockTag());
+    }
+
     private boolean hasEnoughLocalSupport() {
-        var location = HiveLocationRegistry.INSTANCE.getByChunk(empress.level().dimension(), new ChunkPos(empress.blockPosition()));
+        var location = currentLocation();
         if (location == null || !location.isAlive()) {
+            return false;
+        }
+        if (!isNearHiveCenter(location)) {
             return false;
         }
         var bossBar = location.bossBar();
@@ -126,6 +141,36 @@ public class EmpressOvipositorManager implements NBTSerializable {
             .mapToInt(entry -> entry.getValue().size())
             .sum();
         return loadedXenoCount > 2;
+    }
+
+    private boolean tryPayCreationCost() {
+        var location = currentLocation();
+        if (location == null || !location.isAlive()) {
+            return false;
+        }
+
+        var cost = HiveLocationRegistry.INSTANCE.config().ovipositorCreationBiomassCost();
+        if (cost <= 0) {
+            return true;
+        }
+        if (location.biomass() < cost) {
+            return false;
+        }
+
+        location.setBiomass(location.biomass() - cost);
+        return true;
+    }
+
+    private @Nullable HiveLocation currentLocation() {
+        return HiveLocationRegistry.INSTANCE.getByChunk(empress.level().dimension(), new ChunkPos(empress.blockPosition()));
+    }
+
+    private boolean isNearHiveCenter(HiveLocation location) {
+        var centerChunk = new ChunkPos(location.centerPos());
+        var empressChunk = new ChunkPos(empress.blockPosition());
+        var dx = Math.abs(centerChunk.x - empressChunk.x);
+        var dz = Math.abs(centerChunk.z - empressChunk.z);
+        return Math.max(dx, dz) <= 1;
     }
 
     private boolean canOvipositorFit() {
@@ -161,7 +206,7 @@ public class EmpressOvipositorManager implements NBTSerializable {
 
             var aboveBlockState = empress.level().getBlockState(blockPos.above());
             isSupported = (aboveBlockState.isAir() || aboveBlockState.canBeReplaced())
-                && !(blockState.isAir() || blockState.canBeReplaced());
+                && blockState.is(AlienVariantTypes.getFor(empress.getVariant()).resinBlockTag());
 
             stepsDown++;
         }

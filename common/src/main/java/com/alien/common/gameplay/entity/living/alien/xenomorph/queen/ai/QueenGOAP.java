@@ -9,6 +9,7 @@ public class QueenGOAP {
 
     public static final Graph<Queen> GRAPH = Graph.<Queen>builder()
         .apply(XenomorphGOAP::applyBaseGraph)
+        .apply(XenomorphGOAP::addResinPackage)
         .apply(XenomorphGOAP::addEggLayingPackage)
         .build();
 

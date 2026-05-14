@@ -111,8 +111,15 @@ public class OvipositorManager implements NBTSerializable {
             && AlienVariantTypes.getFor(queen.getVariant()).canReproduce()
             && !queen.isPoisoned()
             && !ovipositorCreationCooldown.isActive()
+            && isStandingOnVariantResin()
             && hasEnoughLocalSupport()
             && canOvipositorFit();
+    }
+
+    private boolean isStandingOnVariantResin() {
+        return queen.level()
+            .getBlockState(queen.blockPosition().below())
+            .is(AlienVariantTypes.getFor(queen.getVariant()).resinBlockTag());
     }
 
     /**

@@ -9,6 +9,7 @@ public class EmpressGOAP {
 
     public static final Graph<Empress> GRAPH = Graph.<Empress>builder()
         .apply(XenomorphGOAP::applyBaseGraph)
+        .apply(XenomorphGOAP::addResinPackage)
         .apply(XenomorphGOAP::addEggLayingPackage)
         .build();
 
