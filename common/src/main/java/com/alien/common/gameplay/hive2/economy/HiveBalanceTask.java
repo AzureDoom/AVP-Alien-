@@ -63,6 +63,9 @@ public final class HiveBalanceTask {
         if (totalPop >= cap) {
             return;
         }
+        if (CastePopulation.countCaste(location, AlienEntityTypeTags.QUEENS) <= 0) {
+            return;
+        }
 
         var deficits = computeDeficits(pop, chunks, totalPop);
         if (deficits.isEmpty()) {
