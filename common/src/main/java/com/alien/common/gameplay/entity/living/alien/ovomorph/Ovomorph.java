@@ -42,6 +42,8 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
 
     public static final HatchState DEFAULT_HATCH_STATE = HatchState.SLEEPING;
 
+    private static final int HOST_VIBRATION_RADIUS = 16;
+
     public static AttributeSupplier.Builder createOvomorphAttributes() {
         return Alien.createAlienAttributes()
             .add(Attributes.ARMOR, 0f)
@@ -82,7 +84,7 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
         this.animationDispatcher = new OvomorphAnimationDispatcher(this);
         this.hatchManager = new HatchManager(this, 3 * 20, 3 * 20);
         this.wantsPickup = false;
-        this.vibrationSystemManager = new VibrationSystemManager(this, 2.5F, 8);
+        this.vibrationSystemManager = new VibrationSystemManager(this, 2.5F, HOST_VIBRATION_RADIUS);
     }
 
     @Override
