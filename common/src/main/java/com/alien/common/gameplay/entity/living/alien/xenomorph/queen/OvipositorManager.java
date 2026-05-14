@@ -62,6 +62,10 @@ public class OvipositorManager implements NBTSerializable {
             return;
         }
 
+        if (!tryPayCreationCost()) {
+            return;
+        }
+
         createOvipositor();
         ovipositorCreationCooldown.reset();
     }
@@ -116,7 +120,7 @@ public class OvipositorManager implements NBTSerializable {
      * its territory.
      */
     private boolean hasEnoughLocalSupport() {
-        var location = HiveLocationRegistry.INSTANCE.getByChunk(queen.level().dimension(), new ChunkPos(queen.blockPosition()));
+        var location = currentLocation();
         if (location == null || !location.isAlive()) {
             return false;
         }
@@ -134,6 +138,28 @@ public class OvipositorManager implements NBTSerializable {
             .mapToInt(entry -> entry.getValue().size())
             .sum();
         return loadedXenoCount > 2;
+    }
+
+    private boolean tryPayCreationCost() {
+        var location = currentLocation();
+        if (location == null || !location.isAlive()) {
+            return false;
+        }
+
+        var cost = HiveLocationRegistry.INSTANCE.config().ovipositorCreationBiomassCost();
+        if (cost <= 0) {
+            return true;
+        }
+        if (location.biomass() < cost) {
+            return false;
+        }
+
+        location.setBiomass(location.biomass() - cost);
+        return true;
+    }
+
+    private @Nullable HiveLocation currentLocation() {
+        return HiveLocationRegistry.INSTANCE.getByChunk(queen.level().dimension(), new ChunkPos(queen.blockPosition()));
     }
 
     private boolean isNearHiveCenter(HiveLocation location) {
