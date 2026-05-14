@@ -2,6 +2,7 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.queen;
 
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.entity.living.alien.ovipositor.Ovipositor;
+import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
@@ -119,6 +120,9 @@ public class OvipositorManager implements NBTSerializable {
         if (location == null || !location.isAlive()) {
             return false;
         }
+        if (!isNearHiveCenter(location)) {
+            return false;
+        }
         var bossBar = location.bossBar();
         if (bossBar != null && bossBar.isAngry()) {
             return false;
@@ -130,6 +134,14 @@ public class OvipositorManager implements NBTSerializable {
             .mapToInt(entry -> entry.getValue().size())
             .sum();
         return loadedXenoCount > 2;
+    }
+
+    private boolean isNearHiveCenter(HiveLocation location) {
+        var centerChunk = new ChunkPos(location.centerPos());
+        var queenChunk = new ChunkPos(queen.blockPosition());
+        var dx = Math.abs(centerChunk.x - queenChunk.x);
+        var dz = Math.abs(centerChunk.z - queenChunk.z);
+        return Math.max(dx, dz) <= 1;
     }
 
     private boolean canOvipositorFit() {
