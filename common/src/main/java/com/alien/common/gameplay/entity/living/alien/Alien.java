@@ -5,6 +5,7 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
+import com.alien.common.gameplay.hive2.faction.LocationMembership;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.gameplay.hive2.location.HivePoolCascade;
 import com.alien.common.gameplay.level.saveddata.StrainLeakData;
@@ -257,18 +258,13 @@ public abstract class Alien extends Monster implements DataUser {
                 }
             }
 
-            // Hive2: any xenomorph spawning into a claimed chunk auto-joins the owning lineage. Catches the
-            // post-cocoon-transition rejoin (the new entity has a fresh UUID and isn't yet a member); also natural
-            // for fresh natural spawns of in-territory aliens. The Phase 9 invariant task evicts variant
-            // mismatches, so cross-variant strangers don't stick.
+            // Hive2: any xenomorph spawning into a claimed chunk auto-joins both the owning lineage and the location
+            // faction. Covers natural spawns, spawn eggs, /summon, and MOB_SUMMONED reinforcements/raid units that
+            // funnel through finalizeSpawn. (Note: EntityTransitionUtil.transitionInto does NOT call finalizeSpawn —
+            // transitions carry membership over explicitly via FactionMembershipTransfer.) The Phase 9 invariant task
+            // evicts variant mismatches, so cross-variant strangers don't stick.
             if (getType().is(AlienEntityTypeTags.XENOMORPHS)) {
-                var lineageFaction = com.alien.Alien.MOD.factions().get(locationAtPos.lineageFactionId());
-                if (
-                    lineageFaction != null
-                        && !lineageFaction.membership().hasMember(com.blib.api.common.faction.v1.FactionMember.entity(this))
-                ) {
-                    lineageFaction.membership().addEntity(this);
-                }
+                LocationMembership.join(locationAtPos, this);
             }
         }
 

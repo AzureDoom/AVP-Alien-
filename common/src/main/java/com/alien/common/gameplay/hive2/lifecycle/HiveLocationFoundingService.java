@@ -3,6 +3,7 @@ package com.alien.common.gameplay.hive2.lifecycle;
 import com.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
+import com.alien.common.gameplay.hive2.faction.LocationMembership;
 import com.alien.common.gameplay.hive2.faction.VariantFactionRegistry;
 import com.alien.common.gameplay.hive2.id.HiveLocationId;
 import com.alien.common.gameplay.hive2.id.HiveLocationIds;
@@ -58,10 +59,10 @@ public final class HiveLocationFoundingService {
         lineageData.setDimension(dimension);
         lineageData.setFounderId(queen.getUUID());
 
-        var locationId = mintLocation(queen, lineageId, position, level.getGameTime(), lineageData);
+        var location = mintLocation(queen, lineageId, position, level.getGameTime(), lineageData);
 
-        // Add the queen to the new lineage's membership. addEntity is idempotent.
-        lineageFaction.membership().addEntity(queen);
+        // Adds the queen to both the lineage faction (idempotent) and the new location faction.
+        LocationMembership.join(location, queen);
 
         Alien.LOGGER.info(
             "Hive2: queen {} founded new lineage {} at {} (variant {}) with first location {}",
@@ -69,10 +70,10 @@ public final class HiveLocationFoundingService {
             lineageId,
             position,
             variant,
-            locationId
+            location.id()
         );
 
-        return locationId;
+        return location.id();
     }
 
     /**
@@ -87,10 +88,10 @@ public final class HiveLocationFoundingService {
             throw new IllegalStateException("Lineage " + lineageFactionId + " missing or wrong type at founding time");
         }
 
-        var locationId = mintLocation(queen, lineageFactionId, position, level.getGameTime(), lineageData);
+        var location = mintLocation(queen, lineageFactionId, position, level.getGameTime(), lineageData);
 
-        // Idempotent — queen may or may not already be a member.
-        faction.membership().addEntity(queen);
+        // Adds the queen to both the lineage faction (idempotent) and the new location faction.
+        LocationMembership.join(location, queen);
 
         if (lineageData.locationsById().size() >= 2 && lineageData.empressId() == null) {
             // Phase 10 will pick this up and run the empress emergence ritual.
@@ -100,16 +101,16 @@ public final class HiveLocationFoundingService {
         Alien.LOGGER.info(
             "Hive2: queen {} founded location {} in existing lineage {} at {} (lineage now has {} locations)",
             queen.getUUID(),
-            locationId,
+            location.id(),
             lineageFactionId,
             position,
             lineageData.locationsById().size()
         );
 
-        return locationId;
+        return location.id();
     }
 
-    private static HiveLocationId mintLocation(
+    private static HiveLocation mintLocation(
         Queen queen,
         ResourceLocation lineageFactionId,
         BlockPos position,
@@ -132,7 +133,11 @@ public final class HiveLocationFoundingService {
         lineageData.addLocation(location);
         HiveLocationRegistry.INSTANCE.register(location);
 
-        return locationId;
+        // Provision the per-location faction at founding so it exists from t=0; the founder is added by the caller
+        // via LocationMembership.join after this returns.
+        Alien.MOD.factions().getOrCreate(locationId.value(), AlienFactionDataTypes.LOCATION);
+
+        return location;
     }
 
     /**
