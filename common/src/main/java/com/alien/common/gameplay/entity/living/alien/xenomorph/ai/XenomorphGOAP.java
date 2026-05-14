@@ -206,6 +206,7 @@ public class XenomorphGOAP {
         graphBuilder.addAction(VentActions.CREATE_VENT);
 
         graphBuilder.addSensor(VentSensors.CAN_CREATE_VENT);
+        graphBuilder.addSensor(VentSensors.HAS_VENT_TARGET);
 
         return graphBuilder;
     }

@@ -32,6 +32,10 @@ public class CreateVentAction {
 
     private static final StateKey<Boolean> KEY_HAS_DRILLED = StateKey.sensed("vent_has_drilled");
 
+    public static boolean hasVentTarget(Xenomorph xenomorph) {
+        return findVentTarget(xenomorph, (wallStart, direction) -> {});
+    }
+
     public static Action.Signal perform(Action.Context<? extends Xenomorph> context) {
         var xenomorph = context.getActor();
         var blackboard = context.getBlackboard(Blackboard.Scope.ACTION);
@@ -43,6 +47,7 @@ public class CreateVentAction {
             var found = findVentTarget(xenomorph, blackboard);
 
             if (!found) {
+                recordVentTargetSearchFailure(xenomorph);
                 return Action.Signal.ABORT;
             }
 
@@ -72,6 +77,7 @@ public class CreateVentAction {
 
                 if (xenomorph instanceof VentBuilder ventBuilder) {
                     ventBuilder.getVentData().setLastVentCreationTick(xenomorph.tickCount);
+                    ventBuilder.getVentData().clearVentTargetSearchFailure();
                 }
 
                 blackboard.set(KEY_HAS_DRILLED, true);
@@ -79,7 +85,10 @@ public class CreateVentAction {
             }
             case MOVING -> Action.Signal.CONTINUE;
             case WAITING_FOR_BLOCK_BREAK -> Action.Signal.CONTINUE;
-            case NO_PATH -> Action.Signal.ABORT;
+            case NO_PATH -> {
+                recordVentTargetSearchFailure(xenomorph);
+                yield Action.Signal.ABORT;
+            }
         };
     }
 
@@ -88,6 +97,13 @@ public class CreateVentAction {
     }
 
     private static boolean findVentTarget(Xenomorph xenomorph, Blackboard blackboard) {
+        return findVentTarget(xenomorph, (hitPos, direction) -> {
+            blackboard.set(KEY_WALL_START, hitPos);
+            blackboard.set(KEY_DIRECTION_ORDINAL, direction.get3DDataValue());
+        });
+    }
+
+    private static boolean findVentTarget(Xenomorph xenomorph, VentTargetConsumer targetConsumer) {
         var footPos = xenomorph.blockPosition();
 
         for (var direction : Direction.Plane.HORIZONTAL) {
@@ -117,13 +133,18 @@ public class CreateVentAction {
             var path = xenomorph.getNavigation().createPath(pathTarget, 1);
 
             if (path != null && path.canReach()) {
-                blackboard.set(KEY_WALL_START, hitPos);
-                blackboard.set(KEY_DIRECTION_ORDINAL, direction.get3DDataValue());
+                targetConsumer.accept(hitPos, direction);
                 return true;
             }
         }
 
         return false;
+    }
+
+    private static void recordVentTargetSearchFailure(Xenomorph xenomorph) {
+        if (xenomorph instanceof VentBuilder ventBuilder) {
+            ventBuilder.getVentData().recordVentTargetSearchFailure(xenomorph.tickCount);
+        }
     }
 
     private static void drillVent(Xenomorph xenomorph, BlockPos wallStart, Direction direction) {
@@ -214,6 +235,12 @@ public class CreateVentAction {
 
         return blockState.is(alienVariantType.resin().get())
             || blockState.is(alienVariantType.resinReplaceableTag());
+    }
+
+    @FunctionalInterface
+    private interface VentTargetConsumer {
+
+        void accept(BlockPos wallStart, Direction direction);
     }
 
     private CreateVentAction() {

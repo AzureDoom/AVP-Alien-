@@ -5,18 +5,18 @@ import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.gameplay.hive2.spawning.HiveLocationSpawnGate;
 import com.alien.common.gameplay.level.gameevent.listener.ResinSpreadListener;
+import com.alien.common.model.alien.variant.AlienVariantType;
 import com.alien.common.model.resin.ResinData;
 import com.blib.api.common.nbt.v1.model.NBTSerializable;
 import com.just.core.functional.option.Option;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.gameevent.DynamicGameEventListener;
 import net.minecraft.world.level.gameevent.EntityPositionSource;
 import net.minecraft.world.level.gameevent.GameEventListener;
+import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.BiConsumer;
@@ -29,6 +29,14 @@ public class ResinManager implements GameEventListener.Provider<ResinSpreadListe
 
     private static final int SPREAD_CHARGE = 16;
 
+    private static final int SPREAD_OPPORTUNITY_RECHECK_TICKS = 20;
+
+    private static final int RESIN_NODE_SEARCH_RADIUS = 8;
+
+    private static final int RESIN_SPREAD_TARGET_SEARCH_RADIUS = 6;
+
+    private static final int RESIN_SPREAD_TARGET_VERTICAL_SEARCH_RANGE = 3;
+
     private final Alien alien;
 
     private final DynamicGameEventListener<ResinSpreadListener> dynamicResinSpreadListener;
@@ -40,6 +48,8 @@ public class ResinManager implements GameEventListener.Provider<ResinSpreadListe
     private long lastSpreadTick;
 
     private int ticksSinceAttemptedNodePlacement = 0;
+
+    private int ticksUntilSpreadOpportunityCheck = 0;
 
     public ResinManager(Alien alien) {
         this.alien = alien;
@@ -61,25 +71,44 @@ public class ResinManager implements GameEventListener.Provider<ResinSpreadListe
         }
 
         ticksSinceAttemptedNodePlacement = Math.max(0, ticksSinceAttemptedNodePlacement - 1);
+        ticksUntilSpreadOpportunityCheck = Math.max(0, ticksUntilSpreadOpportunityCheck - 1);
     }
 
     public boolean canSpreadResin() {
-        return alien.tickCount - lastSpreadTick >= SPREAD_COOLDOWN_IN_TICKS
-            && !isNodePlacementOnCooldown()
-            && canSpreadResinAtAlienPosition()
-            && canPaySpreadCost();
+        if (
+            alien.tickCount - lastSpreadTick < SPREAD_COOLDOWN_IN_TICKS
+                || isNodePlacementOnCooldown()
+                || ticksUntilSpreadOpportunityCheck > 0
+                || !canPaySpreadCost()
+        ) {
+            return false;
+        }
+
+        var alienVariantType = AlienVariantTypes.getFor(alien);
+
+        if (!canAttemptResinSpreadAtAlienPosition() || !hasResinSpreadOpportunity(alienVariantType)) {
+            ticksUntilSpreadOpportunityCheck = SPREAD_OPPORTUNITY_RECHECK_TICKS;
+            return false;
+        }
+
+        return true;
     }
 
     public void spreadResin() {
         var location = currentLocation();
-        if (!canPaySpreadCost(location)) {
+        var alienVariantType = AlienVariantTypes.getFor(alien);
+
+        if (
+            !canPaySpreadCost(location)
+                || !canAttemptResinSpreadAtAlienPosition()
+                || !hasResinSpreadOpportunity(alienVariantType)
+        ) {
+            ticksUntilSpreadOpportunityCheck = SPREAD_OPPORTUNITY_RECHECK_TICKS;
             return;
         }
 
         // Set the charge so the nearest resin node listener can consume it.
         resinData.setResin(SPREAD_CHARGE);
-
-        var alienVariantType = AlienVariantTypes.getFor(alien);
 
         // Signal to the nearest resin node that we want to spread resin.
         alien.gameEvent(alienVariantType.resinSpreadEvent());
@@ -96,7 +125,7 @@ public class ResinManager implements GameEventListener.Provider<ResinSpreadListe
         if (resinData.resin() > 0) {
             var level = alien.level();
             // Try and find a suitable resin node block location.
-            var suitableResinNodeBlockPosOption = findSuitableResinNodeBlockPos(level, alienVariantType.resinReplaceableTag());
+            var suitableResinNodeBlockPosOption = findSuitableResinNodeBlockPos(level, alienVariantType);
 
             if (suitableResinNodeBlockPosOption.isNone()) {
                 // Could not find a suitable resin node block position, so reset the node place cooldown and return.
@@ -122,7 +151,7 @@ public class ResinManager implements GameEventListener.Provider<ResinSpreadListe
         return ticksSinceAttemptedNodePlacement > 0;
     }
 
-    private boolean canSpreadResinAtAlienPosition() {
+    private boolean canAttemptResinSpreadAtAlienPosition() {
         // Alien must not have an attack target...
         if (alien.getTarget() != null) {
             return false;
@@ -135,6 +164,52 @@ public class ResinManager implements GameEventListener.Provider<ResinSpreadListe
             return false;
         }
         return isInsideHiveForResinSpread();
+    }
+
+    private boolean hasResinSpreadOpportunity(AlienVariantType alienVariantType) {
+        var level = alien.level();
+
+        return findSuitableResinNodeBlockPos(level, alienVariantType).isSome()
+            || (hasNearbyResinNode(level, alienVariantType) && hasNearbyResinSpreadTarget(level, alienVariantType));
+    }
+
+    private boolean hasNearbyResinNode(Level level, AlienVariantType alienVariantType) {
+        var origin = alien.blockPosition();
+        var resinNode = alienVariantType.resinNode().get();
+        var mutablePos = new BlockPos.MutableBlockPos();
+
+        for (var dx = -RESIN_NODE_SEARCH_RADIUS; dx <= RESIN_NODE_SEARCH_RADIUS; dx++) {
+            for (var dy = -RESIN_NODE_SEARCH_RADIUS; dy <= RESIN_NODE_SEARCH_RADIUS; dy++) {
+                for (var dz = -RESIN_NODE_SEARCH_RADIUS; dz <= RESIN_NODE_SEARCH_RADIUS; dz++) {
+                    mutablePos.set(origin.getX() + dx, origin.getY() + dy, origin.getZ() + dz);
+
+                    if (level.getBlockState(mutablePos).is(resinNode)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private boolean hasNearbyResinSpreadTarget(Level level, AlienVariantType alienVariantType) {
+        var origin = alien.blockPosition();
+        var mutablePos = new BlockPos.MutableBlockPos();
+
+        for (var dx = -RESIN_SPREAD_TARGET_SEARCH_RADIUS; dx <= RESIN_SPREAD_TARGET_SEARCH_RADIUS; dx++) {
+            for (var dy = -RESIN_SPREAD_TARGET_VERTICAL_SEARCH_RANGE; dy <= RESIN_SPREAD_TARGET_VERTICAL_SEARCH_RANGE; dy++) {
+                for (var dz = -RESIN_SPREAD_TARGET_SEARCH_RADIUS; dz <= RESIN_SPREAD_TARGET_SEARCH_RADIUS; dz++) {
+                    mutablePos.set(origin.getX() + dx, origin.getY() + dy, origin.getZ() + dz);
+
+                    if (level.getBlockState(mutablePos).is(alienVariantType.resinReplaceableTag())) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -174,12 +249,12 @@ public class ResinManager implements GameEventListener.Provider<ResinSpreadListe
         return HiveLocationSpawnGate.locationContaining(alien.level(), alien.blockPosition());
     }
 
-    private Option<BlockPos> findSuitableResinNodeBlockPos(Level level, TagKey<Block> replaceableTagKey) {
+    private Option<BlockPos> findSuitableResinNodeBlockPos(Level level, AlienVariantType alienVariantType) {
         var origin = alien.blockPosition();
         var below = origin.below();
         var belowState = level.getBlockState(below);
 
-        if (belowState.is(replaceableTagKey)) {
+        if (belowState.is(alienVariantType.resinReplaceableTag()) && isResinNodePlacementSpaceClear(level, below)) {
             return Option.some(below);
         }
 
@@ -201,13 +276,16 @@ public class ResinManager implements GameEventListener.Provider<ResinSpreadListe
                         belowTargetMutablePos.set(targetMutablePos.getX(), targetMutablePos.getY() - 1, targetMutablePos.getZ());
 
                         var targetStateToReplace = level.getBlockState(targetMutablePos);
+                        var supportState = level.getBlockState(belowTargetMutablePos);
 
                         if (
                             // If the target state is air OR can be replaced...
                             (targetStateToReplace.isAir()
                                 || targetStateToReplace.canBeReplaced())
                                 // AND if the supporting state beneath the target state is a solid render...
-                                && level.getBlockState(belowTargetMutablePos).isSolidRender(level, belowTargetMutablePos)
+                                && supportState.isSolidRender(level, belowTargetMutablePos)
+                                && !supportState.is(alienVariantType.resinBlockTag())
+                                && isResinNodePlacementSpaceClear(level, targetMutablePos)
                         ) {
                             // Then return the target state pos.
                             return Option.some(targetMutablePos.immutable());
@@ -218,6 +296,10 @@ public class ResinManager implements GameEventListener.Provider<ResinSpreadListe
         }
 
         return Option.none();
+    }
+
+    private boolean isResinNodePlacementSpaceClear(Level level, BlockPos blockPos) {
+        return level.getEntities(null, new AABB(blockPos)).isEmpty();
     }
 
     public void updateDynamicGameEventListener(@NotNull BiConsumer<DynamicGameEventListener<?>, ServerLevel> biConsumer) {
