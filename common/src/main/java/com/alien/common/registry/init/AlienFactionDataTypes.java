@@ -3,6 +3,7 @@ package com.alien.common.registry.init;
 import com.alien.Alien;
 import com.alien.common.gameplay.hive.HiveFactionData;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
+import com.alien.common.gameplay.hive2.faction.LocationFactionData;
 import com.alien.common.gameplay.hive2.faction.VariantFactionData;
 import com.blib.api.common.faction.v1.FactionData;
 import com.blib.api.common.faction.v1.FactionDataType;
@@ -30,6 +31,11 @@ public class AlienFactionDataTypes {
     public static final BLibHolder<FactionDataType<LineageFactionData>> LINEAGE = register(
         "lineage",
         () -> new FactionDataType<>(LineageFactionData::new)
+    );
+
+    public static final BLibHolder<FactionDataType<LocationFactionData>> LOCATION = register(
+        "location",
+        () -> new FactionDataType<>(LocationFactionData::new)
     );
 
     private static <T extends FactionData> BLibHolder<FactionDataType<T>> register(
