@@ -8,6 +8,7 @@ import com.alien.common.gameplay.hive2.lifecycle.CivilWarHandler;
 import com.alien.common.gameplay.hive2.lifecycle.LineageAbsorptionTask;
 import com.alien.common.gameplay.hive2.lifecycle.LineageDeathHandler;
 import com.alien.common.gameplay.hive2.lifecycle.LocationDormancyTask;
+import com.alien.common.gameplay.hive2.lifecycle.QueenlessMaturationTask;
 import com.blib.api.common.faction.v1.FactionMember;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.EntityType;
@@ -51,17 +52,22 @@ public final class LineageInvariantTask {
         // the pipeline cleanly.
         CivilWarHandler.scanAndHandle(server);
 
-        // 3. Location dormancy + death cascade. Runs before lineage death so a 0-locations lineage gets one tick of
+        // 3. Queenless lineage maturation — lets civil-war successors (and any other queenless lineage) advance
+        // their leader through the queen-track growth stages over time. Runs after civil war so freshly-minted
+        // successor lineages get tagged on the same scan.
+        QueenlessMaturationTask.scanAll(server);
+
+        // 4. Location dormancy + death cascade. Runs before lineage death so a 0-locations lineage gets one tick of
         // grace before LineageDeathHandler picks it up.
         LocationDormancyTask.scanAll(server);
 
-        // 4. Lineage absorption — same-variant cross-lineage merging.
+        // 5. Lineage absorption — same-variant cross-lineage merging.
         LineageAbsorptionTask.scanAll(server);
 
-        // 5. Contested chunk resolution.
+        // 6. Contested chunk resolution.
         ContestResolutionTask.scanAll(server);
 
-        // 6. Lineage death — picks up 0-locations lineages whose grace period has elapsed.
+        // 7. Lineage death — picks up 0-locations lineages whose grace period has elapsed.
         LineageDeathHandler.scanAndKill(server);
     }
 

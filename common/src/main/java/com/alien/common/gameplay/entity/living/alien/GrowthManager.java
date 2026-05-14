@@ -179,6 +179,19 @@ public class GrowthManager implements NBTSerializable {
         return grow(stage);
     }
 
+    /**
+     * Force-grows the entity into the {@code stage}'s {@code to} form, bypassing the stage's growth requirements (e.g.,
+     * the metamorphosis mob effect). Used by hive-driven maturation paths
+     * ({@link com.alien.common.gameplay.hive2.lifecycle.QueenlessMaturationTask}) where the requirement is the hive's
+     * social state rather than a player-applied effect.
+     * <p>
+     * Still respects {@link #canNeverGrow()} (poisoned/irradiated entities don't transition) and the cocoon pipeline
+     * for xenomorphs — visually identical to a regular grow, just without the requirement gate.
+     */
+    public GrowthResult forceGrow(GrowthStage growthStage) {
+        return grow(growthStage);
+    }
+
     public GrowthResult grow(GrowthStage growthStage) {
         this.growthTimeInTicks = 0;
         this.readyToGrow = false;

@@ -211,6 +211,21 @@ public final class Hive2DebugCommands {
                             )
                     )
             )
+            .then(
+                Commands.literal("force_queenless_advance")
+                    .then(
+                        Commands.argument(LINEAGE_ID_ARG, ResourceLocationArgument.id())
+                            .executes(Hive2DebugCommands::forceQueenlessAdvance)
+                    )
+            )
+            .then(Commands.literal("inspect_queenless_maturation").executes(Hive2DebugCommands::inspectQueenlessMaturation))
+            .then(
+                Commands.literal("force_reserve_promote")
+                    .then(
+                        Commands.argument(LINEAGE_ID_ARG, ResourceLocationArgument.id())
+                            .executes(Hive2DebugCommands::forceReservePromote)
+                    )
+            )
             .then(Commands.literal("validate").executes(Hive2DebugCommands::validate));
     }
 
@@ -1212,5 +1227,93 @@ public final class Hive2DebugCommands {
                 false
             );
         return 1;
+    }
+
+    private static int forceQueenlessAdvance(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
+        var lineageId = ResourceLocationArgument.getId(ctx, LINEAGE_ID_ARG);
+        var advanced = com.alien.common.gameplay.hive2.lifecycle.QueenlessMaturationTask.forceAdvance(
+            ctx.getSource().getServer(),
+            lineageId
+        );
+        ctx.getSource()
+            .sendSuccess(
+                () -> Component.literal("Queenless maturation force-advanced " + advanced + " location(s) in lineage " + lineageId),
+                true
+            );
+        return advanced;
+    }
+
+    private static int inspectQueenlessMaturation(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
+        var server = ctx.getSource().getServer();
+        var stageInterval = HiveLocationRegistry.INSTANCE.config().protoHiveStageInterval();
+        var currentTick = server.overworld().getGameTime();
+        var reported = 0;
+
+        for (var factionId : Alien.MOD.factions().getAllIds()) {
+            if (!LineageIds.isLineageId(factionId)) {
+                continue;
+            }
+            var faction = Alien.MOD.factions().get(factionId);
+            if (faction == null || !(faction.data() instanceof LineageFactionData lineage)) {
+                continue;
+            }
+            if (lineage.empressId() != null || lineage.pendingEmpressEmergence()) {
+                continue;
+            }
+
+            for (var location : lineage.locationsById().values()) {
+                if (!location.isAlive()) {
+                    continue;
+                }
+                var leaderId = location.leadership().getLeaderIdOrNull();
+                var leader = com.alien.common.gameplay.hive2.lifecycle.QueenlessMaturationTask.peekLeader(server, location);
+                var ticksSinceAdvance = location.queenlessMaturationLastAdvanceTick() == Long.MIN_VALUE
+                    ? -1
+                    : currentTick - location.queenlessMaturationLastAdvanceTick();
+                var ticksUntilNext = ticksSinceAdvance < 0 ? -1 : Math.max(0, stageInterval - ticksSinceAdvance);
+
+                final var localFactionId = factionId;
+                final var localLeaderId = leaderId;
+                final var localLeader = leader;
+                final var localUntil = ticksUntilNext;
+                ctx.getSource()
+                    .sendSuccess(
+                        () -> Component.literal(
+                            "  lineage=" + localFactionId
+                                + " location=" + location.id()
+                                + " leader=" + localLeaderId
+                                + " type=" + (localLeader == null
+                                    ? "(unloaded)"
+                                    : localLeader.getType().builtInRegistryHolder().key().location())
+                                + " ticksUntilNextAdvance=" + (localUntil < 0 ? "(timer reset on next scan)" : localUntil)
+                        ),
+                        false
+                    );
+                reported++;
+            }
+        }
+
+        var finalReported = reported;
+        ctx.getSource()
+            .sendSuccess(() -> Component.literal("Queenless maturation: " + finalReported + " location(s) eligible"), false);
+        return reported;
+    }
+
+    private static int forceReservePromote(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
+        var lineageId = ResourceLocationArgument.getId(ctx, LINEAGE_ID_ARG);
+        var promoted = com.alien.common.gameplay.hive2.lifecycle.LineageReservePromotionTask.forcePromote(
+            ctx.getSource().getServer(),
+            lineageId
+        );
+        ctx.getSource()
+            .sendSuccess(
+                () -> Component.literal(
+                    promoted
+                        ? "Force-promoted one reserve unit in lineage " + lineageId + " (see server log for details)"
+                        : "No promotion fired (no living queen, no reserves, or no eligible growth path)"
+                ),
+                true
+            );
+        return promoted ? 1 : 0;
     }
 }

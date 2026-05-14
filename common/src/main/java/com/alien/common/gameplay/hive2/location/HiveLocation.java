@@ -60,6 +60,10 @@ public final class HiveLocation {
 
     private static final String NBT_DORMANT_SINCE_TICK = "DormantSinceTick";
 
+    private static final String NBT_QUEENLESS_MATURATION_LAST_ADVANCE = "QueenlessMaturationLastAdvanceTick";
+
+    private static final String NBT_QUEENLESS_LEADER_SNAPSHOT = "QueenlessLeaderSnapshot";
+
     private static final String NBT_BIOMASS = "Biomass";
 
     private static final String NBT_CLAIMED_CHUNKS = "ClaimedChunks";
@@ -105,6 +109,17 @@ public final class HiveLocation {
      * § 10.
      */
     private long dormantSinceTick;
+
+    /**
+     * Tick at which {@link com.alien.common.gameplay.hive2.lifecycle.QueenlessMaturationTask} last advanced this
+     * location's leader through a growth stage. {@link Long#MIN_VALUE} means "no advance yet." Combined with
+     * {@link #queenlessLeaderSnapshot}, lets the maturation task detect leader changes (i.e., when an alien finishes
+     * cocooning into its next form, the new entity has a fresh UUID — we reset the timer).
+     */
+    private long queenlessMaturationLastAdvanceTick;
+
+    /** UUID of the alien observed as leader on the last queenless maturation advance. Persisted across restarts. */
+    private @Nullable UUID queenlessLeaderSnapshot;
 
     private int biomass;
 
@@ -152,6 +167,8 @@ public final class HiveLocation {
         this.peakDecayElapsedTicks = 0L;
         this.evacuatingRemainingTicks = 0L;
         this.dormantSinceTick = Long.MIN_VALUE;
+        this.queenlessMaturationLastAdvanceTick = Long.MIN_VALUE;
+        this.queenlessLeaderSnapshot = null;
         this.biomass = 0;
         this.claimedChunks = new LinkedHashSet<>();
         this.chunkClaimTicks = new HashMap<>();
@@ -241,6 +258,22 @@ public final class HiveLocation {
 
     public void setDormantSinceTick(long dormantSinceTick) {
         this.dormantSinceTick = dormantSinceTick;
+    }
+
+    public long queenlessMaturationLastAdvanceTick() {
+        return queenlessMaturationLastAdvanceTick;
+    }
+
+    public void setQueenlessMaturationLastAdvanceTick(long tick) {
+        this.queenlessMaturationLastAdvanceTick = tick;
+    }
+
+    public @Nullable UUID queenlessLeaderSnapshot() {
+        return queenlessLeaderSnapshot;
+    }
+
+    public void setQueenlessLeaderSnapshot(@Nullable UUID uuid) {
+        this.queenlessLeaderSnapshot = uuid;
     }
 
     public int biomass() {
@@ -347,6 +380,12 @@ public final class HiveLocation {
         if (dormantSinceTick != Long.MIN_VALUE) {
             tag.putLong(NBT_DORMANT_SINCE_TICK, dormantSinceTick);
         }
+        if (queenlessMaturationLastAdvanceTick != Long.MIN_VALUE) {
+            tag.putLong(NBT_QUEENLESS_MATURATION_LAST_ADVANCE, queenlessMaturationLastAdvanceTick);
+        }
+        if (queenlessLeaderSnapshot != null) {
+            tag.putUUID(NBT_QUEENLESS_LEADER_SNAPSHOT, queenlessLeaderSnapshot);
+        }
         tag.putInt(NBT_BIOMASS, biomass);
 
         var claimedTag = new ListTag();
@@ -419,6 +458,12 @@ public final class HiveLocation {
         location.dormantSinceTick = tag.contains(NBT_DORMANT_SINCE_TICK)
             ? tag.getLong(NBT_DORMANT_SINCE_TICK)
             : Long.MIN_VALUE;
+        location.queenlessMaturationLastAdvanceTick = tag.contains(NBT_QUEENLESS_MATURATION_LAST_ADVANCE)
+            ? tag.getLong(NBT_QUEENLESS_MATURATION_LAST_ADVANCE)
+            : Long.MIN_VALUE;
+        location.queenlessLeaderSnapshot = tag.hasUUID(NBT_QUEENLESS_LEADER_SNAPSHOT)
+            ? tag.getUUID(NBT_QUEENLESS_LEADER_SNAPSHOT)
+            : null;
         location.biomass = Math.max(0, tag.getInt(NBT_BIOMASS));
 
         if (tag.contains(NBT_CLAIMED_CHUNKS)) {
