@@ -58,7 +58,6 @@ public final class VariantFactionInspectorSection extends AbstractHiveInspectorS
                 metric("Next #", String.valueOf(s.getLong(HiveInspectionSnapshot.K_NEXT_LINEAGE_NUMBER))),
                 metric("Members", String.valueOf(s.getInt(HiveInspectionSnapshot.K_VARIANT_MEMBERS))),
                 metric("Lineages", String.valueOf(lineages.size())),
-                metric("Variant pool", String.valueOf(s.getInt(HiveInspectionSnapshot.K_VARIANT_POOL_TOTAL))),
                 metric("Queen mothers", String.valueOf(listOrEmpty(s, HiveInspectionSnapshot.K_QUEEN_MOTHERS).size()))
             );
         }
@@ -96,8 +95,6 @@ public final class VariantFactionInspectorSection extends AbstractHiveInspectorS
                 width,
                 metric("Loaded", String.valueOf(s.getLong(HiveInspectionSnapshot.K_AGG_LOADED_MEMBERS))),
                 metric("Local res", String.valueOf(s.getLong(HiveInspectionSnapshot.K_AGG_LOCAL_RESERVES))),
-                metric("Lineage pools", String.valueOf(s.getLong(HiveInspectionSnapshot.K_AGG_LINEAGE_POOLS))),
-                metric("Variant pools", String.valueOf(s.getLong(HiveInspectionSnapshot.K_AGG_VARIANT_POOLS))),
                 metric("Convoy pop", String.valueOf(s.getLong(HiveInspectionSnapshot.K_AGG_CONVOY_MEMBERS))),
                 metric("Lineage members", String.valueOf(s.getLong(HiveInspectionSnapshot.K_AGG_LINEAGE_MEMBERS))),
                 metric("Loc members", String.valueOf(s.getLong(HiveInspectionSnapshot.K_AGG_LOCATION_MEMBERS))),
@@ -107,63 +104,6 @@ public final class VariantFactionInspectorSection extends AbstractHiveInspectorS
                     s.getLong(HiveInspectionSnapshot.K_AGG_CHUNKS_LOADED) + "/" + s.getLong(HiveInspectionSnapshot.K_AGG_CLAIMED_CHUNKS)
                 )
             );
-        }
-
-        rowY += InspectorStyle.ROW_GAP;
-        var variantPools = listOrEmpty(s, HiveInspectionSnapshot.K_VARIANT_POOLS);
-        var poolsSection = drawCollapsibleSectionHeader(
-            graphics,
-            font,
-            x,
-            rowY,
-            width,
-            "variant_pools",
-            "Variant Pools (" + s.getInt(HiveInspectionSnapshot.K_VARIANT_POOL_TOTAL) + ")",
-            mouseX,
-            mouseY
-        );
-        rowY = poolsSection.nextY();
-        if (poolsSection.expanded()) {
-            rowY += InspectorStyle.CONTENT_PADDING / 2;
-            if (variantPools.isEmpty()) {
-                rowY = HiveInspectorRender.drawNote(graphics, font, x, rowY, width, "(empty - no overflow is parked at variant level)");
-            } else {
-                for (var i = 0; i < variantPools.size(); i++) {
-                    var row = variantPools.getCompound(i);
-                    rowY = HiveInspectorRender.drawItemHeader(
-                        graphics,
-                        font,
-                        x,
-                        rowY,
-                        width,
-                        "Dimension",
-                        row.getString(HiveInspectionSnapshot.K_DIMENSION)
-                    );
-                    rowY = HiveInspectorRender.drawRow(
-                        graphics,
-                        font,
-                        x,
-                        rowY,
-                        width,
-                        "Total",
-                        String.valueOf(row.getInt(HiveInspectionSnapshot.K_VALUE))
-                    );
-                    var poolByType = listOrEmpty(row, HiveInspectionSnapshot.K_RESERVES_BY_TYPE);
-                    if (!poolByType.isEmpty()) {
-                        rowY = HiveInspectorRender.drawCountRows(
-                            graphics,
-                            font,
-                            x,
-                            rowY,
-                            width,
-                            poolByType,
-                            HiveInspectionSnapshot.K_KEY,
-                            HiveInspectionSnapshot.K_VALUE
-                        );
-                    }
-                    rowY += InspectorStyle.ROW_GAP;
-                }
-            }
         }
 
         rowY += InspectorStyle.ROW_GAP;
@@ -236,7 +176,6 @@ public final class VariantFactionInspectorSection extends AbstractHiveInspectorS
                         metric("Pop", row.getLong(HiveInspectionSnapshot.K_TOTAL_POP) + "/" + row.getLong(HiveInspectionSnapshot.K_POP_CAP)),
                         metric("Loaded", String.valueOf(row.getInt(HiveInspectionSnapshot.K_LOADED_MEMBER_TOTAL))),
                         metric("Local res", String.valueOf(row.getInt(HiveInspectionSnapshot.K_LOCAL_RESERVE_TOTAL))),
-                        metric("Pool", String.valueOf(row.getInt(HiveInspectionSnapshot.K_LINEAGE_POOL_TOTAL))),
                         metric("Convoys", row.getInt(HiveInspectionSnapshot.K_CONVOY_COUNT) + "/" + row.getInt(HiveInspectionSnapshot.K_CONVOY_MEMBER_TOTAL)),
                         metric(
                             "Chunks",

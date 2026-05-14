@@ -127,7 +127,6 @@ public final class LineageFactionInspectorSection extends AbstractHiveInspectorS
                 width,
                 metric("Loaded", String.valueOf(s.getLong(HiveInspectionSnapshot.K_AGG_LOADED_MEMBERS))),
                 metric("Local res", String.valueOf(s.getLong(HiveInspectionSnapshot.K_AGG_LOCAL_RESERVES))),
-                metric("Lineage pool", String.valueOf(s.getInt(HiveInspectionSnapshot.K_LINEAGE_POOL_TOTAL))),
                 metric("Convoy pop", String.valueOf(s.getInt(HiveInspectionSnapshot.K_CONVOY_MEMBER_TOTAL))),
                 metric("Loc members", String.valueOf(s.getLong(HiveInspectionSnapshot.K_AGG_LOCATION_MEMBERS))),
                 metric(
@@ -135,38 +134,6 @@ public final class LineageFactionInspectorSection extends AbstractHiveInspectorS
                     s.getLong(HiveInspectionSnapshot.K_AGG_CHUNKS_LOADED) + "/" + s.getLong(HiveInspectionSnapshot.K_AGG_CLAIMED_CHUNKS)
                 )
             );
-        }
-
-        rowY += InspectorStyle.ROW_GAP;
-        var poolRows = listOrEmpty(s, HiveInspectionSnapshot.K_LINEAGE_POOL_BY_TYPE);
-        var lineagePool = drawCollapsibleSectionHeader(
-            graphics,
-            font,
-            x,
-            rowY,
-            width,
-            "lineage_pool",
-            "Lineage Pool (" + s.getInt(HiveInspectionSnapshot.K_LINEAGE_POOL_TOTAL) + ")",
-            mouseX,
-            mouseY
-        );
-        rowY = lineagePool.nextY();
-        if (lineagePool.expanded()) {
-            rowY += InspectorStyle.CONTENT_PADDING / 2;
-            if (poolRows.isEmpty()) {
-                rowY = HiveInspectorRender.drawNote(graphics, font, x, rowY, width, "(empty - no pooled lineage reserves)");
-            } else {
-                rowY = HiveInspectorRender.drawCountRows(
-                    graphics,
-                    font,
-                    x,
-                    rowY,
-                    width,
-                    poolRows,
-                    HiveInspectionSnapshot.K_KEY,
-                    HiveInspectionSnapshot.K_VALUE
-                );
-            }
         }
 
         rowY += InspectorStyle.ROW_GAP;

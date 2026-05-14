@@ -196,7 +196,7 @@ public final class HiveBalanceTask {
             inputTypes.add(type);
         }
 
-        if (!hasOutputReserveHeadroomAfterInputs(location, recipe)) {
+        if (!location.localReserves().accepts(recipe.outputEntity())) {
             return false;
         }
 
@@ -219,20 +219,6 @@ public final class HiveBalanceTask {
             inputs += input.count();
         }
         return 1 - inputs;
-    }
-
-    private static boolean hasOutputReserveHeadroomAfterInputs(HiveLocation location, HiveRecipe recipe) {
-        if (!location.localReserves().accepts(recipe.outputEntity())) {
-            return false;
-        }
-
-        var outputCount = location.localReserves().getCount(recipe.outputEntity());
-        for (var input : recipe.inputEntities()) {
-            if (input.entity().equals(recipe.outputEntity())) {
-                outputCount -= input.count();
-            }
-        }
-        return outputCount < location.localReserves().capFor(recipe.outputEntity());
     }
 
     private static Map<TagKey<EntityType<?>>, Integer> computeDeficits(

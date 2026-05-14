@@ -7,8 +7,6 @@ import com.alien.common.gameplay.hive2.id.HiveLocationId;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.model.alien.variant.AlienVariant;
-import com.blib.api.common.codec.v1.BLibCodecs;
-import com.blib.api.common.entity.v1.EntityReserves;
 import com.blib.api.common.faction.v1.FactionData;
 import com.blib.api.common.faction.v1.FactionMember;
 import net.minecraft.core.registries.Registries;
@@ -33,8 +31,8 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * One queen's bloodline. Lives in a single dimension; owns one or more {@link HiveLocation}s; contains the lineage pool
- * and (eventually) the empress.
+ * One queen's bloodline. Lives in a single dimension; owns one or more {@link HiveLocation}s and can eventually have
+ * an empress.
  * <p>
  * Per {@code HIVE_REDESIGN_12_PERFORMANCE.md} § 3, this class also carries its location records as nested NBT — they're
  * persisted with the lineage shard, not separately.
@@ -69,8 +67,6 @@ public class LineageFactionData extends FactionData {
     private static final String NBT_LINEAGE_NUMBER = "LineageNumber";
 
     private static final String NBT_NEXT_LOCATION_NUMBER = "NextLocationNumber";
-
-    private static final String NBT_LINEAGE_POOL = "LineagePool";
 
     private static final String NBT_LOCATIONS = "Locations";
 
@@ -111,8 +107,6 @@ public class LineageFactionData extends FactionData {
     /** Monotonic per-lineage location counter. Allocated at location mint via {@link #allocateLocationNumber()}. */
     private long nextLocationNumber;
 
-    private final EntityReserves lineagePool;
-
     /** Insertion-ordered so the "oldest location" tiebreak is stable across restarts. */
     private final Map<HiveLocationId, HiveLocation> locationsById;
 
@@ -149,7 +143,6 @@ public class LineageFactionData extends FactionData {
         this.pendingCivilWar = false;
         this.lineageNumber = -1L;
         this.nextLocationNumber = 0L;
-        this.lineagePool = new EntityReserves();
         this.locationsById = new LinkedHashMap<>();
         this.convoys = new ArrayList<>();
         this.killAttributionByPlayer = new HashMap<>();
@@ -377,40 +370,6 @@ public class LineageFactionData extends FactionData {
         markDirty();
     }
 
-    public EntityReserves lineagePool() {
-        return lineagePool;
-    }
-
-    /**
-     * Cap-aware add to the lineage pool. Cap grows with location count per {@code HIVE_REDESIGN_05_RESERVES.md} § 6:
-     *
-     * <pre>
-     * cap = baseLineageCapPerType + lineageCapPerLocationPerType * locationCount
-     * </pre>
-     * <p>
-     * Returns the overflow that didn't fit. The caller is responsible for routing it onward (typically into the variant
-     * pool — see {@link com.alien.common.gameplay.hive2.location.HivePoolCascade}).
-     */
-    public int tryAddToLineagePool(EntityType<?> type, int count) {
-        if (count <= 0) {
-            return 0;
-        }
-
-        var config = com.alien.common.gameplay.hive2.location.HiveLocationRegistry.INSTANCE.config();
-        var cap = config.baseLineageCapPerType()
-            + config.lineageCapPerLocationPerType() * locationsById.size();
-        var current = lineagePool.getCount(type);
-        var headroom = Math.max(0, cap - current);
-        var added = Math.min(count, headroom);
-
-        if (added > 0) {
-            lineagePool.add(type, added);
-            markDirty();
-        }
-
-        return count - added;
-    }
-
     public Map<HiveLocationId, HiveLocation> locationsById() {
         return locationsById;
     }
@@ -511,17 +470,6 @@ public class LineageFactionData extends FactionData {
         this.lineageNumber = tag.contains(NBT_LINEAGE_NUMBER) ? tag.getLong(NBT_LINEAGE_NUMBER) : -1L;
         this.nextLocationNumber = tag.getLong(NBT_NEXT_LOCATION_NUMBER);
 
-        if (tag.contains(NBT_LINEAGE_POOL)) {
-            EntityReserves.CODEC.decode(BLibCodecs.Schema.NBT, tag.getCompound(NBT_LINEAGE_POOL))
-                .inspectErr(
-                    failure -> Alien.LOGGER.error(
-                        "Failed to load lineage pool: {}",
-                        failure
-                    )
-                )
-                .ifOk(loaded -> lineagePool.putAll(loaded.getBackingMap()));
-        }
-
         locationsById.clear();
         var removedMismatchedReserveEntries = 0;
         if (tag.contains(NBT_LOCATIONS)) {
@@ -595,8 +543,6 @@ public class LineageFactionData extends FactionData {
             tag.putLong(NBT_LINEAGE_NUMBER, lineageNumber);
         }
         tag.putLong(NBT_NEXT_LOCATION_NUMBER, nextLocationNumber);
-
-        tag.put(NBT_LINEAGE_POOL, EntityReserves.CODEC.encode(BLibCodecs.Schema.NBT, lineagePool));
 
         var locationsTag = new ListTag();
         for (var location : locationsById.values()) {

@@ -9,10 +9,10 @@ import net.minecraft.resources.ResourceLocation;
 /**
  * Defensive cleanup when BLib removes a faction. Three responsibilities:
  * <ul>
- * <li>Drop any registry entries pointing at the dead lineage. The active death-cascade paths
+ * <li>Drop any registry entries pointing at the dead lineage. The active lineage-removal paths
  * ({@link LineageDeathHandler}, {@link LineageAbsorptionHandler}, {@link CivilWarHandler}) already do this, but
  * defensive cleanup catches admin-removed factions, NBT-corruption recoveries, and any removal path that bypasses the
- * cascades.</li>
+ * normal handlers.</li>
  * <li>Sweep every other lineage's {@code firstAdjacentTickByLineage} map to remove entries pointing at the dead lineage
  * — keeps the absorption timer state from leaking stale references.</li>
  * </ul>

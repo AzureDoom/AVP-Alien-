@@ -17,8 +17,8 @@ import java.util.HashSet;
  * <p>
  * <b>Use this directly only when the caller has already handled the location's reserves and members</b> — for example,
  * {@code MigrationDispatch} drains reserves into the convoy composition before calling here. For natural death
- * (dormancy, contest loss, player kill, admin), use {@link LocationDeathHandler} instead — it adds reserves cascade,
- * member-to-forager conversion, and advancement firing on top of this primitive.
+ * (dormancy, contest loss, player kill, admin), use {@link LocationDeathHandler} instead — it adds death-specific
+ * membership and advancement handling on top of this primitive.
  */
 public final class LocationRemovalHelper {
 

@@ -6,8 +6,8 @@ import com.alien.common.gameplay.hive2.convoy.ConvoyArrival;
 import com.alien.common.gameplay.hive2.convoy.ConvoyTravel;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.id.LineageIds;
+import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
-import com.alien.common.gameplay.hive2.location.HivePoolCascade;
 import net.minecraft.server.MinecraftServer;
 
 /**
@@ -46,7 +46,7 @@ public final class LineageConvoyTickTask {
                 var convoy = iterator.next();
 
                 if (convoy instanceof Convoy.Raid raid) {
-                    if (handleRaidExpiry(raid, lineage, server)) {
+                    if (handleRaidExpiry(raid, server)) {
                         iterator.remove();
                         anyChanged = true;
                         continue;
@@ -82,25 +82,44 @@ public final class LineageConvoyTickTask {
 
     /**
      * Returns true if the raid has expired (passed {@code expiresAtTick}). On expiry: refunds the abstract composition
-     * into the lineage pool with cascade and signals the caller to drop the convoy.
+     * to the source hive location when it still exists and signals the caller to drop the convoy.
      */
-    private static boolean handleRaidExpiry(Convoy.Raid raid, LineageFactionData lineage, MinecraftServer server) {
+    private static boolean handleRaidExpiry(Convoy.Raid raid, MinecraftServer server) {
         var currentTick = server.overworld().getGameTime();
         if (currentTick < raid.expiresAtTick()) {
             return false;
         }
 
         Alien.LOGGER.info(
-            "Raid {} expired at tick {} (dispatched at {}) — refunding composition to lineage pool",
+            "Raid {} expired at tick {} (dispatched at {}) — refunding composition to source location",
             raid.id(),
             currentTick,
             raid.dispatchedTick()
         );
-        for (var entityType : raid.composition().getAvailableEntityTypes()) {
-            var count = raid.composition().getCount(entityType);
-            HivePoolCascade.addToLineageCascading(lineage, entityType, count);
-        }
+        refundToSourceLocation(raid);
         return true;
     }
 
+    private static void refundToSourceLocation(Convoy.Raid raid) {
+        var source = HiveLocationRegistry.INSTANCE.get(raid.sourceLocationId());
+        if (source == null || !source.isAlive()) {
+            Alien.LOGGER.warn(
+                "Hive2: raid {} could not refund {} member(s) because source location {} is gone",
+                raid.id(),
+                raid.composition().getCount(),
+                raid.sourceLocationId()
+            );
+            return;
+        }
+        addCompositionToLocation(source, raid);
+    }
+
+    private static void addCompositionToLocation(HiveLocation location, Convoy convoy) {
+        for (var entityType : convoy.composition().getAvailableEntityTypes()) {
+            var count = convoy.composition().getCount(entityType);
+            if (count > 0) {
+                location.localReserves().tryAdd(entityType, count);
+            }
+        }
+    }
 }

@@ -17,7 +17,7 @@ import java.util.ArrayList;
  * <li>Zero claimed chunks → kill (preserved from the legacy behavior).</li>
  * <li>Location faction empty AND local reserves empty → kill (membership is BLib-persistent so this is reliable across
  * chunk unloads).</li>
- * <li>Parent lineage faction empty → kill (defensive cascade — also fired from {@link LineageDeathHandler}).</li>
+ * <li>Parent lineage faction empty → kill (defensive backup — also fired from {@link LineageDeathHandler}).</li>
  * <li>No-contact safety net: {@link HiveLocation#noContactTicksAccrued()} accumulates while ≥1 claimed chunk is loaded
  * AND no location-faction member is currently in any claimed chunk. Pauses when nothing is loaded; resets when contact
  * is observed; triggers a kill at {@link com.alien.common.gameplay.hive2.config.HiveConfig#locationMaxNoContactTicks()}
@@ -82,8 +82,8 @@ public final class LocationDormancyTask {
             return true;
         }
 
-        // Rule 3: parent lineage faction empty → cascade kill. (LineageDeathHandler also fires the cascade
-        // explicitly; this is a defensive backup that catches the case if the lineage check runs after this.)
+        // Rule 3: parent lineage faction empty. LineageDeathHandler also does this explicitly; this backup catches the
+        // case if the lineage check runs after this.
         if (lineageMemberCount == 0) {
             LocationDeathHandler.killNaturalDecay(level, location, lineage);
             return true;

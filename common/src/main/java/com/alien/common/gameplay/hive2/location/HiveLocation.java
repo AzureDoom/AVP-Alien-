@@ -224,11 +224,7 @@ public final class HiveLocation {
         this.claimedChunks = new LinkedHashSet<>();
         this.chunkClaimTicks = new HashMap<>();
         this.decoratedChunks = new HashSet<>();
-        this.localReserves = new HiveLocationReserves(
-            () -> claimedChunks.size(),
-            () -> HiveLocationRegistry.INSTANCE.config(),
-            this::lineageVariantOrNull
-        );
+        this.localReserves = new HiveLocationReserves(this::lineageVariantOrNull);
         this.leadership = new HiveLocationLeadership();
         this.ventManager = new com.alien.common.gameplay.hive2.vent.HiveVentManager();
         this.loadedMembersByType = new HashMap<>();

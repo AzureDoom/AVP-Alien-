@@ -1,7 +1,6 @@
 package com.alien.common.gameplay.hive2.location;
 
 import com.alien.Alien;
-import com.alien.common.gameplay.hive2.config.HiveConfig;
 import com.alien.common.gameplay.hive2.faction.FactionVariantPolicy;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.blib.api.common.codec.v1.BLibCodecs;
@@ -12,24 +11,13 @@ import net.minecraft.world.entity.EntityType;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.IntSupplier;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
- * Cap-aware wrapper around BLib's {@link EntityReserves}. Each location gets one. Caps grow with the location's
- * claimed-chunk count (per {@code HIVE_REDESIGN_05_RESERVES.md} § 6):
- *
- * <pre>
- * cap = baseLocalCapPerType + localCapPerClaimedChunkPerType * claimedChunks
- * </pre>
- * <p>
- * {@link #tryAdd} is the safe add path: it caps at the per-type ceiling and returns the overflow. Phase 3 callers
- * discard the overflow; Phase 4 will re-route it into the lineage pool, then into the variant pool, per the cascade in
- * § 6.
- * <p>
- * Chunk count and config are pulled from suppliers so the wrapper doesn't lock a snapshot at construction — the
- * underlying location's chunk set and the in-use config are both mutable.
+ * Variant-aware wrapper around BLib's {@link EntityReserves}. Each location gets one, and it is the authoritative
+ * storage for that hive location's abstract members. Population caps gate buying and spawning elsewhere; reserve
+ * storage itself is uncapped so already-owned members are not lost when they unload, travel, or return from convoys.
  */
 public final class HiveLocationReserves {
 
@@ -37,39 +25,19 @@ public final class HiveLocationReserves {
 
     private final EntityReserves underlying;
 
-    private final IntSupplier claimedChunkCountSupplier;
-
-    private final Supplier<HiveConfig> configSupplier;
-
     private final Supplier<AlienVariant> variantSupplier;
 
-    public HiveLocationReserves(
-        IntSupplier claimedChunkCountSupplier,
-        Supplier<HiveConfig> configSupplier,
-        Supplier<AlienVariant> variantSupplier
-    ) {
+    public HiveLocationReserves(Supplier<AlienVariant> variantSupplier) {
         this.underlying = new EntityReserves();
-        this.claimedChunkCountSupplier = claimedChunkCountSupplier;
-        this.configSupplier = configSupplier;
         this.variantSupplier = variantSupplier;
     }
 
     /**
-     * Cap for a given entity type at the current chunk count. Phase 3 uses one flat per-type cap; future phases may
-     * specialize per caste.
+     * Adds all of {@code count} to this location's reserves when the entity type matches the location variant.
      */
-    public int capFor(EntityType<?> type) {
-        var config = configSupplier.get();
-        return config.baseLocalCapPerType() + config.localCapPerClaimedChunkPerType() * claimedChunkCountSupplier.getAsInt();
-    }
-
-    /**
-     * Adds {@code count} of {@code type} to the reserves up to the per-type cap. Returns the overflow (zero if the
-     * whole add fit). The overflow is the caller's problem — Phase 3 discards it.
-     */
-    public int tryAdd(EntityType<?> type, int count) {
+    public boolean tryAdd(EntityType<?> type, int count) {
         if (count <= 0) {
-            return 0;
+            return false;
         }
         if (!accepts(type)) {
             var required = variantSupplier.get();
@@ -79,42 +47,19 @@ public final class HiveLocationReserves {
                 BuiltInRegistries.ENTITY_TYPE.getKey(type),
                 required
             );
-            return count;
-        }
-
-        var current = underlying.getCount(type);
-        var cap = capFor(type);
-        var headroom = Math.max(0, cap - current);
-        var added = Math.min(count, headroom);
-
-        if (added > 0) {
-            underlying.add(type, added);
-        }
-
-        return count - added;
-    }
-
-    /**
-     * Returns already-owned live members to this location. This intentionally bypasses the reserve cap: caps gate new
-     * purchases/spawns, while despawn/shed return should preserve a hive's existing population.
-     */
-    public boolean addReturningMember(EntityType<?> type, int count) {
-        if (count <= 0) {
-            return false;
-        }
-        if (!accepts(type)) {
-            var required = variantSupplier.get();
-            Alien.LOGGER.warn(
-                "Hive2: rejected returning {} reserve member(s) of {} because it does not match location variant {}.",
-                count,
-                BuiltInRegistries.ENTITY_TYPE.getKey(type),
-                required
-            );
             return false;
         }
 
         underlying.add(type, count);
         return true;
+    }
+
+    /**
+     * Returns already-owned live members to this location. Kept separate for readability at call sites that are
+     * preserving existing population rather than buying new units.
+     */
+    public boolean addReturningMember(EntityType<?> type, int count) {
+        return tryAdd(type, count);
     }
 
     /**

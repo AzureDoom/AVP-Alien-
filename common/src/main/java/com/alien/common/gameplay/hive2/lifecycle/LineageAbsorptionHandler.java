@@ -6,8 +6,8 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
 import com.alien.common.gameplay.hive2.convoy.Convoy;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.faction.LineageRemovalReason;
+import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
-import com.alien.common.gameplay.hive2.location.HivePoolCascade;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.faction.v1.Faction;
 import com.blib.api.common.faction.v1.FactionMember;
@@ -26,9 +26,8 @@ import java.util.UUID;
  * <p>
  * Picks the stronger of the two by the comparator chain (member count → empress age → founder age → lineage age → lex
  * compare). The weaker is destroyed: every location reparents to the stronger, members move to the stronger's BLib
- * membership, the lineage pool is added to the stronger's pool with overflow cascade, in-flight convoys are remapped or
- * disbanded, and the weaker's empress is killed (if both had empresses) or demoted to a queen entity (if only the
- * weaker had one).
+ * membership, in-flight convoys are refunded to surviving hive locations, and the weaker's empress is killed (if both
+ * had empresses) or demoted to a queen entity (if only the weaker had one).
  */
 public final class LineageAbsorptionHandler {
 
@@ -80,16 +79,13 @@ public final class LineageAbsorptionHandler {
         // 2. Transfer members.
         transferMembers(weakerFaction.membership(), strongerFaction.membership(), serverLevel);
 
-        // 3. Transfer lineage pool with cascade.
-        transferLineagePool(weaker, stronger);
+        // 3. Remap or disband convoys.
+        remapConvoys(weaker, stronger);
 
-        // 4. Remap or disband convoys.
-        remapConvoys(weaker, stronger, weakerId, strongerId);
-
-        // 5. Empress handling.
+        // 4. Empress handling.
         handleEmpresses(serverLevel, weaker, stronger, strongerFaction);
 
-        // 6. Cleanup: clear timers, mark removed, drop from BLib.
+        // 5. Cleanup: clear timers, mark removed, drop from BLib.
         weaker.firstAdjacentTickByLineage().clear();
         stronger.firstAdjacentTickByLineage().remove(weakerId);
         weaker.setRemovalReason(new LineageRemovalReason.AbsorbedBy(strongerId));
@@ -230,40 +226,45 @@ public final class LineageAbsorptionHandler {
         }
     }
 
-    private static void transferLineagePool(LineageFactionData weaker, LineageFactionData stronger) {
-        var pool = weaker.lineagePool();
-        for (var type : new ArrayList<>(pool.getAvailableEntityTypes())) {
-            var count = pool.getCount(type);
-            if (count <= 0) {
-                continue;
-            }
-            HivePoolCascade.addToLineageCascading(stronger, type, count);
-            pool.add(type, -count);
-        }
-    }
-
     private static void remapConvoys(
         LineageFactionData weaker,
-        LineageFactionData stronger,
-        ResourceLocation weakerId,
-        ResourceLocation strongerId
+        LineageFactionData stronger
     ) {
-        // Convoy records are immutable per the sealed interface design — to remap, we drop them from the weaker and
-        // refund composition into the stronger's pool. (Per HIVE_REDESIGN_06_CONVOYS.md § 8 row "absorbed", the
-        // convoy is reassigned; if its source/dest doesn't exist anymore in the new lineage, it disbands. We
-        // implement the simpler "always disband-and-refund" behavior for Phase 11 — robust and easy to reason
-        // about. Manifestation polish (which doesn't exist yet) would handle the more nuanced reassignment.)
+        // Convoy records are immutable per the sealed interface design. Disband them and refund composition to the
+        // closest surviving location now owned by the stronger lineage.
         var convoys = new ArrayList<>(weaker.convoys());
         for (var convoy : convoys) {
+            var target = nearestLocationToConvoy(convoy, new ArrayList<>(stronger.locationsById().values()));
+            if (target == null) {
+                continue;
+            }
             for (var type : new ArrayList<>(convoy.composition().getAvailableEntityTypes())) {
                 var count = convoy.composition().getCount(type);
                 if (count > 0) {
-                    HivePoolCascade.addToLineageCascading(stronger, type, count);
+                    target.localReserves().tryAdd(type, count);
                     convoy.composition().add(type, -count);
                 }
             }
         }
         weaker.convoys().clear();
+    }
+
+    private static @Nullable HiveLocation nearestLocationToConvoy(Convoy convoy, ArrayList<HiveLocation> locations) {
+        HiveLocation best = null;
+        var bestDistSqr = Double.MAX_VALUE;
+        for (var location : locations) {
+            if (!location.isAlive()) {
+                continue;
+            }
+            var dx = location.centerPos().getX() - convoy.currentPos().x;
+            var dz = location.centerPos().getZ() - convoy.currentPos().z;
+            var distSqr = dx * dx + dz * dz;
+            if (distSqr < bestDistSqr) {
+                bestDistSqr = distSqr;
+                best = location;
+            }
+        }
+        return best;
     }
 
     /**

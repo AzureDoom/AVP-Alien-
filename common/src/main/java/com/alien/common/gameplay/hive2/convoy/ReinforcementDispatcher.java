@@ -80,7 +80,7 @@ public final class ReinforcementDispatcher {
                 continue;
             }
             var reserveTotal = location.localReserves().getCount();
-            var threshold = config.baseLocalCapPerType();
+            var threshold = Math.max(1, config.populationPerChunk());
 
             if (reserveTotal >= threshold * 2) {
                 donors.add(location);

@@ -3,7 +3,6 @@ package com.alien.common.gameplay.hive2.lifecycle;
 import com.alien.Alien;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.faction.LineageRemovalReason;
-import com.alien.common.gameplay.hive2.faction.VariantFactionData;
 import com.alien.common.gameplay.hive2.id.LineageIds;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -14,16 +13,16 @@ import java.util.ArrayList;
  * Per-tick lineage death check. No grace periods — runs every server tick from
  * {@link com.alien.common.gameplay.hive2.location.HiveLocationRegistry#tick}.
  * <ul>
- * <li><b>Members empty AND locationsById non-empty</b> → cascade-kill every owned location via
- * {@link LocationDeathHandler#killNaturalDecay}. The natural-decay path drains each location's reserves into the
- * lineage pool, removes the per-location faction, and releases chunks.</li>
- * <li><b>Members empty AND locationsById empty</b> → kill the lineage immediately. Drains the lineage pool into the
- * variant pool, sets {@link LineageRemovalReason.NoLocationsRemain}, and calls
+ * <li><b>Members empty AND locationsById non-empty</b> → kill every owned location via
+ * {@link LocationDeathHandler#killNaturalDecay}. The natural-decay path removes the per-location faction and releases
+ * chunks.</li>
+ * <li><b>Members empty AND locationsById empty</b> → kill the lineage immediately. Sets
+ * {@link LineageRemovalReason.NoLocationsRemain} and calls
  * {@code Alien.MOD.factions().remove(lineageId)}.</li>
  * </ul>
  * <p>
  * The shed path ({@code HiveManager.tryShedFromLineages}) removes the last alien synchronously, then discards the
- * entity — so the cascade fires on the very next tick when {@code members().isEmpty()} is observed. Accepted: this is
+ * entity — so this cleanup fires on the very next tick when {@code members().isEmpty()} is observed. Accepted: this is
  * correct for the genuine shed case. Civil war successor wipes (unloaded ex-members never join successor lineages) are
  * a known deferred concern; if observed in playtest, fix in {@code CivilWarHandler} rather than reintroducing global
  * throttling.
@@ -32,7 +31,7 @@ public final class LineageDeathHandler {
 
     private LineageDeathHandler() {}
 
-    /** Per-tick scan: cascade-kill locations of empty lineages, kill empty+locationless lineages. */
+    /** Per-tick scan: kill locations of empty lineages, then kill empty+locationless lineages. */
     public static void scanAndKill(MinecraftServer server) {
         var deathQueue = new ArrayList<ResourceLocation>();
 
@@ -50,12 +49,12 @@ public final class LineageDeathHandler {
             }
 
             if (!lineage.locationsById().isEmpty()) {
-                // Cascade: kill all owned locations. They drain into the lineage pool, then the lineage itself
-                // becomes 0-locations and will be killed on the next branch (same tick if rescanned, or next tick).
-                cascadeKillLocations(server, factionId, lineage);
+                // Kill all owned locations. The lineage then becomes 0-locations and will be killed on the next branch
+                // (same tick if rescanned, or next tick).
+                killOwnedLocations(server, factionId, lineage);
             }
 
-            // After cascade (or if locations were already empty), the lineage is dead.
+            // After location cleanup (or if locations were already empty), the lineage is dead.
             if (lineage.locationsById().isEmpty()) {
                 deathQueue.add(factionId);
             }
@@ -66,7 +65,7 @@ public final class LineageDeathHandler {
         }
     }
 
-    private static void cascadeKillLocations(
+    private static void killOwnedLocations(
         MinecraftServer server,
         ResourceLocation lineageId,
         LineageFactionData lineage
@@ -74,7 +73,7 @@ public final class LineageDeathHandler {
         var serverLevel = server.getLevel(lineage.dimension());
         if (serverLevel == null) {
             Alien.LOGGER.warn(
-                "Hive2: lineage {} has 0 members but its dimension {} is not loaded — skipping cascade kill",
+                "Hive2: lineage {} has 0 members but its dimension {} is not loaded — skipping owned-location cleanup",
                 lineageId,
                 lineage.dimension().location()
             );
@@ -83,7 +82,7 @@ public final class LineageDeathHandler {
 
         var snapshot = new ArrayList<>(lineage.locationsById().values());
         Alien.LOGGER.info(
-            "Hive2: lineage {} has 0 members; cascade-killing {} location(s)",
+            "Hive2: lineage {} has 0 members; killing {} owned location(s)",
             lineageId,
             snapshot.size()
         );
@@ -97,7 +96,7 @@ public final class LineageDeathHandler {
     }
 
     /**
-     * Forces lineage death now. Drains the pool into the variant pool, sets removal reason, removes from BLib.
+     * Forces lineage death now. Sets removal reason and removes from BLib.
      * Idempotent — a lineage already dead returns false.
      */
     public static boolean kill(ResourceLocation lineageId) {
@@ -106,47 +105,14 @@ public final class LineageDeathHandler {
             return false;
         }
 
-        // Drain lineage pool → variant pool with cap-aware overflow (per HIVE_REDESIGN_05_RESERVES.md § 6).
-        drainPoolToVariantPool(lineage);
-
         lineage.setRemovalReason(new LineageRemovalReason.NoLocationsRemain());
         Alien.MOD.factions().remove(lineageId);
 
         Alien.LOGGER.info(
-            "Hive2: lineage {} dead (no locations remain); pool drained to variant pool, faction removed",
+            "Hive2: lineage {} dead (no locations remain); faction removed",
             lineageId
         );
         return true;
-    }
-
-    private static void drainPoolToVariantPool(LineageFactionData lineage) {
-        var variantId = lineage.parentVariantFactionId();
-        if (variantId == null) {
-            Alien.LOGGER.warn(
-                "Hive2: lineage death drain — lineage has no parent variant id; pool of {} entries lost",
-                lineage.lineagePool().getCount()
-            );
-            return;
-        }
-
-        var variantFaction = Alien.MOD.factions().get(variantId);
-        if (variantFaction == null || !(variantFaction.data() instanceof VariantFactionData variantData)) {
-            Alien.LOGGER.warn(
-                "Hive2: lineage death drain — variant faction {} missing or wrong type; pool lost",
-                variantId
-            );
-            return;
-        }
-
-        var pool = lineage.lineagePool();
-        for (var type : new ArrayList<>(pool.getAvailableEntityTypes())) {
-            var count = pool.getCount(type);
-            if (count <= 0) {
-                continue;
-            }
-            variantData.tryAddToVariantPool(lineage.dimension(), type, count);
-            pool.add(type, -count);
-        }
     }
 
 }

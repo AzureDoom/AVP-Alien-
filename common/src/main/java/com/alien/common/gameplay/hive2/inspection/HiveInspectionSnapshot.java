@@ -134,10 +134,6 @@ public final class HiveInspectionSnapshot {
 
     public static final String K_LOCATION_COUNT = "LocationCount";
 
-    public static final String K_LINEAGE_POOL_TOTAL = "LineagePoolTotal";
-
-    public static final String K_LINEAGE_POOL_BY_TYPE = "LineagePoolByType";
-
     public static final String K_LOCAL_RESERVE_TOTAL = "LocalReserveTotal";
 
     public static final String K_LOADED_MEMBER_TOTAL = "LoadedMemberTotal";
@@ -168,10 +164,6 @@ public final class HiveInspectionSnapshot {
 
     public static final String K_AGG_LINEAGE_MEMBERS = "AggLineageMembers";
 
-    public static final String K_AGG_LINEAGE_POOLS = "AggLineagePools";
-
-    public static final String K_AGG_VARIANT_POOLS = "AggVariantPools";
-
     public static final String K_AGG_CONVOYS = "AggConvoys";
 
     public static final String K_AGG_CONVOY_MEMBERS = "AggConvoyMembers";
@@ -188,10 +180,6 @@ public final class HiveInspectionSnapshot {
     public static final String K_LINEAGES = "Lineages";
 
     public static final String K_VARIANT_MEMBERS = "VariantMembers";
-
-    public static final String K_VARIANT_POOL_TOTAL = "VariantPoolTotal";
-
-    public static final String K_VARIANT_POOLS = "VariantPools";
 
     public static final String K_QUEEN_MOTHERS = "QueenMothers";
 
@@ -362,8 +350,6 @@ public final class HiveInspectionSnapshot {
         var memberCount = faction.membership().getMembers().size();
         tag.putInt(K_LINEAGE_MEMBER_TOTAL, memberCount);
         tag.putInt(K_LOCATION_COUNT, data.locationsById().size());
-        tag.putInt(K_LINEAGE_POOL_TOTAL, data.lineagePool().getCount());
-        tag.put(K_LINEAGE_POOL_BY_TYPE, reserveRows(data.lineagePool()));
         tag.putInt(K_CONVOY_COUNT, data.convoys().size());
         tag.putInt(K_CONVOY_MEMBER_TOTAL, convoyMemberTotal(data));
         tag.put(K_CONVOYS, convoyRows(data));
@@ -465,9 +451,6 @@ public final class HiveInspectionSnapshot {
         tag.putLong(K_AGE_TICKS, data.ageInTicks());
         tag.putLong(K_NEXT_LINEAGE_NUMBER, data.nextLineageNumber());
         tag.putInt(K_VARIANT_MEMBERS, faction.membership().getMembers().size());
-        var variantPools = variantPoolRows(data);
-        tag.put(K_VARIANT_POOLS, variantPools);
-        tag.putInt(K_VARIANT_POOL_TOTAL, variantPoolTotal(data));
         tag.put(K_QUEEN_MOTHERS, queenMotherRows(data));
 
         long aggBiomass = 0L;
@@ -479,7 +462,6 @@ public final class HiveInspectionSnapshot {
         long aggLoadedMembers = 0L;
         long aggLocationMembers = 0L;
         long aggLineageMembers = 0L;
-        long aggLineagePools = 0L;
         long aggConvoys = 0L;
         long aggConvoyMembers = 0L;
         long aggClaimedChunks = 0L;
@@ -537,11 +519,9 @@ public final class HiveInspectionSnapshot {
                 aggLocations++;
             }
             var lineageMembers = f.membership().getMembers().size();
-            var lineagePoolTotal = lineage.lineagePool().getCount();
             var convoyCount = lineage.convoys().size();
             var convoyMemberTotal = convoyMemberTotal(lineage);
             aggLineageMembers += lineageMembers;
-            aggLineagePools += lineagePoolTotal;
             aggConvoys += convoyCount;
             aggConvoyMembers += convoyMemberTotal;
 
@@ -559,7 +539,6 @@ public final class HiveInspectionSnapshot {
             row.putLong(K_TOTAL_POP, lineagePop);
             row.putLong(K_POP_CAP, lineagePopCap);
             row.putInt(K_LINEAGE_MEMBER_TOTAL, lineageMembers);
-            row.putInt(K_LINEAGE_POOL_TOTAL, lineagePoolTotal);
             row.putInt(K_LOCAL_RESERVE_TOTAL, (int) lineageLocalReserves);
             row.putInt(K_LOADED_MEMBER_TOTAL, (int) lineageLoadedMembers);
             row.putInt(K_LOCATION_FACTION_MEMBER_COUNT, (int) lineageLocationMembers);
@@ -589,8 +568,6 @@ public final class HiveInspectionSnapshot {
         tag.putLong(K_AGG_LOADED_MEMBERS, aggLoadedMembers);
         tag.putLong(K_AGG_LOCATION_MEMBERS, aggLocationMembers);
         tag.putLong(K_AGG_LINEAGE_MEMBERS, aggLineageMembers);
-        tag.putLong(K_AGG_LINEAGE_POOLS, aggLineagePools);
-        tag.putLong(K_AGG_VARIANT_POOLS, data.variantPoolsByDimension().values().stream().mapToInt(EntityReserves::getCount).sum());
         tag.putLong(K_AGG_CONVOYS, aggConvoys);
         tag.putLong(K_AGG_CONVOY_MEMBERS, aggConvoyMembers);
         tag.putLong(K_AGG_CLAIMED_CHUNKS, aggClaimedChunks);
@@ -615,29 +592,6 @@ public final class HiveInspectionSnapshot {
             rows.add(row);
         }
         return rows;
-    }
-
-    private static ListTag variantPoolRows(VariantFactionData data) {
-        var rows = new ListTag();
-        var entries = new ArrayList<>(data.variantPoolsByDimension().entrySet());
-        entries.sort(Comparator.comparing(entry -> entry.getKey().location().toString()));
-        for (var entry : entries) {
-            var reserves = entry.getValue();
-            var row = new CompoundTag();
-            row.putString(K_DIMENSION, entry.getKey().location().toString());
-            row.putInt(K_VALUE, reserves.getCount());
-            row.put(K_RESERVES_BY_TYPE, reserveRows(reserves));
-            rows.add(row);
-        }
-        return rows;
-    }
-
-    private static int variantPoolTotal(VariantFactionData data) {
-        var total = 0;
-        for (var reserves : data.variantPoolsByDimension().values()) {
-            total += reserves.getCount();
-        }
-        return total;
     }
 
     private static ListTag queenMotherRows(VariantFactionData data) {

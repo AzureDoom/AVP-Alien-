@@ -28,11 +28,6 @@ public record HiveConfig(
     // ---------- § 3 Reserves ----------
     long shedGraceTicks,
     long minLineageAgeForShedding,
-    int baseLocalCapPerType,
-    int localCapPerClaimedChunkPerType,
-    int baseLineageCapPerType,
-    int lineageCapPerLocationPerType,
-    int variantPoolCapPerType,
 
     // ---------- § 4 Convoys (common) ----------
     double convoySpeedBlocksPerSecond,
@@ -102,7 +97,6 @@ public record HiveConfig(
     // ---------- § 12 Persistence and performance ----------
     int biomassDirtyThreshold,
     long lastGrowthTickDirtyThreshold,
-    int poolDirtyThreshold,
 
     // ---------- § 13 Population, spawning + jelly economy ----------
     int populationPerChunk,
@@ -140,11 +134,6 @@ public record HiveConfig(
             // § 3 Reserves
             5L * TICKS_PER_MINUTE, // shedGraceTicks: 5 min
             30L * TICKS_PER_MINUTE, // minLineageAgeForShedding: 30 min
-            8, // baseLocalCapPerType
-            2, // localCapPerClaimedChunkPerType
-            32, // baseLineageCapPerType
-            8, // lineageCapPerLocationPerType
-            Integer.MAX_VALUE, // variantPoolCapPerType: effectively uncapped
 
             // § 4 Convoys (common)
             10.0, // convoySpeedBlocksPerSecond
@@ -215,7 +204,6 @@ public record HiveConfig(
             // § 12 Persistence and performance
             10, // biomassDirtyThreshold (±10)
             30L * TICKS_PER_MINUTE, // lastGrowthTickDirtyThreshold (30 min)
-            5, // poolDirtyThreshold (±5)
 
             // § 13 Population, spawning + jelly economy
             8, // populationPerChunk

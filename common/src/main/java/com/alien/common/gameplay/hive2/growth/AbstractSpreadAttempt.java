@@ -37,8 +37,7 @@ import java.util.Random;
  * <p>
  * The candidate position is picked uniformly within the spread zone of one of the lineage's existing locations. We
  * reject if the candidate's chunk is already in any existing location's claimed territory or has been previously
- * decorated. Otherwise: found a new location with bootstrap reserves, decrement the lineage pool by 1 queen if
- * available, and bump {@code lastSpreadTick}.
+ * decorated. Otherwise: found a new location with bootstrap reserves and bump {@code lastSpreadTick}.
  */
 public final class AbstractSpreadAttempt {
 
@@ -96,9 +95,6 @@ public final class AbstractSpreadAttempt {
 
         // Found.
         var locationId = mintAbstractLocation(serverLevel, lineage, lineageId, candidateChunk, currentTick);
-
-        // Decrement queen from pool if available.
-        decrementQueenFromPool(lineage);
 
         lineage.setLastSpreadTick(currentTick);
 
@@ -207,18 +203,4 @@ public final class AbstractSpreadAttempt {
         }
     }
 
-    private static void decrementQueenFromPool(LineageFactionData lineage) {
-        var pool = lineage.lineagePool();
-        for (var type : new ArrayList<>(pool.getAvailableEntityTypes())) {
-            if (isQueenType(type) && pool.getCount(type) > 0) {
-                pool.add(type, -1);
-                return;
-            }
-        }
-        // Else: funded "from the lineage's own breeding capacity" — no pool cost.
-    }
-
-    private static boolean isQueenType(EntityType<?> type) {
-        return type.is(com.alien.common.registry.tag.AlienEntityTypeTags.QUEENS);
-    }
 }

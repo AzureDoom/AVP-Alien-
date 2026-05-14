@@ -2,7 +2,6 @@ package com.alien.common.gameplay.hive2.command;
 
 import com.alien.Alien;
 import com.alien.common.gameplay.hive2.convoy.Convoy;
-import com.alien.common.gameplay.hive2.convoy.InPlacePoolReinforcement;
 import com.alien.common.gameplay.hive2.convoy.MigrationDispatch;
 import com.alien.common.gameplay.hive2.convoy.RaidDispatch;
 import com.alien.common.gameplay.hive2.convoy.ReinforcementDispatcher;
@@ -134,20 +133,6 @@ public final class Hive2DebugCommands {
                     )
             )
             .then(
-                Commands.literal("inspect_lineage_pool")
-                    .then(
-                        Commands.argument(LINEAGE_ID_ARG, ResourceLocationArgument.id())
-                            .executes(Hive2DebugCommands::inspectLineagePool)
-                    )
-            )
-            .then(
-                Commands.literal("inspect_variant_pool")
-                    .then(
-                        Commands.argument(VARIANT_ARG, StringArgumentType.string())
-                            .executes(Hive2DebugCommands::inspectVariantPool)
-                    )
-            )
-            .then(
                 Commands.literal("force_shed_check_nearby")
                     .requires(CommandSourceStack::isPlayer)
                     .executes(Hive2DebugCommands::forceShedCheckNearby)
@@ -186,16 +171,6 @@ public final class Hive2DebugCommands {
                     .then(
                         Commands.argument(LINEAGE_ID_ARG, ResourceLocationArgument.id())
                             .executes(Hive2DebugCommands::inspectKillAttribution)
-                    )
-            )
-            .then(
-                Commands.literal("force_inplace_reinforce")
-                    .then(
-                        Commands.argument(LOCATION_ID_ARG, ResourceLocationArgument.id())
-                            .then(
-                                Commands.argument(ENTITY_TYPE_ARG, ResourceLocationArgument.id())
-                                    .executes(Hive2DebugCommands::forceInplaceReinforce)
-                            )
                     )
             )
             .then(
@@ -493,17 +468,24 @@ public final class Hive2DebugCommands {
         }
 
         var entityType = BuiltInRegistries.ENTITY_TYPE.get(entityTypeId);
-        var overflow = location.localReserves().tryAdd(entityType, count);
+        if (!location.localReserves().tryAdd(entityType, count)) {
+            ctx.getSource()
+                .sendFailure(
+                    Component.literal(
+                        "Reserve add rejected: " + entityTypeId + " does not match " + locationId + "'s variant"
+                    )
+                );
+            return 0;
+        }
 
         ctx.getSource()
             .sendSuccess(
                 () -> Component.literal(
-                    "Added " + (count - overflow) + " of " + entityTypeId
-                        + " to " + locationId + " (overflow discarded: " + overflow + ")"
+                    "Added " + count + " of " + entityTypeId + " to " + locationId
                 ),
                 true
             );
-        return count - overflow;
+        return count;
     }
 
     private static int mintLineageAtPlayer(
@@ -675,7 +657,7 @@ public final class Hive2DebugCommands {
                     () -> Component.literal(
                         "  data.variant=" + variantData.variant()
                             + " ageInTicks=" + variantData.ageInTicks()
-                            + " variantPools=" + variantData.variantPoolsByDimension().size()
+                            + " queenMothers=" + variantData.queenMotherIdsByDimension().size()
                     ),
                     false
                 );
@@ -768,87 +750,6 @@ public final class Hive2DebugCommands {
                 true
             );
         return joined;
-    }
-
-    private static int inspectLineagePool(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
-        var lineageFactionId = ResourceLocationArgument.getId(ctx, LINEAGE_ID_ARG);
-        var faction = Alien.MOD.factions().get(lineageFactionId);
-
-        if (faction == null || !(faction.data() instanceof LineageFactionData lineage)) {
-            ctx.getSource().sendFailure(Component.literal("No lineage with id " + lineageFactionId));
-            return 0;
-        }
-
-        var pool = lineage.lineagePool().getBackingMap();
-        ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    "Lineage " + lineageFactionId + " pool has " + lineage.lineagePool().getCount() + " total entries:"
-                ),
-                false
-            );
-
-        if (pool.isEmpty()) {
-            ctx.getSource().sendSuccess(() -> Component.literal("  (empty)"), false);
-        } else {
-            for (var entry : pool.entrySet()) {
-                var typeId = BuiltInRegistries.ENTITY_TYPE.getKey(entry.getKey());
-                ctx.getSource()
-                    .sendSuccess(() -> Component.literal("  " + typeId + " = " + entry.getValue()), false);
-            }
-        }
-
-        return pool.size();
-    }
-
-    private static int inspectVariantPool(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
-        var variantName = StringArgumentType.getString(ctx, VARIANT_ARG).toUpperCase(Locale.ROOT);
-        AlienVariant variant;
-
-        try {
-            variant = AlienVariant.valueOf(variantName);
-        } catch (IllegalArgumentException ignored) {
-            ctx.getSource().sendFailure(Component.literal("Unknown variant: " + variantName));
-            return 0;
-        }
-
-        var factionId = VariantIds.of(variant);
-        var faction = Alien.MOD.factions().get(factionId);
-
-        if (faction == null || !(faction.data() instanceof VariantFactionData variantData)) {
-            ctx.getSource().sendFailure(Component.literal("Variant faction does not exist yet: " + factionId));
-            return 0;
-        }
-
-        ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal("Variant " + variant + " pools by dimension:"),
-                false
-            );
-
-        if (variantData.variantPoolsByDimension().isEmpty()) {
-            ctx.getSource().sendSuccess(() -> Component.literal("  (no pools yet)"), false);
-            return 0;
-        }
-
-        var totalEntries = 0;
-        for (var entry : variantData.variantPoolsByDimension().entrySet()) {
-            var dim = entry.getKey().location();
-            var pool = entry.getValue();
-            ctx.getSource()
-                .sendSuccess(
-                    () -> Component.literal("  " + dim + " (total " + pool.getCount() + "):"),
-                    false
-                );
-            for (var poolEntry : pool.getBackingMap().entrySet()) {
-                var typeId = BuiltInRegistries.ENTITY_TYPE.getKey(poolEntry.getKey());
-                ctx.getSource()
-                    .sendSuccess(() -> Component.literal("    " + typeId + " = " + poolEntry.getValue()), false);
-                totalEntries++;
-            }
-        }
-
-        return totalEntries;
     }
 
     private static int forceShedCheckNearby(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
@@ -1125,47 +1026,6 @@ public final class Hive2DebugCommands {
                 true
             );
         return 1;
-    }
-
-    private static int forceInplaceReinforce(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
-        var locationId = ResourceLocationArgument.getId(ctx, LOCATION_ID_ARG);
-        var entityTypeId = ResourceLocationArgument.getId(ctx, ENTITY_TYPE_ARG);
-
-        var location = HiveLocationRegistry.INSTANCE.get(HiveLocationId.of(locationId));
-        if (location == null) {
-            ctx.getSource().sendFailure(Component.literal("No hive location with id " + locationId));
-            return 0;
-        }
-
-        var faction = Alien.MOD.factions().get(location.lineageFactionId());
-        if (faction == null || !(faction.data() instanceof LineageFactionData lineage)) {
-            ctx.getSource().sendFailure(Component.literal("Lineage missing for " + locationId));
-            return 0;
-        }
-
-        if (!BuiltInRegistries.ENTITY_TYPE.containsKey(entityTypeId)) {
-            ctx.getSource().sendFailure(Component.literal("No entity type with id " + entityTypeId));
-            return 0;
-        }
-
-        var serverLevel = ctx.getSource().getServer().getLevel(location.dimension());
-        if (serverLevel == null) {
-            ctx.getSource().sendFailure(Component.literal("Dimension not loaded: " + location.dimension().location()));
-            return 0;
-        }
-
-        var entityType = BuiltInRegistries.ENTITY_TYPE.get(entityTypeId);
-        var ok = InPlacePoolReinforcement.tryReinforce(serverLevel, location, lineage, entityType);
-        ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    ok
-                        ? "In-place pool reinforcement spawned " + entityTypeId + " at " + locationId
-                        : "In-place pool reinforcement refused (no empress, no pool, or spawn failed)"
-                ),
-                true
-            );
-        return ok ? 1 : 0;
     }
 
     private static int forceMigration(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {

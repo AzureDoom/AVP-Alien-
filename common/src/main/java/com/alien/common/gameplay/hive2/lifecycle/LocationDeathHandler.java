@@ -6,19 +6,15 @@ import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.gameplay.hive2.location.HiveLocationRemovalReason;
-import com.alien.common.gameplay.hive2.location.HivePoolCascade;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 /**
- * Full {@link HiveLocation} death cascade. Per {@code HIVE_REDESIGN_03_LOCATIONS.md} § 10:
+ * Full {@link HiveLocation} death handling. Per {@code HIVE_REDESIGN_03_LOCATIONS.md} § 10:
  * <ul>
- * <li>Local reserves overflow into the lineage pool with cascade to the variant pool per
- * {@code HIVE_REDESIGN_05_RESERVES.md} § 6.</li>
  * <li>Fires the {@link AlienAdvancements#KILL_A_HIVE} advancement to nearby players, but only when the death was
  * player-caused.</li>
  * <li>Releases every claimed chunk through BLib's territory manager.</li>
@@ -66,18 +62,15 @@ public final class LocationDeathHandler {
         HiveLocationRemovalReason reason,
         boolean fireAdvancement
     ) {
-        // 1. Drain local reserves into the lineage pool with cascade (overflow → variant pool).
-        drainReservesToCascade(location, lineage);
-
-        // 2. Fire advancement BEFORE we release chunks so the territory check still works.
+        // 1. Fire advancement BEFORE we release chunks so the territory check still works.
         if (fireAdvancement) {
             fireKillAHiveAdvancement(level, location);
         }
 
-        // 3. Release every claimed chunk via BLib + reset local indexes (LocationRemovalHelper handles BLib release).
+        // 2. Release every claimed chunk via BLib + reset local indexes (LocationRemovalHelper handles BLib release).
         LocationRemovalHelper.remove(level, location, lineage, reason);
 
-        // 4. Drop the per-location BLib faction. Members of this faction lose location-tier membership but stay in
+        // 3. Drop the per-location BLib faction. Members of this faction lose location-tier membership but stay in
         // the parent lineage (no eviction-on-load — loading state should not affect lineage membership).
         Alien.MOD.factions().remove(location.id().value());
 
@@ -88,20 +81,6 @@ public final class LocationDeathHandler {
             location.lineageFactionId(),
             lineage.locationsById().size()
         );
-    }
-
-    private static void drainReservesToCascade(HiveLocation location, LineageFactionData lineage) {
-        var reserves = location.localReserves();
-        for (var type : new ArrayList<>(reserves.getAvailableEntityTypes())) {
-            var count = reserves.getCount(type);
-            if (count <= 0) {
-                continue;
-            }
-            // Pull all out of the location and push to lineage with cascade. We deliberately bypass
-            // addToLocationCascading because we're killing the location.
-            reserves.underlying().add(type, -count);
-            HivePoolCascade.addToLineageCascading(lineage, type, count);
-        }
     }
 
     private static void fireKillAHiveAdvancement(ServerLevel level, HiveLocation location) {

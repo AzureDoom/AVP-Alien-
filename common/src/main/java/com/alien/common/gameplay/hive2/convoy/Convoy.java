@@ -19,8 +19,8 @@ import java.util.UUID;
  * <p>
  * Common semantics across all subtypes:
  * <ul>
- * <li>{@link #composition} — the EntityReserves bag of "who's in the convoy." Decrements on combat losses (Phase 8b
- * manifestation), refunds via cascade on disband (mostly Phase 8b).</li>
+ * <li>{@link #composition} — the EntityReserves bag of "who's in the convoy." Decrements on combat losses and refunds
+ * to a live hive location on disband when possible.</li>
  * <li>{@link #currentPos} — the abstract Vec3 position. Updated every tick by {@link ConvoyTravel}.</li>
  * <li>{@link #dispatchedTick} — when the convoy was first minted; used by raid expiry (Phase 8b) and just informational
  * for reinforcement.</li>
@@ -45,7 +45,7 @@ public sealed interface Convoy {
     /**
      * Sister-to-sister rebalancing. The default convoy type. Source has surplus reserves; destination is low. The
      * empress dispatches; the convoy travels through abstract space; on arrival, composition pours into the
-     * destination's local reserves with overflow cascading to the lineage pool.
+     * destination's local reserves.
      * <p>
      * See {@code HIVE_REDESIGN_06_CONVOYS.md} § 4.
      */

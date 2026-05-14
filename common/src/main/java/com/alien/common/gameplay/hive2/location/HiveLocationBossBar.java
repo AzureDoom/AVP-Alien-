@@ -105,8 +105,7 @@ public final class HiveLocationBossBar {
         var loadedHere = countMatchingLoadedMembers(XENOMORPH_PREDICATE);
         var inReserves = location.localReserves().getCountMatching(XENOMORPH_PREDICATE);
 
-        // Reference `lineage` to satisfy the param contract — Phase 4+ may need
-        // pool-aware adjustments here.
+        // Reference `lineage` to satisfy the param contract; future lineage-level display rules may use it.
         if (lineage == null) {
             return 0;
         }

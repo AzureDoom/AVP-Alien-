@@ -4,7 +4,7 @@ import com.alien.common.model.alien.variant.AlienVariant;
 
 /**
  * Path-style faction display names: {@code xenos/{variant}/lin{N}/loc{M}}. Numbers are monotonic per parent (variant
- * counts lineages; lineage counts locations) — dead lineages/locations don't return their numbers to the pool, so the
+ * counts lineages; lineage counts locations) — dead lineages/locations don't return their numbers to the sequence, so the
  * path is stable for the lifetime of the faction.
  */
 public final class FactionNaming {

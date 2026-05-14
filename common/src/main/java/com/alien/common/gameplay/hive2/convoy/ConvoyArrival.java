@@ -3,9 +3,10 @@ package com.alien.common.gameplay.hive2.convoy;
 import com.alien.Alien;
 import com.alien.common.gameplay.hive2.config.HiveConfig;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
+import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
-import com.alien.common.gameplay.hive2.location.HivePoolCascade;
 import com.alien.common.gameplay.hive2.spawning.ReserveSpawnUtil;
+import com.blib.api.common.entity.v1.EntityReserves;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.MobSpawnType;
@@ -14,8 +15,7 @@ import net.minecraft.world.entity.MobSpawnType;
  * Detects when a convoy has reached its destination and applies the arrival effect.
  * <p>
  * For {@link Convoy.Reinforcement}: pours the entire {@code composition} into the destination location's
- * {@link com.alien.common.gameplay.hive2.location.HiveLocationReserves} via {@link HivePoolCascade} (overflow cascades
- * up to the lineage pool, then variant pool — see {@code HIVE_REDESIGN_05_RESERVES.md} § 6).
+ * {@link com.alien.common.gameplay.hive2.location.HiveLocationReserves}.
  * <p>
  * {@link #checkArrival} returns {@code true} when the arrival fires; the caller should remove the convoy from the
  * lineage's convoy list at that point.
@@ -31,7 +31,7 @@ public final class ConvoyArrival {
         }
 
         if (convoy instanceof Convoy.Reinforcement reinforcement) {
-            arriveReinforcement(reinforcement, lineage);
+            arriveReinforcement(reinforcement);
             return true;
         }
 
@@ -41,7 +41,7 @@ public final class ConvoyArrival {
         }
 
         if (convoy instanceof Convoy.Raid raid) {
-            arriveRaid(server, raid, lineage);
+            arriveRaid(server, raid);
             return true;
         }
 
@@ -49,32 +49,24 @@ public final class ConvoyArrival {
         return true;
     }
 
-    private static void arriveReinforcement(Convoy.Reinforcement reinforcement, LineageFactionData lineage) {
+    private static void arriveReinforcement(Convoy.Reinforcement reinforcement) {
         var destinationLocation = HiveLocationRegistry.INSTANCE.get(reinforcement.destinationLocationId());
 
         if (destinationLocation == null) {
-            // Destination died mid-flight. Per HIVE_REDESIGN_06_CONVOYS.md § 8, refund the abstract
-            // composition into the lineage pool with cascade.
             Alien.LOGGER.info(
-                "Convoy {} arrived but destination location {} is gone — refunding composition to lineage pool",
+                "Convoy {} arrived but destination location {} is gone — refunding composition to source location",
                 reinforcement.id(),
                 reinforcement.destinationLocationId()
             );
-            for (var entityType : reinforcement.composition().getAvailableEntityTypes()) {
-                var count = reinforcement.composition().getCount(entityType);
-                HivePoolCascade.addToLineageCascading(lineage, entityType, count);
-            }
+            refundToLocation(
+                HiveLocationRegistry.INSTANCE.get(reinforcement.sourceLocationId()),
+                reinforcement.composition(),
+                reinforcement.id().toString()
+            );
             return;
         }
 
-        // Pour each type into the destination's local reserves with cascade.
-        for (var entityType : reinforcement.composition().getAvailableEntityTypes()) {
-            var count = reinforcement.composition().getCount(entityType);
-            if (count <= 0) {
-                continue;
-            }
-            HivePoolCascade.addToLocationCascading(destinationLocation, lineage, entityType, count);
-        }
+        addCompositionToLocation(destinationLocation, reinforcement.composition());
 
         Alien.LOGGER.info(
             "Convoy {} arrived at location {} (lineage {}); composition poured into reserves",
@@ -88,29 +80,16 @@ public final class ConvoyArrival {
         var destination = HiveLocationRegistry.INSTANCE.get(migration.destinationLocationId());
 
         if (destination == null) {
-            // Destination died mid-flight. Per HIVE_REDESIGN_06_CONVOYS.md § 8: if migration carries the empress,
-            // she becomes a forager (Phase 9 will handle the actual respawn). For Phase 8b, refund composition
-            // and biomass to the lineage pool / discard biomass.
             Alien.LOGGER.info(
-                "Migration {} arrived but destination location {} is gone — refunding composition to lineage pool",
+                "Migration {} arrived but destination location {} is gone — refunding composition to nearest surviving location",
                 migration.id(),
                 migration.destinationLocationId()
             );
-            for (var entityType : migration.composition().getAvailableEntityTypes()) {
-                var count = migration.composition().getCount(entityType);
-                HivePoolCascade.addToLineageCascading(lineage, entityType, count);
-            }
+            refundToLocation(nearestAliveLocation(lineage, migration), migration.composition(), migration.id().toString());
             return;
         }
 
-        // Pour composition into destination reserves.
-        for (var entityType : migration.composition().getAvailableEntityTypes()) {
-            var count = migration.composition().getCount(entityType);
-            if (count <= 0) {
-                continue;
-            }
-            HivePoolCascade.addToLocationCascading(destination, lineage, entityType, count);
-        }
+        addCompositionToLocation(destination, migration.composition());
 
         // Add biomass payload (capped at biomass cap by the location's setter).
         if (migration.biomassPayload() > 0) {
@@ -140,18 +119,15 @@ public final class ConvoyArrival {
      * entities at the convoy's current position so the player has something to fight. Composition is emptied — these
      * members are now in the world (combat losses are real losses; survivors despawn naturally).
      */
-    private static void arriveRaid(MinecraftServer server, Convoy.Raid raid, LineageFactionData lineage) {
+    private static void arriveRaid(MinecraftServer server, Convoy.Raid raid) {
         var serverLevel = server.getLevel(raid.dimension());
         if (serverLevel == null) {
             Alien.LOGGER.info(
-                "Raid {} arrived but destination dimension {} is unloaded — refunding composition to lineage pool",
+                "Raid {} arrived but destination dimension {} is unloaded — refunding composition to source location",
                 raid.id(),
                 raid.dimension().location()
             );
-            for (var entityType : raid.composition().getAvailableEntityTypes()) {
-                var count = raid.composition().getCount(entityType);
-                HivePoolCascade.addToLineageCascading(lineage, entityType, count);
-            }
+            refundToLocation(HiveLocationRegistry.INSTANCE.get(raid.sourceLocationId()), raid.composition(), raid.id().toString());
             return;
         }
 
@@ -182,5 +158,45 @@ public final class ConvoyArrival {
             spawnedCount,
             raid.targetPlayerId()
         );
+    }
+
+    private static void addCompositionToLocation(HiveLocation location, EntityReserves composition) {
+        for (var entityType : composition.getAvailableEntityTypes()) {
+            var count = composition.getCount(entityType);
+            if (count <= 0) {
+                continue;
+            }
+            location.localReserves().tryAdd(entityType, count);
+        }
+    }
+
+    private static void refundToLocation(HiveLocation location, EntityReserves composition, String convoyId) {
+        if (location == null || !location.isAlive()) {
+            Alien.LOGGER.warn(
+                "Hive2: convoy {} could not refund {} member(s) because no live hive location was available",
+                convoyId,
+                composition.getCount()
+            );
+            return;
+        }
+        addCompositionToLocation(location, composition);
+    }
+
+    private static HiveLocation nearestAliveLocation(LineageFactionData lineage, Convoy convoy) {
+        HiveLocation best = null;
+        var bestDistance = Double.MAX_VALUE;
+        for (var location : lineage.locationsById().values()) {
+            if (!location.isAlive()) {
+                continue;
+            }
+            var dx = location.centerPos().getX() - convoy.currentPos().x;
+            var dz = location.centerPos().getZ() - convoy.currentPos().z;
+            var distance = dx * dx + dz * dz;
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                best = location;
+            }
+        }
+        return best;
     }
 }

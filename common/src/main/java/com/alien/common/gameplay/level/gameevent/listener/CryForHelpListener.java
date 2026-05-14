@@ -1,10 +1,7 @@
 package com.alien.common.gameplay.level.gameevent.listener;
 
-import com.alien.Alien;
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.block.entity.resin.vent.ResinVentBlockEntity;
-import com.alien.common.gameplay.hive2.convoy.InPlacePoolReinforcement;
-import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.spawning.ReserveSpawnUtil;
 import com.alien.common.registry.tag.AlienBlockTags;
@@ -27,8 +24,7 @@ import java.util.List;
 
 /**
  * Reacts to a xenomorph's "cry for help" game event by summoning a defender at a vent. In hive2 the responding hive is
- * the {@link HiveLocation} bound to the vent's chunk; defender supply comes from the location's local reserves first,
- * with empress-gated {@link InPlacePoolReinforcement} as a fallback when the local reserves can't satisfy the request.
+ * the {@link HiveLocation} bound to the vent's chunk; defender supply comes from the location's local reserves.
  */
 public class CryForHelpListener implements GameEventListener {
 
@@ -107,11 +103,6 @@ public class CryForHelpListener implements GameEventListener {
             return false;
         }
 
-        var lineageFaction = Alien.MOD.factions().get(location.lineageFactionId());
-        if (lineageFaction == null || !(lineageFaction.data() instanceof LineageFactionData lineage)) {
-            return false;
-        }
-
         var basePos = vent.getBlockPos();
         var freeSpaces = BlockPosUtil.getNeighborsMatching(serverLevel, basePos, blockState -> blockState.is(AlienBlockTags.RESIN_WEBS));
 
@@ -123,22 +114,18 @@ public class CryForHelpListener implements GameEventListener {
             return false;
         }
 
-        // Pick a defender type from the location's local reserves first; pool-fallback (empress-gated) below.
+        // Pick a defender type from the location's local reserves.
         var localReserveTypes = location.localReserves()
             .getAvailableEntityTypes()
             .stream()
             .filter(type -> type.is(AlienEntityTypeTags.ANSWERS_XENOMORPH_CRIES_FOR_HELP))
             .toList();
 
-        if (!localReserveTypes.isEmpty()) {
-            var spawnedFromReserves = trySpawnFromReserves(serverLevel, location, sourceEntity, spawnPos, localReserveTypes, vent);
-            if (spawnedFromReserves) {
-                return true;
-            }
+        if (localReserveTypes.isEmpty()) {
+            return false;
         }
 
-        // Fallback: try empress-gated pool reinforcement directly into the vent's spawn pos.
-        return tryPoolFallback(serverLevel, location, lineage, sourceEntity, spawnPos, vent);
+        return trySpawnFromReserves(serverLevel, location, sourceEntity, spawnPos, localReserveTypes, vent);
     }
 
     private static boolean trySpawnFromReserves(
@@ -163,51 +150,6 @@ public class CryForHelpListener implements GameEventListener {
         location.localReserves().trySpawn(randomType);
         vent.getAlienSpawnCooldown().reset();
         retargetIfPossible(sourceEntity, summoned);
-        return true;
-    }
-
-    private static boolean tryPoolFallback(
-        ServerLevel level,
-        HiveLocation location,
-        LineageFactionData lineage,
-        Entity sourceEntity,
-        BlockPos spawnPos,
-        ResinVentBlockEntity vent
-    ) {
-        if (lineage.empressId() == null) {
-            return false;
-        }
-
-        var poolTypes = lineage.lineagePool()
-            .getAvailableEntityTypes()
-            .stream()
-            .filter(type -> type.is(AlienEntityTypeTags.ANSWERS_XENOMORPH_CRIES_FOR_HELP))
-            .toList();
-        if (poolTypes.isEmpty()) {
-            return false;
-        }
-
-        var randomType = poolTypes.get(sourceEntity.getRandom().nextInt(poolTypes.size()));
-        // We can't use InPlacePoolReinforcement directly because it spawns at location.centerPos(); we want the
-        // vent's spawnPos. Inline the equivalent.
-        if (lineage.lineagePool().getCount(randomType) <= 0) {
-            return false;
-        }
-        var summoned = randomType.spawn(level, spawnPos, MobSpawnType.MOB_SUMMONED);
-        if (summoned == null) {
-            return false;
-        }
-
-        ReserveSpawnUtil.markSpawnedFromReserves(summoned);
-        lineage.lineagePool().add(randomType, -1);
-        lineage.markDirty();
-        vent.getAlienSpawnCooldown().reset();
-        retargetIfPossible(sourceEntity, summoned);
-
-        // Reference InPlacePoolReinforcement so the doc-pointer in the class header stays valid for IDE Find Usages.
-        @SuppressWarnings("unused")
-        var ref = InPlacePoolReinforcement.class;
-
         return true;
     }
 

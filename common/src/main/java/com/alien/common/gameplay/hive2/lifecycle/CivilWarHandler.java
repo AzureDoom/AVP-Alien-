@@ -29,9 +29,7 @@ import java.util.Map;
  * The dead lineage is removed; each location is reparented to a fresh single-location lineage; members are partitioned
  * by which location's claimed chunks they currently sit in (or become foragers if outside any claimed territory);
  * convoys are partitioned per {@code HIVE_REDESIGN_06_CONVOYS.md} § 8 (each member of a convoy follows the rules for
- * its own type, the convoy itself disbands and refunds its composition into the closest successor lineage's pool).
- * <p>
- * Lineage pool is split equally; remainder goes to the oldest location's successor.
+ * its own type, the convoy itself disbands and refunds its composition into the closest successor location's reserves).
  * <p>
  * Per {@code HIVE_REDESIGN_02_FACTION_LIFECYCLES.md} § 3.
  */
@@ -76,8 +74,7 @@ public final class CivilWarHandler {
             return List.of();
         }
 
-        // Sort locations by ageInTicks descending so the oldest location is at index 0 — its successor gets the
-        // pool remainder per § 3 step 2 last-bullet.
+        // Sort locations by ageInTicks descending so successor order is stable.
         locations.sort((a, b) -> Long.compare(b.ageInTicks(), a.ageInTicks()));
 
         // 1. Mint one successor lineage per location (faction id, faction record, and parented to same variant).
@@ -205,14 +202,11 @@ public final class CivilWarHandler {
             // Else: outside any claimed chunk → forager. No-op (already removed above).
         }
 
-        // 4. Partition the lineage pool equally among successors, remainder goes to the oldest-location successor.
-        partitionLineagePool(deadLineage, successorDataById, locations.get(0).id(), successorByLocation);
-
-        // 5. Partition convoys per HIVE_REDESIGN_06_CONVOYS.md § 8 (civil war row): convoys disband where they are;
+        // 4. Partition convoys per HIVE_REDESIGN_06_CONVOYS.md § 8 (civil war row): convoys disband where they are;
         // their composition splits among successors keyed by closest successor location to the convoy's currentPos.
         partitionConvoys(deadLineage, locations, successorDataById, successorByLocation);
 
-        // 6. Mark the dead lineage with the civil-war removal reason and remove from BLib.
+        // 5. Mark the dead lineage with the civil-war removal reason and remove from BLib.
         var successorIdSet = new LinkedHashSet<>(successorIds);
         deadLineage.setRemovalReason(new LineageRemovalReason.CivilWar(successorIdSet));
         deadLineage.setPendingCivilWar(false);
@@ -282,44 +276,6 @@ public final class CivilWarHandler {
         return null;
     }
 
-    private static void partitionLineagePool(
-        LineageFactionData deadLineage,
-        Map<ResourceLocation, LineageFactionData> successorDataById,
-        HiveLocationId oldestLocationId,
-        Map<HiveLocationId, ResourceLocation> successorByLocation
-    ) {
-        var n = successorDataById.size();
-        if (n == 0) {
-            return;
-        }
-
-        var pool = deadLineage.lineagePool();
-        var oldestSuccessorId = successorByLocation.get(oldestLocationId);
-
-        for (var type : new ArrayList<>(pool.getAvailableEntityTypes())) {
-            var total = pool.getCount(type);
-            if (total <= 0) {
-                continue;
-            }
-
-            var perSuccessor = total / n;
-            var remainder = total - (perSuccessor * n);
-
-            for (var entry : successorDataById.entrySet()) {
-                var slice = perSuccessor;
-                if (entry.getKey().equals(oldestSuccessorId)) {
-                    slice += remainder;
-                }
-                if (slice > 0) {
-                    entry.getValue().tryAddToLineagePool(type, slice);
-                }
-            }
-
-            // Drain from the dead pool so we don't double-count if anyone reads it later.
-            pool.add(type, -total);
-        }
-    }
-
     private static void partitionConvoys(
         LineageFactionData deadLineage,
         List<HiveLocation> locations,
@@ -336,17 +292,15 @@ public final class CivilWarHandler {
             if (successorId == null) {
                 continue;
             }
-            var successorData = successorDataById.get(successorId);
-            if (successorData == null) {
+            if (!successorDataById.containsKey(successorId)) {
                 continue;
             }
 
-            // Refund composition into the successor's pool. Manifested entities become foragers — but Phase 11
-            // doesn't manifest convoys to begin with, so this is the only step needed.
+            // Refund composition into the nearest successor location's reserves.
             for (var type : new ArrayList<>(convoy.composition().getAvailableEntityTypes())) {
                 var count = convoy.composition().getCount(type);
                 if (count > 0) {
-                    successorData.tryAddToLineagePool(type, count);
+                    nearestLocation.localReserves().tryAdd(type, count);
                     convoy.composition().add(type, -count);
                 }
             }
