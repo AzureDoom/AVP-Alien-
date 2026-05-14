@@ -13,20 +13,19 @@ import java.util.ArrayList;
 /**
  * Per-tick jelly production. For each location:
  * <ul>
- * <li>{@code royalJellyAccumulator += loaded queen count}. At
+ * <li>{@code royalJellyAccumulator += queen count}. At
  * {@link com.alien.common.gameplay.hive2.config.HiveConfig#royalJellyTicksPerProduction()}, grant +1 royal jelly.</li>
- * <li>{@code queenScourgeAccumulator += loaded queen count}. At
+ * <li>{@code queenScourgeAccumulator += queen count}. At
  * {@link com.alien.common.gameplay.hive2.config.HiveConfig#scourgeJellyTicksPerQueenProduction()}, grant +1 scourge
  * jelly.</li>
- * <li>{@code harbingerScourgeAccumulator += loaded harbinger count}. At
+ * <li>{@code harbingerScourgeAccumulator += harbinger count}. At
  * {@link com.alien.common.gameplay.hive2.config.HiveConfig#scourgeJellyTicksPerHarbingerProduction()}, grant +1
  * scourge.</li>
  * </ul>
  * Grants are capped by claimed chunk count; overflow is discarded (the accumulator is still subtracted so the same
  * tick budget isn't re-banked into the next minute).
  * <p>
- * Unloaded producers don't contribute — only what's in {@code loadedMembersByType} this tick. Matches the project's
- * no-throttling / observed-only stance for instant economy effects.
+ * Producers in local reserves contribute too; reserves represent fully-grown unloaded xenomorphs.
  */
 public final class JellyProduction {
 
@@ -56,8 +55,8 @@ public final class JellyProduction {
         HiveLocation location,
         com.alien.common.gameplay.hive2.config.HiveConfig config
     ) {
-        var queenCount = countLoadedTagged(location, AlienEntityTypeTags.QUEENS);
-        var harbingerCount = countLoadedTagged(location, AlienEntityTypeTags.HARBINGERS);
+        var queenCount = countTaggedProducers(location, AlienEntityTypeTags.QUEENS);
+        var harbingerCount = countTaggedProducers(location, AlienEntityTypeTags.HARBINGERS);
 
         if (queenCount > 0) {
             var nextRoyal = location.royalJellyAccumulator() + queenCount;
@@ -88,13 +87,14 @@ public final class JellyProduction {
         }
     }
 
-    private static int countLoadedTagged(HiveLocation location, net.minecraft.tags.TagKey<net.minecraft.world.entity.EntityType<?>> tag) {
+    private static int countTaggedProducers(HiveLocation location, net.minecraft.tags.TagKey<net.minecraft.world.entity.EntityType<?>> tag) {
         var count = 0;
         for (var entry : location.loadedMembersByType().entrySet()) {
             if (entry.getKey().is(tag)) {
                 count += entry.getValue().size();
             }
         }
+        count += location.localReserves().getCountMatching(type -> type.is(tag));
         return count;
     }
 
