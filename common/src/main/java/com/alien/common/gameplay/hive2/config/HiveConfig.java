@@ -107,7 +107,15 @@ public record HiveConfig(
     // ---------- § 12 Persistence and performance ----------
     int biomassDirtyThreshold,
     long lastGrowthTickDirtyThreshold,
-    int poolDirtyThreshold
+    int poolDirtyThreshold,
+
+    // ---------- § 13 Population + jelly economy ----------
+    int populationPerChunk,
+    long royalJellyTicksPerProduction,
+    long scourgeJellyTicksPerQueenProduction,
+    long scourgeJellyTicksPerHarbingerProduction,
+    int royalJellyCap,
+    int scourgeJellyCap
 ) {
 
     private static final int TICKS_PER_SECOND = 20;
@@ -195,7 +203,7 @@ public record HiveConfig(
             10000, // maxChunksPerLineage
             16, // maxLineagesPerDimensionPerVariant
             64, // maxClaimsPerScan (enough to complete a 7x7 ring boundary in one scan, so partial fills
-            //                       align with ring boundaries instead of breaking mid-ring)
+            // align with ring boundaries instead of breaking mid-ring)
             24L * TICKS_PER_HOUR, // resinFullDensityTicks
 
             // § 11 Biomass
@@ -214,7 +222,15 @@ public record HiveConfig(
             // § 12 Persistence and performance
             10, // biomassDirtyThreshold (±10)
             30L * TICKS_PER_MINUTE, // lastGrowthTickDirtyThreshold (30 min)
-            5 // poolDirtyThreshold (±5)
+            5, // poolDirtyThreshold (±5)
+
+            // § 13 Population + jelly economy
+            8, // populationPerChunk
+            TICKS_PER_MINUTE, // royalJellyTicksPerProduction (1 game-min per queen)
+            100L * TICKS_PER_MINUTE, // scourgeJellyTicksPerQueenProduction (100 game-min per queen)
+            TICKS_PER_MINUTE, // scourgeJellyTicksPerHarbingerProduction (1 game-min per harbinger)
+            64, // royalJellyCap per location
+            16 // scourgeJellyCap per location
         );
     }
 }

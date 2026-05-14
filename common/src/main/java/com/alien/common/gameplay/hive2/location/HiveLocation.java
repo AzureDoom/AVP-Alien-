@@ -68,6 +68,16 @@ public final class HiveLocation {
 
     private static final String NBT_BIOMASS = "Biomass";
 
+    private static final String NBT_ROYAL_JELLY = "RoyalJelly";
+
+    private static final String NBT_SCOURGE_JELLY = "ScourgeJelly";
+
+    private static final String NBT_ROYAL_JELLY_ACCUMULATOR = "RoyalJellyAccumulator";
+
+    private static final String NBT_QUEEN_SCOURGE_ACCUMULATOR = "QueenScourgeAccumulator";
+
+    private static final String NBT_HARBINGER_SCOURGE_ACCUMULATOR = "HarbingerScourgeAccumulator";
+
     private static final String NBT_CLAIMED_CHUNKS = "ClaimedChunks";
 
     private static final String NBT_CHUNK_CLAIM_TICKS = "ChunkClaimTicks";
@@ -134,6 +144,29 @@ public final class HiveLocation {
 
     private int biomass;
 
+    /** Refined resource produced by queens (1/min). Used by hive recipes to upgrade castes. */
+    private int royalJelly;
+
+    /** Rare resource produced by queens (1/100min) and harbingers (1/min). Powers high-tier caste recipes. */
+    private int scourgeJelly;
+
+    /**
+     * Tick accumulator: incremented once per loaded queen per tick. At {@code royalJellyTicksPerProduction}, +1 royal.
+     */
+    private long royalJellyAccumulator;
+
+    /**
+     * Tick accumulator: incremented once per loaded queen per tick. At {@code scourgeJellyTicksPerQueenProduction}, +1
+     * scourge.
+     */
+    private long queenScourgeAccumulator;
+
+    /**
+     * Tick accumulator: incremented once per loaded harbinger per tick. At
+     * {@code scourgeJellyTicksPerHarbingerProduction}, +1 scourge.
+     */
+    private long harbingerScourgeAccumulator;
+
     private final Set<ChunkPos> claimedChunks;
 
     private final Map<ChunkPos, Long> chunkClaimTicks;
@@ -182,6 +215,11 @@ public final class HiveLocation {
         this.queenlessMaturationLastAdvanceTick = Long.MIN_VALUE;
         this.queenlessLeaderSnapshot = null;
         this.biomass = 0;
+        this.royalJelly = 0;
+        this.scourgeJelly = 0;
+        this.royalJellyAccumulator = 0L;
+        this.queenScourgeAccumulator = 0L;
+        this.harbingerScourgeAccumulator = 0L;
         this.claimedChunks = new LinkedHashSet<>();
         this.chunkClaimTicks = new HashMap<>();
         this.decoratedChunks = new HashSet<>();
@@ -304,6 +342,46 @@ public final class HiveLocation {
         this.biomass = Math.max(0, biomass);
     }
 
+    public int royalJelly() {
+        return royalJelly;
+    }
+
+    public void setRoyalJelly(int royalJelly) {
+        this.royalJelly = Math.max(0, royalJelly);
+    }
+
+    public int scourgeJelly() {
+        return scourgeJelly;
+    }
+
+    public void setScourgeJelly(int scourgeJelly) {
+        this.scourgeJelly = Math.max(0, scourgeJelly);
+    }
+
+    public long royalJellyAccumulator() {
+        return royalJellyAccumulator;
+    }
+
+    public void setRoyalJellyAccumulator(long value) {
+        this.royalJellyAccumulator = Math.max(0L, value);
+    }
+
+    public long queenScourgeAccumulator() {
+        return queenScourgeAccumulator;
+    }
+
+    public void setQueenScourgeAccumulator(long value) {
+        this.queenScourgeAccumulator = Math.max(0L, value);
+    }
+
+    public long harbingerScourgeAccumulator() {
+        return harbingerScourgeAccumulator;
+    }
+
+    public void setHarbingerScourgeAccumulator(long value) {
+        this.harbingerScourgeAccumulator = Math.max(0L, value);
+    }
+
     public Set<ChunkPos> claimedChunks() {
         return claimedChunks;
     }
@@ -410,6 +488,21 @@ public final class HiveLocation {
             tag.putUUID(NBT_QUEENLESS_LEADER_SNAPSHOT, queenlessLeaderSnapshot);
         }
         tag.putInt(NBT_BIOMASS, biomass);
+        if (royalJelly > 0) {
+            tag.putInt(NBT_ROYAL_JELLY, royalJelly);
+        }
+        if (scourgeJelly > 0) {
+            tag.putInt(NBT_SCOURGE_JELLY, scourgeJelly);
+        }
+        if (royalJellyAccumulator > 0L) {
+            tag.putLong(NBT_ROYAL_JELLY_ACCUMULATOR, royalJellyAccumulator);
+        }
+        if (queenScourgeAccumulator > 0L) {
+            tag.putLong(NBT_QUEEN_SCOURGE_ACCUMULATOR, queenScourgeAccumulator);
+        }
+        if (harbingerScourgeAccumulator > 0L) {
+            tag.putLong(NBT_HARBINGER_SCOURGE_ACCUMULATOR, harbingerScourgeAccumulator);
+        }
 
         var claimedTag = new ListTag();
         var claimTicksTag = new ListTag();
@@ -489,6 +582,11 @@ public final class HiveLocation {
             ? tag.getUUID(NBT_QUEENLESS_LEADER_SNAPSHOT)
             : null;
         location.biomass = Math.max(0, tag.getInt(NBT_BIOMASS));
+        location.royalJelly = Math.max(0, tag.getInt(NBT_ROYAL_JELLY));
+        location.scourgeJelly = Math.max(0, tag.getInt(NBT_SCOURGE_JELLY));
+        location.royalJellyAccumulator = Math.max(0L, tag.getLong(NBT_ROYAL_JELLY_ACCUMULATOR));
+        location.queenScourgeAccumulator = Math.max(0L, tag.getLong(NBT_QUEEN_SCOURGE_ACCUMULATOR));
+        location.harbingerScourgeAccumulator = Math.max(0L, tag.getLong(NBT_HARBINGER_SCOURGE_ACCUMULATOR));
 
         if (tag.contains(NBT_CLAIMED_CHUNKS)) {
             var claimedTag = tag.getList(NBT_CLAIMED_CHUNKS, Tag.TAG_COMPOUND);
