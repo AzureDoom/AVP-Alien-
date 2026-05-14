@@ -500,6 +500,7 @@ public final class Hive2DebugCommands {
         }
 
         FactionAesthetics.applyDefaults(lineageFaction, variant, FactionAesthetics.Tier.LINEAGE);
+        lineageData.setFactionId(lineageId);
 
         lineageData.setVariant(variant);
         lineageData.setParentVariantFactionId(variantFaction.id());
@@ -565,6 +566,10 @@ public final class Hive2DebugCommands {
 
         var locationFaction = Alien.MOD.factions().getOrCreate(locationId.value(), AlienFactionDataTypes.LOCATION);
         FactionAesthetics.applyDefaults(locationFaction, lineageData.variant(), FactionAesthetics.Tier.LOCATION);
+        var locationData = locationFaction.data();
+        if (locationData != null) {
+            locationData.setLocationId(locationId);
+        }
 
         ctx.getSource()
             .sendSuccess(

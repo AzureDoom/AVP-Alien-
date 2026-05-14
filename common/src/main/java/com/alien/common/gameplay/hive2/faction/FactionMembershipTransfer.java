@@ -1,11 +1,16 @@
 package com.alien.common.gameplay.hive2.faction;
 
 import com.alien.Alien;
+import com.alien.common.gameplay.hive2.id.HiveLocationId;
 import com.alien.common.gameplay.hive2.id.HiveLocationIds;
 import com.alien.common.gameplay.hive2.id.LineageIds;
+import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
+import com.alien.common.model.alien.variant.AlienVariant;
+import com.blib.api.common.faction.v1.Faction;
 import com.blib.api.common.faction.v1.FactionMember;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -45,15 +50,44 @@ public final class FactionMembershipTransfer {
         return snapshot;
     }
 
-    /** Adds {@code newEntity} to every faction in the snapshot it isn't already a member of. */
+    /**
+     * Adds {@code newEntity} to every faction in the snapshot it isn't already a member of, skipping any whose variant
+     * doesn't match the new entity's. Variant mismatch is expected on the {@code transitionIntoVariant} path (drone →
+     * irradiated drone): the old lineage's variant no longer applies to the new entity, so its membership must be
+     * dropped on the floor.
+     */
     public static void apply(Set<ResourceLocation> snapshot, Entity newEntity) {
         var factions = Alien.MOD.factions();
         var member = FactionMember.entity(newEntity);
         for (var factionId : snapshot) {
             var faction = factions.get(factionId);
-            if (faction != null && !faction.membership().hasMember(member)) {
-                faction.membership().addEntity(newEntity);
+            if (faction == null || faction.membership().hasMember(member)) {
+                continue;
+            }
+
+            var factionVariant = variantOfFaction(faction);
+            if (factionVariant != null && !FactionVariantPolicy.variantMatches(newEntity, factionVariant)) {
+                continue;
+            }
+
+            faction.membership().addEntity(newEntity);
+        }
+    }
+
+    private static @Nullable AlienVariant variantOfFaction(Faction<?> faction) {
+        if (faction.data() instanceof LineageFactionData lineage) {
+            return lineage.variant();
+        }
+        if (HiveLocationIds.isHiveLocationId(faction.id())) {
+            var location = HiveLocationRegistry.INSTANCE.get(HiveLocationId.of(faction.id()));
+            if (location == null) {
+                return null;
+            }
+            var parent = Alien.MOD.factions().get(location.lineageFactionId());
+            if (parent != null && parent.data() instanceof LineageFactionData parentLineage) {
+                return parentLineage.variant();
             }
         }
+        return null;
     }
 }

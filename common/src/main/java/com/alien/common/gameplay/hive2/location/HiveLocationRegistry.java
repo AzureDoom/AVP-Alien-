@@ -281,6 +281,11 @@ public final class HiveLocationRegistry {
                 continue;
             }
 
+            // Backfill the own-faction-id so reactive variant guards work on saves that predate the field.
+            if (lineageData.factionId() == null) {
+                lineageData.setFactionId(factionId);
+            }
+
             var locations = lineageData.locationsById();
             Alien.LOGGER.info(
                 "HiveLocationRegistry rebuild: lineage {} has {} nested locations to register",
@@ -291,6 +296,19 @@ public final class HiveLocationRegistry {
             for (var location : locations.values()) {
                 register(location);
                 locationCount++;
+
+                // Backfill the location-faction's own location-id (for the reactive variant + lineage-membership
+                // guard in LocationFactionData.onMemberAdded).
+                var locationFactionId = location.id().value();
+                var locationFaction = Alien.MOD.factions().get(locationFactionId);
+                if (
+                    locationFaction != null && locationFaction
+                        .data() instanceof com.alien.common.gameplay.hive2.faction.LocationFactionData locationData
+                ) {
+                    if (locationData.locationId() == null) {
+                        locationData.setLocationId(location.id());
+                    }
+                }
             }
         }
 

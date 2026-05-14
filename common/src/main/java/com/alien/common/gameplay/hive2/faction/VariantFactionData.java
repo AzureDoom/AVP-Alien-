@@ -1,14 +1,17 @@
 package com.alien.common.gameplay.hive2.faction;
 
 import com.alien.Alien;
+import com.alien.common.gameplay.hive2.id.VariantIds;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.blib.api.common.codec.v1.BLibCodecs;
 import com.blib.api.common.entity.v1.EntityReserves;
 import com.blib.api.common.faction.v1.FactionData;
+import com.blib.api.common.faction.v1.FactionMember;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 
@@ -59,6 +62,24 @@ public class VariantFactionData extends FactionData {
         this.ageInTicks = 0L;
         this.queenMotherIdsByDimension = new HashMap<>();
         this.variantPoolsByDimension = new HashMap<>();
+    }
+
+    @Override
+    public void onMemberAdded(FactionMember member, Entity entity) {
+        if (FactionVariantPolicy.variantMatches(entity, variant)) {
+            return;
+        }
+        Alien.LOGGER.warn(
+            "Hive2: evicting variant-mismatched member {} (type={}) from variant faction {} (variant={})",
+            entity.getUUID(),
+            entity.getType(),
+            VariantIds.of(variant),
+            variant
+        );
+        var faction = Alien.MOD.factions().get(VariantIds.of(variant));
+        if (faction != null) {
+            faction.membership().removeMember(member);
+        }
     }
 
     public AlienVariant variant() {

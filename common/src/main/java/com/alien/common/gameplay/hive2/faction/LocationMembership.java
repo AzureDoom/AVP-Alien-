@@ -21,14 +21,36 @@ public final class LocationMembership {
 
     /**
      * Idempotent join: ensures the entity is a member of the location's parent lineage faction, then of the location
-     * faction itself. Lineage first to maintain the subset invariant.
+     * faction itself. Lineage first to maintain the subset invariant. Refuses the join if the entity's variant doesn't
+     * match the parent lineage's variant — see {@link FactionVariantPolicy}.
      */
     public static void join(HiveLocation location, Entity entity) {
         var factions = Alien.MOD.factions();
         var member = FactionMember.entity(entity);
 
         var lineageFaction = factions.get(location.lineageFactionId());
-        if (lineageFaction != null && !lineageFaction.membership().hasMember(member)) {
+        if (lineageFaction == null || !(lineageFaction.data() instanceof LineageFactionData lineage)) {
+            Alien.LOGGER.warn(
+                "Hive2: LocationMembership.join — lineage faction {} missing for location {}; refusing to add {}",
+                location.lineageFactionId(),
+                location.id(),
+                entity.getUUID()
+            );
+            return;
+        }
+
+        if (!FactionVariantPolicy.variantMatches(entity, lineage.variant())) {
+            Alien.LOGGER.debug(
+                "Hive2: LocationMembership.join — variant mismatch: entity {} (type={}) doesn't match lineage {} variant {}; skipping",
+                entity.getUUID(),
+                entity.getType(),
+                location.lineageFactionId(),
+                lineage.variant()
+            );
+            return;
+        }
+
+        if (!lineageFaction.membership().hasMember(member)) {
             lineageFaction.membership().addEntity(entity);
         }
 

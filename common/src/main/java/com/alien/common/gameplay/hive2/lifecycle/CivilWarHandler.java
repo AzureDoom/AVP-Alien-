@@ -99,6 +99,7 @@ public final class CivilWarHandler {
                 deadLineage.variant(),
                 com.alien.common.gameplay.hive2.faction.FactionAesthetics.Tier.LINEAGE
             );
+            successorData.setFactionId(successorId);
 
             successorData.setVariant(deadLineage.variant());
             successorData.setParentVariantFactionId(deadLineage.parentVariantFactionId());

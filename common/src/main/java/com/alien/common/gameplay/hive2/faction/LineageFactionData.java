@@ -48,6 +48,8 @@ public class LineageFactionData extends FactionData {
 
     private static final String NBT_VARIANT_ID = "VariantId";
 
+    private static final String NBT_FACTION_ID = "FactionId";
+
     private static final String NBT_PARENT_VARIANT_FACTION_ID = "ParentVariantFactionId";
 
     private static final String NBT_DIMENSION = "Dimension";
@@ -77,6 +79,11 @@ public class LineageFactionData extends FactionData {
     private static final AlienVariant DEFAULT_VARIANT = AlienVariant.NORMAL;
 
     private AlienVariant variant;
+
+    /**
+     * Own BLib faction id. Set right after the faction is minted so onMemberAdded reactive guards can evict mismatches.
+     */
+    private @Nullable ResourceLocation factionId;
 
     private @Nullable ResourceLocation parentVariantFactionId;
 
@@ -121,6 +128,7 @@ public class LineageFactionData extends FactionData {
 
     public LineageFactionData() {
         this.variant = DEFAULT_VARIANT;
+        this.factionId = null;
         this.parentVariantFactionId = null;
         this.dimension = Level.OVERWORLD;
         this.founderId = null;
@@ -144,7 +152,25 @@ public class LineageFactionData extends FactionData {
 
     @Override
     public void onMemberAdded(FactionMember member, Entity entity) {
-        // Phase 9 will validate variant match here and reject mismatched members.
+        // Reactive variant guard: lineage factions accept only members of their own variant. Reject mismatches
+        // immediately by removing them. (Proactive guards in LocationMembership.join and
+        // FactionMembershipTransfer.apply catch the common paths; this is defense-in-depth for direct addEntity calls
+        // — civil war partition, queenless maturation, debug commands, etc.)
+        if (!FactionVariantPolicy.variantMatches(entity, variant) && factionId != null) {
+            Alien.LOGGER.warn(
+                "Hive2: evicting variant-mismatched member {} (type={}) from lineage {} (variant={})",
+                entity.getUUID(),
+                entity.getType(),
+                factionId,
+                variant
+            );
+            var faction = Alien.MOD.factions().get(factionId);
+            if (faction != null) {
+                faction.membership().removeMember(member);
+            }
+            return;
+        }
+
         // The entity is, by virtue of being passed here, currently loaded, so route it
         // into the per-location loadedMembersByType immediately — BLib does not fire
         // onMemberLoaded for entities that were already loaded when added.
@@ -231,6 +257,15 @@ public class LineageFactionData extends FactionData {
 
     public void setVariant(AlienVariant variant) {
         this.variant = variant;
+        markDirty();
+    }
+
+    public @Nullable ResourceLocation factionId() {
+        return factionId;
+    }
+
+    public void setFactionId(ResourceLocation factionId) {
+        this.factionId = factionId;
         markDirty();
     }
 
@@ -412,6 +447,10 @@ public class LineageFactionData extends FactionData {
             this.variant = AlienVariant.getById(tag.getByte(NBT_VARIANT_ID)).unwrapOr(DEFAULT_VARIANT);
         }
 
+        if (tag.contains(NBT_FACTION_ID)) {
+            this.factionId = ResourceLocation.parse(tag.getString(NBT_FACTION_ID));
+        }
+
         if (tag.contains(NBT_PARENT_VARIANT_FACTION_ID)) {
             this.parentVariantFactionId = ResourceLocation.parse(tag.getString(NBT_PARENT_VARIANT_FACTION_ID));
         }
@@ -479,6 +518,10 @@ public class LineageFactionData extends FactionData {
     @Override
     public void save(CompoundTag tag) {
         tag.putByte(NBT_VARIANT_ID, (byte) variant.getId());
+
+        if (factionId != null) {
+            tag.putString(NBT_FACTION_ID, factionId.toString());
+        }
 
         if (parentVariantFactionId != null) {
             tag.putString(NBT_PARENT_VARIANT_FACTION_ID, parentVariantFactionId.toString());
