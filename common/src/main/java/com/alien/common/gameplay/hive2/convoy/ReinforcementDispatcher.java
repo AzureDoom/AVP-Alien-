@@ -47,7 +47,7 @@ public final class ReinforcementDispatcher {
         var currentTick = server.overworld().getGameTime();
         var config = HiveLocationRegistry.INSTANCE.config();
 
-        for (var factionId : Alien.MOD.factions().getAllIds()) {
+        for (var factionId : new ArrayList<>(Alien.MOD.factions().getAllIds())) {
             if (!LineageIds.isLineageId(factionId)) {
                 continue;
             }

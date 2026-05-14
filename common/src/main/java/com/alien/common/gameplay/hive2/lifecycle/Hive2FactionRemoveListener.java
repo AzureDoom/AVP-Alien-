@@ -36,7 +36,7 @@ public final class Hive2FactionRemoveListener {
 
         // 2. Sweep adjacency timers in every other lineage.
         var sweptCount = 0;
-        for (var otherId : Alien.MOD.factions().getAllIds()) {
+        for (var otherId : new java.util.ArrayList<>(Alien.MOD.factions().getAllIds())) {
             if (!LineageIds.isLineageId(otherId) || otherId.equals(factionId)) {
                 continue;
             }

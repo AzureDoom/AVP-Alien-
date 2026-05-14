@@ -42,7 +42,7 @@ public final class LineageAbsorptionTask {
 
         // 1. Group all live lineages by (variant, dimension).
         var bucket = new HashMap<BucketKey, List<LineageInfo>>();
-        for (var factionId : Alien.MOD.factions().getAllIds()) {
+        for (var factionId : new ArrayList<>(Alien.MOD.factions().getAllIds())) {
             if (!LineageIds.isLineageId(factionId)) {
                 continue;
             }

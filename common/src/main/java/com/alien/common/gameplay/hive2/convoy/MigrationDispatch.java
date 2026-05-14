@@ -37,7 +37,8 @@ public final class MigrationDispatch {
         var currentTick = server.overworld().getGameTime();
         var config = HiveLocationRegistry.INSTANCE.config();
 
-        for (var factionId : Alien.MOD.factions().getAllIds()) {
+        // Snapshot faction ids because dispatch removes the source location's location-faction.
+        for (var factionId : new java.util.ArrayList<>(Alien.MOD.factions().getAllIds())) {
             if (!LineageIds.isLineageId(factionId)) {
                 continue;
             }

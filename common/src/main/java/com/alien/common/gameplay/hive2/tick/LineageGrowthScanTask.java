@@ -23,7 +23,8 @@ public final class LineageGrowthScanTask {
     public static void run(MinecraftServer server) {
         var currentTick = server.overworld().getGameTime();
 
-        for (var factionId : Alien.MOD.factions().getAllIds()) {
+        // Abstract spread can mint location factions, so do not iterate BLib's live id view.
+        for (var factionId : new java.util.ArrayList<>(Alien.MOD.factions().getAllIds())) {
             if (!LineageIds.isLineageId(factionId)) {
                 continue;
             }
@@ -38,7 +39,7 @@ public final class LineageGrowthScanTask {
                 continue;
             }
 
-            for (var location : lineage.locationsById().values()) {
+            for (var location : new java.util.ArrayList<>(lineage.locationsById().values())) {
                 if (!location.isAlive()) {
                     continue;
                 }

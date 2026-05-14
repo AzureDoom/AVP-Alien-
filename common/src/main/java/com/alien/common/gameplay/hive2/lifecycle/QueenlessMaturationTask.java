@@ -46,7 +46,7 @@ public final class QueenlessMaturationTask {
         var currentTick = server.overworld().getGameTime();
         var stageInterval = HiveLocationRegistry.INSTANCE.config().protoHiveStageInterval();
 
-        for (var factionId : Alien.MOD.factions().getAllIds()) {
+        for (var factionId : new java.util.ArrayList<>(Alien.MOD.factions().getAllIds())) {
             if (!LineageIds.isLineageId(factionId)) {
                 continue;
             }
@@ -63,7 +63,7 @@ public final class QueenlessMaturationTask {
                 continue;
             }
 
-            for (var location : lineage.locationsById().values()) {
+            for (var location : new java.util.ArrayList<>(lineage.locationsById().values())) {
                 if (!location.isAlive()) {
                     continue;
                 }
@@ -86,7 +86,7 @@ public final class QueenlessMaturationTask {
             return 0;
         }
         var advanced = 0;
-        for (var location : lineage.locationsById().values()) {
+        for (var location : new java.util.ArrayList<>(lineage.locationsById().values())) {
             if (!location.isAlive()) {
                 continue;
             }

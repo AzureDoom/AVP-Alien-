@@ -241,7 +241,7 @@ public final class CivilWarHandler {
      */
     public static void scanAndHandle(MinecraftServer server) {
         var pendingIds = new ArrayList<ResourceLocation>();
-        for (var factionId : Alien.MOD.factions().getAllIds()) {
+        for (var factionId : new ArrayList<>(Alien.MOD.factions().getAllIds())) {
             if (!LineageIds.isLineageId(factionId)) {
                 continue;
             }
@@ -274,12 +274,6 @@ public final class CivilWarHandler {
             // the byLineage entry under the new id.
             HiveLocationRegistry.INSTANCE.unregister(location.id());
             HiveLocationRegistry.INSTANCE.register(location);
-        }
-        // Drop the orphan entry for the dead lineage if it lingers.
-        // (HiveLocationRegistry doesn't expose direct byLineage access; the unregister loop above clears it
-        // for each removed entry, and an empty set would have been dropped by unregister's internal cleanup.)
-        if (Alien.LOGGER.isDebugEnabled()) {
-            Alien.LOGGER.debug("Hive2: civil war reindexed {} locations from dead lineage {}", locations.size(), deadLineageId);
         }
     }
 

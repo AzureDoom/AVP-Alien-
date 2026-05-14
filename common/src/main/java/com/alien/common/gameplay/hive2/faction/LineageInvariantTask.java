@@ -63,7 +63,7 @@ public final class LineageInvariantTask {
     }
 
     private static void scanVariantInvariants() {
-        for (var factionId : Alien.MOD.factions().getAllIds()) {
+        for (var factionId : new ArrayList<>(Alien.MOD.factions().getAllIds())) {
             if (!LineageIds.isLineageId(factionId)) {
                 continue;
             }
@@ -83,7 +83,7 @@ public final class LineageInvariantTask {
         var mismatchedUuids = new HashSet<UUID>();
         var removedReserveEntries = 0;
 
-        for (var location : lineage.locationsById().values()) {
+        for (var location : new ArrayList<>(lineage.locationsById().values())) {
             for (var entry : location.loadedMembersByType().entrySet()) {
                 if (FactionVariantPolicy.variantMatches(entry.getKey(), lineageVariant)) {
                     continue;

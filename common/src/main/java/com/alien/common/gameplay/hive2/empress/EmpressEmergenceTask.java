@@ -26,7 +26,7 @@ public final class EmpressEmergenceTask {
     public static void scanAndStart(MinecraftServer server) {
         var currentTick = server.overworld().getGameTime();
 
-        for (var factionId : Alien.MOD.factions().getAllIds()) {
+        for (var factionId : new java.util.ArrayList<>(Alien.MOD.factions().getAllIds())) {
             if (!LineageIds.isLineageId(factionId)) {
                 continue;
             }
