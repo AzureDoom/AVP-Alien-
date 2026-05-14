@@ -45,8 +45,6 @@ import com.alien.client.render.entity.head.EntityHeadDataCache;
 import com.alien.client.render.entity.parasite.attachment.AlienParasiteHeadAttachmentOffsetData;
 import com.alien.client.render.entity.parasite.attachment.ParasiteHeadAttachmentOffsetDataCache;
 import com.alien.client.render.entity.parasite.facehugger.FacehuggerRenderer;
-import com.alien.client.render.item.CrusherHeadRenderers;
-import com.alien.client.render.item.QueenHeadRenderers;
 import com.alien.common.registry.init.AlienBlockEntityTypes;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienParticleTypes;
@@ -370,55 +368,33 @@ public class AlienClient {
     }
 
     private static void registerItemRenderers() {
-        // Wearable trophy variants. Use the trophy factory so they don't get the shield's blocking
-        // transforms — they look like a head being held, not a shield being held.
-        registerQueenHeadTrophyRenderer(AlienItems.QUEEN_HEAD, "queen", "queen_head");
-        registerQueenHeadTrophyRenderer(AlienItems.ABERRANT_QUEEN_HEAD, "aberrant_queen", "aberrant_queen_head");
-        registerQueenHeadTrophyRenderer(AlienItems.IRRADIATED_QUEEN_HEAD, "irradiated_queen", "irradiated_queen_head");
-        registerQueenHeadTrophyRenderer(AlienItems.NETHER_QUEEN_HEAD, "nether_queen", "nether_queen_head");
+        // Queen heads — trophy + shield variants. Trophies have no blocking transforms; the shared
+        // blocking predicate is harmless for them since the renderer short-circuits when there are no
+        // blocking transforms. Shields use the same predicate for actual raise-to-block behavior.
+        registerAsset(AlienItems.QUEEN_HEAD, "queen_head");
+        registerAsset(AlienItems.ABERRANT_QUEEN_HEAD, "aberrant_queen_head");
+        registerAsset(AlienItems.IRRADIATED_QUEEN_HEAD, "irradiated_queen_head");
+        registerAsset(AlienItems.NETHER_QUEEN_HEAD, "nether_queen_head");
 
-        // Shield variants — separate transform set so in-hand shield poses can be tuned independently of
-        // the trophy poses, plus a blocking-transform set for the raised-shield animation.
-        registerQueenHeadShieldRenderer(AlienItems.QUEEN_HEAD_SHIELD, "queen", "queen_head_shield");
-        registerQueenHeadShieldRenderer(AlienItems.ABERRANT_QUEEN_HEAD_SHIELD, "aberrant_queen", "aberrant_queen_head_shield");
-        registerQueenHeadShieldRenderer(AlienItems.IRRADIATED_QUEEN_HEAD_SHIELD, "irradiated_queen", "irradiated_queen_head_shield");
-        registerQueenHeadShieldRenderer(AlienItems.NETHER_QUEEN_HEAD_SHIELD, "nether_queen", "nether_queen_head_shield");
+        registerAsset(AlienItems.QUEEN_HEAD_SHIELD, "queen_head_shield");
+        registerAsset(AlienItems.ABERRANT_QUEEN_HEAD_SHIELD, "aberrant_queen_head_shield");
+        registerAsset(AlienItems.IRRADIATED_QUEEN_HEAD_SHIELD, "irradiated_queen_head_shield");
+        registerAsset(AlienItems.NETHER_QUEEN_HEAD_SHIELD, "nether_queen_head_shield");
 
-        // Crusher head trophies — same factory shape as the queen, sourced from the crusher geo + textures.
-        registerCrusherHeadTrophyRenderer(AlienItems.CRUSHER_HEAD, "crusher", "crusher_head");
-        registerCrusherHeadTrophyRenderer(AlienItems.ABERRANT_CRUSHER_HEAD, "aberrant_crusher", "aberrant_crusher_head");
-        registerCrusherHeadTrophyRenderer(AlienItems.IRRADIATED_CRUSHER_HEAD, "irradiated_crusher", "irradiated_crusher_head");
-        registerCrusherHeadTrophyRenderer(AlienItems.NETHER_CRUSHER_HEAD, "nether_crusher", "nether_crusher_head");
+        // Crusher heads — same shape, sourced from the crusher geo + per-tint textures.
+        registerAsset(AlienItems.CRUSHER_HEAD, "crusher_head");
+        registerAsset(AlienItems.ABERRANT_CRUSHER_HEAD, "aberrant_crusher_head");
+        registerAsset(AlienItems.IRRADIATED_CRUSHER_HEAD, "irradiated_crusher_head");
+        registerAsset(AlienItems.NETHER_CRUSHER_HEAD, "nether_crusher_head");
 
-        // Crusher head shields — independent tuner keys so blocking poses don't share state with the trophy.
-        registerCrusherHeadShieldRenderer(AlienItems.CRUSHER_HEAD_SHIELD, "crusher", "crusher_head_shield");
-        registerCrusherHeadShieldRenderer(AlienItems.ABERRANT_CRUSHER_HEAD_SHIELD, "aberrant_crusher", "aberrant_crusher_head_shield");
-        registerCrusherHeadShieldRenderer(
-            AlienItems.IRRADIATED_CRUSHER_HEAD_SHIELD,
-            "irradiated_crusher",
-            "irradiated_crusher_head_shield"
-        );
-        registerCrusherHeadShieldRenderer(AlienItems.NETHER_CRUSHER_HEAD_SHIELD, "nether_crusher", "nether_crusher_head_shield");
+        registerAsset(AlienItems.CRUSHER_HEAD_SHIELD, "crusher_head_shield");
+        registerAsset(AlienItems.ABERRANT_CRUSHER_HEAD_SHIELD, "aberrant_crusher_head_shield");
+        registerAsset(AlienItems.IRRADIATED_CRUSHER_HEAD_SHIELD, "irradiated_crusher_head_shield");
+        registerAsset(AlienItems.NETHER_CRUSHER_HEAD_SHIELD, "nether_crusher_head_shield");
     }
 
-    private static void registerQueenHeadTrophyRenderer(BLibHolder<Item> holder, String textureEntityName, String itemPath) {
-        var itemId = AlienResources.location(itemPath);
-        MOD.registries().registerItemRenderer(holder, name -> () -> QueenHeadRenderers.createTrophy(itemId, textureEntityName));
-    }
-
-    private static void registerQueenHeadShieldRenderer(BLibHolder<Item> holder, String textureEntityName, String itemPath) {
-        var itemId = AlienResources.location(itemPath);
-        MOD.registries().registerItemRenderer(holder, name -> () -> QueenHeadRenderers.createShield(itemId, textureEntityName));
-    }
-
-    private static void registerCrusherHeadTrophyRenderer(BLibHolder<Item> holder, String textureEntityName, String itemPath) {
-        var itemId = AlienResources.location(itemPath);
-        MOD.registries().registerItemRenderer(holder, name -> () -> CrusherHeadRenderers.createTrophy(itemId, textureEntityName));
-    }
-
-    private static void registerCrusherHeadShieldRenderer(BLibHolder<Item> holder, String textureEntityName, String itemPath) {
-        var itemId = AlienResources.location(itemPath);
-        MOD.registries().registerItemRenderer(holder, name -> () -> CrusherHeadRenderers.createShield(itemId, textureEntityName));
+    private static void registerAsset(BLibHolder<Item> holder, String configPath) {
+        MOD.registries().registerGeoBoneItemRendererFromAsset(holder, AlienResources.location(configPath));
     }
 
     private static void registerBlockEntityRenderers() {

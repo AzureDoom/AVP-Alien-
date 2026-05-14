@@ -1,9 +1,10 @@
 package com.alien.common.gameplay.block.crusher;
 
 /**
- * Identifies which crusher-texture variant a crusher-head block / block-entity uses for rendering. Matches the
- * {@code textures/entity/<entityName>.png} stem the existing {@link com.alien.client.render.item.CrusherHeadRenderers}
- * already references for items, so the block renderer can reuse the same texture resolution path.
+ * Identifies which crusher-texture variant a crusher-head block / block-entity uses for rendering. The
+ * {@link #entityTextureName} maps to {@code textures/entity/<entityName>.png} — the same stem the asset-driven item
+ * renderer configs use under {@code assets/avp_alien/blib/item_renderers/}, so the block renderer can reuse the same
+ * texture resolution path.
  */
 public enum CrusherHeadVariant {
 

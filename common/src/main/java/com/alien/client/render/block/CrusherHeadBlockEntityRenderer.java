@@ -5,7 +5,7 @@ import com.alien.common.gameplay.block.crusher.CrusherHeadVariant;
 import com.alien.common.gameplay.block.crusher.CrusherWallHeadBlock;
 import com.alien.common.gameplay.block.entity.crusher.CrusherHeadBlockEntity;
 import com.alien.common.registry.init.item.AlienItems;
-import com.blib.api.client.render.v1.item.BLibItemTransformOverrides;
+import com.blib.engine.gizmo.BLibItemTransformOverrides;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
