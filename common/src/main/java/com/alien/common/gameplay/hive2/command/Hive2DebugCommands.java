@@ -425,8 +425,10 @@ public final class Hive2DebugCommands {
             .sendSuccess(
                 () -> Component.literal(
                     "  resources: biomass=" + location.biomass()
-                        + ", royalJelly=" + location.royalJelly() + "/" + econConfig.royalJellyCap()
-                        + ", scourgeJelly=" + location.scourgeJelly() + "/" + econConfig.scourgeJellyCap()
+                        + ", royalJelly=" + location.royalJelly() + "/"
+                        + com.alien.common.gameplay.hive2.economy.JellyProduction.royalJellyCap(location)
+                        + ", scourgeJelly=" + location.scourgeJelly() + "/"
+                        + com.alien.common.gameplay.hive2.economy.JellyProduction.scourgeJellyCap(location)
                 ),
                 false
             );

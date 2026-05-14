@@ -110,9 +110,7 @@ public record HiveConfig(
     double minimumPopulationRatioForClaiming,
     long royalJellyTicksPerProduction,
     long scourgeJellyTicksPerQueenProduction,
-    long scourgeJellyTicksPerHarbingerProduction,
-    int royalJellyCap,
-    int scourgeJellyCap
+    long scourgeJellyTicksPerHarbingerProduction
 ) {
 
     private static final int TICKS_PER_SECOND = 20;
@@ -222,9 +220,7 @@ public record HiveConfig(
             0.8, // minimumPopulationRatioForClaiming
             TICKS_PER_MINUTE, // royalJellyTicksPerProduction (1 game-min per queen)
             100L * TICKS_PER_MINUTE, // scourgeJellyTicksPerQueenProduction (100 game-min per queen)
-            TICKS_PER_MINUTE, // scourgeJellyTicksPerHarbingerProduction (1 game-min per harbinger)
-            64, // royalJellyCap per location
-            16 // scourgeJellyCap per location
+            TICKS_PER_MINUTE // scourgeJellyTicksPerHarbingerProduction (1 game-min per harbinger)
         );
     }
 }

@@ -2,6 +2,7 @@ package com.alien.common.gameplay.hive2.inspection;
 
 import com.alien.Alien;
 import com.alien.common.gameplay.hive2.economy.CastePopulation;
+import com.alien.common.gameplay.hive2.economy.JellyProduction;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.faction.VariantFactionData;
 import com.alien.common.gameplay.hive2.growth.BiomassIncome;
@@ -178,11 +179,11 @@ public final class HiveInspectionSnapshot {
         tag.putInt(K_NEXT_CLAIM_COST, BiomassIncome.claimCost(location, config));
 
         tag.putInt(K_ROYAL_JELLY, location.royalJelly());
-        tag.putInt(K_ROYAL_JELLY_CAP, config.royalJellyCap());
+        tag.putInt(K_ROYAL_JELLY_CAP, JellyProduction.royalJellyCap(location));
         tag.putLong(K_ROYAL_JELLY_ACC, location.royalJellyAccumulator());
 
         tag.putInt(K_SCOURGE_JELLY, location.scourgeJelly());
-        tag.putInt(K_SCOURGE_JELLY_CAP, config.scourgeJellyCap());
+        tag.putInt(K_SCOURGE_JELLY_CAP, JellyProduction.scourgeJellyCap(location));
         tag.putLong(K_SCOURGE_QUEEN_ACC, location.queenScourgeAccumulator());
         tag.putLong(K_SCOURGE_HARBINGER_ACC, location.harbingerScourgeAccumulator());
 

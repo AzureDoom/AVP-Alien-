@@ -22,8 +22,8 @@ import java.util.ArrayList;
  * {@link com.alien.common.gameplay.hive2.config.HiveConfig#scourgeJellyTicksPerHarbingerProduction()}, grant +1
  * scourge.</li>
  * </ul>
- * Grants are capped by {@code royalJellyCap} / {@code scourgeJellyCap}; overflow is discarded (the accumulator is still
- * subtracted so the same tick budget isn't re-banked into the next minute).
+ * Grants are capped by claimed chunk count; overflow is discarded (the accumulator is still subtracted so the same
+ * tick budget isn't re-banked into the next minute).
  * <p>
  * Unloaded producers don't contribute — only what's in {@code loadedMembersByType} this tick. Matches the project's
  * no-throttling / observed-only stance for instant economy effects.
@@ -63,7 +63,7 @@ public final class JellyProduction {
             var nextRoyal = location.royalJellyAccumulator() + queenCount;
             var royalThreshold = config.royalJellyTicksPerProduction();
             if (nextRoyal >= royalThreshold) {
-                grantRoyal(location, (int) (nextRoyal / royalThreshold), config.royalJellyCap());
+                grantRoyal(location, (int) (nextRoyal / royalThreshold), royalJellyCap(location));
                 nextRoyal %= royalThreshold;
             }
             location.setRoyalJellyAccumulator(nextRoyal);
@@ -71,7 +71,7 @@ public final class JellyProduction {
             var nextQueenScourge = location.queenScourgeAccumulator() + queenCount;
             var queenScourgeThreshold = config.scourgeJellyTicksPerQueenProduction();
             if (nextQueenScourge >= queenScourgeThreshold) {
-                grantScourge(location, (int) (nextQueenScourge / queenScourgeThreshold), config.scourgeJellyCap());
+                grantScourge(location, (int) (nextQueenScourge / queenScourgeThreshold), scourgeJellyCap(location));
                 nextQueenScourge %= queenScourgeThreshold;
             }
             location.setQueenScourgeAccumulator(nextQueenScourge);
@@ -81,7 +81,7 @@ public final class JellyProduction {
             var nextHarbScourge = location.harbingerScourgeAccumulator() + harbingerCount;
             var harbScourgeThreshold = config.scourgeJellyTicksPerHarbingerProduction();
             if (nextHarbScourge >= harbScourgeThreshold) {
-                grantScourge(location, (int) (nextHarbScourge / harbScourgeThreshold), config.scourgeJellyCap());
+                grantScourge(location, (int) (nextHarbScourge / harbScourgeThreshold), scourgeJellyCap(location));
                 nextHarbScourge %= harbScourgeThreshold;
             }
             location.setHarbingerScourgeAccumulator(nextHarbScourge);
@@ -96,6 +96,14 @@ public final class JellyProduction {
             }
         }
         return count;
+    }
+
+    public static int royalJellyCap(HiveLocation location) {
+        return location.claimedChunks().size();
+    }
+
+    public static int scourgeJellyCap(HiveLocation location) {
+        return location.claimedChunks().size();
     }
 
     private static void grantRoyal(HiveLocation location, int amount, int cap) {
