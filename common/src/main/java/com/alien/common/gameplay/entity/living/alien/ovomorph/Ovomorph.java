@@ -42,7 +42,7 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
 
     public static final HatchState DEFAULT_HATCH_STATE = HatchState.SLEEPING;
 
-    private static final int HOST_VIBRATION_RADIUS = 16;
+    private static final int HOST_VIBRATION_RADIUS = 8;
 
     public static AttributeSupplier.Builder createOvomorphAttributes() {
         return Alien.createAlienAttributes()

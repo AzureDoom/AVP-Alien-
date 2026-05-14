@@ -11,6 +11,8 @@ public class HatchDesireManager {
 
     private static final int MAXIMUM_DESIRE_TO_HATCH = 100;
 
+    private static final int HOST_VIBRATION_DESIRE_MULTIPLIER = 4;
+
     private final Ovomorph ovomorph;
 
     private final DataAccessor<Integer> desireToHatch;
@@ -48,7 +50,7 @@ public class HatchDesireManager {
                 sourceEntity != null && AlienPredicates.isFreeHost(ovomorph, sourceEntity) && ovomorph.getSensing()
                     .hasLineOfSight(sourceEntity)
             ) {
-                var baseDesire = (int) Math.abs(radius - vibrationInfo.distance()) * 2;
+                var baseDesire = (int) Math.abs(radius - vibrationInfo.distance()) * HOST_VIBRATION_DESIRE_MULTIPLIER;
 
                 var level = ovomorph.level();
                 var blockPos = ovomorph.blockPosition();
