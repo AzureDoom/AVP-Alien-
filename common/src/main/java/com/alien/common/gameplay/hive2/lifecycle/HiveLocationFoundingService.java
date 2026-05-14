@@ -2,6 +2,7 @@ package com.alien.common.gameplay.hive2.lifecycle;
 
 import com.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
+import com.alien.common.gameplay.hive2.faction.FactionAesthetics;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.faction.LocationMembership;
 import com.alien.common.gameplay.hive2.faction.VariantFactionRegistry;
@@ -53,6 +54,8 @@ public final class HiveLocationFoundingService {
         if (lineageData == null) {
             throw new IllegalStateException("LineageFactionData was null after getOrCreate for " + lineageId);
         }
+
+        FactionAesthetics.applyDefaults(lineageFaction, variant, FactionAesthetics.Tier.LINEAGE);
 
         lineageData.setVariant(variant);
         lineageData.setParentVariantFactionId(variantFaction.id());
@@ -135,7 +138,12 @@ public final class HiveLocationFoundingService {
 
         // Provision the per-location faction at founding so it exists from t=0; the founder is added by the caller
         // via LocationMembership.join after this returns.
-        Alien.MOD.factions().getOrCreate(locationId.value(), AlienFactionDataTypes.LOCATION);
+        var locationFaction = Alien.MOD.factions().getOrCreate(locationId.value(), AlienFactionDataTypes.LOCATION);
+        FactionAesthetics.applyDefaults(
+            locationFaction,
+            lineageData.variant(),
+            FactionAesthetics.Tier.LOCATION
+        );
 
         return location;
     }

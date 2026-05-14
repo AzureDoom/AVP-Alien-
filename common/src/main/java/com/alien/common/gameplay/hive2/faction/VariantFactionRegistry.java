@@ -16,11 +16,16 @@ public final class VariantFactionRegistry {
 
     public static Faction<VariantFactionData> getOrCreate(AlienVariant variant) {
         var id = VariantIds.of(variant);
+        var preExisting = Alien.MOD.factions().get(id) != null;
         var faction = Alien.MOD.factions().getOrCreate(id, AlienFactionDataTypes.VARIANT);
 
         var data = faction.data();
         if (data != null && data.variant() != variant) {
             data.setVariant(variant);
+        }
+
+        if (!preExisting) {
+            FactionAesthetics.applyDefaults(faction, variant, FactionAesthetics.Tier.VARIANT);
         }
 
         return faction;

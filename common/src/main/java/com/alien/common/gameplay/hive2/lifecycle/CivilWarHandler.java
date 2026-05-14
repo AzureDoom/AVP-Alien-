@@ -94,6 +94,12 @@ public final class CivilWarHandler {
                 continue;
             }
 
+            com.alien.common.gameplay.hive2.faction.FactionAesthetics.applyDefaults(
+                successorFaction,
+                deadLineage.variant(),
+                com.alien.common.gameplay.hive2.faction.FactionAesthetics.Tier.LINEAGE
+            );
+
             successorData.setVariant(deadLineage.variant());
             successorData.setParentVariantFactionId(deadLineage.parentVariantFactionId());
             successorData.setDimension(deadLineage.dimension());

@@ -126,6 +126,12 @@ public final class OldHiveMigrator {
             return null;
         }
 
+        com.alien.common.gameplay.hive2.faction.FactionAesthetics.applyDefaults(
+            lineageFaction,
+            variant,
+            com.alien.common.gameplay.hive2.faction.FactionAesthetics.Tier.LINEAGE
+        );
+
         lineageData.setVariant(variant);
         lineageData.setParentVariantFactionId(variantFaction.id());
         lineageData.setDimension(dimension);
@@ -149,6 +155,13 @@ public final class OldHiveMigrator {
 
         lineageData.addLocation(location);
         HiveLocationRegistry.INSTANCE.register(location);
+
+        var locationFaction = Alien.MOD.factions().getOrCreate(locationId.value(), AlienFactionDataTypes.LOCATION);
+        com.alien.common.gameplay.hive2.faction.FactionAesthetics.applyDefaults(
+            locationFaction,
+            variant,
+            com.alien.common.gameplay.hive2.faction.FactionAesthetics.Tier.LOCATION
+        );
 
         // 4. Transfer membership: every old member becomes a lineage + variant member.
         var memberSnapshot = new ArrayList<>(legacyFaction.membership().getMembers());

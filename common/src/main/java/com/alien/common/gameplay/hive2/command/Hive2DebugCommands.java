@@ -8,6 +8,7 @@ import com.alien.common.gameplay.hive2.convoy.RaidDispatch;
 import com.alien.common.gameplay.hive2.convoy.ReinforcementDispatcher;
 import com.alien.common.gameplay.hive2.empress.EmpressEmergenceRitual;
 import com.alien.common.gameplay.hive2.empress.EmpressEmergenceTask;
+import com.alien.common.gameplay.hive2.faction.FactionAesthetics;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.faction.LineageInvariantTask;
 import com.alien.common.gameplay.hive2.faction.VariantFactionData;
@@ -498,6 +499,8 @@ public final class Hive2DebugCommands {
             return 0;
         }
 
+        FactionAesthetics.applyDefaults(lineageFaction, variant, FactionAesthetics.Tier.LINEAGE);
+
         lineageData.setVariant(variant);
         lineageData.setParentVariantFactionId(variantFaction.id());
         lineageData.setDimension(level.dimension());
@@ -559,6 +562,9 @@ public final class Hive2DebugCommands {
 
         lineageData.addLocation(location);
         HiveLocationRegistry.INSTANCE.register(location);
+
+        var locationFaction = Alien.MOD.factions().getOrCreate(locationId.value(), AlienFactionDataTypes.LOCATION);
+        FactionAesthetics.applyDefaults(locationFaction, lineageData.variant(), FactionAesthetics.Tier.LOCATION);
 
         ctx.getSource()
             .sendSuccess(
