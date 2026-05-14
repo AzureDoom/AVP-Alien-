@@ -153,11 +153,20 @@ public final class CivilWarHandler {
                 continue;
             }
 
-            var successorId = successorForEntity(entity.blockPosition(), locations, successorByLocation);
-            if (successorId != null) {
-                var successorFaction = Alien.MOD.factions().get(successorId);
-                if (successorFaction != null) {
-                    successorFaction.membership().addEntity(entity);
+            var owningLocation = locationContainingChunk(entity.blockPosition(), locations);
+            if (owningLocation != null) {
+                var successorId = successorByLocation.get(owningLocation.id());
+                if (successorId != null) {
+                    var successorFaction = Alien.MOD.factions().get(successorId);
+                    if (successorFaction != null) {
+                        successorFaction.membership().addEntity(entity);
+                    }
+                }
+                // Also assign to the location-tier faction (preserves location ⊆ lineage). The location's
+                // lineageFactionId was already reparented to the successor by rebuildRegistryLineageIndex above.
+                var locationFaction = Alien.MOD.factions().get(owningLocation.id().value());
+                if (locationFaction != null) {
+                    locationFaction.membership().addEntity(entity);
                 }
             }
             // Else: outside any claimed chunk → forager. No-op (already removed above).
@@ -236,15 +245,11 @@ public final class CivilWarHandler {
         }
     }
 
-    private static @Nullable ResourceLocation successorForEntity(
-        BlockPos pos,
-        List<HiveLocation> locations,
-        Map<HiveLocationId, ResourceLocation> successorByLocation
-    ) {
+    private static @Nullable HiveLocation locationContainingChunk(BlockPos pos, List<HiveLocation> locations) {
         var chunk = new ChunkPos(pos);
         for (var location : locations) {
             if (location.claimedChunks().contains(chunk)) {
-                return successorByLocation.get(location.id());
+                return location;
             }
         }
         return null;
