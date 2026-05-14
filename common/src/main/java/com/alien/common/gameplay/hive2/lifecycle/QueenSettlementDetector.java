@@ -12,18 +12,19 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Per-queen settlement timer. Tracks how long each queen has been standing in a single chunk without combat. Returns a
- * {@link BlockPos} when {@link com.alien.common.gameplay.hive2.config.HiveConfig#settlementTicks()} have elapsed since
- * the queen first anchored — at which point the caller should evaluate {@link SpreadZoneCheck} and (if permitted) hand
- * the position to {@link HiveLocationFoundingService}.
+ * Per-queen settlement timer. Tracks how long each queen has been out of combat. Returns a {@link BlockPos} when
+ * {@link com.alien.common.gameplay.hive2.config.HiveConfig#settlementTicks()} have elapsed since she first anchored —
+ * at which point the caller should evaluate {@link SpreadZoneCheck} and (if permitted) hand the position to
+ * {@link HiveLocationFoundingService}.
  * <p>
- * Reset conditions, per {@code HIVE_REDESIGN_02_FACTION_LIFECYCLES.md} § 2 ("without combat") and
- * {@code HIVE_REDESIGN_03_LOCATIONS.md} § 9:
+ * Reset conditions:
  * <ul>
- * <li>Queen moves to a different chunk (anchor re-established).</li>
  * <li>Queen has a target (in combat).</li>
  * <li>Queen took damage in the last few ticks ({@code hurtTime > 0}).</li>
  * </ul>
+ * <p>
+ * Chunk crossings do <em>not</em> reset the timer — wandering during settlement is fine; she founds the hive at
+ * whichever chunk she happens to be in when the timer expires.
  * <p>
  * State is in-memory only — a server stop or world reload starts every queen fresh. That's the design intent;
  * settlements are rare events (60 seconds each) and persistence isn't worth the complexity.
@@ -46,12 +47,14 @@ public final class QueenSettlementDetector {
             return null;
         }
 
-        var currentChunk = new ChunkPos(queen.blockPosition());
         var existing = states.get(uuid);
-
-        if (existing == null || !existing.chunk().equals(currentChunk)) {
-            // First observation, or queen moved — re-anchor.
-            states.put(uuid, new AnchorState(currentChunk, currentGameTime, queen.blockPosition()));
+        if (existing == null) {
+            // First out-of-combat observation — start the timer. The recorded chunk is purely informational
+            // (used in /hive2 inspect_settlement); settlement snaps to wherever she's standing at expiry.
+            states.put(
+                uuid,
+                new AnchorState(new ChunkPos(queen.blockPosition()), currentGameTime, queen.blockPosition())
+            );
             return null;
         }
 
@@ -62,10 +65,11 @@ public final class QueenSettlementDetector {
             return null;
         }
 
-        // Settled. Snap the position to the chunk center at the queen's current Y so the location's
-        // centerPos is reproducible regardless of where exactly within the chunk she stopped.
+        // Settled at the queen's CURRENT chunk — wandering across chunk borders during the settlement window is
+        // allowed. Snap to the chunk's middle for a stable, reproducible centerPos.
+        var settlementChunk = new ChunkPos(queen.blockPosition());
         states.remove(uuid);
-        return existing.chunk().getMiddleBlockPosition(queen.blockPosition().getY());
+        return settlementChunk.getMiddleBlockPosition(queen.blockPosition().getY());
     }
 
     /** Drops the queen's anchor without firing settlement. Use when she dies, despawns, or is otherwise removed. */
