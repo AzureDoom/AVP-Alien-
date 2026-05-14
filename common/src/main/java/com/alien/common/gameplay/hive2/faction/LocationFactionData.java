@@ -14,10 +14,11 @@ import org.jetbrains.annotations.Nullable;
  * Per-{@link com.alien.common.gameplay.hive2.location.HiveLocation} faction. The faction id equals the location's
  * {@link HiveLocationId} ResourceLocation, so {@code factions().get(location.id().value())} returns the right faction.
  * <p>
- * Membership encodes "born here" — aliens spawned from this location's machinery (founder queen, post-transition
- * xenomorphs in claimed chunks, in-place reinforcements, etc.). The whole point of this tier is that BLib's persistent
- * UUID-keyed membership survives chunk unloads, so location death can be keyed off real membership rather than the
- * load-state-sensitive {@code loadedMembersByType} on {@link com.alien.common.gameplay.hive2.location.HiveLocation}.
+ * This tier owns the BLib chunk claims for the location and also tracks "born here" membership — aliens spawned from this
+ * location's machinery (founder queen, post-transition xenomorphs in claimed chunks, in-place reinforcements, etc.).
+ * BLib's persistent UUID-keyed membership survives chunk unloads, so location death can be keyed off real membership
+ * rather than the load-state-sensitive {@code loadedMembersByType} on
+ * {@link com.alien.common.gameplay.hive2.location.HiveLocation}.
  * <p>
  * The {@link #locationId} backref lets the reactive {@link #onMemberAdded(FactionMember, Entity)} guard look up the
  * owning location → parent lineage → variant chain, and reject joins from the wrong variant or from aliens not in the

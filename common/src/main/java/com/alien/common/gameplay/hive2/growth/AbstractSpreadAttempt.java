@@ -4,6 +4,7 @@ import com.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
 import com.alien.common.gameplay.hive2.config.HiveConfig;
+import com.alien.common.gameplay.hive2.faction.HiveLocationFactionProvisioner;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.id.HiveLocationId;
 import com.alien.common.gameplay.hive2.id.HiveLocationIds;
@@ -169,6 +170,8 @@ public final class AbstractSpreadAttempt {
             centerPos,
             null // No founder — minted abstractly without a queen entity.
         );
+        location.setLocationNumber(lineage.allocateLocationNumber());
+        HiveLocationFactionProvisioner.ensure(location, lineage);
 
         claimInitialCore(level, location, candidate, currentTick);
 

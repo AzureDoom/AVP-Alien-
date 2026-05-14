@@ -1,7 +1,10 @@
 package com.alien.common.gameplay.hive2.growth;
 
 import com.alien.Alien;
+import com.alien.common.gameplay.hive2.id.HiveLocationId;
+import com.alien.common.gameplay.hive2.id.HiveLocationIds;
 import com.alien.common.gameplay.hive2.id.LineageIds;
+import com.alien.common.gameplay.hive2.id.VariantIds;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
@@ -18,7 +21,8 @@ import java.util.HashMap;
  * <p>
  * Every {@code contestTickWindow} (default 60 seconds), scans every level's contested chunks via
  * {@code TerritoryManager.getAllContestedChunks(level)}. For each contested chunk, counts the number of loaded
- * xenomorphs in that chunk per claimant lineage; the side with more wins. The losers' claims on that chunk are removed.
+ * xenomorphs in that chunk per claimant location's lineage; the side with more wins. The losers' location claims on
+ * that chunk are removed.
  * <p>
  * If only one xenomorph is present (or zero), the resolution is deferred — no decisive winner. This avoids flipping an
  * empty contested chunk back and forth.
@@ -54,13 +58,23 @@ public final class ContestResolutionTask {
             return;
         }
 
-        // Count xenomorphs per claimant within this chunk.
+        // Count xenomorphs per claimant location within this chunk.
         var counts = new HashMap<ResourceLocation, Integer>();
         for (var claimantId : claimants) {
-            if (!LineageIds.isLineageId(claimantId)) {
+            if (!HiveLocationIds.isHiveLocationId(claimantId)) {
+                if (LineageIds.isLineageId(claimantId) || VariantIds.isVariantId(claimantId)) {
+                    Alien.MOD.territory().removeClaim(level, chunk, claimantId);
+                }
                 continue;
             }
-            counts.put(claimantId, countXenomorphsIn(level, chunk, claimantId));
+
+            var location = HiveLocationRegistry.INSTANCE.get(HiveLocationId.of(claimantId));
+            if (location == null || !location.claimedChunks().contains(chunk)) {
+                Alien.MOD.territory().removeClaim(level, chunk, claimantId);
+                continue;
+            }
+
+            counts.put(claimantId, countXenomorphsIn(level, chunk, location.lineageFactionId()));
         }
 
         if (counts.size() < 2) {
@@ -85,14 +99,13 @@ public final class ContestResolutionTask {
             return;
         }
 
-        // Remove every loser's claim on this chunk. Walk the loser's locations in this dim and find the one that
-        // owns this chunk in claimedChunks; release it via HiveLocationClaims.
+        // Remove every loser's location claim on this chunk.
         for (var entry : counts.entrySet()) {
             var loserId = entry.getKey();
             if (loserId.equals(winner)) {
                 continue;
             }
-            releaseChunkFromLineage(level, loserId, chunk);
+            releaseChunkFromLocation(level, loserId, chunk);
         }
 
         Alien.LOGGER.info(
@@ -129,22 +142,11 @@ public final class ContestResolutionTask {
         return xenomorphCount;
     }
 
-    private static void releaseChunkFromLineage(ServerLevel level, ResourceLocation lineageId, ChunkPos chunk) {
-        // The byChunk index points at one location per chunk — that's the location that "officially" owns the chunk
-        // in the registry. The contest may belong to a different location in the same lineage, so scan all of the
-        // lineage's locations to find which one has this chunk in its claimedChunks.
-        HiveLocation owningLocation = null;
-        for (var locId : HiveLocationRegistry.INSTANCE.byLineage(lineageId)) {
-            var loc = HiveLocationRegistry.INSTANCE.get(locId);
-            if (loc != null && loc.claimedChunks().contains(chunk)) {
-                owningLocation = loc;
-                break;
-            }
-        }
+    private static void releaseChunkFromLocation(ServerLevel level, ResourceLocation locationFactionId, ChunkPos chunk) {
+        HiveLocation owningLocation = HiveLocationRegistry.INSTANCE.get(HiveLocationId.of(locationFactionId));
 
         if (owningLocation == null) {
-            // The contest claim isn't tracked by any of our locations — just remove the BLib claim directly.
-            Alien.MOD.territory().removeClaim(level, chunk, lineageId);
+            Alien.MOD.territory().removeClaim(level, chunk, locationFactionId);
             return;
         }
 

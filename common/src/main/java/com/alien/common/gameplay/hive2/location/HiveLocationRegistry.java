@@ -2,7 +2,9 @@ package com.alien.common.gameplay.hive2.location;
 
 import com.alien.Alien;
 import com.alien.common.gameplay.hive2.config.HiveConfig;
+import com.alien.common.gameplay.hive2.faction.HiveLocationFactionProvisioner;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
+import com.alien.common.gameplay.hive2.growth.HiveLocationClaims;
 import com.alien.common.gameplay.hive2.id.HiveLocationId;
 import com.alien.common.gameplay.hive2.id.HiveLocationIds;
 import com.alien.common.gameplay.hive2.id.LineageIds;
@@ -313,33 +315,7 @@ public final class HiveLocationRegistry {
                 register(location);
                 locationCount++;
 
-                // Backfill the location-faction's own location-id (for the reactive variant + lineage-membership
-                // guard in LocationFactionData.onMemberAdded).
-                var locationFactionId = location.id().value();
-                var locationFaction = Alien.MOD.factions().get(locationFactionId);
-                if (
-                    locationFaction != null && locationFaction
-                        .data() instanceof com.alien.common.gameplay.hive2.faction.LocationFactionData locationData
-                ) {
-                    if (locationData.locationId() == null) {
-                        locationData.setLocationId(location.id());
-                    }
-                }
-
-                // Backfill location path name + monotonic number under this lineage.
-                if (location.locationNumber() < 0) {
-                    var allocated = lineageData.allocateLocationNumber();
-                    location.setLocationNumber(allocated);
-                    if (locationFaction != null) {
-                        locationFaction.setName(
-                            com.alien.common.gameplay.hive2.faction.FactionNaming.forLocation(
-                                lineageData.variant(),
-                                lineageData.lineageNumber(),
-                                allocated
-                            )
-                        );
-                    }
-                }
+                HiveLocationFactionProvisioner.ensure(location, lineageData);
             }
         }
 
@@ -385,6 +361,29 @@ public final class HiveLocationRegistry {
             byLineage.size(),
             orphanLocationFactions
         );
+    }
+
+    public void repairTerritoryClaims(MinecraftServer server) {
+        var reconciledChunks = 0;
+
+        for (var location : byId.values()) {
+            var level = server.getLevel(location.dimension());
+            if (level == null) {
+                continue;
+            }
+
+            for (var chunk : location.claimedChunks()) {
+                HiveLocationClaims.syncTerritoryClaim(level, location, chunk);
+                reconciledChunks++;
+            }
+        }
+
+        if (reconciledChunks > 0) {
+            Alien.LOGGER.info(
+                "HiveLocationRegistry: reconciled {} BLib territory claims under location faction ids",
+                reconciledChunks
+            );
+        }
     }
 
     /**
@@ -510,6 +509,11 @@ public final class HiveLocationRegistry {
         var spatialRepairs = 0;
 
         for (var location : byId.values()) {
+            var lineageFaction = Alien.MOD.factions().get(location.lineageFactionId());
+            if (lineageFaction != null && lineageFaction.data() instanceof LineageFactionData lineageData) {
+                HiveLocationFactionProvisioner.ensure(location, lineageData);
+            }
+
             var byChunkForDim = byChunk.get(location.dimension());
             for (var chunk : location.claimedChunks()) {
                 if (byChunkForDim == null || !location.id().equals(byChunkForDim.get(chunk))) {

@@ -2,6 +2,8 @@ package com.alien.common.gameplay.hive2.growth;
 
 import com.alien.Alien;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
+import com.alien.common.gameplay.hive2.id.LineageIds;
+import com.alien.common.gameplay.hive2.id.VariantIds;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import net.minecraft.server.level.ServerLevel;
@@ -16,7 +18,7 @@ import java.util.HashSet;
  * <ul>
  * <li>Updates the location's {@code claimedChunks} set and {@code chunkClaimTicks} map</li>
  * <li>Calls BLib's {@link com.blib.api.common.mod.v1.model.access.BLibTerritoryAccess} to register the claim under the
- * lineage faction id</li>
+ * location faction id</li>
  * <li>Updates the {@link HiveLocationRegistry} {@code byChunk} index</li>
  * </ul>
  * <p>
@@ -41,7 +43,7 @@ public final class HiveLocationClaims {
         location.chunkClaimTicks().put(chunk, currentTick);
         HiveLocationRegistry.INSTANCE.onChunkClaimed(location, chunk);
 
-        Alien.MOD.territory().addClaim(level, chunk, location.lineageFactionId());
+        syncTerritoryClaim(level, location, chunk);
 
         return true;
     }
@@ -85,13 +87,27 @@ public final class HiveLocationClaims {
         location.chunkClaimTicks().remove(chunk);
         HiveLocationRegistry.INSTANCE.onChunkReleased(location, chunk);
 
-        Alien.MOD.territory().removeClaim(level, chunk, location.lineageFactionId());
+        Alien.MOD.territory().removeClaim(level, chunk, location.id().value());
+        removeNonLocationTierClaims(level, chunk);
 
         if (pruneDisconnected && location.claimedChunks().contains(new ChunkPos(location.centerPos()))) {
             releaseDisconnectedClaims(level, location);
         }
 
         return true;
+    }
+
+    public static void syncTerritoryClaim(ServerLevel level, HiveLocation location, ChunkPos chunk) {
+        removeNonLocationTierClaims(level, chunk);
+        Alien.MOD.territory().addClaim(level, chunk, location.id().value());
+    }
+
+    private static void removeNonLocationTierClaims(ServerLevel level, ChunkPos chunk) {
+        for (var claimantId : new ArrayList<>(Alien.MOD.territory().getClaimants(level, chunk))) {
+            if (LineageIds.isLineageId(claimantId) || VariantIds.isVariantId(claimantId)) {
+                Alien.MOD.territory().removeClaim(level, chunk, claimantId);
+            }
+        }
     }
 
     /**

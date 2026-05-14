@@ -1324,6 +1324,7 @@ public final class Hive2DebugCommands {
 
     private static int rebuildIndexes(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
         HiveLocationRegistry.INSTANCE.rebuildFromFactions();
+        HiveLocationRegistry.INSTANCE.repairTerritoryClaims(ctx.getSource().getServer());
         ctx.getSource()
             .sendSuccess(
                 () -> Component.literal(
@@ -1340,6 +1341,7 @@ public final class Hive2DebugCommands {
 
     private static int validate(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
         HiveLocationRegistry.INSTANCE.validate();
+        HiveLocationRegistry.INSTANCE.repairTerritoryClaims(ctx.getSource().getServer());
         ctx.getSource()
             .sendSuccess(
                 () -> Component.literal(

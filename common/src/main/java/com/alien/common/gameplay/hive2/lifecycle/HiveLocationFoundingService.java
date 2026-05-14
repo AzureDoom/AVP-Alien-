@@ -4,6 +4,7 @@ import com.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
 import com.alien.common.gameplay.hive2.faction.FactionAesthetics;
 import com.alien.common.gameplay.hive2.faction.FactionNaming;
+import com.alien.common.gameplay.hive2.faction.HiveLocationFactionProvisioner;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.faction.LocationMembership;
 import com.alien.common.gameplay.hive2.faction.VariantFactionRegistry;
@@ -146,6 +147,8 @@ public final class HiveLocationFoundingService {
         lineageData.addLocation(location);
         HiveLocationRegistry.INSTANCE.register(location);
 
+        HiveLocationFactionProvisioner.ensure(location, lineageData);
+
         // Claim the initial core through HiveLocationClaims so all three sources of truth (location set,
         // registry byChunk index, BLib territory map) stay synchronized. Direct claimedChunks().add(...)
         // would miss the BLib territory addClaim and leave the core chunks unclaimed in the UI.
@@ -154,22 +157,6 @@ public final class HiveLocationFoundingService {
         } else {
             addInitialCoreOffline(location, centerChunk, currentGameTime);
         }
-
-        // Provision the per-location faction at founding so it exists from t=0; the founder is added by the caller
-        // via LocationMembership.join after this returns.
-        var locationFaction = Alien.MOD.factions().getOrCreate(locationId.value(), AlienFactionDataTypes.LOCATION);
-        FactionAesthetics.applyDefaults(
-            locationFaction,
-            lineageData.variant(),
-            FactionAesthetics.Tier.LOCATION
-        );
-        var locationData = locationFaction.data();
-        if (locationData != null) {
-            locationData.setLocationId(locationId);
-        }
-        locationFaction.setName(
-            FactionNaming.forLocation(lineageData.variant(), lineageData.lineageNumber(), locationNumber)
-        );
 
         return location;
     }

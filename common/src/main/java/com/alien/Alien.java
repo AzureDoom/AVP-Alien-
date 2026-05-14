@@ -141,6 +141,7 @@ public class Alien {
             // structure before the registry rebuilds. Idempotent — does nothing on a clean hive2-only world.
             com.alien.common.gameplay.hive2.migration.OldHiveMigrator.run(server);
             HiveLocationRegistry.INSTANCE.rebuildFromFactions();
+            HiveLocationRegistry.INSTANCE.repairTerritoryClaims(server);
         });
         MOD.events().onServerStopped().register(server -> HiveLocationRegistry.INSTANCE.clear());
 

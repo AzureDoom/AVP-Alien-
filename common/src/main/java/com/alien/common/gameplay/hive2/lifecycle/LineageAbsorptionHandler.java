@@ -19,7 +19,6 @@ import net.minecraft.world.entity.MobSpawnType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.UUID;
 
 /**
@@ -76,7 +75,7 @@ public final class LineageAbsorptionHandler {
         }
 
         // 1. Reparent every location of the weaker to the stronger.
-        transferLocations(serverLevel, weaker, weakerId, stronger, strongerId);
+        transferLocations(weaker, stronger, strongerId);
 
         // 2. Transfer members.
         transferMembers(weakerFaction.membership(), strongerFaction.membership(), serverLevel);
@@ -197,9 +196,7 @@ public final class LineageAbsorptionHandler {
     }
 
     private static void transferLocations(
-        ServerLevel level,
         LineageFactionData weaker,
-        ResourceLocation weakerId,
         LineageFactionData stronger,
         ResourceLocation strongerId
     ) {
@@ -207,10 +204,7 @@ public final class LineageAbsorptionHandler {
         for (var location : locations) {
             // Reparent the record itself.
             location.setLineageFactionId(strongerId);
-            // Transfer every claimed chunk in BLib.
-            for (var chunk : new LinkedHashSet<>(location.claimedChunks())) {
-                Alien.MOD.territory().transferClaim(level, chunk, weakerId, strongerId);
-            }
+            // BLib territory is keyed by location faction id; reparenting the location does not move the claim owner.
             stronger.addLocation(location);
             weaker.removeLocation(location.id());
             // Rebuild registry indexes for this location under the stronger lineage id.

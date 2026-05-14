@@ -3,6 +3,7 @@ package com.alien.common.gameplay.hive2.migration;
 import com.alien.Alien;
 import com.alien.common.gameplay.hive.HiveFactionData;
 import com.alien.common.gameplay.hive.HiveIds;
+import com.alien.common.gameplay.hive2.faction.HiveLocationFactionProvisioner;
 import com.alien.common.gameplay.hive2.faction.VariantFactionRegistry;
 import com.alien.common.gameplay.hive2.id.HiveLocationIds;
 import com.alien.common.gameplay.hive2.id.LineageIds;
@@ -148,6 +149,9 @@ public final class OldHiveMigrator {
         // 2. Mint the first location at the legacy center, claim every chunk within LEGACY_HIVE_RADIUS_CHUNKS.
         var locationId = HiveLocationIds.create();
         var location = new HiveLocation(locationId, lineageId, dimension, centerPos, leaderId);
+        var locationNumber = lineageData.allocateLocationNumber();
+        location.setLocationNumber(locationNumber);
+        HiveLocationFactionProvisioner.ensure(location, lineageData);
 
         var currentTick = server.overworld().getGameTime();
         claimChunksWithinRadius(serverLevel, location, centerPos, currentTick);
@@ -163,27 +167,6 @@ public final class OldHiveMigrator {
 
         lineageData.addLocation(location);
         HiveLocationRegistry.INSTANCE.register(location);
-
-        var locationNumber = lineageData.allocateLocationNumber();
-        location.setLocationNumber(locationNumber);
-
-        var locationFaction = Alien.MOD.factions().getOrCreate(locationId.value(), AlienFactionDataTypes.LOCATION);
-        com.alien.common.gameplay.hive2.faction.FactionAesthetics.applyDefaults(
-            locationFaction,
-            variant,
-            com.alien.common.gameplay.hive2.faction.FactionAesthetics.Tier.LOCATION
-        );
-        var locationData = locationFaction.data();
-        if (locationData != null) {
-            locationData.setLocationId(locationId);
-        }
-        locationFaction.setName(
-            com.alien.common.gameplay.hive2.faction.FactionNaming.forLocation(
-                variant,
-                lineageData.lineageNumber(),
-                locationNumber
-            )
-        );
 
         // 4. Transfer membership: every old member becomes a lineage + variant member.
         var memberSnapshot = new ArrayList<>(legacyFaction.membership().getMembers());

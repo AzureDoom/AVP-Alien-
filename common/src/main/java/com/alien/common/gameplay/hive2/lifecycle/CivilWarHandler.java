@@ -129,7 +129,7 @@ public final class CivilWarHandler {
             successorDataById.put(successorId, successorData);
         }
 
-        // 2. Reparent each location to its successor lineage, then transfer claims from old → new in BLib.
+        // 2. Reparent each location to its successor lineage. BLib claims stay keyed by location faction id.
         for (var location : locations) {
             var successorId = successorByLocation.get(location.id());
             if (successorId == null) {
@@ -153,11 +153,6 @@ public final class CivilWarHandler {
                         newLocationNumber
                     )
                 );
-            }
-
-            // Transfer every claimed chunk in BLib's territory manager.
-            for (var chunk : new LinkedHashSet<>(location.claimedChunks())) {
-                Alien.MOD.territory().transferClaim(serverLevel, chunk, deadLineageId, successorId);
             }
 
             // Move the location into its successor lineage's locations map and out of the dead one's.
