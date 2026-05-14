@@ -417,6 +417,37 @@ public final class Hive2DebugCommands {
                 false
             );
 
+        // Economy snapshot: resources + population vs cap + per-caste counts.
+        var econConfig = HiveLocationRegistry.INSTANCE.config();
+        var totalPop = com.alien.common.gameplay.hive2.economy.CastePopulation.totalTrackedPopulation(location);
+        var popCap = econConfig.populationPerChunk() * location.claimedChunks().size();
+        ctx.getSource()
+            .sendSuccess(
+                () -> Component.literal(
+                    "  resources: biomass=" + location.biomass()
+                        + ", royalJelly=" + location.royalJelly() + "/" + econConfig.royalJellyCap()
+                        + ", scourgeJelly=" + location.scourgeJelly() + "/" + econConfig.scourgeJellyCap()
+                ),
+                false
+            );
+        ctx.getSource()
+            .sendSuccess(
+                () -> Component.literal("  population=" + totalPop + "/" + popCap),
+                false
+            );
+
+        var castePop = com.alien.common.gameplay.hive2.economy.CastePopulation.popByCaste(location);
+        ctx.getSource().sendSuccess(() -> Component.literal("  per-caste:"), false);
+        for (var entry : castePop.entrySet()) {
+            if (entry.getValue() > 0) {
+                ctx.getSource()
+                    .sendSuccess(
+                        () -> Component.literal("    " + entry.getKey().location() + " = " + entry.getValue()),
+                        false
+                    );
+            }
+        }
+
         // Also list the lineage's BLib membership so you can compare with what's actually routed
         // into the location. A UUID in lineage membership but not in loadedHere means the entity
         // isn't loaded right now, or its chunk isn't owned by this location.
@@ -874,12 +905,14 @@ public final class Hive2DebugCommands {
         for (var dx = -radius; dx <= radius; dx++) {
             for (var dz = -radius; dz <= radius; dz++) {
                 var chunk = new ChunkPos(centerChunk.x + dx, centerChunk.z + dz);
-                if (com.alien.common.gameplay.hive2.growth.HiveLocationClaims.claim(
-                    serverLevel,
-                    location,
-                    chunk,
-                    serverLevel.getGameTime()
-                )) {
+                if (
+                    com.alien.common.gameplay.hive2.growth.HiveLocationClaims.claim(
+                        serverLevel,
+                        location,
+                        chunk,
+                        serverLevel.getGameTime()
+                    )
+                ) {
                     added++;
                 }
             }
