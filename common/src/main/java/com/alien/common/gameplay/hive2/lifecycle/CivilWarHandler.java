@@ -101,6 +101,22 @@ public final class CivilWarHandler {
             );
             successorData.setFactionId(successorId);
 
+            // Allocate per-variant lineage number and name the new lineage.
+            var variantFaction = deadLineage.parentVariantFactionId() != null
+                ? Alien.MOD.factions().get(deadLineage.parentVariantFactionId())
+                : null;
+            var successorLineageNumber = variantFaction != null
+                && variantFaction.data() instanceof com.alien.common.gameplay.hive2.faction.VariantFactionData variantData
+                    ? variantData.allocateLineageNumber()
+                    : 0L;
+            successorData.setLineageNumber(successorLineageNumber);
+            successorFaction.setName(
+                com.alien.common.gameplay.hive2.faction.FactionNaming.forLineage(
+                    deadLineage.variant(),
+                    successorLineageNumber
+                )
+            );
+
             successorData.setVariant(deadLineage.variant());
             successorData.setParentVariantFactionId(deadLineage.parentVariantFactionId());
             successorData.setDimension(deadLineage.dimension());
@@ -123,6 +139,22 @@ public final class CivilWarHandler {
             // Reparent the location record itself.
             location.setLineageFactionId(successorId);
 
+            // Re-number the location under its new lineage (it's loc0 of a successor that owns just this location)
+            // and update the location-faction's path name accordingly.
+            var successorData = successorDataById.get(successorId);
+            var newLocationNumber = successorData.allocateLocationNumber();
+            location.setLocationNumber(newLocationNumber);
+            var locationFaction = Alien.MOD.factions().get(location.id().value());
+            if (locationFaction != null) {
+                locationFaction.setName(
+                    com.alien.common.gameplay.hive2.faction.FactionNaming.forLocation(
+                        successorData.variant(),
+                        successorData.lineageNumber(),
+                        newLocationNumber
+                    )
+                );
+            }
+
             // Transfer every claimed chunk in BLib's territory manager.
             for (var chunk : new LinkedHashSet<>(location.claimedChunks())) {
                 Alien.MOD.territory().transferClaim(serverLevel, chunk, deadLineageId, successorId);
@@ -130,7 +162,6 @@ public final class CivilWarHandler {
 
             // Move the location into its successor lineage's locations map and out of the dead one's.
             // (Order matters: addLocation first so the registry rebuild on next start finds the right home.)
-            var successorData = successorDataById.get(successorId);
             successorData.addLocation(location);
             deadLineage.removeLocation(location.id());
         }

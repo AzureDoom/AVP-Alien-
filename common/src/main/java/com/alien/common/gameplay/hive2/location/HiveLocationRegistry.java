@@ -286,6 +286,21 @@ public final class HiveLocationRegistry {
                 lineageData.setFactionId(factionId);
             }
 
+            // Backfill lineage path name + monotonic number.
+            if (lineageData.lineageNumber() < 0) {
+                var variantFaction = lineageData.parentVariantFactionId() != null
+                    ? Alien.MOD.factions().get(lineageData.parentVariantFactionId())
+                    : null;
+                var allocated = variantFaction != null
+                    && variantFaction.data() instanceof com.alien.common.gameplay.hive2.faction.VariantFactionData variantData
+                        ? variantData.allocateLineageNumber()
+                        : 0L;
+                lineageData.setLineageNumber(allocated);
+                faction.setName(
+                    com.alien.common.gameplay.hive2.faction.FactionNaming.forLineage(lineageData.variant(), allocated)
+                );
+            }
+
             var locations = lineageData.locationsById();
             Alien.LOGGER.info(
                 "HiveLocationRegistry rebuild: lineage {} has {} nested locations to register",
@@ -309,6 +324,34 @@ public final class HiveLocationRegistry {
                         locationData.setLocationId(location.id());
                     }
                 }
+
+                // Backfill location path name + monotonic number under this lineage.
+                if (location.locationNumber() < 0) {
+                    var allocated = lineageData.allocateLocationNumber();
+                    location.setLocationNumber(allocated);
+                    if (locationFaction != null) {
+                        locationFaction.setName(
+                            com.alien.common.gameplay.hive2.faction.FactionNaming.forLocation(
+                                lineageData.variant(),
+                                lineageData.lineageNumber(),
+                                allocated
+                            )
+                        );
+                    }
+                }
+            }
+        }
+
+        // Backfill variant faction names for saves predating FactionNaming.
+        for (var variant : com.alien.common.model.alien.variant.AlienVariant.VALUES) {
+            var variantId = com.alien.common.gameplay.hive2.id.VariantIds.of(variant);
+            var variantFaction = Alien.MOD.factions().get(variantId);
+            if (variantFaction == null) {
+                continue;
+            }
+            var expectedName = com.alien.common.gameplay.hive2.faction.FactionNaming.forVariant(variant);
+            if (!expectedName.equals(variantFaction.name())) {
+                variantFaction.setName(expectedName);
             }
         }
 

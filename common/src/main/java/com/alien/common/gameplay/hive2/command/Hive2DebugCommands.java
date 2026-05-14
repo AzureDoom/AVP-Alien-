@@ -9,6 +9,7 @@ import com.alien.common.gameplay.hive2.convoy.ReinforcementDispatcher;
 import com.alien.common.gameplay.hive2.empress.EmpressEmergenceRitual;
 import com.alien.common.gameplay.hive2.empress.EmpressEmergenceTask;
 import com.alien.common.gameplay.hive2.faction.FactionAesthetics;
+import com.alien.common.gameplay.hive2.faction.FactionNaming;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.faction.LineageInvariantTask;
 import com.alien.common.gameplay.hive2.faction.VariantFactionData;
@@ -502,6 +503,11 @@ public final class Hive2DebugCommands {
         FactionAesthetics.applyDefaults(lineageFaction, variant, FactionAesthetics.Tier.LINEAGE);
         lineageData.setFactionId(lineageId);
 
+        var variantData = variantFaction.data();
+        var lineageNumber = variantData != null ? variantData.allocateLineageNumber() : 0L;
+        lineageData.setLineageNumber(lineageNumber);
+        lineageFaction.setName(FactionNaming.forLineage(variant, lineageNumber));
+
         lineageData.setVariant(variant);
         lineageData.setParentVariantFactionId(variantFaction.id());
         lineageData.setDimension(level.dimension());
@@ -564,12 +570,18 @@ public final class Hive2DebugCommands {
         lineageData.addLocation(location);
         HiveLocationRegistry.INSTANCE.register(location);
 
+        var locationNumber = lineageData.allocateLocationNumber();
+        location.setLocationNumber(locationNumber);
+
         var locationFaction = Alien.MOD.factions().getOrCreate(locationId.value(), AlienFactionDataTypes.LOCATION);
         FactionAesthetics.applyDefaults(locationFaction, lineageData.variant(), FactionAesthetics.Tier.LOCATION);
         var locationData = locationFaction.data();
         if (locationData != null) {
             locationData.setLocationId(locationId);
         }
+        locationFaction.setName(
+            FactionNaming.forLocation(lineageData.variant(), lineageData.lineageNumber(), locationNumber)
+        );
 
         ctx.getSource()
             .sendSuccess(

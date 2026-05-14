@@ -33,6 +33,8 @@ public class VariantFactionData extends FactionData {
 
     private static final String NBT_AGE_IN_TICKS = "AgeInTicks";
 
+    private static final String NBT_NEXT_LINEAGE_NUMBER = "NextLineageNumber";
+
     private static final String NBT_QUEEN_MOTHERS = "QueenMothersByDimension";
 
     private static final String NBT_VARIANT_POOLS = "VariantPoolsByDimension";
@@ -53,6 +55,9 @@ public class VariantFactionData extends FactionData {
 
     private long ageInTicks;
 
+    /** Monotonic per-variant lineage counter. Allocated at lineage mint via {@link #allocateLineageNumber()}. */
+    private long nextLineageNumber;
+
     private final Map<ResourceKey<Level>, UUID> queenMotherIdsByDimension;
 
     private final Map<ResourceKey<Level>, EntityReserves> variantPoolsByDimension;
@@ -60,8 +65,25 @@ public class VariantFactionData extends FactionData {
     public VariantFactionData() {
         this.variant = DEFAULT_VARIANT;
         this.ageInTicks = 0L;
+        this.nextLineageNumber = 0L;
         this.queenMotherIdsByDimension = new HashMap<>();
         this.variantPoolsByDimension = new HashMap<>();
+    }
+
+    /** Returns the next lineage number and advances the counter. Monotonic — dead lineages don't release numbers. */
+    public long allocateLineageNumber() {
+        var n = nextLineageNumber++;
+        markDirty();
+        return n;
+    }
+
+    public long nextLineageNumber() {
+        return nextLineageNumber;
+    }
+
+    public void setNextLineageNumber(long nextLineageNumber) {
+        this.nextLineageNumber = nextLineageNumber;
+        markDirty();
     }
 
     @Override
@@ -146,6 +168,7 @@ public class VariantFactionData extends FactionData {
         }
 
         this.ageInTicks = tag.getLong(NBT_AGE_IN_TICKS);
+        this.nextLineageNumber = tag.getLong(NBT_NEXT_LINEAGE_NUMBER);
 
         queenMotherIdsByDimension.clear();
         if (tag.contains(NBT_QUEEN_MOTHERS)) {
@@ -183,6 +206,7 @@ public class VariantFactionData extends FactionData {
     public void save(CompoundTag tag) {
         tag.putByte(NBT_VARIANT_ID, (byte) variant.getId());
         tag.putLong(NBT_AGE_IN_TICKS, ageInTicks);
+        tag.putLong(NBT_NEXT_LINEAGE_NUMBER, nextLineageNumber);
 
         var queenMothers = new net.minecraft.nbt.ListTag();
         for (var entry : queenMotherIdsByDimension.entrySet()) {

@@ -66,6 +66,10 @@ public class LineageFactionData extends FactionData {
 
     private static final String NBT_PENDING_CIVIL_WAR = "PendingCivilWar";
 
+    private static final String NBT_LINEAGE_NUMBER = "LineageNumber";
+
+    private static final String NBT_NEXT_LOCATION_NUMBER = "NextLocationNumber";
+
     private static final String NBT_LINEAGE_POOL = "LineagePool";
 
     private static final String NBT_LOCATIONS = "Locations";
@@ -100,6 +104,12 @@ public class LineageFactionData extends FactionData {
     private boolean pendingEmpressEmergence;
 
     private boolean pendingCivilWar;
+
+    /** Per-variant lineage index assigned at mint (used in {@link FactionNaming} paths). -1 = unassigned. */
+    private long lineageNumber;
+
+    /** Monotonic per-lineage location counter. Allocated at location mint via {@link #allocateLocationNumber()}. */
+    private long nextLocationNumber;
 
     private final EntityReserves lineagePool;
 
@@ -137,6 +147,8 @@ public class LineageFactionData extends FactionData {
         this.lastSpreadTick = 0L;
         this.pendingEmpressEmergence = false;
         this.pendingCivilWar = false;
+        this.lineageNumber = -1L;
+        this.nextLocationNumber = 0L;
         this.lineagePool = new EntityReserves();
         this.locationsById = new LinkedHashMap<>();
         this.convoys = new ArrayList<>();
@@ -267,6 +279,31 @@ public class LineageFactionData extends FactionData {
     public void setFactionId(ResourceLocation factionId) {
         this.factionId = factionId;
         markDirty();
+    }
+
+    public long lineageNumber() {
+        return lineageNumber;
+    }
+
+    public void setLineageNumber(long lineageNumber) {
+        this.lineageNumber = lineageNumber;
+        markDirty();
+    }
+
+    public long nextLocationNumber() {
+        return nextLocationNumber;
+    }
+
+    public void setNextLocationNumber(long nextLocationNumber) {
+        this.nextLocationNumber = nextLocationNumber;
+        markDirty();
+    }
+
+    /** Returns the next location number and advances the counter. Monotonic — dead locations don't release numbers. */
+    public long allocateLocationNumber() {
+        var n = nextLocationNumber++;
+        markDirty();
+        return n;
     }
 
     public @Nullable ResourceLocation parentVariantFactionId() {
@@ -471,6 +508,8 @@ public class LineageFactionData extends FactionData {
         this.lastSpreadTick = tag.getLong(NBT_LAST_SPREAD_TICK);
         this.pendingEmpressEmergence = tag.getBoolean(NBT_PENDING_EMPRESS_EMERGENCE);
         this.pendingCivilWar = tag.getBoolean(NBT_PENDING_CIVIL_WAR);
+        this.lineageNumber = tag.contains(NBT_LINEAGE_NUMBER) ? tag.getLong(NBT_LINEAGE_NUMBER) : -1L;
+        this.nextLocationNumber = tag.getLong(NBT_NEXT_LOCATION_NUMBER);
 
         if (tag.contains(NBT_LINEAGE_POOL)) {
             EntityReserves.CODEC.decode(BLibCodecs.Schema.NBT, tag.getCompound(NBT_LINEAGE_POOL))
@@ -541,6 +580,10 @@ public class LineageFactionData extends FactionData {
         tag.putLong(NBT_LAST_SPREAD_TICK, lastSpreadTick);
         tag.putBoolean(NBT_PENDING_EMPRESS_EMERGENCE, pendingEmpressEmergence);
         tag.putBoolean(NBT_PENDING_CIVIL_WAR, pendingCivilWar);
+        if (lineageNumber >= 0) {
+            tag.putLong(NBT_LINEAGE_NUMBER, lineageNumber);
+        }
+        tag.putLong(NBT_NEXT_LOCATION_NUMBER, nextLocationNumber);
 
         tag.put(NBT_LINEAGE_POOL, EntityReserves.CODEC.encode(BLibCodecs.Schema.NBT, lineagePool));
 

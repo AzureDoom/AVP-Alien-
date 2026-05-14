@@ -26,6 +26,7 @@ public final class VariantFactionRegistry {
 
         if (!preExisting) {
             FactionAesthetics.applyDefaults(faction, variant, FactionAesthetics.Tier.VARIANT);
+            faction.setName(FactionNaming.forVariant(variant));
         }
 
         return faction;

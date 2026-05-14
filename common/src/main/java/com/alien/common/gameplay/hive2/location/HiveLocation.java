@@ -60,6 +60,8 @@ public final class HiveLocation {
 
     private static final String NBT_NO_CONTACT_TICKS_ACCRUED = "NoContactTicksAccrued";
 
+    private static final String NBT_LOCATION_NUMBER = "LocationNumber";
+
     private static final String NBT_QUEENLESS_MATURATION_LAST_ADVANCE = "QueenlessMaturationLastAdvanceTick";
 
     private static final String NBT_QUEENLESS_LEADER_SNAPSHOT = "QueenlessLeaderSnapshot";
@@ -112,6 +114,12 @@ public final class HiveLocation {
      * inside the territory. Persisted across restarts.
      */
     private long noContactTicksAccrued;
+
+    /**
+     * Per-lineage index assigned at mint, used in {@link com.alien.common.gameplay.hive2.faction.FactionNaming}. -1 =
+     * unassigned.
+     */
+    private long locationNumber;
 
     /**
      * Tick at which {@link com.alien.common.gameplay.hive2.lifecycle.QueenlessMaturationTask} last advanced this
@@ -170,6 +178,7 @@ public final class HiveLocation {
         this.peakDecayElapsedTicks = 0L;
         this.evacuatingRemainingTicks = 0L;
         this.noContactTicksAccrued = 0L;
+        this.locationNumber = -1L;
         this.queenlessMaturationLastAdvanceTick = Long.MIN_VALUE;
         this.queenlessLeaderSnapshot = null;
         this.biomass = 0;
@@ -261,6 +270,14 @@ public final class HiveLocation {
 
     public void setNoContactTicksAccrued(long noContactTicksAccrued) {
         this.noContactTicksAccrued = Math.max(0L, noContactTicksAccrued);
+    }
+
+    public long locationNumber() {
+        return locationNumber;
+    }
+
+    public void setLocationNumber(long locationNumber) {
+        this.locationNumber = locationNumber;
     }
 
     public long queenlessMaturationLastAdvanceTick() {
@@ -383,6 +400,9 @@ public final class HiveLocation {
         if (noContactTicksAccrued > 0L) {
             tag.putLong(NBT_NO_CONTACT_TICKS_ACCRUED, noContactTicksAccrued);
         }
+        if (locationNumber >= 0) {
+            tag.putLong(NBT_LOCATION_NUMBER, locationNumber);
+        }
         if (queenlessMaturationLastAdvanceTick != Long.MIN_VALUE) {
             tag.putLong(NBT_QUEENLESS_MATURATION_LAST_ADVANCE, queenlessMaturationLastAdvanceTick);
         }
@@ -461,6 +481,7 @@ public final class HiveLocation {
         location.noContactTicksAccrued = tag.contains(NBT_NO_CONTACT_TICKS_ACCRUED)
             ? Math.max(0L, tag.getLong(NBT_NO_CONTACT_TICKS_ACCRUED))
             : 0L;
+        location.locationNumber = tag.contains(NBT_LOCATION_NUMBER) ? tag.getLong(NBT_LOCATION_NUMBER) : -1L;
         location.queenlessMaturationLastAdvanceTick = tag.contains(NBT_QUEENLESS_MATURATION_LAST_ADVANCE)
             ? tag.getLong(NBT_QUEENLESS_MATURATION_LAST_ADVANCE)
             : Long.MIN_VALUE;

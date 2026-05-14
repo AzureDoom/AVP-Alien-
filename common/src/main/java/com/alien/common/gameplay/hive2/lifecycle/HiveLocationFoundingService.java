@@ -3,6 +3,7 @@ package com.alien.common.gameplay.hive2.lifecycle;
 import com.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
 import com.alien.common.gameplay.hive2.faction.FactionAesthetics;
+import com.alien.common.gameplay.hive2.faction.FactionNaming;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.faction.LocationMembership;
 import com.alien.common.gameplay.hive2.faction.VariantFactionRegistry;
@@ -57,6 +58,13 @@ public final class HiveLocationFoundingService {
 
         FactionAesthetics.applyDefaults(lineageFaction, variant, FactionAesthetics.Tier.LINEAGE);
         lineageData.setFactionId(lineageId);
+
+        // Allocate a monotonic per-variant index and name the lineage faction xenos/{variant}/lin{N}.
+        var lineageNumber = variantFaction.data() != null
+            ? variantFaction.data().allocateLineageNumber()
+            : 0L;
+        lineageData.setLineageNumber(lineageNumber);
+        lineageFaction.setName(FactionNaming.forLineage(variant, lineageNumber));
 
         lineageData.setVariant(variant);
         lineageData.setParentVariantFactionId(variantFaction.id());
@@ -134,6 +142,10 @@ public final class HiveLocationFoundingService {
         location.claimedChunks().add(centerChunk);
         location.chunkClaimTicks().put(centerChunk, currentGameTime);
 
+        // Allocate the location's per-lineage index before adding so the path name reflects it.
+        var locationNumber = lineageData.allocateLocationNumber();
+        location.setLocationNumber(locationNumber);
+
         lineageData.addLocation(location);
         HiveLocationRegistry.INSTANCE.register(location);
 
@@ -149,6 +161,9 @@ public final class HiveLocationFoundingService {
         if (locationData != null) {
             locationData.setLocationId(locationId);
         }
+        locationFaction.setName(
+            FactionNaming.forLocation(lineageData.variant(), lineageData.lineageNumber(), locationNumber)
+        );
 
         return location;
     }
