@@ -12,6 +12,10 @@ public class EmpressGOAP {
         .apply(XenomorphGOAP::addEggLayingPackage)
         .build();
 
+    public static final Graph<Empress> OVIPOSITOR_GRAPH = Graph.<Empress>builder()
+        .apply(XenomorphGOAP::applyEggLayingOnlyGraph)
+        .build();
+
     public static Agent.Builder<Empress> applyAgentProperties(Agent.Builder<Empress> agentBuilder) {
         return XenomorphGOAP.applyBaseAgentProperties(agentBuilder);
     }

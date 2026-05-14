@@ -104,7 +104,11 @@ public class Queen extends Xenomorph implements GOAPUser<Queen>, EggLayer {
 
     @Override
     public @Nullable Graph<Queen> blib$getGOAPGraphOrNull() {
-        return getActiveGOAPGraph(QueenGOAP.GRAPH);
+        return getActiveGOAPGraph(isOnOvipositor() ? QueenGOAP.OVIPOSITOR_GRAPH : QueenGOAP.GRAPH);
+    }
+
+    private boolean isOnOvipositor() {
+        return ovipositorManager != null && ovipositorManager.hasOvipositor();
     }
 
     @Override

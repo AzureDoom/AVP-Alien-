@@ -50,6 +50,10 @@ public class XenomorphGOAP {
             .apply(XenomorphGOAP::addIdlePackage);
     }
 
+    public static <T extends Xenomorph & EggLayer> Graph.Builder<T> applyEggLayingOnlyGraph(Graph.Builder<T> graphBuilder) {
+        return graphBuilder.apply(XenomorphGOAP::addEggLayingPackage);
+    }
+
     public static <T extends Xenomorph> Agent.Builder<T> applyBaseAgentProperties(Agent.Builder<T> agentBuilder) {
         return agentBuilder.withReplanPolicy(
             ReplanPolicies.anyOf(
