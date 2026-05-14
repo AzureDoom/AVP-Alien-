@@ -86,6 +86,7 @@ public record HiveConfig(
     // ---------- § 11 Biomass ----------
     int baseChunkCost,
     int ovipositorCreationBiomassCost,
+    int resinSpreadBiomassCost,
     double growthFactor,
     double baseUnloadedBiomassPerChunkPerSec,
     double unloadedEmpressBonusPerSec,
@@ -194,6 +195,7 @@ public record HiveConfig(
             // § 11 Biomass
             100, // baseChunkCost
             100, // ovipositorCreationBiomassCost
+            5, // resinSpreadBiomassCost
             0.05, // growthFactor
             0.05, // baseUnloadedBiomassPerChunkPerSec
             1.0, // unloadedEmpressBonusPerSec

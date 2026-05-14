@@ -1,6 +1,8 @@
 package com.alien.common.gameplay.entity.living.alien;
 
 import com.alien.common.data.AlienVariantTypes;
+import com.alien.common.gameplay.hive2.location.HiveLocation;
+import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.gameplay.hive2.spawning.HiveLocationSpawnGate;
 import com.alien.common.gameplay.level.gameevent.listener.ResinSpreadListener;
 import com.alien.common.model.resin.ResinData;
@@ -64,10 +66,16 @@ public class ResinManager implements GameEventListener.Provider<ResinSpreadListe
     public boolean canSpreadResin() {
         return alien.tickCount - lastSpreadTick >= SPREAD_COOLDOWN_IN_TICKS
             && !isNodePlacementOnCooldown()
-            && canSpreadResinAtAlienPosition();
+            && canSpreadResinAtAlienPosition()
+            && canPaySpreadCost();
     }
 
     public void spreadResin() {
+        var location = currentLocation();
+        if (!canPaySpreadCost(location)) {
+            return;
+        }
+
         // Set the charge so the nearest resin node listener can consume it.
         resinData.setResin(SPREAD_CHARGE);
 
@@ -77,6 +85,11 @@ public class ResinManager implements GameEventListener.Provider<ResinSpreadListe
         alien.gameEvent(alienVariantType.resinSpreadEvent());
 
         lastSpreadTick = alien.tickCount;
+
+        if (resinData.resin() <= 0) {
+            paySpreadCost(location);
+            return;
+        }
 
         // If the alien still has resin even after signalling a resin spread event, that means there was no resin node
         // to intercept the event. So we try to place a resin node down here.
@@ -97,6 +110,7 @@ public class ResinManager implements GameEventListener.Provider<ResinSpreadListe
             // Place the resin node block at the suitable position.
             level.setBlockAndUpdate(suitableResinNodeBlockPosOption.unwrap(), resinNodeBlockState);
             resinData.setResin(0);
+            paySpreadCost(location);
         }
     }
 
@@ -128,12 +142,36 @@ public class ResinManager implements GameEventListener.Provider<ResinSpreadListe
      * location; the angry check is the location's boss-bar angry state.
      */
     private boolean isInsideHiveForResinSpread() {
-        var location = HiveLocationSpawnGate.locationContaining(alien.level(), alien.blockPosition());
+        var location = currentLocation();
         if (location == null) {
             return false;
         }
         var bossBar = location.bossBar();
         return bossBar == null || !bossBar.isAngry();
+    }
+
+    private boolean canPaySpreadCost() {
+        return canPaySpreadCost(currentLocation());
+    }
+
+    private boolean canPaySpreadCost(HiveLocation location) {
+        if (location == null || !location.isAlive()) {
+            return false;
+        }
+
+        var cost = HiveLocationRegistry.INSTANCE.config().resinSpreadBiomassCost();
+        return cost <= 0 || location.biomass() >= cost;
+    }
+
+    private void paySpreadCost(HiveLocation location) {
+        var cost = HiveLocationRegistry.INSTANCE.config().resinSpreadBiomassCost();
+        if (cost > 0) {
+            location.setBiomass(location.biomass() - cost);
+        }
+    }
+
+    private HiveLocation currentLocation() {
+        return HiveLocationSpawnGate.locationContaining(alien.level(), alien.blockPosition());
     }
 
     private Option<BlockPos> findSuitableResinNodeBlockPos(Level level, TagKey<Block> replaceableTagKey) {
