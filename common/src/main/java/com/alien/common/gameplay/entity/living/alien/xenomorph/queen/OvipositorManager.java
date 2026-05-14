@@ -165,7 +165,7 @@ public class OvipositorManager implements NBTSerializable {
 
             var aboveBlockState = queen.level().getBlockState(blockPos.above());
             isSupported = (aboveBlockState.isAir() || aboveBlockState.canBeReplaced())
-                && !(blockState.isAir() || blockState.canBeReplaced());
+                && blockState.is(AlienVariantTypes.getFor(queen.getVariant()).resinBlockTag());
 
             stepsDown++;
         }
