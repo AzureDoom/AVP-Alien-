@@ -16,22 +16,21 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Per-tick "balance the hive" buy task. For each living location:
+ * Per-tick hive buy task. For each living location:
  * <ol>
- * <li>Counts tracked castes (loaded + reserves) and totalsthe population.</li>
- * <li>Skips if total population is at or beyond the per-chunk cap (overencumbered — convoys may have pushed past).</li>
- * <li>Computes desired counts from policy ratios (drone↔warrior 1:1, prowler↔runner 1:4, praetorian = warriors/12,
- * crusher = runners/12, ravager = warriors/8, harbinger = 1 when pop ≥ 100, runner baseline = 1 + chunks/4). The
- * praetorian/crusher gates use the recipe-input caste so the buy stabilizes — gating praetorians on drones (recipe
- * consumes warriors) creates a slow refill cycle that doesn't violate the cap but keeps the buy task firing.</li>
- * <li>Picks the caste with the largest deficit. Tiebreak: order in {@link CastePopulation#TRACKED_CASTES}.</li>
- * <li>Resolves the concrete entity recipe for that caste, checks conditions + resources + inputs, commits on
- * success.</li>
+ * <li>Counts tracked castes (loaded + reserves) and totals the population.</li>
+ * <li>If population is below the per-chunk cap, buys a net-new basic unit when resources allow.</li>
+ * <li>Once population is full, spends paid recipes on composition upgrades to move toward the policy ratios.</li>
  * </ol>
- * Runs every server tick from {@link HiveLocationRegistry#tick}. Per-location body is cheap (a few sums and a single
- * recipe lookup); no throttling per the project's correctness-over-cadence preference.
+ * Runs every server tick from {@link HiveLocationRegistry#tick}. Per-location body is cheap (a few sums and bounded
+ * recipe lookups); no throttling per the project's correctness-over-cadence preference.
  */
 public final class HiveBalanceTask {
+
+    private static final TagKey<EntityType<?>>[] POPULATION_FILL_CASTES = new TagKey[] {
+        AlienEntityTypeTags.RUNNERS,
+        AlienEntityTypeTags.DRONES
+    };
 
     private HiveBalanceTask() {}
 
@@ -61,44 +60,122 @@ public final class HiveBalanceTask {
         var totalPop = pop.values().stream().mapToInt(Integer::intValue).sum();
         var chunks = location.claimedChunks().size();
         var cap = populationPerChunk * chunks;
-        if (totalPop >= cap) {
+        if (cap <= 0 || totalPop > cap) {
             return;
         }
         if (CastePopulation.countCaste(location, AlienEntityTypeTags.QUEENS) <= 0) {
             return;
         }
 
-        var deficits = computeDeficits(pop, chunks, totalPop);
-        if (deficits.isEmpty()) {
+        if (totalPop < cap) {
+            tryFillPopulation(location, lineage, pop, chunks, totalPop);
             return;
         }
 
-        TagKey<EntityType<?>> chosen = null;
-        var chosenDeficit = 0;
-        for (var caste : CastePopulation.TRACKED_CASTES) {
-            var d = deficits.getOrDefault(caste, 0);
-            if (d > chosenDeficit) {
-                chosenDeficit = d;
-                chosen = caste;
+        tryBalanceComposition(location, lineage, pop, chunks, totalPop);
+    }
+
+    private static boolean tryFillPopulation(
+        HiveLocation location,
+        LineageFactionData lineage,
+        Map<TagKey<EntityType<?>>, Integer> pop,
+        int chunks,
+        int totalPop
+    ) {
+        var ordered = populationFillOrder(pop, chunks);
+        for (var caste : ordered) {
+            if (tryCommitCaste(location, lineage, caste, totalPop, RecipePopulationMode.NET_GAIN)) {
+                return true;
             }
         }
-        if (chosen == null) {
-            return;
+        return false;
+    }
+
+    private static ArrayList<TagKey<EntityType<?>>> populationFillOrder(
+        Map<TagKey<EntityType<?>>, Integer> pop,
+        int chunks
+    ) {
+        var ordered = new ArrayList<TagKey<EntityType<?>>>();
+        var drones = pop.getOrDefault(AlienEntityTypeTags.DRONES, 0);
+        var runners = pop.getOrDefault(AlienEntityTypeTags.RUNNERS, 0);
+        var runnerBaseline = 1 + chunks / 4;
+
+        if (runners < runnerBaseline) {
+            ordered.add(AlienEntityTypeTags.RUNNERS);
         }
 
-        var variant = lineage.variant();
-        var outputType = CasteResolver.entityTypeForCaste(variant, chosen);
+        if (drones <= runners) {
+            addIfMissing(ordered, AlienEntityTypeTags.DRONES);
+            addIfMissing(ordered, AlienEntityTypeTags.RUNNERS);
+        } else {
+            addIfMissing(ordered, AlienEntityTypeTags.RUNNERS);
+            addIfMissing(ordered, AlienEntityTypeTags.DRONES);
+        }
+
+        for (var caste : POPULATION_FILL_CASTES) {
+            addIfMissing(ordered, caste);
+        }
+        return ordered;
+    }
+
+    private static void addIfMissing(ArrayList<TagKey<EntityType<?>>> list, TagKey<EntityType<?>> caste) {
+        if (!list.contains(caste)) {
+            list.add(caste);
+        }
+    }
+
+    private static boolean tryBalanceComposition(
+        HiveLocation location,
+        LineageFactionData lineage,
+        Map<TagKey<EntityType<?>>, Integer> pop,
+        int chunks,
+        int totalPop
+    ) {
+        var deficits = computeDeficits(pop, chunks, totalPop);
+        if (deficits.isEmpty()) {
+            return false;
+        }
+
+        var candidates = new ArrayList<TagKey<EntityType<?>>>();
+        for (var caste : CastePopulation.TRACKED_CASTES) {
+            if (deficits.getOrDefault(caste, 0) > 0) {
+                candidates.add(caste);
+            }
+        }
+        candidates.sort((left, right) -> Integer.compare(deficits.get(right), deficits.get(left)));
+
+        for (var caste : candidates) {
+            if (tryCommitCaste(location, lineage, caste, totalPop, RecipePopulationMode.NEUTRAL)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean tryCommitCaste(
+        HiveLocation location,
+        LineageFactionData lineage,
+        TagKey<EntityType<?>> caste,
+        int totalPop,
+        RecipePopulationMode populationMode
+    ) {
+        var outputType = CasteResolver.entityTypeForCaste(lineage.variant(), caste);
         if (outputType == null) {
-            return;
+            return false;
         }
 
         var recipe = HiveRecipeRegistry.forOutputEntity(outputType);
         if (recipe == null) {
-            return;
+            return false;
+        }
+
+        var netPopulationChange = netPopulationChange(recipe);
+        if (!populationMode.matches(netPopulationChange)) {
+            return false;
         }
 
         if (!conditionsHold(recipe, location, totalPop)) {
-            return;
+            return false;
         }
 
         if (
@@ -106,7 +183,7 @@ public final class HiveBalanceTask {
                 || location.royalJelly() < recipe.royalJelly()
                 || location.scourgeJelly() < recipe.scourgeJelly()
         ) {
-            return;
+            return false;
         }
 
         // Confirm the concrete input entity reserves cover the recipe.
@@ -114,13 +191,13 @@ public final class HiveBalanceTask {
         for (var input : recipe.inputEntities()) {
             var type = input.entity();
             if (location.localReserves().getCount(type) < input.count()) {
-                return;
+                return false;
             }
             inputTypes.add(type);
         }
 
-        if (!location.localReserves().accepts(recipe.outputEntity())) {
-            return;
+        if (!hasOutputReserveHeadroomAfterInputs(location, recipe)) {
+            return false;
         }
 
         // All gates pass — commit.
@@ -133,15 +210,29 @@ public final class HiveBalanceTask {
             location.localReserves().underlying().add(inputTypes.get(i), -count);
         }
         location.localReserves().tryAdd(recipe.outputEntity(), 1);
+        return true;
+    }
 
-        Alien.LOGGER.debug(
-            "Hive2: balance buy at {} → +1 {} (cost: {} biomass, {} royal, {} scourge)",
-            location.id(),
-            recipe.outputEntity().builtInRegistryHolder().key().location(),
-            recipe.biomass(),
-            recipe.royalJelly(),
-            recipe.scourgeJelly()
-        );
+    private static int netPopulationChange(HiveRecipe recipe) {
+        var inputs = 0;
+        for (var input : recipe.inputEntities()) {
+            inputs += input.count();
+        }
+        return 1 - inputs;
+    }
+
+    private static boolean hasOutputReserveHeadroomAfterInputs(HiveLocation location, HiveRecipe recipe) {
+        if (!location.localReserves().accepts(recipe.outputEntity())) {
+            return false;
+        }
+
+        var outputCount = location.localReserves().getCount(recipe.outputEntity());
+        for (var input : recipe.inputEntities()) {
+            if (input.entity().equals(recipe.outputEntity())) {
+                outputCount -= input.count();
+            }
+        }
+        return outputCount < location.localReserves().capFor(recipe.outputEntity());
     }
 
     private static Map<TagKey<EntityType<?>>, Integer> computeDeficits(
@@ -206,5 +297,22 @@ public final class HiveBalanceTask {
             }
         }
         return true;
+    }
+
+    private enum RecipePopulationMode {
+        NET_GAIN {
+            @Override
+            boolean matches(int netPopulationChange) {
+                return netPopulationChange > 0;
+            }
+        },
+        NEUTRAL {
+            @Override
+            boolean matches(int netPopulationChange) {
+                return netPopulationChange == 0;
+            }
+        };
+
+        abstract boolean matches(int netPopulationChange);
     }
 }

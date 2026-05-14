@@ -15,7 +15,6 @@ public record HiveConfig(
     // ---------- § 1 Faction lifecycle ----------
     long lineageAbsorptionAdjacencyTicks,
     long protoHiveStageInterval,
-    long lineageReservePromotionInterval,
 
     // ---------- § 2 Locations ----------
     long settlementTicks,
@@ -128,7 +127,6 @@ public record HiveConfig(
             // § 1 Faction lifecycle
             5L * TICKS_PER_MINUTE, // lineageAbsorptionAdjacencyTicks: 5 min
             5L * TICKS_PER_MINUTE, // protoHiveStageInterval: 5 min between drone→warrior→praetorian→queen advances
-            1L * TICKS_PER_MINUTE, // lineageReservePromotionInterval: 1 min between queen-driven reserve promotions
 
             // § 2 Locations
             60L * TICKS_PER_SECOND, // settlementTicks: 60s

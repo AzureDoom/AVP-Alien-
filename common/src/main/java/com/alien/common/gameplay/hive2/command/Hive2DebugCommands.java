@@ -229,13 +229,6 @@ public final class Hive2DebugCommands {
                     )
             )
             .then(Commands.literal("inspect_queenless_maturation").executes(Hive2DebugCommands::inspectQueenlessMaturation))
-            .then(
-                Commands.literal("force_reserve_promote")
-                    .then(
-                        Commands.argument(LINEAGE_ID_ARG, ResourceLocationArgument.id())
-                            .executes(Hive2DebugCommands::forceReservePromote)
-                    )
-            )
             .then(Commands.literal("validate").executes(Hive2DebugCommands::validate));
     }
 
@@ -1429,21 +1422,4 @@ public final class Hive2DebugCommands {
         return reported;
     }
 
-    private static int forceReservePromote(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
-        var lineageId = ResourceLocationArgument.getId(ctx, LINEAGE_ID_ARG);
-        var promoted = com.alien.common.gameplay.hive2.lifecycle.LineageReservePromotionTask.forcePromote(
-            ctx.getSource().getServer(),
-            lineageId
-        );
-        ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    promoted
-                        ? "Force-promoted one reserve unit in lineage " + lineageId + " (see server log for details)"
-                        : "No promotion fired (no living queen, no reserves, or no eligible growth path)"
-                ),
-                true
-            );
-        return promoted ? 1 : 0;
-    }
 }

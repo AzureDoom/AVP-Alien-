@@ -63,8 +63,6 @@ public final class HiveLocationRegistry {
 
     private long ticksSinceLastDispatch = 0L;
 
-    private long ticksSinceLastReservePromotion = 0L;
-
     private long ticksSinceLastHiveSpawn = 0L;
 
     private HiveLocationRegistry() {}
@@ -248,7 +246,6 @@ public final class HiveLocationRegistry {
         byCenterDim.clear();
         ticksSinceLastScan = 0L;
         ticksSinceLastDispatch = 0L;
-        ticksSinceLastReservePromotion = 0L;
         ticksSinceLastHiveSpawn = 0L;
 
         var allIds = Alien.MOD.factions().getAllIds();
@@ -440,12 +437,6 @@ public final class HiveLocationRegistry {
             com.alien.common.gameplay.hive2.empress.EmpressEmergenceTask.scanAndStart(server);
         }
 
-        ticksSinceLastReservePromotion++;
-        if (ticksSinceLastReservePromotion >= config.lineageReservePromotionInterval()) {
-            ticksSinceLastReservePromotion = 0L;
-            com.alien.common.gameplay.hive2.lifecycle.LineageReservePromotionTask.scanAndPromote(server);
-        }
-
         ticksSinceLastScan++;
         if (ticksSinceLastScan >= config.lineageScanIntervalTicks()) {
             ticksSinceLastScan = 0L;
@@ -567,7 +558,6 @@ public final class HiveLocationRegistry {
         byCenterDim.clear();
         ticksSinceLastScan = 0L;
         ticksSinceLastDispatch = 0L;
-        ticksSinceLastReservePromotion = 0L;
         ticksSinceLastHiveSpawn = 0L;
     }
 
