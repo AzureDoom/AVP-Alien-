@@ -1,6 +1,7 @@
 package com.alien.common.gameplay.entity.living.alien;
 
 import com.alien.common.data.AlienVariantTypes;
+import com.alien.common.gameplay.block.entity.resin.node.ChargeCursor;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.gameplay.hive2.spawning.HiveLocationSpawnGate;
@@ -18,6 +19,7 @@ import net.minecraft.world.level.gameevent.EntityPositionSource;
 import net.minecraft.world.level.gameevent.GameEventListener;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
 
@@ -116,7 +118,6 @@ public class ResinManager implements GameEventListener.Provider<ResinSpreadListe
         lastSpreadTick = alien.tickCount;
 
         if (resinData.resin() <= 0) {
-            paySpreadCost(location);
             return;
         }
 
@@ -145,6 +146,20 @@ public class ResinManager implements GameEventListener.Provider<ResinSpreadListe
 
     public ResinData resinData() {
         return resinData;
+    }
+
+    public @Nullable ChargeCursor.SpreadCost spreadCost() {
+        var location = currentLocation();
+        if (location == null || !location.isAlive()) {
+            return null;
+        }
+
+        var cost = HiveLocationRegistry.INSTANCE.config().resinSpreadBiomassCost();
+        if (cost <= 0) {
+            return null;
+        }
+
+        return new ChargeCursor.SpreadCost(location.id().value(), cost);
     }
 
     private boolean isNodePlacementOnCooldown() {

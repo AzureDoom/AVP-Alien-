@@ -82,7 +82,11 @@ public class ResinSpreadListener implements GameEventListener {
             }
 
             var resin = resinData.resin();
-            this.resinSpreader.addCursors(BlockPos.containing(vec3.relative(Direction.UP, 0.5)), resin);
+            this.resinSpreader.addCursors(
+                BlockPos.containing(vec3.relative(Direction.UP, 0.5)),
+                resin,
+                resinProducer.getResinManager().spreadCost()
+            );
             resinData.setResin(0);
             return true;
         }
