@@ -123,7 +123,7 @@ public class EggLayingSensors {
             .getEntitiesOfClass(
                 Ovomorph.class,
                 searchBox,
-                entity -> entity.getType().is(AlienEntityTypeTags.OVOMORPHS) && !entity.isPassenger()
+                entity -> entity.getType().is(AlienEntityTypeTags.OVOMORPHS) && entity.isRooted.get()
             )
             .isEmpty();
     }
