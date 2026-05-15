@@ -261,7 +261,7 @@ public final class HiveLocation {
         return lineageFactionId;
     }
 
-    private @Nullable AlienVariant lineageVariantOrNull() {
+    public @Nullable AlienVariant lineageVariantOrNull() {
         var faction = Alien.MOD.factions().get(lineageFactionId);
         if (faction == null || !(faction.data() instanceof LineageFactionData lineage)) {
             return null;

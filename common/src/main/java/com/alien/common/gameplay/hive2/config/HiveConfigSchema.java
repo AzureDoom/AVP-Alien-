@@ -111,6 +111,7 @@ public final class HiveConfigSchema {
             "hiveSpawnerIntervalTicks",
             "hiveSpawnerMaxSpawnAttemptsPerLocation",
             "hiveSpawnerMaxSpawnsPerLocation",
+            "maxOvomorphsPerHiveLocation",
             "royalJellyTicksPerProduction",
             "scourgeJellyTicksPerQueenProduction",
             "scourgeJellyTicksPerHarbingerProduction"

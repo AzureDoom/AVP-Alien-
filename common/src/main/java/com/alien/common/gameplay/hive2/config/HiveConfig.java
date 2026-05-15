@@ -111,6 +111,7 @@ public record HiveConfig(
     long hiveSpawnerIntervalTicks,
     int hiveSpawnerMaxSpawnAttemptsPerLocation,
     int hiveSpawnerMaxSpawnsPerLocation,
+    int maxOvomorphsPerHiveLocation,
     long royalJellyTicksPerProduction,
     long scourgeJellyTicksPerQueenProduction,
     long scourgeJellyTicksPerHarbingerProduction
@@ -224,6 +225,7 @@ public record HiveConfig(
             TICKS_PER_SECOND, // hiveSpawnerIntervalTicks
             32, // hiveSpawnerMaxSpawnAttemptsPerLocation
             4, // hiveSpawnerMaxSpawnsPerLocation
+            30, // maxOvomorphsPerHiveLocation
             TICKS_PER_MINUTE, // royalJellyTicksPerProduction (1 game-min per queen)
             100L * TICKS_PER_MINUTE, // scourgeJellyTicksPerQueenProduction (100 game-min per queen)
             TICKS_PER_MINUTE // scourgeJellyTicksPerHarbingerProduction (1 game-min per harbinger)
