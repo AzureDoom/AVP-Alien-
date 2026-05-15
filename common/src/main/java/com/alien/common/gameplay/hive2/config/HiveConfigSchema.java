@@ -34,6 +34,7 @@ public final class HiveConfigSchema {
             "convoySpeedBlocksPerSecond",
             "arrivalRadiusBlocks",
             "manifestDistanceBlocks",
+            "convoyInterceptRadiusBlocks",
             "reinforcementSpeedMultiplier",
             "migrationSpeedMultiplier",
             "raidSpeedMultiplier"

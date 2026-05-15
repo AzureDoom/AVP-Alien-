@@ -34,6 +34,7 @@ public record HiveConfig(
     double convoySpeedBlocksPerSecond,
     int arrivalRadiusBlocks,
     int manifestDistanceBlocks,
+    int convoyInterceptRadiusBlocks,
     double reinforcementSpeedMultiplier,
     double migrationSpeedMultiplier,
     double raidSpeedMultiplier,
@@ -149,6 +150,7 @@ public record HiveConfig(
             10.0, // convoySpeedBlocksPerSecond
             16, // arrivalRadiusBlocks
             80, // manifestDistanceBlocks
+            32, // convoyInterceptRadiusBlocks
             1.0, // reinforcementSpeedMultiplier
             0.7, // migrationSpeedMultiplier
             1.5, // raidSpeedMultiplier

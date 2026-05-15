@@ -3,6 +3,7 @@ package com.alien.common.gameplay.hive2.tick;
 import com.alien.Alien;
 import com.alien.common.gameplay.hive2.convoy.Convoy;
 import com.alien.common.gameplay.hive2.convoy.ConvoyArrival;
+import com.alien.common.gameplay.hive2.convoy.ConvoyInterception;
 import com.alien.common.gameplay.hive2.convoy.ConvoyTravel;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.id.LineageIds;
@@ -52,6 +53,12 @@ public final class LineageConvoyTickTask {
                         continue;
                     }
                     updateRaidTargetPos(raid, server);
+                }
+
+                if (ConvoyInterception.tryIntercept(server, convoy, config)) {
+                    iterator.remove();
+                    anyChanged = true;
+                    continue;
                 }
 
                 ConvoyTravel.tick(convoy, config);
