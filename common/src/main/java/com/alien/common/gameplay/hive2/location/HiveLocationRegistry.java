@@ -19,6 +19,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -395,7 +396,7 @@ public final class HiveLocationRegistry {
      */
     public void tick(MinecraftServer server) {
         if (!byId.isEmpty()) {
-            for (var location : byId.values()) {
+            for (var location : new ArrayList<>(byId.values())) {
                 if (!location.isAlive()) {
                     continue;
                 }
