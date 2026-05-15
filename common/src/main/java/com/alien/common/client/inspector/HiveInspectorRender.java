@@ -38,7 +38,7 @@ public final class HiveInspectorRender {
 
     private static final int BAR_BG_COLOR = 0xFF14141A;
 
-    private static final int BAR_VALUE_ON_FILL_COLOR = 0xFF18181C;
+    private static final int BAR_FILL_COLOR = 0xFF6B5529;
 
     private HiveInspectorRender() {}
 
@@ -203,44 +203,19 @@ public final class HiveInspectorRender {
         var barY = row.y() + Math.max(0, (row.height() - barH) / 2);
 
         graphics.fill(barX, barY, barX + barW, barY + barH, BAR_BG_COLOR);
-        var filled = 0;
         if (cap > 0 && current > 0) {
-            filled = Math.max(0, Math.min(barW, (int) Math.round(((double) current / (double) cap) * (double) barW)));
-            graphics.fill(barX, barY, barX + filled, barY + barH, InspectorStyle.ACCENT_COLOR);
+            var filled = Math.max(0, Math.min(barW, (int) Math.round(((double) current / (double) cap) * (double) barW)));
+            graphics.fill(barX, barY, barX + filled, barY + barH, BAR_FILL_COLOR);
         }
 
         var textW = font.width(valueText);
-        var textX = textW <= barW ? barX + (barW - textW) / 2 : barX + 2;
-        var textMaxW = textW <= barW ? textW : Math.max(0, barW - 4);
-        drawSplitBarText(graphics, font, valueText, textX, textY, textMaxW, barX, row.y(), filled, row.bottom());
+        if (textW <= barW) {
+            UiText.drawClipped(graphics, font, valueText, barX + (barW - textW) / 2, textY, textW, InspectorStyle.VALUE_COLOR);
+        } else {
+            UiText.drawClipped(graphics, font, valueText, barX + 2, textY, Math.max(0, barW - 4), InspectorStyle.VALUE_COLOR);
+        }
 
         return row.bottom();
-    }
-
-    private static void drawSplitBarText(
-        GuiGraphics graphics,
-        Font font,
-        String text,
-        int textX,
-        int textY,
-        int textMaxWidth,
-        int barX,
-        int clipTop,
-        int filled,
-        int clipBottom
-    ) {
-        if (textMaxWidth <= 0) {
-            return;
-        }
-
-        UiText.drawClipped(graphics, font, text, textX, textY, textMaxWidth, InspectorStyle.VALUE_COLOR);
-        if (filled <= 0) {
-            return;
-        }
-
-        graphics.enableScissor(barX, clipTop, barX + filled, clipBottom);
-        UiText.drawClipped(graphics, font, text, textX, textY, textMaxWidth, BAR_VALUE_ON_FILL_COLOR);
-        graphics.disableScissor();
     }
 
     /** Compact row group for short numeric facts. Wraps to multiple rows when the inspector is narrow. */
