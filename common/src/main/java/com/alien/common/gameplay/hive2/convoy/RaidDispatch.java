@@ -254,6 +254,9 @@ public final class RaidDispatch {
         if (!type.is(AlienEntityTypeTags.XENOMORPHS)) {
             return false;
         }
+        if (type.is(AlienEntityTypeTags.WARRIORS)) {
+            return true;
+        }
         var recipe = HiveRecipeRegistry.forOutputEntity(type);
         return recipe != null && recipe.scourgeJelly() > 0;
     }
