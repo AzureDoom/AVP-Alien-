@@ -156,6 +156,9 @@ public class Alien {
             .register(server -> com.alien.common.gameplay.hive2.convoy.RaidDispatch.clear());
         MOD.events()
             .onServerStopped()
+            .register(server -> com.alien.common.gameplay.hive2.convoy.ConvoyBossBars.clear());
+        MOD.events()
+            .onServerStopped()
             .register(server -> com.alien.common.gameplay.hive2.empress.EmpressEmergenceRitual.clear());
 
         // Hive2: variant-faction join is event-driven. Catches every alien that loads from disk

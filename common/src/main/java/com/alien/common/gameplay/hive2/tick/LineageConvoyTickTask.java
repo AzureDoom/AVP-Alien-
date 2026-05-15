@@ -3,6 +3,8 @@ package com.alien.common.gameplay.hive2.tick;
 import com.alien.Alien;
 import com.alien.common.gameplay.hive2.convoy.Convoy;
 import com.alien.common.gameplay.hive2.convoy.ConvoyArrival;
+import com.alien.common.gameplay.hive2.convoy.ConvoyBossBars;
+import com.alien.common.gameplay.hive2.convoy.ConvoyId;
 import com.alien.common.gameplay.hive2.convoy.ConvoyInterception;
 import com.alien.common.gameplay.hive2.convoy.ConvoyTravel;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
@@ -27,6 +29,7 @@ public final class LineageConvoyTickTask {
 
     public static void run(MinecraftServer server) {
         var config = HiveLocationRegistry.INSTANCE.config();
+        var activeConvoyIds = new java.util.HashSet<ConvoyId>();
 
         for (var factionId : new java.util.ArrayList<>(Alien.MOD.factions().getAllIds())) {
             if (!LineageIds.isLineageId(factionId)) {
@@ -45,9 +48,12 @@ public final class LineageConvoyTickTask {
 
             while (iterator.hasNext()) {
                 var convoy = iterator.next();
+                activeConvoyIds.add(convoy.id());
 
                 if (convoy instanceof Convoy.Raid raid) {
                     if (handleRaidExpiry(raid, server)) {
+                        ConvoyBossBars.remove(convoy);
+                        activeConvoyIds.remove(convoy.id());
                         iterator.remove();
                         anyChanged = true;
                         continue;
@@ -55,7 +61,11 @@ public final class LineageConvoyTickTask {
                     updateRaidTargetPos(raid, server);
                 }
 
+                ConvoyBossBars.tick(server, convoy, lineage, config);
+
                 if (ConvoyInterception.tryIntercept(server, convoy, config)) {
+                    ConvoyBossBars.remove(convoy);
+                    activeConvoyIds.remove(convoy.id());
                     iterator.remove();
                     anyChanged = true;
                     continue;
@@ -64,6 +74,8 @@ public final class LineageConvoyTickTask {
                 ConvoyTravel.tick(convoy, config);
 
                 if (ConvoyArrival.checkArrival(server, convoy, lineage, config)) {
+                    ConvoyBossBars.remove(convoy);
+                    activeConvoyIds.remove(convoy.id());
                     iterator.remove();
                     anyChanged = true;
                 }
@@ -73,6 +85,8 @@ public final class LineageConvoyTickTask {
                 lineage.markDirty();
             }
         }
+
+        ConvoyBossBars.retain(activeConvoyIds);
     }
 
     /** Refreshes a raid's last-known target position when its target player is online + same dim + alive. */
