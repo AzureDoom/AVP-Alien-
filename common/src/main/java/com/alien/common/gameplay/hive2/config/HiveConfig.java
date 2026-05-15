@@ -80,6 +80,7 @@ public record HiveConfig(
     int maxLineagesPerDimensionPerVariant,
     int maxClaimsPerScan,
     long resinFullDensityTicks,
+    int maxPassiveClaimsPerUnloadedScan,
 
     // ---------- § 11 Biomass ----------
     int baseChunkCost,
@@ -190,6 +191,7 @@ public record HiveConfig(
             64, // maxClaimsPerScan (enough to complete a 7x7 ring boundary in one scan, so partial fills
             // align with ring boundaries instead of breaking mid-ring)
             24L * TICKS_PER_HOUR, // resinFullDensityTicks
+            1, // maxPassiveClaimsPerUnloadedScan
 
             // § 11 Biomass
             100, // baseChunkCost

@@ -9,15 +9,16 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Picks the next chunk a location should try to claim. Walks the cardinal-adjacent frontier of its current
+ * Picks chunks a location should try to claim. Loaded growth walks the cardinal-adjacent frontier of its current
  * {@code claimedChunks}, filters out chunks owned by any other registered location, and returns the candidate closest
- * to the location's center (Chebyshev distance). Returns {@code null} when the location is hemmed in or no candidate
- * has a loaded xenomorph member of this location standing in it.
+ * to the location's center (Chebyshev distance). Passive unloaded growth uses the same frontier/occupancy checks but
+ * selects a random candidate without requiring the chunk or an explorer xenomorph to be loaded.
  * <p>
  * The "loaded xeno present in the candidate" gate means hive growth is xenomorph-driven: the hive can't passively print
  * territory; an actual unit has to be out exploring an adjacent unclaimed chunk for it to be claimed.
@@ -37,7 +38,7 @@ public final class ChunkPicker {
         }
 
         var centerChunk = new ChunkPos(location.centerPos());
-        var frontier = collectFrontier(level, location);
+        var frontier = collectFrontier(level, location, true);
 
         if (frontier.isEmpty()) {
             return null;
@@ -57,7 +58,20 @@ public final class ChunkPicker {
             .orElse(null);
     }
 
-    private static Set<ChunkPos> collectFrontier(ServerLevel level, HiveLocation location) {
+    public static @Nullable ChunkPos pickPassiveChunk(ServerLevel level, HiveLocation location, HiveConfig config) {
+        if (location.claimedChunks().size() >= config.maxChunksPerLocation()) {
+            return null;
+        }
+
+        var frontier = new ArrayList<>(collectFrontier(level, location, false));
+        if (frontier.isEmpty()) {
+            return null;
+        }
+
+        return frontier.get(level.random.nextInt(frontier.size()));
+    }
+
+    private static Set<ChunkPos> collectFrontier(ServerLevel level, HiveLocation location, boolean requireLoadedMember) {
         var dimension = location.dimension();
         var frontier = new HashSet<ChunkPos>();
         var locationFaction = Alien.MOD.factions().get(location.id().value());
@@ -76,15 +90,17 @@ public final class ChunkPicker {
                     continue;
                 }
 
-                // Candidate must be loaded.
-                if (!level.getChunkSource().hasChunk(candidate.x, candidate.z)) {
-                    continue;
-                }
+                if (requireLoadedMember) {
+                    // Candidate must be loaded.
+                    if (!level.getChunkSource().hasChunk(candidate.x, candidate.z)) {
+                        continue;
+                    }
 
-                // At least one location-faction member must be standing in the candidate chunk. This makes hive
-                // growth contingent on a xenomorph actually exploring outward.
-                if (!hasMemberInChunk(level, locationFaction, candidate)) {
-                    continue;
+                    // At least one location-faction member must be standing in the candidate chunk. This makes loaded
+                    // hive growth xenomorph-driven: an actual unit has to be exploring an adjacent unclaimed chunk.
+                    if (!hasMemberInChunk(level, locationFaction, candidate)) {
+                        continue;
+                    }
                 }
 
                 frontier.add(candidate);

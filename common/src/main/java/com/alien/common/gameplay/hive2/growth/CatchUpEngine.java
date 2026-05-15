@@ -11,8 +11,8 @@ import net.minecraft.server.level.ServerLevel;
  * <ol>
  * <li>Adding biomass for the elapsed period using {@link BiomassIncome#unloadedPerSecond} (the "abstract" formula that
  * doesn't read entity state — see {@code HIVE_REDESIGN_09_GROWTH.md} § 5).</li>
- * <li>Looping claim attempts up to {@link com.alien.common.gameplay.hive2.config.HiveConfig#maxClaimsPerScan} while the
- * location can afford the next chunk's cost.</li>
+ * <li>Looping claim attempts while the location can afford the next chunk's cost. Loaded calls use explorer-driven
+ * claims; unloaded calls use a slower passive random claim mode.</li>
  * <li>Bumping {@code lastGrowthTick} to {@code currentTick}.</li>
  * </ol>
  * <p>
@@ -27,6 +27,20 @@ public final class CatchUpEngine {
     private CatchUpEngine() {}
 
     public static void catchUpTo(ServerLevel level, HiveLocation location, LineageFactionData lineage, long currentTick) {
+        catchUpTo(level, location, lineage, currentTick, false);
+    }
+
+    public static void catchUpUnloadedTo(ServerLevel level, HiveLocation location, LineageFactionData lineage, long currentTick) {
+        catchUpTo(level, location, lineage, currentTick, true);
+    }
+
+    private static void catchUpTo(
+        ServerLevel level,
+        HiveLocation location,
+        LineageFactionData lineage,
+        long currentTick,
+        boolean passiveClaims
+    ) {
         var config = HiveLocationRegistry.INSTANCE.config();
         HiveLocationClaims.releaseDisconnectedClaims(level, location);
 
@@ -50,7 +64,7 @@ public final class CatchUpEngine {
             return;
         }
 
-        runClaimLoop(level, location, lineage, currentTick, config);
+        runClaimLoop(level, location, lineage, currentTick, config, passiveClaims);
     }
 
     private static void addBiomassClamped(HiveLocation location, int income, com.alien.common.gameplay.hive2.config.HiveConfig config) {
@@ -64,13 +78,15 @@ public final class CatchUpEngine {
         HiveLocation location,
         LineageFactionData lineage,
         long currentTick,
-        com.alien.common.gameplay.hive2.config.HiveConfig config
+        com.alien.common.gameplay.hive2.config.HiveConfig config,
+        boolean passiveClaims
     ) {
+        var claimLimit = passiveClaims ? config.maxPassiveClaimsPerUnloadedScan() : config.maxClaimsPerScan();
         var claimsThisRun = 0;
         var lineageTotal = HiveLocationClaims.totalChunksFor(lineage);
 
         while (
-            claimsThisRun < config.maxClaimsPerScan()
+            claimsThisRun < claimLimit
                 && location.claimedChunks().size() < config.maxChunksPerLocation()
                 && lineageTotal < config.maxChunksPerLineage()
         ) {
@@ -83,7 +99,9 @@ public final class CatchUpEngine {
                 return;
             }
 
-            var nextChunk = ChunkPicker.pickNextChunk(level, location, config);
+            var nextChunk = passiveClaims
+                ? ChunkPicker.pickPassiveChunk(level, location, config)
+                : ChunkPicker.pickNextChunk(level, location, config);
             if (nextChunk == null) {
                 return;
             }

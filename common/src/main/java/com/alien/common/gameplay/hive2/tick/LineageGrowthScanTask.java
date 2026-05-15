@@ -42,7 +42,7 @@ public final class LineageGrowthScanTask {
 
                 var isLoaded = level != null && HiveLocationLoadedTickTask.hasLoadedClaimedChunk(level, location);
                 if (level != null && !isLoaded) {
-                    CatchUpEngine.catchUpTo(level, location, lineage, currentTick);
+                    CatchUpEngine.catchUpUnloadedTo(level, location, lineage, currentTick);
                 }
 
                 // Phase 11 fallback: unloaded locations spread on the slow scan; loaded locations use the fast task.
