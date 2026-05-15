@@ -2,12 +2,14 @@ package com.alien.common.gameplay.hive2.convoy;
 
 import com.alien.Alien;
 import com.alien.common.gameplay.hive2.config.HiveConfig;
+import com.alien.common.gameplay.hive2.economy.CastePopulation;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.id.HiveLocationId;
 import com.alien.common.gameplay.hive2.id.LineageIds;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.gameplay.hive2.location.HiveLocationReserves;
+import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.entity.v1.EntityReserves;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -28,7 +30,7 @@ import java.util.UUID;
  * <ul>
  * <li>Empress-gated.</li>
  * <li>Triggered when a player has at least {@code raidThresholdKills} kills in the aggro window.</li>
- * <li>Source = the largest qualifying location ({@code claimedChunks ≥ raidMinLocationSizeChunks}).</li>
+ * <li>Source = the largest qualifying location ({@code claimedChunks ≥ raidMinLocationSizeChunks}) with a harbinger.</li>
  * <li>Per-source cooldown so the same source doesn't spam raids.</li>
  * <li>Composition drained from source reserves — Phase 8b uses round-robin (Phase 8b polish: skew toward
  * fighters).</li>
@@ -187,6 +189,9 @@ public final class RaidDispatch {
                 continue;
             }
             if (location.claimedChunks().size() < config.raidMinLocationSizeChunks()) {
+                continue;
+            }
+            if (CastePopulation.countCaste(location, AlienEntityTypeTags.HARBINGERS) <= 0) {
                 continue;
             }
 
