@@ -2,6 +2,7 @@ package com.alien.common.gameplay.hive2.inspection;
 
 import com.alien.Alien;
 import com.alien.common.gameplay.hive2.config.HiveConfig;
+import com.alien.common.gameplay.hive2.config.HiveConfigSchema;
 import com.alien.common.gameplay.hive2.economy.CastePopulation;
 import com.alien.common.gameplay.hive2.economy.JellyProduction;
 import com.alien.common.gameplay.hive2.convoy.Convoy;
@@ -50,6 +51,8 @@ public final class HiveInspectionSnapshot {
     public static final String K_AGE_TICKS = "AgeTicks";
 
     public static final String K_REMOVAL_REASON = "RemovalReason";
+
+    public static final String K_HIVE_CONFIG = "HiveConfig";
 
     // Location keys
     public static final String K_LOCATION_ID = "LocationId";
@@ -267,6 +270,8 @@ public final class HiveInspectionSnapshot {
         var config = HiveLocationRegistry.INSTANCE.config();
         var locationFactionId = location.id().value();
 
+        putConfig(tag, config);
+
         tag.putString(K_FACTION_ID, locationFactionId.toString());
         tag.putString(K_LOCATION_ID, location.id().value().toString());
         tag.putLong(K_LOCATION_NUMBER, location.locationNumber());
@@ -373,6 +378,8 @@ public final class HiveInspectionSnapshot {
         }
         var config = HiveLocationRegistry.INSTANCE.config();
         var factionId = faction.id();
+
+        putConfig(tag, config);
 
         tag.putString(K_FACTION_ID, factionId.toString());
         tag.putString(K_DISPLAY_NAME, faction.name());
@@ -546,6 +553,8 @@ public final class HiveInspectionSnapshot {
         }
         var config = HiveLocationRegistry.INSTANCE.config();
         var factionId = faction.id();
+
+        putConfig(tag, config);
 
         tag.putString(K_FACTION_ID, factionId.toString());
         tag.putString(K_DISPLAY_NAME, faction.name());
@@ -794,6 +803,10 @@ public final class HiveInspectionSnapshot {
             }
         }
         return loaded;
+    }
+
+    private static void putConfig(CompoundTag tag, HiveConfig config) {
+        tag.put(K_HIVE_CONFIG, HiveConfigSchema.toTag(config));
     }
 
 }

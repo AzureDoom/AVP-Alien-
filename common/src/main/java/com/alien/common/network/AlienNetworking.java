@@ -2,8 +2,10 @@ package com.alien.common.network;
 
 import com.alien.Alien;
 import com.alien.common.network.handler.AlienClientPacketListener;
+import com.alien.common.network.handler.HiveConfigUpdateHandler;
 import com.alien.common.network.handler.HiveInspectionRequestHandler;
 import com.alien.common.network.payload.C2SRequestHiveInspectionPayload;
+import com.alien.common.network.payload.C2SUpdateHiveConfigPayload;
 import com.alien.common.network.payload.S2CHiveInspectionPayload;
 import com.blib.api.common.network.v1.NetworkHandler;
 import com.blib.api.common.network.v1.PacketDirection;
@@ -24,6 +26,9 @@ public final class AlienNetworking {
             new PacketDirection.C2S<>(C2SRequestHiveInspectionPayload.TYPE, C2SRequestHiveInspectionPayload.CODEC)
         );
         registry.registerPacketDirection(
+            new PacketDirection.C2S<>(C2SUpdateHiveConfigPayload.TYPE, C2SUpdateHiveConfigPayload.CODEC)
+        );
+        registry.registerPacketDirection(
             new PacketDirection.S2C<>(S2CHiveInspectionPayload.TYPE, S2CHiveInspectionPayload.CODEC)
         );
 
@@ -32,6 +37,13 @@ public final class AlienNetworking {
                 C2SRequestHiveInspectionPayload.TYPE,
                 C2SRequestHiveInspectionPayload.CODEC,
                 HiveInspectionRequestHandler::handle
+            )
+        );
+        registry.registerPacketHandler(
+            new NetworkHandler.FromClient<>(
+                C2SUpdateHiveConfigPayload.TYPE,
+                C2SUpdateHiveConfigPayload.CODEC,
+                HiveConfigUpdateHandler::handle
             )
         );
         registry.registerPacketHandler(

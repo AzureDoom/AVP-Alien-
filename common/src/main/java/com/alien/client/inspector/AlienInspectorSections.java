@@ -1,5 +1,6 @@
 package com.alien.client.inspector;
 
+import com.alien.common.client.inspector.HiveConfigInspectorSection;
 import com.alien.common.client.inspector.LineageFactionInspectorSection;
 import com.alien.common.client.inspector.LocationFactionInspectorSection;
 import com.alien.common.client.inspector.VariantFactionInspectorSection;
@@ -18,5 +19,6 @@ public final class AlienInspectorSections {
         InspectorSectionRegistry.register(new LocationFactionInspectorSection());
         InspectorSectionRegistry.register(new LineageFactionInspectorSection());
         InspectorSectionRegistry.register(new VariantFactionInspectorSection());
+        InspectorSectionRegistry.register(new HiveConfigInspectorSection());
     }
 }
