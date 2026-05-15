@@ -6,6 +6,7 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.gameplay.hive2.location.HiveLocationSpacing;
+import com.alien.common.gameplay.hive2.policy.HivePolicies;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
@@ -206,7 +207,7 @@ public final class HiveLoadedSpawner {
             for (var dy = -8; dy <= 8; dy++) {
                 var y = Math.clamp(baseY + dy, level.getMinBuildHeight() + 1, level.getMaxBuildHeight() - 1);
                 var pos = new BlockPos(x, y, z);
-                if (isValidSpawnPosition(level, pos, type)) {
+                if (isValidSpawnPosition(level, location, pos, type)) {
                     return pos;
                 }
             }
@@ -235,15 +236,14 @@ public final class HiveLoadedSpawner {
     }
 
     @SuppressWarnings("unchecked")
-    private static boolean isValidSpawnPosition(ServerLevel level, BlockPos pos, EntityType<?> rawType) {
+    private static boolean isValidSpawnPosition(ServerLevel level, HiveLocation location, BlockPos pos, EntityType<?> rawType) {
         if (!isValidPlayerDistance(level, pos)) {
             return false;
         }
         if (!level.noCollision(rawType.getSpawnAABB(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5))) {
             return false;
         }
-        var config = HiveLocationRegistry.INSTANCE.config();
-        if (config.reserveSpawnsCanIgnoreResin()) {
+        if (HivePolicies.reserveSpawnsCanIgnoreResin(level.getServer(), location)) {
             return AlienSpawning.checkSpawnRules(
                 (EntityType<? extends Alien>) rawType,
                 level,
