@@ -191,6 +191,104 @@ public final class LocationFactionInspectorSection extends AbstractHiveInspector
         }
 
         rowY += InspectorStyle.ROW_GAP;
+        var spread = drawCollapsibleSectionHeader(graphics, font, x, rowY, width, "abstract_spread", "Abstract Spread", mouseX, mouseY);
+        rowY = spread.nextY();
+        if (spread.expanded()) {
+            rowY += InspectorStyle.CONTENT_PADDING / 2;
+            rowY = HiveInspectorRender.drawMetricStrip(
+                graphics,
+                font,
+                x,
+                rowY,
+                width,
+                metric("Can try", canTrySpread(s) ? "yes" : "no"),
+                metric("Remaining", formatTicksOrUnavailable(s.getLong(HiveInspectionSnapshot.K_SPREAD_COOLDOWN_REMAINING_TICKS))),
+                metric(
+                    "Locations",
+                    s.getInt(HiveInspectionSnapshot.K_LOCATION_COUNT) + "/" + s.getInt(HiveInspectionSnapshot.K_SPREAD_MAX_LOCATIONS)
+                ),
+                metric("Cooldown", HiveInspectorRender.formatTicks(s.getLong(HiveInspectionSnapshot.K_SPREAD_COOLDOWN_TICKS))),
+                metric("Radius", s.getInt(HiveInspectionSnapshot.K_SPREAD_MAX_RADIUS_CHUNKS) + " chunks"),
+                metric("Min dist", s.getInt(HiveInspectionSnapshot.K_SPREAD_MIN_DISTANCE_CHUNKS) + " chunks")
+            );
+            rowY = HiveInspectorRender.drawRow(
+                graphics,
+                font,
+                x,
+                rowY,
+                width,
+                "Current tick",
+                formatTick(s.getLong(HiveInspectionSnapshot.K_SPREAD_CURRENT_TICK))
+            );
+            rowY = HiveInspectorRender.drawRow(
+                graphics,
+                font,
+                x,
+                rowY,
+                width,
+                "Last success",
+                formatTimedTick(
+                    s,
+                    HiveInspectionSnapshot.K_SPREAD_HAS_LAST_SUCCESS,
+                    HiveInspectionSnapshot.K_SPREAD_LAST_SUCCESS_AGE_TICKS,
+                    HiveInspectionSnapshot.K_SPREAD_LAST_SUCCESS_TICK
+                )
+            );
+            rowY = HiveInspectorRender.drawRow(
+                graphics,
+                font,
+                x,
+                rowY,
+                width,
+                "Next eligible",
+                formatNextEligible(s)
+            );
+
+            if (s.getBoolean(HiveInspectionSnapshot.K_SPREAD_HAS_LAST_ATTEMPT)) {
+                rowY = HiveInspectorRender.drawItemHeader(
+                    graphics,
+                    font,
+                    x,
+                    rowY,
+                    width,
+                    "Last attempt",
+                    formatTimedTick(
+                        s,
+                        HiveInspectionSnapshot.K_SPREAD_HAS_LAST_ATTEMPT,
+                        HiveInspectionSnapshot.K_SPREAD_LAST_ATTEMPT_AGE_TICKS,
+                        HiveInspectionSnapshot.K_SPREAD_LAST_ATTEMPT_TICK
+                    )
+                );
+                rowY = HiveInspectorRender.drawMetricStrip(
+                    graphics,
+                    font,
+                    x,
+                    rowY,
+                    width,
+                    metric("Result", s.getString(HiveInspectionSnapshot.K_SPREAD_LAST_ATTEMPT_RESULT)),
+                    metric("Candidate", candidateChunk(s))
+                );
+                if (s.contains(HiveInspectionSnapshot.K_SPREAD_LAST_ATTEMPT_CREATED_LOCATION_ID)) {
+                    rowY = HiveInspectorRender.drawClippedRow(
+                        graphics,
+                        font,
+                        x,
+                        rowY,
+                        width,
+                        "Created",
+                        s.getString(HiveInspectionSnapshot.K_SPREAD_LAST_ATTEMPT_CREATED_LOCATION_ID)
+                    );
+                }
+                var detail = s.getString(HiveInspectionSnapshot.K_SPREAD_LAST_ATTEMPT_DETAIL);
+                if (!detail.isBlank()) {
+                    rowY = HiveInspectorRender.drawNote(graphics, font, x, rowY, width, detail);
+                }
+            } else {
+                rowY = HiveInspectorRender.drawNote(graphics, font, x, rowY, width, "(none - no abstract spread attempt recorded)");
+            }
+        }
+
+        rowY += InspectorStyle.ROW_GAP;
         var leadership = drawCollapsibleSectionHeader(graphics, font, x, rowY, width, "leadership", "Leadership", mouseX, mouseY);
         rowY = leadership.nextY();
         if (leadership.expanded()) {
@@ -276,6 +374,56 @@ public final class LocationFactionInspectorSection extends AbstractHiveInspector
         }
 
         return rowY;
+    }
+
+    private static boolean canTrySpread(CompoundTag tag) {
+        return tag.getBoolean(HiveInspectionSnapshot.K_SPREAD_COOLDOWN_ELIGIBLE) &&
+            tag.getInt(HiveInspectionSnapshot.K_LOCATION_COUNT) < tag.getInt(HiveInspectionSnapshot.K_SPREAD_MAX_LOCATIONS);
+    }
+
+    private static String candidateChunk(CompoundTag tag) {
+        if (
+            !tag.contains(HiveInspectionSnapshot.K_SPREAD_LAST_ATTEMPT_CANDIDATE_CHUNK_X) ||
+            !tag.contains(HiveInspectionSnapshot.K_SPREAD_LAST_ATTEMPT_CANDIDATE_CHUNK_Z)
+        ) {
+            return "none";
+        }
+        return tag.getInt(HiveInspectionSnapshot.K_SPREAD_LAST_ATTEMPT_CANDIDATE_CHUNK_X) +
+            ", " +
+            tag.getInt(HiveInspectionSnapshot.K_SPREAD_LAST_ATTEMPT_CANDIDATE_CHUNK_Z);
+    }
+
+    private static String formatTimedTick(CompoundTag tag, String hasKey, String ageKey, String tickKey) {
+        if (!tag.getBoolean(hasKey)) {
+            return "never";
+        }
+
+        var tick = tag.getLong(tickKey);
+        var age = tag.getLong(ageKey);
+        if (age >= 0L) {
+            return HiveInspectorRender.formatTicks(age) + " ago (tick " + tick + ")";
+        }
+        return "tick " + tick;
+    }
+
+    private static String formatNextEligible(CompoundTag tag) {
+        var nextEligibleTick = tag.getLong(HiveInspectionSnapshot.K_SPREAD_NEXT_ELIGIBLE_TICK);
+        if (nextEligibleTick < 0L) {
+            return "n/a";
+        }
+        var remaining = tag.getLong(HiveInspectionSnapshot.K_SPREAD_COOLDOWN_REMAINING_TICKS);
+        if (remaining == 0L) {
+            return "now (tick " + nextEligibleTick + ")";
+        }
+        return "tick " + nextEligibleTick + " in " + HiveInspectorRender.formatTicks(remaining);
+    }
+
+    private static String formatTicksOrUnavailable(long ticks) {
+        return ticks >= 0L ? HiveInspectorRender.formatTicks(ticks) : "n/a";
+    }
+
+    private static String formatTick(long tick) {
+        return tick >= 0L ? String.valueOf(tick) : "n/a";
     }
 
     private static int drawCountRows(

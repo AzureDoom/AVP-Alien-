@@ -275,6 +275,8 @@ public final class LineageFactionInspectorSection extends AbstractHiveInspectorS
                         metric("Age", HiveInspectorRender.formatTicks(row.getLong(HiveInspectionSnapshot.K_AGE_TICKS))),
                         metric("No contact", HiveInspectorRender.formatTicks(row.getLong(HiveInspectionSnapshot.K_NO_CONTACT_TICKS))),
                         metric("Evac", HiveInspectorRender.formatTicks(row.getLong(HiveInspectionSnapshot.K_EVACUATING_TICKS))),
+                        metric("Spread", formatSpreadStatus(row)),
+                        metric("Attempt", formatSpreadAttempt(row)),
                         metric(
                             "Leader",
                             row.hasUUID(HiveInspectionSnapshot.K_LEADER_ID)
@@ -301,5 +303,24 @@ public final class LineageFactionInspectorSection extends AbstractHiveInspectorS
 
     private static String coords(CompoundTag tag, String xKey, String yKey, String zKey) {
         return tag.getInt(xKey) + ", " + tag.getInt(yKey) + ", " + tag.getInt(zKey);
+    }
+
+    private static String formatSpreadStatus(CompoundTag row) {
+        if (row.getInt(HiveInspectionSnapshot.K_LOCATION_COUNT) >= row.getInt(HiveInspectionSnapshot.K_SPREAD_MAX_LOCATIONS)) {
+            return "cap";
+        }
+        var remaining = row.getLong(HiveInspectionSnapshot.K_SPREAD_COOLDOWN_REMAINING_TICKS);
+        if (remaining < 0L) {
+            return "n/a";
+        }
+        return row.getBoolean(HiveInspectionSnapshot.K_SPREAD_COOLDOWN_ELIGIBLE)
+            ? "ready"
+            : HiveInspectorRender.formatTicks(remaining);
+    }
+
+    private static String formatSpreadAttempt(CompoundTag row) {
+        return row.getBoolean(HiveInspectionSnapshot.K_SPREAD_HAS_LAST_ATTEMPT)
+            ? row.getString(HiveInspectionSnapshot.K_SPREAD_LAST_ATTEMPT_RESULT)
+            : "none";
     }
 }
