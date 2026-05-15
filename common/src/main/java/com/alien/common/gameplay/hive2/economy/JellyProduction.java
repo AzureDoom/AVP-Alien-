@@ -25,7 +25,8 @@ import java.util.ArrayList;
  * Grants are capped by claimed chunk count; overflow is discarded (the accumulator is still subtracted so the same
  * tick budget isn't re-banked into the next minute).
  * <p>
- * Producers in local reserves contribute too; reserves represent fully-grown unloaded xenomorphs.
+ * Producers in the location's persisted known-member index and local reserves contribute, so persistent royal/harbinger
+ * entities keep producing after their chunks unload.
  */
 public final class JellyProduction {
 
@@ -89,7 +90,7 @@ public final class JellyProduction {
 
     private static int countTaggedProducers(HiveLocation location, net.minecraft.tags.TagKey<net.minecraft.world.entity.EntityType<?>> tag) {
         var count = 0;
-        for (var entry : location.loadedMembersByType().entrySet()) {
+        for (var entry : location.knownMembersByType().entrySet()) {
             if (entry.getKey().is(tag)) {
                 count += entry.getValue().size();
             }

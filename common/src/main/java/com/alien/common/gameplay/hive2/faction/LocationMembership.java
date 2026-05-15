@@ -10,6 +10,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ServerLevelAccessor;
 
+import java.util.HashSet;
+
 /**
  * Helpers for the location-tier faction. Centralizes the lineage-superset invariant
  * ({@code location.members() ⊆ lineage.members()}) so callers can't accidentally add to a location faction without also
@@ -50,6 +52,18 @@ public final class LocationMembership {
         var locationFaction = factions.getOrCreate(location.id().value(), AlienFactionDataTypes.LOCATION);
         if (!locationFaction.membership().hasMember(member)) {
             locationFaction.membership().addEntity(entity);
+        }
+
+        location
+            .loadedMembersByType()
+            .computeIfAbsent(entity.getType(), $ -> new HashSet<>())
+            .add(entity.getUUID());
+        var addedKnownMember = location
+            .knownMembersByType()
+            .computeIfAbsent(entity.getType(), $ -> new HashSet<>())
+            .add(entity.getUUID());
+        if (addedKnownMember) {
+            lineage.markDirty();
         }
     }
 

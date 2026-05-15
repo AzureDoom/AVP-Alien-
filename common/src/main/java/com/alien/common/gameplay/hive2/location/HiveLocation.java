@@ -5,6 +5,7 @@ import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.id.HiveLocationId;
 import com.alien.common.model.alien.variant.AlienVariant;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -90,6 +91,8 @@ public final class HiveLocation {
     private static final String NBT_DECORATED_CHUNKS = "DecoratedChunks";
 
     private static final String NBT_LOCAL_RESERVES = "LocalReserves";
+
+    private static final String NBT_KNOWN_MEMBERS_BY_TYPE = "KnownMembersByType";
 
     private static final String NBT_LEADERSHIP = "Leadership";
 
@@ -188,6 +191,8 @@ public final class HiveLocation {
 
     private final com.alien.common.gameplay.hive2.vent.HiveVentManager ventManager;
 
+    private final Map<EntityType<?>, Set<UUID>> knownMembersByType;
+
     private final Map<EntityType<?>, Set<UUID>> loadedMembersByType;
 
     private @Nullable HiveLocationBossBar bossBar;
@@ -237,6 +242,7 @@ public final class HiveLocation {
         this.localReserves = new HiveLocationReserves(this::lineageVariantOrNull);
         this.leadership = new HiveLocationLeadership();
         this.ventManager = new com.alien.common.gameplay.hive2.vent.HiveVentManager();
+        this.knownMembersByType = new HashMap<>();
         this.loadedMembersByType = new HashMap<>();
         this.bossBar = null;
         this.removalReason = null;
@@ -444,6 +450,10 @@ public final class HiveLocation {
         return ventManager;
     }
 
+    public Map<EntityType<?>, Set<UUID>> knownMembersByType() {
+        return knownMembersByType;
+    }
+
     public Map<EntityType<?>, Set<UUID>> loadedMembersByType() {
         return loadedMembersByType;
     }
@@ -581,6 +591,26 @@ public final class HiveLocation {
         localReserves.save(reservesTag);
         tag.put(NBT_LOCAL_RESERVES, reservesTag);
 
+        var knownMembersTag = new ListTag();
+        for (var entry : knownMembersByType.entrySet()) {
+            var members = entry.getValue();
+            if (members.isEmpty()) {
+                continue;
+            }
+            var row = new CompoundTag();
+            row.putString("Type", BuiltInRegistries.ENTITY_TYPE.getKey(entry.getKey()).toString());
+
+            var membersTag = new ListTag();
+            for (var uuid : members) {
+                var memberTag = new CompoundTag();
+                memberTag.putUUID("Uuid", uuid);
+                membersTag.add(memberTag);
+            }
+            row.put("Members", membersTag);
+            knownMembersTag.add(row);
+        }
+        tag.put(NBT_KNOWN_MEMBERS_BY_TYPE, knownMembersTag);
+
         var leadershipTag = new CompoundTag();
         leadership.save(leadershipTag);
         tag.put(NBT_LEADERSHIP, leadershipTag);
@@ -663,6 +693,27 @@ public final class HiveLocation {
 
         if (tag.contains(NBT_LOCAL_RESERVES)) {
             location.localReserves.load(tag.getCompound(NBT_LOCAL_RESERVES));
+        }
+
+        if (tag.contains(NBT_KNOWN_MEMBERS_BY_TYPE)) {
+            var knownMembersTag = tag.getList(NBT_KNOWN_MEMBERS_BY_TYPE, Tag.TAG_COMPOUND);
+            for (var i = 0; i < knownMembersTag.size(); i++) {
+                var row = knownMembersTag.getCompound(i);
+                var typeId = ResourceLocation.parse(row.getString("Type"));
+                var type = BuiltInRegistries.ENTITY_TYPE.getOptional(typeId).orElse(null);
+                if (type == null) {
+                    continue;
+                }
+
+                var membersTag = row.getList("Members", Tag.TAG_COMPOUND);
+                var members = location.knownMembersByType.computeIfAbsent(type, $ -> new HashSet<>());
+                for (var j = 0; j < membersTag.size(); j++) {
+                    var memberTag = membersTag.getCompound(j);
+                    if (memberTag.hasUUID("Uuid")) {
+                        members.add(memberTag.getUUID("Uuid"));
+                    }
+                }
+            }
         }
 
         if (tag.contains(NBT_LEADERSHIP)) {

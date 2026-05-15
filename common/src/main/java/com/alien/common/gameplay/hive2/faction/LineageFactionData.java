@@ -186,6 +186,7 @@ public class LineageFactionData extends FactionData {
         if (member instanceof FactionMember.Entity entityMember) {
             for (var location : locationsById.values()) {
                 removeLoadedMemberByUuid(location, entityMember.uuid());
+                removeKnownMemberByUuid(location, entityMember.uuid());
             }
         }
         markDirty();
@@ -214,6 +215,13 @@ public class LineageFactionData extends FactionData {
             .loadedMembersByType()
             .computeIfAbsent(entity.getType(), $ -> new HashSet<>())
             .add(entity.getUUID());
+        var addedKnownMember = location
+            .knownMembersByType()
+            .computeIfAbsent(entity.getType(), $ -> new HashSet<>())
+            .add(entity.getUUID());
+        if (addedKnownMember) {
+            markDirty();
+        }
     }
 
     private @Nullable HiveLocation locationContaining(Entity entity) {
@@ -245,6 +253,17 @@ public class LineageFactionData extends FactionData {
 
     private static void removeLoadedMemberByUuid(HiveLocation location, UUID uuid) {
         var iterator = location.loadedMembersByType().entrySet().iterator();
+        while (iterator.hasNext()) {
+            var entry = iterator.next();
+            entry.getValue().remove(uuid);
+            if (entry.getValue().isEmpty()) {
+                iterator.remove();
+            }
+        }
+    }
+
+    private static void removeKnownMemberByUuid(HiveLocation location, UUID uuid) {
+        var iterator = location.knownMembersByType().entrySet().iterator();
         while (iterator.hasNext()) {
             var entry = iterator.next();
             entry.getValue().remove(uuid);

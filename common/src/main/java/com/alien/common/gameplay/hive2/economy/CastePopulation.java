@@ -9,12 +9,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Snapshot of a location's per-caste population: loaded live members + local reserves, summed by entity-type tag. Used
- * by {@link HiveBalanceTask} to compute deficits and by recipe-condition checks.
- * <p>
- * Unloaded members don't contribute — they're not visible in {@code loadedMembersByType} and the faction-tier UUID-only
- * set doesn't carry entity-type info. This is a known approximation; the population cap is enforced against what we can
- * actually observe.
+ * Snapshot of a location's per-caste population: known location members + local reserves, summed by entity-type tag.
+ * Used by {@link HiveBalanceTask} to compute deficits and by recipe-condition checks. The known-member index is
+ * persisted on each location so persistent queens, empresses, and harbingers still count after their chunks unload.
  */
 public final class CastePopulation {
 
@@ -38,7 +35,7 @@ public final class CastePopulation {
 
     private CastePopulation() {}
 
-    /** Per-caste population (loaded live + reserves). Insertion-ordered for stable iteration. */
+    /** Per-caste population (known location members + reserves). Insertion-ordered for stable iteration. */
     public static Map<TagKey<EntityType<?>>, Integer> popByCaste(HiveLocation location) {
         var counts = new LinkedHashMap<TagKey<EntityType<?>>, Integer>();
         for (var caste : TRACKED_CASTES) {
@@ -56,10 +53,10 @@ public final class CastePopulation {
         return total;
     }
 
-    /** Count of one caste (live loaded + reserves) in this location. */
+    /** Count of one caste (known location members + reserves) in this location. */
     public static int countCaste(HiveLocation location, TagKey<EntityType<?>> caste) {
         var count = 0;
-        for (var entry : location.loadedMembersByType().entrySet()) {
+        for (var entry : location.knownMembersByType().entrySet()) {
             if (entry.getKey().is(caste)) {
                 count += entry.getValue().size();
             }
@@ -68,11 +65,11 @@ public final class CastePopulation {
         return count;
     }
 
-    /** Count of one concrete entity type (live loaded + reserves) in this location. */
+    /** Count of one concrete entity type (known location members + reserves) in this location. */
     public static int countEntity(HiveLocation location, EntityType<?> entityType) {
-        var loaded = location.loadedMembersByType()
+        var known = location.knownMembersByType()
             .getOrDefault(entityType, java.util.Set.of())
             .size();
-        return loaded + location.localReserves().getCount(entityType);
+        return known + location.localReserves().getCount(entityType);
     }
 }
