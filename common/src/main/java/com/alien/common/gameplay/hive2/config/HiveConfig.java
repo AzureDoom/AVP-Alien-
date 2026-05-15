@@ -103,6 +103,7 @@ public record HiveConfig(
     int populationPerChunk,
     double minimumPopulationRatioForClaiming,
     int hiveSpawnerMinimumLoadedXenomorphs,
+    boolean reserveSpawnsCanIgnoreResin,
     long hiveSpawnerIntervalTicks,
     int hiveSpawnerMaxSpawnAttemptsPerLocation,
     int hiveSpawnerMaxSpawnsPerLocation,
@@ -211,6 +212,7 @@ public record HiveConfig(
             8, // populationPerChunk
             0.8, // minimumPopulationRatioForClaiming
             20, // hiveSpawnerMinimumLoadedXenomorphs
+            true, // reserveSpawnsCanIgnoreResin: reserves can materialize without a resin floor
             TICKS_PER_SECOND, // hiveSpawnerIntervalTicks
             32, // hiveSpawnerMaxSpawnAttemptsPerLocation
             4, // hiveSpawnerMaxSpawnsPerLocation

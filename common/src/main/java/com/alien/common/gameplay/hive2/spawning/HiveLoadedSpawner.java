@@ -242,10 +242,17 @@ public final class HiveLoadedSpawner {
         if (!level.noCollision(rawType.getSpawnAABB(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5))) {
             return false;
         }
-        if (!AlienSpawning.canSpawnAt((EntityType<? extends Alien>) rawType, level, MobSpawnType.NATURAL, pos, level.random)) {
-            return false;
+        var config = HiveLocationRegistry.INSTANCE.config();
+        if (config.reserveSpawnsCanIgnoreResin()) {
+            return AlienSpawning.checkSpawnRules(
+                (EntityType<? extends Alien>) rawType,
+                level,
+                MobSpawnType.NATURAL,
+                pos,
+                level.random
+            );
         }
-        return true;
+        return AlienSpawning.canSpawnAt((EntityType<? extends Alien>) rawType, level, MobSpawnType.NATURAL, pos, level.random);
     }
 
     private static boolean isValidPlayerDistance(ServerLevel level, BlockPos pos) {
