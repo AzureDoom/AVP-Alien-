@@ -3,9 +3,9 @@ package com.alien.common.gameplay.hive2.faction;
 import com.alien.common.model.alien.variant.AlienVariant;
 
 /**
- * Path-style faction display names: {@code xenos/{variant}/lin{N}/loc{M}}. Numbers are monotonic per parent (variant
- * counts lineages; lineage counts locations) — dead lineages/locations don't return their numbers to the sequence, so the
- * path is stable for the lifetime of the faction.
+ * Faction display names. Numbers are monotonic per parent (variant counts lineages; lineage counts locations) — dead
+ * lineages/locations don't return their numbers to the sequence, so the names stay stable for the lifetime of the
+ * faction.
  */
 public final class FactionNaming {
 
@@ -30,6 +30,15 @@ public final class FactionNaming {
     }
 
     public static String forLocation(AlienVariant variant, long lineageNumber, long locationNumber) {
-        return forLineage(variant, lineageNumber) + "/loc" + locationNumber;
+        return "Hive " + variantCode(variant) + "_" + lineageNumber + "_" + locationNumber;
+    }
+
+    public static String variantCode(AlienVariant variant) {
+        return switch (variant) {
+            case NORMAL -> "NO";
+            case NETHER -> "NE";
+            case ABERRANT -> "AB";
+            case IRRADIATED -> "IR";
+        };
     }
 }
