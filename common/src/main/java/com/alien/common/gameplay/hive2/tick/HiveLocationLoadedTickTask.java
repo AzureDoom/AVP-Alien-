@@ -2,10 +2,12 @@ package com.alien.common.gameplay.hive2.tick;
 
 import com.alien.Alien;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
+import com.alien.common.gameplay.hive2.growth.AbstractSpreadAttempt;
 import com.alien.common.gameplay.hive2.growth.CatchUpEngine;
 import com.alien.common.gameplay.hive2.growth.LoadedBiomassTicker;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 
 /**
  * Fast-path per-server-tick work for a single {@link HiveLocation}. Resolves the owning lineage faction (skipping the
@@ -46,6 +48,9 @@ public final class HiveLocationLoadedTickTask {
         }
 
         var currentTick = serverLevel.getGameTime();
+        if (!hasLoadedClaimedChunk(serverLevel, location)) {
+            return;
+        }
 
         // Loaded biomass income — only for player-nearby locations (proxy: boss bar is showing). Cheap to call,
         // so we check every tick and let LoadedBiomassTicker decide whether this is its second.
@@ -55,10 +60,21 @@ public final class HiveLocationLoadedTickTask {
 
         // Per-tick claim attempts for loaded locations. CatchUpEngine is idempotent — it does its own
         // biomass-cost gating and skips if the location is angry. Calling every tick would be wasteful in the
-        // limit; gate to a coarse cadence.
+        // limit; gate to a coarse cadence. Abstract spread follows this loaded-location cadence; unloaded locations
+        // still use LineageGrowthScanTask's slower fallback.
         if (currentTick % 20L == 0L) {
             CatchUpEngine.catchUpTo(serverLevel, location, lineage, currentTick);
+            AbstractSpreadAttempt.tryRun(server, location.lineageFactionId(), lineage, location, currentTick);
         }
+    }
+
+    public static boolean hasLoadedClaimedChunk(ServerLevel level, HiveLocation location) {
+        for (var chunk : location.claimedChunks()) {
+            if (level.getChunkSource().hasChunk(chunk.x, chunk.z)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static boolean isPlayerNearby(HiveLocation location) {
