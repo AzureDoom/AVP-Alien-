@@ -9,11 +9,13 @@ import com.alien.common.gameplay.hive2.id.LineageIds;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.gameplay.hive2.location.HiveLocationReserves;
+import com.alien.common.registry.HiveRecipeRegistry;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.entity.v1.EntityReserves;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,8 +34,7 @@ import java.util.UUID;
  * <li>Triggered when a player has at least {@code raidThresholdKills} kills in the aggro window.</li>
  * <li>Source = the largest qualifying location ({@code claimedChunks ≥ raidMinLocationSizeChunks}) with a harbinger.</li>
  * <li>Per-source cooldown so the same source doesn't spam raids.</li>
- * <li>Composition drained from source reserves — Phase 8b uses round-robin (Phase 8b polish: skew toward
- * fighters).</li>
+ * <li>Composition drained from source reserves, limited to xenomorphs whose hive recipe costs scourge jelly.</li>
  * <li>Expires {@code raidExpiryTicks} after dispatch (default 30 minutes).</li>
  * </ul>
  * <p>
@@ -129,7 +130,7 @@ public final class RaidDispatch {
         var raidSize = (int) Math.round(
             config.baseRaidSize() + config.raidSizePerClaimedChunk() * source.claimedChunks().size()
         );
-        var available = source.localReserves().getCount();
+        var available = eligibleRaidReserveCount(source.localReserves());
         raidSize = Math.min(raidSize, available);
 
         if (raidSize <= 0) {
@@ -209,11 +210,16 @@ public final class RaidDispatch {
         return best;
     }
 
-    /** Same round-robin draw as {@link ReinforcementDispatcher}; raid composition skewing is parked for polish. */
+    /** Same round-robin draw as {@link ReinforcementDispatcher}, filtered to scourge-jelly recipe outputs. */
     private static EntityReserves drainComposition(HiveLocationReserves donorReserves, int count) {
         var composition = new EntityReserves();
         var remaining = count;
-        var available = new ArrayList<>(donorReserves.getAvailableEntityTypes());
+        var available = new ArrayList<>(
+            donorReserves.getAvailableEntityTypes()
+                .stream()
+                .filter(RaidDispatch::isRaidEligible)
+                .toList()
+        );
 
         while (remaining > 0 && !available.isEmpty()) {
             var iterator = available.iterator();
@@ -232,5 +238,23 @@ public final class RaidDispatch {
         }
 
         return composition;
+    }
+
+    private static int eligibleRaidReserveCount(HiveLocationReserves reserves) {
+        var count = 0;
+        for (var type : reserves.getAvailableEntityTypes()) {
+            if (isRaidEligible(type)) {
+                count += reserves.getCount(type);
+            }
+        }
+        return count;
+    }
+
+    private static boolean isRaidEligible(EntityType<?> type) {
+        if (!type.is(AlienEntityTypeTags.XENOMORPHS)) {
+            return false;
+        }
+        var recipe = HiveRecipeRegistry.forOutputEntity(type);
+        return recipe != null && recipe.scourgeJelly() > 0;
     }
 }
