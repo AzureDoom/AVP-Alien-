@@ -20,6 +20,7 @@ public final class CastePopulation {
 
     /** All castes the buy task considers when computing deficits. Iterate in this order for stable tiebreaks. */
     public static final TagKey<EntityType<?>>[] TRACKED_CASTES = new TagKey[] {
+        AlienEntityTypeTags.QUEENS,
         AlienEntityTypeTags.DRONES,
         AlienEntityTypeTags.RUNNERS,
         AlienEntityTypeTags.WARRIORS,
