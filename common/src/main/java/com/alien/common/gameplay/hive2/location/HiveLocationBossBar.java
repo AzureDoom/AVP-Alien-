@@ -15,17 +15,12 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.entity.EntityType;
 
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Map;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 /**
  * Per-location boss bar. Visible to players within {@link HiveConfig#bossBarDisplayRadiusBlocks()} of the location's
- * center. Title and color follow the lineage variant.
+ * center. Title identifies the lineage/location numbers; color follows the lineage variant.
  * <p>
  * Progress = (loaded xenomorphs inside this location's chunks + xenomorphs in local reserves) /
  * {@code peakXenomorphCount}. The peak decays at 1 per minute (fixes {@code HIVE_SYSTEM_ANALYSIS.md} § 9.5.22) and is
@@ -49,14 +44,6 @@ public final class HiveLocationBossBar {
 
     private static final Predicate<EntityType<?>> XENOMORPH_PREDICATE = type -> type.is(AlienEntityTypeTags.XENOMORPHS);
 
-    private static final Map<AlienVariant, String> VARIANT_TITLE_KEYS = Arrays.stream(AlienVariant.values())
-        .collect(
-            Collectors.toMap(
-                Function.identity(),
-                variant -> "bossbar.avp.hive." + variant.name().toLowerCase(Locale.US) + ".title"
-            )
-        );
-
     private final HiveLocation location;
 
     private final Supplier<HiveConfig> configSupplier;
@@ -67,7 +54,7 @@ public final class HiveLocationBossBar {
         this.location = location;
         this.configSupplier = configSupplier;
         this.bossEvent = (ServerBossEvent) new ServerBossEvent(
-            titleComponent(variant, 0, false),
+            titleComponent(),
             AlienVariantTypes.getFor(variant).bossBarColor(),
             BossEvent.BossBarOverlay.PROGRESS
         ).setDarkenScreen(AlienPropertyAccess.INSTANCE.getOrThrow(AlienProperties.Hive.DARKEN_SCREEN));
@@ -76,8 +63,8 @@ public final class HiveLocationBossBar {
     public void tick(MinecraftServer server, AlienVariant variant, LineageFactionData lineage) {
         decayPeak();
         decayEvacuating();
-        var xenomorphCount = updateProgress(lineage);
-        updateColorAndTitle(variant, xenomorphCount);
+        updateProgress(lineage);
+        updateColorAndTitle(variant);
         updateTrackingPlayers(server, variant);
     }
 
@@ -127,25 +114,26 @@ public final class HiveLocationBossBar {
         return count;
     }
 
-    private void updateColorAndTitle(AlienVariant variant, int xenomorphCount) {
+    private void updateColorAndTitle(AlienVariant variant) {
         var evacuating = location.evacuatingRemainingTicks() > 0;
         if (evacuating) {
             bossEvent.setColor(BossEvent.BossBarColor.YELLOW);
         } else {
             bossEvent.setColor(AlienVariantTypes.getFor(variant).bossBarColor());
         }
-        bossEvent.setName(titleComponent(variant, xenomorphCount, evacuating));
+        bossEvent.setName(titleComponent());
     }
 
-    private static Component titleComponent(AlienVariant variant, int xenomorphCount, boolean evacuating) {
-        var title = Component.translatable(VARIANT_TITLE_KEYS.get(variant))
-            .append(Component.literal(" - " + xenomorphCount));
+    private Component titleComponent() {
+        return Component.literal("Hive (" + locationLineageNumber() + ", " + location.locationNumber() + ")");
+    }
 
-        if (evacuating) {
-            title.append(Component.literal(" (Evacuating)"));
+    private long locationLineageNumber() {
+        var faction = com.alien.Alien.MOD.factions().get(location.lineageFactionId());
+        if (faction != null && faction.data() instanceof LineageFactionData lineage) {
+            return lineage.lineageNumber();
         }
-
-        return title;
+        return -1L;
     }
 
     private void updateTrackingPlayers(MinecraftServer server, AlienVariant variant) {
