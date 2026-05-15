@@ -13,21 +13,7 @@ public final class HiveLocationSpacing {
         ChunkPos candidate,
         int minimumDistanceChunks
     ) {
-        if (minimumDistanceChunks <= 0) {
-            return true;
-        }
-
-        for (var location : HiveLocationRegistry.INSTANCE.all()) {
-            if (!location.isAlive() || !location.dimension().equals(dimension)) {
-                continue;
-            }
-
-            if (chunkDistance(new ChunkPos(location.centerPos()), candidate) < minimumDistanceChunks) {
-                return false;
-            }
-        }
-
-        return true;
+        return HiveLocationRegistry.INSTANCE.findTooCloseToCenter(dimension, candidate, minimumDistanceChunks) == null;
     }
 
     public static int chunkDistance(ChunkPos left, ChunkPos right) {

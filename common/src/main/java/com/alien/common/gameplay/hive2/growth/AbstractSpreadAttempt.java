@@ -14,7 +14,6 @@ import com.alien.common.gameplay.hive2.id.HiveLocationId;
 import com.alien.common.gameplay.hive2.id.HiveLocationIds;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
-import com.alien.common.gameplay.hive2.location.HiveLocationSpacing;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.entity.v1.EntityReserves;
 import net.minecraft.resources.ResourceLocation;
@@ -271,16 +270,19 @@ public final class AbstractSpreadAttempt {
             );
         }
 
-        if (
-            !HiveLocationSpacing.isFarEnoughFromExistingLocations(
-                lineage.dimension(),
-                candidate,
-                config.minimumHiveLocationDistanceChunks()
-            )
-        ) {
+        var tooClose = HiveLocationRegistry.INSTANCE.findTooCloseToCenter(
+            lineage.dimension(),
+            candidate,
+            config.minimumHiveLocationDistanceChunks()
+        );
+        if (tooClose != null) {
             return CandidateValidation.reject(
                 RESULT_TOO_CLOSE,
-                "Candidate is within " + config.minimumHiveLocationDistanceChunks() + " chunks of an existing hive location."
+                "Candidate is within "
+                    + config.minimumHiveLocationDistanceChunks()
+                    + " chunks of existing hive location "
+                    + tooClose.id().value()
+                    + "."
             );
         }
 

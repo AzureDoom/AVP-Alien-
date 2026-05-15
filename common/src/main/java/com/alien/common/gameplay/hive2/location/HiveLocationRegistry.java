@@ -225,6 +225,57 @@ public final class HiveLocationRegistry {
         return nearest;
     }
 
+    /**
+     * Returns any live location in {@code dimension} whose center is closer than {@code minimumDistanceChunks} to
+     * {@code candidate}, measured in Chebyshev chunk distance. Uses the per-dimension spatial bucket index so abstract
+     * settlement checks only inspect nearby location centers instead of every hive location in the world.
+     */
+    public @Nullable HiveLocation findTooCloseToCenter(
+        ResourceKey<Level> dimension,
+        ChunkPos candidate,
+        int minimumDistanceChunks
+    ) {
+        if (minimumDistanceChunks <= 0) {
+            return null;
+        }
+
+        var dimBuckets = byCenterDim.get(dimension);
+        if (dimBuckets == null || dimBuckets.isEmpty()) {
+            return null;
+        }
+
+        var maxOffset = minimumDistanceChunks - 1;
+        var minBucketX = bucketCoord(candidate.x - maxOffset);
+        var maxBucketX = bucketCoord(candidate.x + maxOffset);
+        var minBucketZ = bucketCoord(candidate.z - maxOffset);
+        var maxBucketZ = bucketCoord(candidate.z + maxOffset);
+
+        for (var bucketX = minBucketX; bucketX <= maxBucketX; bucketX++) {
+            for (var bucketZ = minBucketZ; bucketZ <= maxBucketZ; bucketZ++) {
+                var bucket = dimBuckets.get(bucketKey(bucketX, bucketZ));
+                if (bucket == null) {
+                    continue;
+                }
+
+                for (var locationId : bucket) {
+                    var location = byId.get(locationId);
+                    if (location == null || !location.isAlive()) {
+                        continue;
+                    }
+
+                    if (
+                        HiveLocationSpacing.chunkDistance(new ChunkPos(location.centerPos()), candidate)
+                            < minimumDistanceChunks
+                    ) {
+                        return location;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     public void onChunkClaimed(HiveLocation location, ChunkPos chunk) {
         byChunk
             .computeIfAbsent(location.dimension(), $ -> new HashMap<>())
