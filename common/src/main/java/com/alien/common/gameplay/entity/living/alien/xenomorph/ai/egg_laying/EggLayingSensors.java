@@ -19,6 +19,8 @@ public class EggLayingSensors {
 
     public static final StateKey.Sensed<Boolean> CAN_LAY_EGG = StateKey.sensed("can_lay_egg");
 
+    private static final double MIN_HORIZONTAL_OVOMORPH_SPACING_BLOCKS = 2.0;
+
     public static <T extends EggLayer> Sensor.Mono<T, Boolean> canLayEgg() {
         return Sensors.map(
             CAN_LAY_EGG,
@@ -106,7 +108,7 @@ public class EggLayingSensors {
 
     private static boolean noEggsNearby(EggLayer eggLayer) {
         var eggPos = eggLayer.getEggLayingPosition();
-        var halfSize = 0.5;
+        var halfSize = MIN_HORIZONTAL_OVOMORPH_SPACING_BLOCKS;
 
         var searchBox = new AABB(
             eggPos.x - halfSize,
@@ -121,7 +123,7 @@ public class EggLayingSensors {
             .getEntitiesOfClass(
                 Ovomorph.class,
                 searchBox,
-                entity -> entity.getType().is(AlienEntityTypeTags.OVOMORPHS) && !entity.isRooted.get()
+                entity -> entity.getType().is(AlienEntityTypeTags.OVOMORPHS) && !entity.isPassenger()
             )
             .isEmpty();
     }

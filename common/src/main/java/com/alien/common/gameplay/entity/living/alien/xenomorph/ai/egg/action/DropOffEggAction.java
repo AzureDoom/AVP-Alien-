@@ -3,6 +3,7 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg.action;
 import com.alien.common.gameplay.entity.living.alien.ovomorph.Ovomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.registry.init.AlienSoundEvents;
+import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.goap.v1.action.impl.NeoMoveToPosAction;
 import com.just.ai.goap.StateKey;
 import com.just.ai.goap.action.Action;
@@ -38,6 +39,10 @@ public class DropOffEggAction {
     private static final int MAX_REMEMBERED_FAILED_SPOTS = 32;
 
     private static final int MAX_PATH_VALIDATION_ATTEMPTS = 24;
+
+    private static final int EGG_GRID_SPACING_BLOCKS = 3;
+
+    private static final double MIN_HORIZONTAL_OVOMORPH_SPACING_BLOCKS = 2.0;
 
     private static final List<BlockPos> EGG_GRID_POS_OFFSETS = generateSpiralOffsets(16);
 
@@ -147,41 +152,12 @@ public class DropOffEggAction {
         Predicate<BlockPos> isWalkable,
         Set<BlockPos> failedSpots
     ) {
-        var centerIsOdd = (center.getX() & 1) != 0 && (center.getZ() & 1) != 0;
-
-        var result = tryFindWithParity(xenomorph, level, center, isWalkable, centerIsOdd, failedSpots);
-
-        if (result.isEmpty()) {
-            result = tryFindWithParity(xenomorph, level, center, isWalkable, !centerIsOdd, failedSpots);
-        }
-
-        return result;
-    }
-
-    private static Optional<BlockPos> tryFindWithParity(
-        Xenomorph xenomorph,
-        Level level,
-        BlockPos center,
-        Predicate<BlockPos> isWalkable,
-        boolean useOdd,
-        Set<BlockPos> failedSpots
-    ) {
-        var baseX = (center.getX() & ~1) + (useOdd ? 1 : 0);
-        var baseZ = (center.getZ() & ~1) + (useOdd ? 1 : 0);
-        var gridAlignedCenter = new BlockPos(baseX, center.getY(), baseZ);
+        var gridAlignedCenter = alignToEggGrid(center);
 
         var viable = new ArrayList<BlockPos>();
 
         for (var offset : EGG_GRID_POS_OFFSETS) {
             var pos = gridAlignedCenter.offset(offset);
-
-            if (((pos.getX() & 1) == 0) == useOdd) {
-                continue;
-            }
-
-            if (((pos.getZ() & 1) == 0) == useOdd) {
-                continue;
-            }
 
             var verticalSearchRange = 4;
 
@@ -205,6 +181,7 @@ public class DropOffEggAction {
                     (state.isAir() || state.canBeReplaced())
                         && (aboveState.isAir() || aboveState.canBeReplaced())
                         && level.getEntities(null, new AABB(adjustedPos)).isEmpty()
+                        && hasOvomorphSpacing(level, adjustedPos)
                 ) {
                     viable.add(adjustedPos.immutable());
                 }
@@ -225,6 +202,31 @@ public class DropOffEggAction {
         }
 
         return Optional.empty();
+    }
+
+    private static BlockPos alignToEggGrid(BlockPos center) {
+        var baseX = Math.floorDiv(center.getX(), EGG_GRID_SPACING_BLOCKS) * EGG_GRID_SPACING_BLOCKS;
+        var baseZ = Math.floorDiv(center.getZ(), EGG_GRID_SPACING_BLOCKS) * EGG_GRID_SPACING_BLOCKS;
+        return new BlockPos(baseX, center.getY(), baseZ);
+    }
+
+    private static boolean hasOvomorphSpacing(Level level, BlockPos pos) {
+        var center = pos.getCenter();
+        var halfSize = MIN_HORIZONTAL_OVOMORPH_SPACING_BLOCKS;
+        var searchBox = new AABB(
+            center.x - halfSize,
+            pos.getY() - level.dimensionType().height(),
+            center.z - halfSize,
+            center.x + halfSize,
+            pos.getY() + 5,
+            center.z + halfSize
+        );
+
+        return level.getEntitiesOfClass(
+            Ovomorph.class,
+            searchBox,
+            entity -> entity.getType().is(AlienEntityTypeTags.OVOMORPHS) && !entity.isPassenger()
+        ).isEmpty();
     }
 
     private static Set<BlockPos> getFailedSpots(Blackboard blackboard) {
@@ -252,16 +254,12 @@ public class DropOffEggAction {
     }
 
     private static List<BlockPos> generateSpiralOffsets(int maxDist) {
-        var step = 2;
+        var step = EGG_GRID_SPACING_BLOCKS;
         var offsets = new ArrayList<BlockPos>();
 
         for (var dist = 0; dist <= maxDist; dist += step) {
             for (var dx = -dist; dx <= dist; dx += step) {
                 var dz = dist - Math.abs(dx);
-
-                if ((dz & 1) != 0) {
-                    continue;
-                }
 
                 offsets.add(new BlockPos(dx, 0, dz));
 
