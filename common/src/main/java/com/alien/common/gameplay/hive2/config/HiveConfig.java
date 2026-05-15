@@ -19,6 +19,7 @@ public record HiveConfig(
     // ---------- § 2 Locations ----------
     long settlementTicks,
     long locationMaxNoContactTicks,
+    long locationBootstrapGraceTicks,
     int bossBarDisplayRadiusBlocks,
     long angryGraceTicks,
     long contestTickWindow,
@@ -125,6 +126,7 @@ public record HiveConfig(
             // § 2 Locations
             60L * TICKS_PER_SECOND, // settlementTicks: 60s
             7L * 24L * TICKS_PER_HOUR, // locationMaxNoContactTicks: 7 game-days of loaded-no-contact time
+            30L * TICKS_PER_MINUTE, // locationBootstrapGraceTicks: protect newborn locations for 30 min
             96, // bossBarDisplayRadiusBlocks
             60L * TICKS_PER_SECOND, // angryGraceTicks: 60s
             60L * TICKS_PER_SECOND, // contestTickWindow: 60s

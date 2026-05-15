@@ -6,6 +6,7 @@ import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.id.LineageIds;
 import com.alien.common.gameplay.hive2.lifecycle.LocationRemovalHelper;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
+import com.alien.common.gameplay.hive2.location.HiveLocationBootstrapProtection;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.gameplay.hive2.location.HiveLocationRemovalReason;
 import net.minecraft.resources.ResourceLocation;
@@ -17,7 +18,8 @@ import org.jetbrains.annotations.Nullable;
  * Migration dispatch and execution. Two trigger paths in Phase 8b:
  * <ul>
  * <li><b>Auto</b>: any location whose {@code claimedChunks.size() <= migrationTerritoryFloorChunks} (default 2) is
- * evacuated, provided the lineage has an empress alive and ≥ 1 sister.</li>
+ * evacuated, provided the lineage has an empress alive and ≥ 1 sister, and the source is past its bootstrap
+ * protection window.</li>
  * <li><b>Admin</b>: {@link #forceMigration(MinecraftServer, HiveLocation, LineageFactionData)} — trigger any evacuation
  * regardless of conditions, useful for testing.</li>
  * </ul>
@@ -57,6 +59,9 @@ public final class MigrationDispatch {
             var locations = new java.util.ArrayList<>(lineage.locationsById().values());
             for (var location : locations) {
                 if (!location.isAlive()) {
+                    continue;
+                }
+                if (HiveLocationBootstrapProtection.isProtected(location, config)) {
                     continue;
                 }
                 if (location.claimedChunks().size() > config.migrationTerritoryFloorChunks()) {
