@@ -14,6 +14,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.AABB;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -53,7 +54,7 @@ public final class ContestResolutionTask {
     }
 
     private static void resolveChunk(ServerLevel level, ChunkPos chunk) {
-        var claimants = Alien.MOD.territory().getClaimants(level, chunk);
+        var claimants = new ArrayList<>(Alien.MOD.territory().getClaimants(level, chunk));
         if (claimants.size() < 2) {
             return;
         }
