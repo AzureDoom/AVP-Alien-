@@ -48,6 +48,7 @@ import com.alien.common.registry.init.item.block.NetherAlienResinBlockItems;
 import com.blib.api.BLibAPI;
 import com.blib.api.common.mod.v1.BLibMod;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -134,13 +135,7 @@ public class Alien {
         MOD.events().postLevelTick().register(Alien::tickQueenSpawnCooldown);
         MOD.events().onTagsUpdated().register(Alien::onTagsUpdated);
 
-        MOD.events().onServerStarted().register(server -> {
-            // Phase 12 migrator: convert any legacy avp_alien:hive/* factions into the new lineage + location
-            // structure before the registry rebuilds. Idempotent — does nothing on a clean hive2-only world.
-            com.alien.common.gameplay.hive2.migration.OldHiveMigrator.run(server);
-            HiveLocationRegistry.INSTANCE.rebuildFromFactions();
-            HiveLocationRegistry.INSTANCE.repairTerritoryClaims(server);
-        });
+        MOD.events().onFactionsLoaded().register(Alien::rebuildHive2RegistryFromFactions);
         MOD.events().onServerStopped().register(server -> HiveLocationRegistry.INSTANCE.clear());
 
         // Hive2: defensive cleanup when any lineage faction is removed (admin removal, civil war, absorption, etc.).
@@ -177,6 +172,15 @@ public class Alien {
         if (entity instanceof com.alien.common.gameplay.entity.living.alien.Alien alien) {
             alien.getHiveManager().ensureVariantFactionMembership();
         }
+    }
+
+    public static void rebuildHive2RegistryFromFactions(MinecraftServer server) {
+        // Phase 12 migrator: convert any legacy avp_alien:hive/* factions into the new lineage + location
+        // structure after BLib's faction store is definitely loaded. Idempotent — does nothing on a clean hive2-only
+        // world.
+        com.alien.common.gameplay.hive2.migration.OldHiveMigrator.run(server);
+        HiveLocationRegistry.INSTANCE.rebuildFromFactions();
+        HiveLocationRegistry.INSTANCE.repairTerritoryClaims(server);
     }
 
     /**

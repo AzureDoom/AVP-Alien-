@@ -16,6 +16,7 @@ import com.blib.api.common.faction.v1.Faction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.Nullable;
@@ -366,6 +367,15 @@ public final class HiveInspectionSnapshot {
             tag.putString(K_REMOVAL_REASON, location.removalReason().typeKind());
         }
 
+        return tag;
+    }
+
+    public static CompoundTag buildMissingLocation(ResourceLocation factionId, String reason) {
+        var tag = new CompoundTag();
+        putConfig(tag, HiveLocationRegistry.INSTANCE.config());
+        tag.putString(K_FACTION_ID, factionId.toString());
+        tag.putString(K_LOCATION_ID, factionId.toString());
+        tag.putString(K_REMOVAL_REASON, reason);
         return tag;
     }
 
