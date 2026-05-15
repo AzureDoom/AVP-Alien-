@@ -55,6 +55,8 @@ public final class AbstractSpreadAttempt {
 
     private static final String RESULT_INSUFFICIENT_POPULATION = "insufficient_population";
 
+    private static final String RESULT_INSUFFICIENT_FOUNDER_POPULATION = "insufficient_founder_population";
+
     private static final String RESULT_OCCUPIED = "occupied";
 
     private static final String RESULT_TOO_CLOSE = "too_close";
@@ -140,6 +142,32 @@ public final class AbstractSpreadAttempt {
             return null;
         }
 
+        var founderParty = FounderParty.forLineage(lineage);
+        if (founderParty == null) {
+            record(
+                sourceLocation,
+                lineage,
+                currentTick,
+                RESULT_SPREAD_DISABLED,
+                null,
+                null,
+                "Could not resolve queen/drone/runner founder types for variant " + lineage.variant() + "."
+            );
+            return null;
+        }
+        if (!founderParty.availableIn(sourceLocation)) {
+            record(
+                sourceLocation,
+                lineage,
+                currentTick,
+                RESULT_INSUFFICIENT_FOUNDER_POPULATION,
+                null,
+                null,
+                founderParty.missingDetail(sourceLocation)
+            );
+            return null;
+        }
+
         var candidateChunk = pickCandidateInSpreadZone(sourceLocation, config);
         if (candidateChunk == null) {
             record(
@@ -169,7 +197,8 @@ public final class AbstractSpreadAttempt {
         }
 
         // Found.
-        var locationId = mintAbstractLocation(serverLevel, lineage, lineageId, candidateChunk, currentTick);
+        founderParty.drainFrom(sourceLocation);
+        var locationId = mintAbstractLocation(serverLevel, lineage, lineageId, candidateChunk, currentTick, founderParty);
 
         sourceLocation.setLastAbstractSpreadTick(currentTick);
         record(
@@ -179,7 +208,7 @@ public final class AbstractSpreadAttempt {
             RESULT_SUCCESS,
             candidateChunk,
             locationId,
-            "Minted a location with queen and bootstrap worker reserves."
+            "Transferred queen, drone, and runner from source reserves into a new location."
         );
 
         Alien.LOGGER.info(
@@ -256,7 +285,8 @@ public final class AbstractSpreadAttempt {
         LineageFactionData lineage,
         ResourceLocation lineageId,
         ChunkPos candidate,
-        long currentTick
+        long currentTick,
+        FounderParty founderParty
     ) {
         var locationId = HiveLocationIds.create();
         var centerPos = candidate.getMiddleBlockPosition(64); // Y is approximate; chunk-load corrects later
@@ -272,18 +302,9 @@ public final class AbstractSpreadAttempt {
 
         claimInitialCore(level, location, candidate, currentTick);
 
-        var queenType = Queen.getType(lineage.variant());
-        var droneType = Drone.getType(lineage.variant());
-        var runnerType = Runner.getType(lineage.variant());
-        if (queenType != null) {
-            location.localReserves().tryAdd((EntityType<?>) queenType, 1);
-        }
-        if (droneType != null) {
-            location.localReserves().tryAdd((EntityType<?>) droneType, 1);
-        }
-        if (runnerType != null) {
-            location.localReserves().tryAdd((EntityType<?>) runnerType, 1);
-        }
+        location.localReserves().tryAdd(founderParty.queenType(), 1);
+        location.localReserves().tryAdd(founderParty.droneType(), 1);
+        location.localReserves().tryAdd(founderParty.runnerType(), 1);
 
         location.setBiomass(0);
         location.setLastGrowthTick(currentTick);
@@ -337,6 +358,44 @@ public final class AbstractSpreadAttempt {
 
         private static CandidateValidation reject(String result, String detail) {
             return new CandidateValidation(false, result, detail);
+        }
+    }
+
+    private record FounderParty(
+        EntityType<?> queenType,
+        EntityType<?> droneType,
+        EntityType<?> runnerType
+    ) {
+        private static @Nullable FounderParty forLineage(LineageFactionData lineage) {
+            var queenType = Queen.getType(lineage.variant());
+            var droneType = Drone.getType(lineage.variant());
+            var runnerType = Runner.getType(lineage.variant());
+            if (queenType == null || droneType == null || runnerType == null) {
+                return null;
+            }
+            return new FounderParty((EntityType<?>) queenType, (EntityType<?>) droneType, (EntityType<?>) runnerType);
+        }
+
+        private boolean availableIn(HiveLocation location) {
+            return location.localReserves().getCount(queenType) >= 1
+                && location.localReserves().getCount(droneType) >= 1
+                && location.localReserves().getCount(runnerType) >= 1;
+        }
+
+        private void drainFrom(HiveLocation location) {
+            location.localReserves().trySpawn(queenType);
+            location.localReserves().trySpawn(droneType);
+            location.localReserves().trySpawn(runnerType);
+        }
+
+        private String missingDetail(HiveLocation location) {
+            return "Source reserves need queen/drone/runner founder party; have "
+                + location.localReserves().getCount(queenType)
+                + "/"
+                + location.localReserves().getCount(droneType)
+                + "/"
+                + location.localReserves().getCount(runnerType)
+                + ".";
         }
     }
 
