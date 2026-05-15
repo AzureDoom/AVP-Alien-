@@ -100,6 +100,8 @@ public record HiveConfig(
     // ---------- § 12 Persistence and performance ----------
     int biomassDirtyThreshold,
     long lastGrowthTickDirtyThreshold,
+    int slowPathLocationUpdatesPerTick,
+    int passiveClaimCatchUpWindowCap,
 
     // ---------- § 13 Population, spawning + jelly economy ----------
     int populationPerChunk,
@@ -211,6 +213,8 @@ public record HiveConfig(
             // § 12 Persistence and performance
             10, // biomassDirtyThreshold (±10)
             30L * TICKS_PER_MINUTE, // lastGrowthTickDirtyThreshold (30 min)
+            4, // slowPathLocationUpdatesPerTick
+            4, // passiveClaimCatchUpWindowCap
 
             // § 13 Population, spawning + jelly economy
             8, // populationPerChunk

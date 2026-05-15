@@ -143,6 +143,8 @@ public final class HiveLocationFoundingService {
         // Allocate the location's per-lineage index before adding so the path name reflects it.
         var locationNumber = lineageData.allocateLocationNumber();
         location.setLocationNumber(locationNumber);
+        location.setLastGrowthTick(currentGameTime);
+        location.setLastPassiveClaimTick(currentGameTime);
 
         lineageData.addLocation(location);
         HiveLocationRegistry.INSTANCE.register(location);

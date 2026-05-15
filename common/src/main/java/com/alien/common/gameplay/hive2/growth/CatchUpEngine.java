@@ -17,10 +17,9 @@ import net.minecraft.server.level.ServerLevel;
  * </ol>
  * <p>
  * Idempotent — calling twice in the same tick is a no-op (elapsed = 0 → no income, claim loop runs but cost gates
- * everything). The {@link com.alien.common.gameplay.hive2.tick.LineageGrowthScanTask} calls this for every location
- * every {@code lineageScanIntervalTicks}; the {@link com.alien.common.gameplay.hive2.tick.HiveLocationLoadedTickTask}
- * also calls it on locations with a player nearby (where the loaded ticker is bumping {@code lastGrowthTick}
- * frequently, so this just absorbs the small remainder).
+ * everything). The {@link com.alien.common.gameplay.hive2.tick.HiveLocationSlowTickTask} samples unloaded locations
+ * through this path, while {@link com.alien.common.gameplay.hive2.tick.HiveLocationLoadedTickTask} also calls it for
+ * loaded locations on its faster cadence.
  */
 public final class CatchUpEngine {
 
@@ -57,6 +56,10 @@ public final class CatchUpEngine {
             location.setLastGrowthTick(currentTick);
         }
 
+        if (!passiveClaims) {
+            location.setLastPassiveClaimTick(currentTick);
+        }
+
         // Skip claim attempts on angry locations per HIVE_REDESIGN_04_BOSS_BAR § 4.
         // (Boss bar may not exist yet on a newly-minted location — treat that as "not angry".)
         var bossBar = location.bossBar();
@@ -64,7 +67,12 @@ public final class CatchUpEngine {
             return;
         }
 
-        runClaimLoop(level, location, lineage, currentTick, config, passiveClaims);
+        var claimLimit = passiveClaims ? passiveClaimLimit(location, currentTick, config) : loadedClaimLimit(config);
+        if (claimLimit <= 0) {
+            return;
+        }
+
+        runClaimLoop(level, location, lineage, currentTick, config, passiveClaims, claimLimit);
     }
 
     private static void addBiomassClamped(HiveLocation location, int income, com.alien.common.gameplay.hive2.config.HiveConfig config) {
@@ -79,9 +87,9 @@ public final class CatchUpEngine {
         LineageFactionData lineage,
         long currentTick,
         com.alien.common.gameplay.hive2.config.HiveConfig config,
-        boolean passiveClaims
+        boolean passiveClaims,
+        int claimLimit
     ) {
-        var claimLimit = passiveClaims ? config.maxPassiveClaimsPerUnloadedScan() : config.maxClaimsPerScan();
         var claimsThisRun = 0;
         var lineageTotal = HiveLocationClaims.totalChunksFor(lineage);
 
@@ -111,6 +119,46 @@ public final class CatchUpEngine {
             claimsThisRun++;
             lineageTotal++;
         }
+    }
+
+    private static int passiveClaimLimit(
+        HiveLocation location,
+        long currentTick,
+        com.alien.common.gameplay.hive2.config.HiveConfig config
+    ) {
+        var perWindow = Math.max(0, config.maxPassiveClaimsPerUnloadedScan());
+        if (perWindow <= 0) {
+            location.setLastPassiveClaimTick(currentTick);
+            return 0;
+        }
+
+        var interval = Math.max(1L, config.lineageScanIntervalTicks());
+        var lastPassiveTick = location.lastPassiveClaimTick();
+        if (lastPassiveTick <= 0L || currentTick <= lastPassiveTick) {
+            location.setLastPassiveClaimTick(currentTick);
+            return 0;
+        }
+
+        var elapsed = currentTick - lastPassiveTick;
+        var elapsedWindows = elapsed / interval;
+        if (elapsedWindows <= 0L) {
+            return 0;
+        }
+
+        var maxWindows = Math.max(1, config.passiveClaimCatchUpWindowCap());
+        var windowsToApply = Math.min(elapsedWindows, maxWindows);
+        if (elapsedWindows > maxWindows) {
+            location.setLastPassiveClaimTick(currentTick);
+        } else {
+            location.setLastPassiveClaimTick(lastPassiveTick + windowsToApply * interval);
+        }
+
+        var limit = windowsToApply * (long) perWindow;
+        return limit > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) limit;
+    }
+
+    private static int loadedClaimLimit(com.alien.common.gameplay.hive2.config.HiveConfig config) {
+        return Math.max(0, config.maxClaimsPerScan());
     }
 
     private static boolean hasEnoughPopulationToClaim(

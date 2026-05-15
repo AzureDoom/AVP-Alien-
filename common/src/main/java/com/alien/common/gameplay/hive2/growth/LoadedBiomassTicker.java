@@ -11,8 +11,8 @@ import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
  * round to a whole biomass value.
  * <p>
  * Discrete event income (per-kill, per-resin-block) lives elsewhere — this ticker only handles the periodic portion.
- * Bumps {@code lastGrowthTick} so {@link CatchUpEngine}'s slow-path scan doesn't double-count the same elapsed period
- * using the (lower) unloaded formula.
+ * Bumps {@code lastGrowthTick} so {@link CatchUpEngine}'s slow-path sampling doesn't double-count the same elapsed
+ * period using the (lower) unloaded formula.
  * <p>
  * Does NOT attempt claims — those are handled by {@link CatchUpEngine}'s claim loop, which the loaded path also drives
  * via {@link com.alien.common.gameplay.hive2.tick.HiveLocationLoadedTickTask}.

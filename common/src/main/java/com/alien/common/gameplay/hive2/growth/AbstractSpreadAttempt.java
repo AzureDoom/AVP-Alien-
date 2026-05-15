@@ -26,8 +26,8 @@ import java.util.Random;
  * Unloaded spread per {@code HIVE_REDESIGN_08_LINEAGE_SPREAD.md} § 3.
  * <p>
  * Drives "the lineage conquers an unattended dimension over real-world weeks" without forcing queen entities into
- * unloaded chunks. Folded into {@link com.alien.common.gameplay.hive2.tick.LineageGrowthScanTask}'s loop — runs once
- * per scan tick per hive location when conditions allow.
+ * unloaded chunks. Folded into {@link com.alien.common.gameplay.hive2.tick.HiveLocationSlowTickTask}'s randomized
+ * location scheduler when chunks are not loaded, and the loaded-location fast path otherwise.
  * <p>
  * Conditions (must all hold):
  * <ul>
@@ -308,6 +308,7 @@ public final class AbstractSpreadAttempt {
 
         location.setBiomass(0);
         location.setLastGrowthTick(currentTick);
+        location.setLastPassiveClaimTick(currentTick);
 
         lineage.addLocation(location);
         HiveLocationRegistry.INSTANCE.register(location);

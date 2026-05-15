@@ -95,7 +95,13 @@ public final class HiveConfigSchema {
             "loadedBiomassIdleBonusPerSec",
             "biomassAccumulationCapMultiplier"
         ),
-        group("Persistence", "biomassDirtyThreshold", "lastGrowthTickDirtyThreshold"),
+        group(
+            "Persistence",
+            "biomassDirtyThreshold",
+            "lastGrowthTickDirtyThreshold",
+            "slowPathLocationUpdatesPerTick",
+            "passiveClaimCatchUpWindowCap"
+        ),
         group(
             "Population And Spawning",
             "populationPerChunk",

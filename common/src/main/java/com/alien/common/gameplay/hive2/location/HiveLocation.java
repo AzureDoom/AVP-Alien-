@@ -54,6 +54,8 @@ public final class HiveLocation {
 
     private static final String NBT_LAST_GROWTH_TICK = "LastGrowthTick";
 
+    private static final String NBT_LAST_PASSIVE_CLAIM_TICK = "LastPassiveClaimTick";
+
     private static final String NBT_LAST_ABSTRACT_SPREAD_TICK = "LastAbstractSpreadTick";
 
     private static final String NBT_LAST_ABSTRACT_SPREAD_ATTEMPT = "LastAbstractSpreadAttempt";
@@ -111,6 +113,8 @@ public final class HiveLocation {
     private long ageInTicks;
 
     private long lastGrowthTick;
+
+    private long lastPassiveClaimTick;
 
     private long lastAbstractSpreadTick;
 
@@ -221,6 +225,7 @@ public final class HiveLocation {
         this.founderId = null;
         this.ageInTicks = 0L;
         this.lastGrowthTick = 0L;
+        this.lastPassiveClaimTick = 0L;
         this.lastAbstractSpreadTick = 0L;
         this.lastAbstractSpreadAttempt = AbstractSpreadAttemptDebug.none();
         this.peakXenomorphCount = 1;
@@ -298,6 +303,14 @@ public final class HiveLocation {
 
     public void setLastGrowthTick(long lastGrowthTick) {
         this.lastGrowthTick = lastGrowthTick;
+    }
+
+    public long lastPassiveClaimTick() {
+        return lastPassiveClaimTick;
+    }
+
+    public void setLastPassiveClaimTick(long lastPassiveClaimTick) {
+        this.lastPassiveClaimTick = Math.max(0L, lastPassiveClaimTick);
     }
 
     public long lastAbstractSpreadTick() {
@@ -520,6 +533,9 @@ public final class HiveLocation {
 
         tag.putLong(NBT_AGE_IN_TICKS, ageInTicks);
         tag.putLong(NBT_LAST_GROWTH_TICK, lastGrowthTick);
+        if (lastPassiveClaimTick > 0L) {
+            tag.putLong(NBT_LAST_PASSIVE_CLAIM_TICK, lastPassiveClaimTick);
+        }
         if (lastAbstractSpreadTick > 0L) {
             tag.putLong(NBT_LAST_ABSTRACT_SPREAD_TICK, lastAbstractSpreadTick);
         }
@@ -642,6 +658,9 @@ public final class HiveLocation {
 
         location.ageInTicks = tag.getLong(NBT_AGE_IN_TICKS);
         location.lastGrowthTick = tag.getLong(NBT_LAST_GROWTH_TICK);
+        location.lastPassiveClaimTick = tag.contains(NBT_LAST_PASSIVE_CLAIM_TICK)
+            ? Math.max(0L, tag.getLong(NBT_LAST_PASSIVE_CLAIM_TICK))
+            : Math.max(0L, location.lastGrowthTick);
         location.lastAbstractSpreadTick = Math.max(0L, tag.getLong(NBT_LAST_ABSTRACT_SPREAD_TICK));
         location.lastAbstractSpreadAttempt = tag.contains(NBT_LAST_ABSTRACT_SPREAD_ATTEMPT)
             ? AbstractSpreadAttemptDebug.load(tag.getCompound(NBT_LAST_ABSTRACT_SPREAD_ATTEMPT))

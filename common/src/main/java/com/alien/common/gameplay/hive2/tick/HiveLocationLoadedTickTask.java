@@ -61,7 +61,7 @@ public final class HiveLocationLoadedTickTask {
         // Per-tick claim attempts for loaded locations. CatchUpEngine is idempotent — it does its own
         // biomass-cost gating and skips if the location is angry. Calling every tick would be wasteful in the
         // limit; gate to a coarse cadence. Abstract spread follows this loaded-location cadence; unloaded locations
-        // still use LineageGrowthScanTask's slower fallback.
+        // use HiveLocationSlowTickTask's bounded randomized fallback.
         if (currentTick % 20L == 0L) {
             CatchUpEngine.catchUpTo(serverLevel, location, lineage, currentTick);
             AbstractSpreadAttempt.tryRun(server, location.lineageFactionId(), lineage, location, currentTick);

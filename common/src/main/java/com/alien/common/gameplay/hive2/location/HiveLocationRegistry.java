@@ -10,7 +10,7 @@ import com.alien.common.gameplay.hive2.id.HiveLocationIds;
 import com.alien.common.gameplay.hive2.id.LineageIds;
 import com.alien.common.gameplay.hive2.tick.HiveLocationLoadedTickTask;
 import com.alien.common.gameplay.hive2.tick.LineageConvoyTickTask;
-import com.alien.common.gameplay.hive2.tick.LineageGrowthScanTask;
+import com.alien.common.gameplay.hive2.tick.HiveLocationSlowTickTask;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -36,9 +36,9 @@ import java.util.Set;
  * {@link LineageFactionData}'s nested locations.
  * <p>
  * {@link #tick(MinecraftServer)} runs once per server tick (driven from {@code Alien.tickHive2Registry}). It iterates
- * every registered location across every dimension and dispatches them to {@link HiveLocationLoadedTickTask}; every
- * {@link HiveConfig#lineageScanIntervalTicks()} ticks it also fires {@link LineageGrowthScanTask}. Both tasks are empty
- * in Phase 2 — later phases attach the actual work.
+ * every registered location across every dimension and dispatches them to {@link HiveLocationLoadedTickTask}; bounded
+ * randomized slow-location work is also sampled every tick. Every {@link HiveConfig#lineageScanIntervalTicks()} ticks
+ * it fires coarse lineage lifecycle work.
  * <p>
  * See {@code HIVE_REDESIGN_03_LOCATIONS.md} § 1 and {@code HIVE_REDESIGN_12_PERFORMANCE.md} § 3.
  */
@@ -250,6 +250,7 @@ public final class HiveLocationRegistry {
         ticksSinceLastScan = 0L;
         ticksSinceLastDispatch = 0L;
         ticksSinceLastHiveSpawn = 0L;
+        HiveLocationSlowTickTask.reset();
 
         var allIds = Alien.MOD.factions().getAllIds();
         var lineageIdCount = 0;
@@ -389,10 +390,8 @@ public final class HiveLocationRegistry {
 
     /**
      * Per-server-tick entry point. Iterates every registered location across every dimension (fixes the legacy
-     * Overworld-only bug, see {@code HIVE_SYSTEM_ANALYSIS.md} § 9.1.2) and dispatches them to the fast-path task. Every
-     * {@link HiveConfig#lineageScanIntervalTicks()} ticks also invokes the slow-path scan.
-     * <p>
-     * Phase 2 attaches no real behavior — both tasks are no-ops. Later phases fill them in.
+     * Overworld-only bug, see {@code HIVE_SYSTEM_ANALYSIS.md} § 9.1.2), dispatches loaded-location fast work, samples
+     * bounded slow-location work, and periodically invokes coarse lineage lifecycle scans.
      */
     public void tick(MinecraftServer server) {
         if (!byId.isEmpty()) {
@@ -408,6 +407,8 @@ public final class HiveLocationRegistry {
 
         // Phase 8: convoy travel + arrival every tick. Sparse — most lineages have zero convoys.
         LineageConvoyTickTask.run(server);
+
+        HiveLocationSlowTickTask.run(server);
 
         // Phase 10: empress emergence per-tick advancement. Cheap when no queens are emerging.
         com.alien.common.gameplay.hive2.empress.EmpressEmergenceRitual.tick(server);
@@ -440,7 +441,6 @@ public final class HiveLocationRegistry {
         ticksSinceLastScan++;
         if (ticksSinceLastScan >= config.lineageScanIntervalTicks()) {
             ticksSinceLastScan = 0L;
-            LineageGrowthScanTask.run(server);
             com.alien.common.gameplay.hive2.growth.PopulationPressureDecayTask.scanAll(server);
             // Phase 11: full lifecycle dispatch (civil war, dormancy, absorption, contests, lineage death) layered
             // on top of variant-mismatch invariants.
