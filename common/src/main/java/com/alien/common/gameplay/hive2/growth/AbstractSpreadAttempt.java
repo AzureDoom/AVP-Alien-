@@ -59,6 +59,8 @@ public final class AbstractSpreadAttempt {
 
     private static final String RESULT_OCCUPIED = "occupied";
 
+    private static final String RESULT_CORE_OVERLAP = "core_overlap";
+
     private static final String RESULT_TOO_CLOSE = "too_close";
 
     private static final String RESULT_DECORATED = "decorated";
@@ -253,6 +255,15 @@ public final class AbstractSpreadAttempt {
             );
         }
 
+        var coreOverlap = findInitialCoreOverlap(lineage, candidate);
+        if (coreOverlap != null) {
+            return CandidateValidation.reject(
+                RESULT_CORE_OVERLAP,
+                "Initial claim footprint would overlap " + coreOverlap.occupant().id().value()
+                    + " at chunk " + coreOverlap.chunk() + "."
+            );
+        }
+
         if (
             !HiveLocationSpacing.isFarEnoughFromExistingLocations(
                 lineage.dimension(),
@@ -278,6 +289,20 @@ public final class AbstractSpreadAttempt {
         }
 
         return CandidateValidation.accept();
+    }
+
+    private static @Nullable CoreOverlap findInitialCoreOverlap(LineageFactionData lineage, ChunkPos candidate) {
+        var radius = HiveLocationRegistry.INSTANCE.config().initialHiveLocationClaimRadiusChunks();
+        for (var dx = -radius; dx <= radius; dx++) {
+            for (var dz = -radius; dz <= radius; dz++) {
+                var chunk = new ChunkPos(candidate.x + dx, candidate.z + dz);
+                var occupant = HiveLocationRegistry.INSTANCE.getByChunk(lineage.dimension(), chunk);
+                if (occupant != null) {
+                    return new CoreOverlap(chunk, occupant);
+                }
+            }
+        }
+        return null;
     }
 
     private static HiveLocationId mintAbstractLocation(
@@ -361,6 +386,11 @@ public final class AbstractSpreadAttempt {
             return new CandidateValidation(false, result, detail);
         }
     }
+
+    private record CoreOverlap(
+        ChunkPos chunk,
+        HiveLocation occupant
+    ) {}
 
     private record FounderParty(
         EntityType<?> queenType,
