@@ -35,20 +35,18 @@ public final class LineageGrowthScanTask {
             }
 
             var level = server.getLevel(lineage.dimension());
-            if (level == null) {
-                continue;
-            }
-
             for (var location : new java.util.ArrayList<>(lineage.locationsById().values())) {
                 if (!location.isAlive()) {
                     continue;
                 }
-                CatchUpEngine.catchUpTo(level, location, lineage, currentTick);
-            }
 
-            // Phase 11: abstract spread per scan. The attempt itself is gated by cooldown + max-locations cap, so
-            // calling unconditionally is cheap and idempotent.
-            AbstractSpreadAttempt.tryRun(server, factionId, lineage, currentTick);
+                if (level != null) {
+                    CatchUpEngine.catchUpTo(level, location, lineage, currentTick);
+                }
+
+                // Phase 11: abstract spread per scan, independently gated per source location.
+                AbstractSpreadAttempt.tryRun(server, factionId, lineage, location, currentTick);
+            }
         }
     }
 }

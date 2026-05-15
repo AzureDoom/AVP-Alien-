@@ -1,6 +1,7 @@
 package com.alien.common.gameplay.hive2.inspection;
 
 import com.alien.Alien;
+import com.alien.common.gameplay.hive2.config.HiveConfig;
 import com.alien.common.gameplay.hive2.economy.CastePopulation;
 import com.alien.common.gameplay.hive2.economy.JellyProduction;
 import com.alien.common.gameplay.hive2.convoy.Convoy;
@@ -176,6 +177,44 @@ public final class HiveInspectionSnapshot {
 
     public static final String K_AGG_LOCATIONS = "AggLocations";
 
+    public static final String K_SPREAD_CURRENT_TICK = "SpreadCurrentTick";
+
+    public static final String K_SPREAD_COOLDOWN_TICKS = "SpreadCooldownTicks";
+
+    public static final String K_SPREAD_COOLDOWN_REMAINING_TICKS = "SpreadCooldownRemainingTicks";
+
+    public static final String K_SPREAD_COOLDOWN_ELIGIBLE = "SpreadCooldownEligible";
+
+    public static final String K_SPREAD_LAST_SUCCESS_TICK = "SpreadLastSuccessTick";
+
+    public static final String K_SPREAD_HAS_LAST_SUCCESS = "SpreadHasLastSuccess";
+
+    public static final String K_SPREAD_LAST_SUCCESS_AGE_TICKS = "SpreadLastSuccessAgeTicks";
+
+    public static final String K_SPREAD_NEXT_ELIGIBLE_TICK = "SpreadNextEligibleTick";
+
+    public static final String K_SPREAD_MAX_LOCATIONS = "SpreadMaxLocations";
+
+    public static final String K_SPREAD_MAX_RADIUS_CHUNKS = "SpreadMaxRadiusChunks";
+
+    public static final String K_SPREAD_MIN_DISTANCE_CHUNKS = "SpreadMinDistanceChunks";
+
+    public static final String K_SPREAD_LAST_ATTEMPT_TICK = "SpreadLastAttemptTick";
+
+    public static final String K_SPREAD_HAS_LAST_ATTEMPT = "SpreadHasLastAttempt";
+
+    public static final String K_SPREAD_LAST_ATTEMPT_AGE_TICKS = "SpreadLastAttemptAgeTicks";
+
+    public static final String K_SPREAD_LAST_ATTEMPT_RESULT = "SpreadLastAttemptResult";
+
+    public static final String K_SPREAD_LAST_ATTEMPT_DETAIL = "SpreadLastAttemptDetail";
+
+    public static final String K_SPREAD_LAST_ATTEMPT_CREATED_LOCATION_ID = "SpreadLastAttemptCreatedLocationId";
+
+    public static final String K_SPREAD_LAST_ATTEMPT_CANDIDATE_CHUNK_X = "SpreadLastAttemptCandidateChunkX";
+
+    public static final String K_SPREAD_LAST_ATTEMPT_CANDIDATE_CHUNK_Z = "SpreadLastAttemptCandidateChunkZ";
+
     // Variant keys
     public static final String K_NEXT_LINEAGE_NUMBER = "NextLineageNumber";
 
@@ -316,6 +355,11 @@ public final class HiveInspectionSnapshot {
         var lineageFaction = Alien.MOD.factions().get(location.lineageFactionId());
         var lineageMembers = lineageFaction != null ? lineageFaction.membership().getMembers().size() : 0;
         tag.putInt(K_LINEAGE_MEMBER_COUNT, lineageMembers);
+        var lineageData = lineageFaction != null && lineageFaction.data() instanceof LineageFactionData lineage ? lineage : null;
+        if (lineageData != null) {
+            tag.putInt(K_LOCATION_COUNT, lineageData.locationsById().size());
+        }
+        putSpreadDiagnostics(tag, location, lineageData, config, server);
 
         if (location.removalReason() != null) {
             tag.putString(K_REMOVAL_REASON, location.removalReason().typeKind());
@@ -415,6 +459,7 @@ public final class HiveInspectionSnapshot {
             if (location.removalReason() != null) {
                 row.putString(K_REMOVAL_REASON, location.removalReason().typeKind());
             }
+            putSpreadDiagnostics(row, location, data, config, server);
             locationsList.add(row);
         }
         tag.put(K_LOCATIONS, locationsList);
@@ -436,6 +481,64 @@ public final class HiveInspectionSnapshot {
         }
 
         return tag;
+    }
+
+    private static void putSpreadDiagnostics(
+        CompoundTag tag,
+        HiveLocation location,
+        @Nullable LineageFactionData lineage,
+        HiveConfig config,
+        @Nullable MinecraftServer server
+    ) {
+        var level = server != null ? server.getLevel(location.dimension()) : null;
+        var currentTick = level != null ? level.getGameTime() : -1L;
+        var lastSuccessTick = location.lastAbstractSpreadTick();
+        var hasLastSuccess = lastSuccessTick > 0L;
+        var cooldownRemaining = spreadCooldownRemaining(location, currentTick, config);
+        var nextEligibleTick = currentTick >= 0L && cooldownRemaining >= 0L ? currentTick + cooldownRemaining : -1L;
+
+        tag.putLong(K_SPREAD_CURRENT_TICK, currentTick);
+        tag.putLong(K_SPREAD_COOLDOWN_TICKS, config.lineageSpreadCooldownTicks());
+        tag.putLong(K_SPREAD_COOLDOWN_REMAINING_TICKS, cooldownRemaining);
+        tag.putBoolean(K_SPREAD_COOLDOWN_ELIGIBLE, currentTick >= 0L && cooldownRemaining <= 0L);
+        tag.putLong(K_SPREAD_LAST_SUCCESS_TICK, lastSuccessTick);
+        tag.putBoolean(K_SPREAD_HAS_LAST_SUCCESS, hasLastSuccess);
+        tag.putLong(
+            K_SPREAD_LAST_SUCCESS_AGE_TICKS,
+            currentTick >= 0L && hasLastSuccess ? Math.max(0L, currentTick - lastSuccessTick) : -1L
+        );
+        tag.putLong(K_SPREAD_NEXT_ELIGIBLE_TICK, nextEligibleTick);
+        tag.putInt(K_SPREAD_MAX_LOCATIONS, config.maxLocationsPerLineage());
+        tag.putInt(K_LOCATION_COUNT, lineage != null ? lineage.locationsById().size() : 0);
+        tag.putInt(K_SPREAD_MAX_RADIUS_CHUNKS, config.maxLineageSpreadChunks());
+        tag.putInt(K_SPREAD_MIN_DISTANCE_CHUNKS, config.minimumHiveLocationDistanceChunks());
+
+        var lastAttempt = location.lastAbstractSpreadAttempt();
+        var hasLastAttempt = lastAttempt.tick() >= 0L;
+        tag.putLong(K_SPREAD_LAST_ATTEMPT_TICK, lastAttempt.tick());
+        tag.putBoolean(K_SPREAD_HAS_LAST_ATTEMPT, hasLastAttempt);
+        tag.putLong(
+            K_SPREAD_LAST_ATTEMPT_AGE_TICKS,
+            currentTick >= 0L && hasLastAttempt ? Math.max(0L, currentTick - lastAttempt.tick()) : -1L
+        );
+        tag.putString(K_SPREAD_LAST_ATTEMPT_RESULT, lastAttempt.result());
+        tag.putString(K_SPREAD_LAST_ATTEMPT_DETAIL, lastAttempt.detail());
+        if (lastAttempt.createdLocationId() != null) {
+            tag.putString(K_SPREAD_LAST_ATTEMPT_CREATED_LOCATION_ID, lastAttempt.createdLocationId().value().toString());
+        }
+        if (lastAttempt.candidateChunk() != null) {
+            tag.putInt(K_SPREAD_LAST_ATTEMPT_CANDIDATE_CHUNK_X, lastAttempt.candidateChunk().x);
+            tag.putInt(K_SPREAD_LAST_ATTEMPT_CANDIDATE_CHUNK_Z, lastAttempt.candidateChunk().z);
+        }
+    }
+
+    private static long spreadCooldownRemaining(HiveLocation location, long currentTick, HiveConfig config) {
+        var cooldownTicks = config.lineageSpreadCooldownTicks();
+        var lastSuccessTick = location.lastAbstractSpreadTick();
+        if (lastSuccessTick > 0L) {
+            return currentTick >= 0L ? Math.max(0L, lastSuccessTick + cooldownTicks - currentTick) : -1L;
+        }
+        return Math.max(0L, cooldownTicks - location.ageInTicks());
     }
 
     /** Build a snapshot for a variant faction. Lists owned lineages plus aggregates across them. */

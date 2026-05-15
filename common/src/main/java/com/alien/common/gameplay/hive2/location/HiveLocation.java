@@ -53,6 +53,10 @@ public final class HiveLocation {
 
     private static final String NBT_LAST_GROWTH_TICK = "LastGrowthTick";
 
+    private static final String NBT_LAST_ABSTRACT_SPREAD_TICK = "LastAbstractSpreadTick";
+
+    private static final String NBT_LAST_ABSTRACT_SPREAD_ATTEMPT = "LastAbstractSpreadAttempt";
+
     private static final String NBT_PEAK_XENOMORPH_COUNT = "PeakXenomorphCount";
 
     private static final String NBT_PEAK_DECAY_ELAPSED = "PeakDecayElapsedTicks";
@@ -106,6 +110,10 @@ public final class HiveLocation {
     private long ageInTicks;
 
     private long lastGrowthTick;
+
+    private long lastAbstractSpreadTick;
+
+    private AbstractSpreadAttemptDebug lastAbstractSpreadAttempt;
 
     /**
      * Decays at 1/min during normal ticking; floored at 1 to avoid the NaN-divide bug from
@@ -212,6 +220,8 @@ public final class HiveLocation {
         this.founderId = null;
         this.ageInTicks = 0L;
         this.lastGrowthTick = 0L;
+        this.lastAbstractSpreadTick = 0L;
+        this.lastAbstractSpreadAttempt = AbstractSpreadAttemptDebug.none();
         this.peakXenomorphCount = 1;
         this.peakDecayElapsedTicks = 0L;
         this.evacuatingRemainingTicks = 0L;
@@ -287,6 +297,28 @@ public final class HiveLocation {
 
     public void setLastGrowthTick(long lastGrowthTick) {
         this.lastGrowthTick = lastGrowthTick;
+    }
+
+    public long lastAbstractSpreadTick() {
+        return lastAbstractSpreadTick;
+    }
+
+    public void setLastAbstractSpreadTick(long lastAbstractSpreadTick) {
+        this.lastAbstractSpreadTick = Math.max(0L, lastAbstractSpreadTick);
+    }
+
+    public AbstractSpreadAttemptDebug lastAbstractSpreadAttempt() {
+        return lastAbstractSpreadAttempt;
+    }
+
+    public void recordAbstractSpreadAttempt(
+        long tick,
+        String result,
+        @Nullable ChunkPos candidateChunk,
+        @Nullable HiveLocationId createdLocationId,
+        String detail
+    ) {
+        this.lastAbstractSpreadAttempt = new AbstractSpreadAttemptDebug(tick, result, candidateChunk, createdLocationId, detail);
     }
 
     public int peakXenomorphCount() {
@@ -491,6 +523,12 @@ public final class HiveLocation {
 
         tag.putLong(NBT_AGE_IN_TICKS, ageInTicks);
         tag.putLong(NBT_LAST_GROWTH_TICK, lastGrowthTick);
+        if (lastAbstractSpreadTick > 0L) {
+            tag.putLong(NBT_LAST_ABSTRACT_SPREAD_TICK, lastAbstractSpreadTick);
+        }
+        if (lastAbstractSpreadAttempt.tick() >= 0L) {
+            tag.put(NBT_LAST_ABSTRACT_SPREAD_ATTEMPT, lastAbstractSpreadAttempt.save());
+        }
         tag.putInt(NBT_PEAK_XENOMORPH_COUNT, peakXenomorphCount);
         tag.putLong(NBT_PEAK_DECAY_ELAPSED, peakDecayElapsedTicks);
         tag.putLong(NBT_EVACUATING_REMAINING, evacuatingRemainingTicks);
@@ -591,6 +629,10 @@ public final class HiveLocation {
 
         location.ageInTicks = tag.getLong(NBT_AGE_IN_TICKS);
         location.lastGrowthTick = tag.getLong(NBT_LAST_GROWTH_TICK);
+        location.lastAbstractSpreadTick = Math.max(0L, tag.getLong(NBT_LAST_ABSTRACT_SPREAD_TICK));
+        location.lastAbstractSpreadAttempt = tag.contains(NBT_LAST_ABSTRACT_SPREAD_ATTEMPT)
+            ? AbstractSpreadAttemptDebug.load(tag.getCompound(NBT_LAST_ABSTRACT_SPREAD_ATTEMPT))
+            : AbstractSpreadAttemptDebug.none();
         location.peakXenomorphCount = Math.max(1, tag.getInt(NBT_PEAK_XENOMORPH_COUNT));
         location.peakDecayElapsedTicks = Math.max(0L, tag.getLong(NBT_PEAK_DECAY_ELAPSED));
         location.evacuatingRemainingTicks = Math.max(0L, tag.getLong(NBT_EVACUATING_REMAINING));
@@ -651,5 +693,71 @@ public final class HiveLocation {
         }
 
         return location;
+    }
+
+    public record AbstractSpreadAttemptDebug(
+        long tick,
+        String result,
+        @Nullable ChunkPos candidateChunk,
+        @Nullable HiveLocationId createdLocationId,
+        String detail
+    ) {
+        private static final String NBT_TICK = "Tick";
+        private static final String NBT_RESULT = "Result";
+        private static final String NBT_CANDIDATE_CHUNK_X = "CandidateChunkX";
+        private static final String NBT_CANDIDATE_CHUNK_Z = "CandidateChunkZ";
+        private static final String NBT_CREATED_LOCATION_ID = "CreatedLocationId";
+        private static final String NBT_DETAIL = "Detail";
+
+        public AbstractSpreadAttemptDebug {
+            if (result == null || result.isBlank()) {
+                result = "unknown";
+            }
+            if (detail == null) {
+                detail = "";
+            }
+        }
+
+        public static AbstractSpreadAttemptDebug none() {
+            return new AbstractSpreadAttemptDebug(
+                -1L,
+                "never",
+                null,
+                null,
+                "No abstract spread attempt has been recorded."
+            );
+        }
+
+        public CompoundTag save() {
+            var tag = new CompoundTag();
+            tag.putLong(NBT_TICK, tick);
+            tag.putString(NBT_RESULT, result);
+            if (candidateChunk != null) {
+                tag.putInt(NBT_CANDIDATE_CHUNK_X, candidateChunk.x);
+                tag.putInt(NBT_CANDIDATE_CHUNK_Z, candidateChunk.z);
+            }
+            if (createdLocationId != null) {
+                tag.putString(NBT_CREATED_LOCATION_ID, createdLocationId.value().toString());
+            }
+            tag.putString(NBT_DETAIL, detail);
+            return tag;
+        }
+
+        public static AbstractSpreadAttemptDebug load(CompoundTag tag) {
+            var candidateChunk = tag.contains(NBT_CANDIDATE_CHUNK_X) && tag.contains(NBT_CANDIDATE_CHUNK_Z)
+                ? new ChunkPos(tag.getInt(NBT_CANDIDATE_CHUNK_X), tag.getInt(NBT_CANDIDATE_CHUNK_Z))
+                : null;
+            var createdLocationId = tag.contains(NBT_CREATED_LOCATION_ID)
+                ? new HiveLocationId(ResourceLocation.parse(tag.getString(NBT_CREATED_LOCATION_ID)))
+                : null;
+
+            return new AbstractSpreadAttemptDebug(
+                tag.contains(NBT_TICK) ? tag.getLong(NBT_TICK) : -1L,
+                tag.contains(NBT_RESULT) ? tag.getString(NBT_RESULT) : "unknown",
+                candidateChunk,
+                createdLocationId,
+                tag.contains(NBT_DETAIL) ? tag.getString(NBT_DETAIL) : ""
+            );
+        }
     }
 }

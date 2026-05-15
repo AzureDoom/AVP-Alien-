@@ -18,7 +18,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.ChunkPos;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -26,21 +25,39 @@ import java.util.Random;
  * <p>
  * Drives "the lineage conquers an unattended dimension over real-world weeks" without forcing queen entities into
  * unloaded chunks. Folded into {@link com.alien.common.gameplay.hive2.tick.LineageGrowthScanTask}'s loop — runs once
- * per scan tick per lineage when conditions allow.
+ * per scan tick per hive location when conditions allow.
  * <p>
  * Conditions (must all hold):
  * <ul>
- * <li>{@code currentTick - lineage.lastSpreadTick >= lineageSpreadCooldownTicks} (default 30 minutes).</li>
+ * <li>Source location is old enough or past its own {@code lineageSpreadCooldownTicks} spread cooldown.</li>
  * <li>Lineage hasn't hit {@code maxLocationsPerLineage}.</li>
  * </ul>
  * <p>
- * The candidate position is picked uniformly within the spread zone of one of the lineage's existing locations. We
- * reject if the candidate's chunk is already in any existing location's claimed territory or has been previously
- * decorated. Otherwise: found a new location with bootstrap reserves and bump {@code lastSpreadTick}.
+ * The candidate position is picked uniformly within the spread zone of the source location. We reject if the
+ * candidate's chunk is already in any existing location's claimed territory or has been previously
+ * decorated. Otherwise: found a new location with bootstrap reserves and bump the source location's spread tick.
  */
 public final class AbstractSpreadAttempt {
 
     private static final Random RANDOM = new Random();
+
+    private static final String RESULT_COOLDOWN = "cooldown";
+
+    private static final String RESULT_MAX_LOCATIONS = "max_locations";
+
+    private static final String RESULT_DIMENSION_UNLOADED = "dimension_unloaded";
+
+    private static final String RESULT_SOURCE_INACTIVE = "source_inactive";
+
+    private static final String RESULT_SPREAD_DISABLED = "spread_disabled";
+
+    private static final String RESULT_OCCUPIED = "occupied";
+
+    private static final String RESULT_TOO_CLOSE = "too_close";
+
+    private static final String RESULT_DECORATED = "decorated";
+
+    private static final String RESULT_SUCCESS = "success";
 
     private AbstractSpreadAttempt() {}
 
@@ -52,45 +69,100 @@ public final class AbstractSpreadAttempt {
         MinecraftServer server,
         ResourceLocation lineageId,
         LineageFactionData lineage,
+        HiveLocation sourceLocation,
         long currentTick
     ) {
         var config = HiveLocationRegistry.INSTANCE.config();
 
         // Cooldown.
-        if (currentTick - lineage.lastSpreadTick() < config.lineageSpreadCooldownTicks()) {
+        var remainingCooldownTicks = remainingCooldownTicks(sourceLocation, currentTick, config);
+        if (remainingCooldownTicks > 0L) {
+            record(
+                sourceLocation,
+                lineage,
+                currentTick,
+                RESULT_COOLDOWN,
+                null,
+                null,
+                "Next eligible in " + remainingCooldownTicks + " ticks."
+            );
             return null;
         }
 
         // Max locations cap.
         if (lineage.locationsById().size() >= config.maxLocationsPerLineage()) {
+            record(
+                sourceLocation,
+                lineage,
+                currentTick,
+                RESULT_MAX_LOCATIONS,
+                null,
+                null,
+                "Lineage has " + lineage.locationsById().size() + "/" + config.maxLocationsPerLineage() + " locations."
+            );
             return null;
         }
 
         var serverLevel = server.getLevel(lineage.dimension());
         if (serverLevel == null) {
+            record(
+                sourceLocation,
+                lineage,
+                currentTick,
+                RESULT_DIMENSION_UNLOADED,
+                null,
+                null,
+                "Dimension " + lineage.dimension().location() + " is not loaded."
+            );
             return null;
         }
 
-        var locations = new ArrayList<>(lineage.locationsById().values());
-        if (locations.isEmpty()) {
+        if (!sourceLocation.isAlive()) {
+            record(sourceLocation, lineage, currentTick, RESULT_SOURCE_INACTIVE, null, null, "Source location is not alive.");
             return null;
         }
 
-        // Pick a source location uniformly to spread from.
-        var sourceLocation = locations.get(RANDOM.nextInt(locations.size()));
         var candidateChunk = pickCandidateInSpreadZone(sourceLocation, config);
         if (candidateChunk == null) {
+            record(
+                sourceLocation,
+                lineage,
+                currentTick,
+                RESULT_SPREAD_DISABLED,
+                null,
+                null,
+                "maxLineageSpreadChunks is " + config.maxLineageSpreadChunks() + "."
+            );
             return null;
         }
 
-        if (!isCandidateValid(lineage, candidateChunk, config)) {
+        var candidateValidation = validateCandidate(lineage, candidateChunk, config);
+        if (!candidateValidation.valid()) {
+            record(
+                sourceLocation,
+                lineage,
+                currentTick,
+                candidateValidation.result(),
+                candidateChunk,
+                null,
+                candidateValidation.detail()
+            );
             return null;
         }
 
         // Found.
         var locationId = mintAbstractLocation(serverLevel, lineage, lineageId, candidateChunk, currentTick);
 
-        lineage.setLastSpreadTick(currentTick);
+        sourceLocation.setLastAbstractSpreadTick(currentTick);
+        record(
+            sourceLocation,
+            lineage,
+            currentTick,
+            RESULT_SUCCESS,
+            candidateChunk,
+            locationId,
+            "Minted a pending-founder-queen location with bootstrap worker reserves."
+        );
 
         Alien.LOGGER.info(
             "Hive2: abstract spread for lineage {}: minted location {} at chunk {} (sourced from {})",
@@ -101,6 +173,14 @@ public final class AbstractSpreadAttempt {
         );
 
         return locationId;
+    }
+
+    private static long remainingCooldownTicks(HiveLocation sourceLocation, long currentTick, HiveConfig config) {
+        var lastSpreadTick = sourceLocation.lastAbstractSpreadTick();
+        if (lastSpreadTick > 0L) {
+            return Math.max(0L, lastSpreadTick + config.lineageSpreadCooldownTicks() - currentTick);
+        }
+        return Math.max(0L, config.lineageSpreadCooldownTicks() - sourceLocation.ageInTicks());
     }
 
     private static @Nullable ChunkPos pickCandidateInSpreadZone(HiveLocation source, HiveConfig config) {
@@ -116,11 +196,14 @@ public final class AbstractSpreadAttempt {
         return new ChunkPos(sourceChunk.x + dx, sourceChunk.z + dz);
     }
 
-    private static boolean isCandidateValid(LineageFactionData lineage, ChunkPos candidate, HiveConfig config) {
+    private static CandidateValidation validateCandidate(LineageFactionData lineage, ChunkPos candidate, HiveConfig config) {
         // Reject any chunk owned by any existing location.
         var occupant = HiveLocationRegistry.INSTANCE.getByChunk(lineage.dimension(), candidate);
         if (occupant != null) {
-            return false;
+            return CandidateValidation.reject(
+                RESULT_OCCUPIED,
+                "Candidate chunk is already claimed by " + occupant.id().value() + "."
+            );
         }
 
         if (
@@ -130,18 +213,24 @@ public final class AbstractSpreadAttempt {
                 config.minimumHiveLocationDistanceChunks()
             )
         ) {
-            return false;
+            return CandidateValidation.reject(
+                RESULT_TOO_CLOSE,
+                "Candidate is within " + config.minimumHiveLocationDistanceChunks() + " chunks of an existing hive location."
+            );
         }
 
         // Reject if the chunk has the decorated_by_hive flag from any of THIS lineage's previously-killed locations.
         // (Soft cooldown — a player who clears a hive gets a brief reprieve before it tries to come back.)
         for (var location : lineage.locationsById().values()) {
             if (location.decoratedChunks().contains(candidate)) {
-                return false;
+                return CandidateValidation.reject(
+                    RESULT_DECORATED,
+                    "Candidate chunk was previously decorated by " + location.id().value() + "."
+                );
             }
         }
 
-        return true;
+        return CandidateValidation.accept();
     }
 
     private static HiveLocationId mintAbstractLocation(
@@ -196,6 +285,39 @@ public final class AbstractSpreadAttempt {
                 }
                 HiveLocationClaims.claim(level, location, chunk, currentTick);
             }
+        }
+    }
+
+    private static void record(
+        HiveLocation sourceLocation,
+        LineageFactionData lineage,
+        long currentTick,
+        String result,
+        @Nullable ChunkPos candidateChunk,
+        @Nullable HiveLocationId createdLocationId,
+        String detail
+    ) {
+        sourceLocation.recordAbstractSpreadAttempt(
+            currentTick,
+            result,
+            candidateChunk,
+            createdLocationId,
+            detail
+        );
+        lineage.markDirty();
+    }
+
+    private record CandidateValidation(
+        boolean valid,
+        String result,
+        String detail
+    ) {
+        private static CandidateValidation accept() {
+            return new CandidateValidation(true, "", "");
+        }
+
+        private static CandidateValidation reject(String result, String detail) {
+            return new CandidateValidation(false, result, detail);
         }
     }
 

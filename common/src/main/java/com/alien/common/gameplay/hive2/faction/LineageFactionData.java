@@ -58,8 +58,6 @@ public class LineageFactionData extends FactionData {
 
     private static final String NBT_AGE_IN_TICKS = "AgeInTicks";
 
-    private static final String NBT_LAST_SPREAD_TICK = "LastSpreadTick";
-
     private static final String NBT_PENDING_EMPRESS_EMERGENCE = "PendingEmpressEmergence";
 
     private static final String NBT_PENDING_CIVIL_WAR = "PendingCivilWar";
@@ -94,8 +92,6 @@ public class LineageFactionData extends FactionData {
     private @Nullable UUID empressId;
 
     private long ageInTicks;
-
-    private long lastSpreadTick;
 
     private boolean pendingEmpressEmergence;
 
@@ -138,7 +134,6 @@ public class LineageFactionData extends FactionData {
         this.founderId = null;
         this.empressId = null;
         this.ageInTicks = 0L;
-        this.lastSpreadTick = 0L;
         this.pendingEmpressEmergence = false;
         this.pendingCivilWar = false;
         this.lineageNumber = -1L;
@@ -343,15 +338,6 @@ public class LineageFactionData extends FactionData {
         this.ageInTicks++;
     }
 
-    public long lastSpreadTick() {
-        return lastSpreadTick;
-    }
-
-    public void setLastSpreadTick(long lastSpreadTick) {
-        this.lastSpreadTick = lastSpreadTick;
-        markDirty();
-    }
-
     public boolean pendingEmpressEmergence() {
         return pendingEmpressEmergence;
     }
@@ -464,7 +450,6 @@ public class LineageFactionData extends FactionData {
         }
 
         this.ageInTicks = tag.getLong(NBT_AGE_IN_TICKS);
-        this.lastSpreadTick = tag.getLong(NBT_LAST_SPREAD_TICK);
         this.pendingEmpressEmergence = tag.getBoolean(NBT_PENDING_EMPRESS_EMERGENCE);
         this.pendingCivilWar = tag.getBoolean(NBT_PENDING_CIVIL_WAR);
         this.lineageNumber = tag.contains(NBT_LINEAGE_NUMBER) ? tag.getLong(NBT_LINEAGE_NUMBER) : -1L;
@@ -536,7 +521,6 @@ public class LineageFactionData extends FactionData {
         }
 
         tag.putLong(NBT_AGE_IN_TICKS, ageInTicks);
-        tag.putLong(NBT_LAST_SPREAD_TICK, lastSpreadTick);
         tag.putBoolean(NBT_PENDING_EMPRESS_EMERGENCE, pendingEmpressEmergence);
         tag.putBoolean(NBT_PENDING_CIVIL_WAR, pendingCivilWar);
         if (lineageNumber >= 0) {
