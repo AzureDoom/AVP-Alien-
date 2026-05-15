@@ -13,6 +13,8 @@ import com.alien.common.gameplay.hive2.id.HiveLocationIds;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.gameplay.hive2.location.HiveLocationSpacing;
+import com.alien.common.registry.tag.AlienEntityTypeTags;
+import com.blib.api.common.entity.v1.EntityReserves;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -144,7 +146,7 @@ public final class AbstractSpreadAttempt {
             return null;
         }
 
-        var founderParty = FounderParty.forLineage(lineage);
+        var founderParty = FounderParty.forLineage(lineage, config);
         if (founderParty == null) {
             record(
                 sourceLocation,
@@ -199,8 +201,8 @@ public final class AbstractSpreadAttempt {
         }
 
         // Found.
-        founderParty.drainFrom(sourceLocation);
-        var locationId = mintAbstractLocation(serverLevel, lineage, lineageId, candidateChunk, currentTick, founderParty);
+        var founderGroup = founderParty.drainFrom(sourceLocation);
+        var locationId = mintAbstractLocation(serverLevel, lineage, lineageId, candidateChunk, currentTick, founderGroup);
 
         sourceLocation.setLastAbstractSpreadTick(currentTick);
         record(
@@ -210,7 +212,7 @@ public final class AbstractSpreadAttempt {
             RESULT_SUCCESS,
             candidateChunk,
             locationId,
-            "Transferred queen, drone, and runner from source reserves into a new location."
+            "Transferred " + founderGroup.composition().getCount() + " founder reserves into a new location."
         );
 
         Alien.LOGGER.info(
@@ -311,7 +313,7 @@ public final class AbstractSpreadAttempt {
         ResourceLocation lineageId,
         ChunkPos candidate,
         long currentTick,
-        FounderParty founderParty
+        FounderGroup founderGroup
     ) {
         var locationId = HiveLocationIds.create();
         var centerPos = candidate.getMiddleBlockPosition(64); // Y is approximate; chunk-load corrects later
@@ -327,9 +329,9 @@ public final class AbstractSpreadAttempt {
 
         claimInitialCore(level, location, candidate, currentTick);
 
-        location.localReserves().tryAdd(founderParty.queenType(), 1);
-        location.localReserves().tryAdd(founderParty.droneType(), 1);
-        location.localReserves().tryAdd(founderParty.runnerType(), 1);
+        for (var entry : founderGroup.composition().getBackingMap().entrySet()) {
+            location.localReserves().tryAdd(entry.getKey(), Math.max(0, entry.getValue()));
+        }
 
         location.setBiomass(0);
         location.setLastGrowthTick(currentTick);
@@ -395,28 +397,45 @@ public final class AbstractSpreadAttempt {
     private record FounderParty(
         EntityType<?> queenType,
         EntityType<?> droneType,
-        EntityType<?> runnerType
+        EntityType<?> runnerType,
+        int minSize,
+        int maxSize
     ) {
-        private static @Nullable FounderParty forLineage(LineageFactionData lineage) {
+        private static @Nullable FounderParty forLineage(LineageFactionData lineage, HiveConfig config) {
             var queenType = Queen.getType(lineage.variant());
             var droneType = Drone.getType(lineage.variant());
             var runnerType = Runner.getType(lineage.variant());
             if (queenType == null || droneType == null || runnerType == null) {
                 return null;
             }
-            return new FounderParty((EntityType<?>) queenType, (EntityType<?>) droneType, (EntityType<?>) runnerType);
+            var minSize = Math.max(3, config.abstractSpreadMinFounderGroupSize());
+            var maxSize = Math.max(minSize, config.abstractSpreadMaxFounderGroupSize());
+            return new FounderParty(
+                (EntityType<?>) queenType,
+                (EntityType<?>) droneType,
+                (EntityType<?>) runnerType,
+                minSize,
+                maxSize
+            );
         }
 
         private boolean availableIn(HiveLocation location) {
             return location.localReserves().getCount(queenType) >= 1
                 && location.localReserves().getCount(droneType) >= 1
-                && location.localReserves().getCount(runnerType) >= 1;
+                && location.localReserves().getCount(runnerType) >= 1
+                && eligibleReserveCount(location) >= minSize;
         }
 
-        private void drainFrom(HiveLocation location) {
-            location.localReserves().trySpawn(queenType);
-            location.localReserves().trySpawn(droneType);
-            location.localReserves().trySpawn(runnerType);
+        private FounderGroup drainFrom(HiveLocation location) {
+            var targetSize = Math.min(maxSize, eligibleReserveCount(location));
+            var composition = new EntityReserves();
+
+            drainOne(location, composition, queenType);
+            drainOne(location, composition, droneType);
+            drainOne(location, composition, runnerType);
+            drainFillers(location, composition, targetSize - composition.getCount());
+
+            return new FounderGroup(composition);
         }
 
         private String missingDetail(HiveLocation location) {
@@ -426,8 +445,72 @@ public final class AbstractSpreadAttempt {
                 + location.localReserves().getCount(droneType)
                 + "/"
                 + location.localReserves().getCount(runnerType)
-                + ".";
+                + " and "
+                + eligibleReserveCount(location)
+                + "/"
+                + minSize
+                + " eligible founder reserves.";
+        }
+
+        private int eligibleReserveCount(HiveLocation location) {
+            var count = location.localReserves().getCount(queenType) > 0 ? 1 : 0;
+            for (var type : location.localReserves().getAvailableEntityTypes()) {
+                if (isFounderFillerEligible(type)) {
+                    count += location.localReserves().getCount(type);
+                }
+            }
+            return count;
+        }
+
+        private static void drainOne(HiveLocation location, EntityReserves composition, EntityType<?> type) {
+            if (location.localReserves().trySpawn(type)) {
+                composition.add(type, 1);
+            }
+        }
+
+        private static void drainFillers(HiveLocation location, EntityReserves composition, int count) {
+            var remaining = count;
+            var available = new java.util.ArrayList<>(
+                location.localReserves()
+                    .getAvailableEntityTypes()
+                    .stream()
+                    .filter(FounderParty::isFounderFillerEligible)
+                    .toList()
+            );
+
+            while (remaining > 0 && !available.isEmpty()) {
+                var iterator = available.iterator();
+                while (iterator.hasNext() && remaining > 0) {
+                    var type = iterator.next();
+                    if (location.localReserves().trySpawn(type)) {
+                        composition.add(type, 1);
+                        remaining--;
+                        if (location.localReserves().getCount(type) <= 0) {
+                            iterator.remove();
+                        }
+                    } else {
+                        iterator.remove();
+                    }
+                }
+            }
+        }
+
+        private static boolean isFounderFillerEligible(EntityType<?> type) {
+            return type.is(AlienEntityTypeTags.DRONES)
+                || type.is(AlienEntityTypeTags.RUNNERS)
+                || type.is(AlienEntityTypeTags.WARRIORS)
+                || type.is(AlienEntityTypeTags.PROWLERS)
+                || type.is(AlienEntityTypeTags.PRAETORIANS)
+                || type.is(AlienEntityTypeTags.CRUSHERS)
+                || type.is(AlienEntityTypeTags.RAVAGERS)
+                || type.is(AlienEntityTypeTags.RAZOR_CLAWS)
+                || type.is(AlienEntityTypeTags.BURSTERS)
+                || type.is(AlienEntityTypeTags.CARRIERS)
+                || type.is(AlienEntityTypeTags.CHRYSALISES)
+                || type.is(AlienEntityTypeTags.SPITTERS);
         }
     }
+
+    private record FounderGroup(EntityReserves composition) {}
 
 }

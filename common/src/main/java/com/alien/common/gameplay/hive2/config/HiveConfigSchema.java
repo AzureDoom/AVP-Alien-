@@ -65,6 +65,8 @@ public final class HiveConfigSchema {
             "lineageSpreadCooldownTicks",
             "maxLocationsPerLineage",
             "minimumPopulationForHiveSpread",
+            "abstractSpreadMinFounderGroupSize",
+            "abstractSpreadMaxFounderGroupSize",
             "foragerJoinTicks"
         ),
         group(

@@ -69,6 +69,8 @@ public record HiveConfig(
     long lineageSpreadCooldownTicks,
     int maxLocationsPerLineage,
     int minimumPopulationForHiveSpread,
+    int abstractSpreadMinFounderGroupSize,
+    int abstractSpreadMaxFounderGroupSize,
     long foragerJoinTicks,
 
     // ---------- § 10 Growth ----------
@@ -182,6 +184,8 @@ public record HiveConfig(
             30L * TICKS_PER_MINUTE, // lineageSpreadCooldownTicks
             16, // maxLocationsPerLineage
             100, // minimumPopulationForHiveSpread
+            4, // abstractSpreadMinFounderGroupSize
+            10, // abstractSpreadMaxFounderGroupSize
             30L * TICKS_PER_SECOND, // foragerJoinTicks
 
             // § 10 Growth
