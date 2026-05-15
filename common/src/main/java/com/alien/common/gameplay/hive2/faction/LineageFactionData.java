@@ -1,6 +1,7 @@
 package com.alien.common.gameplay.hive2.faction;
 
 import com.alien.Alien;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
 import com.alien.common.gameplay.hive2.convoy.Convoy;
 import com.alien.common.gameplay.hive2.convoy.ConvoyCodec;
 import com.alien.common.gameplay.hive2.id.HiveLocationId;
@@ -67,6 +68,8 @@ public class LineageFactionData extends FactionData {
     private static final String NBT_NEXT_LOCATION_NUMBER = "NextLocationNumber";
 
     private static final String NBT_LOCATIONS = "Locations";
+
+    private static final String LEGACY_NBT_PENDING_FOUNDER_QUEEN = "PendingFounderQueen";
 
     private static final String NBT_CONVOYS = "Convoys";
 
@@ -457,14 +460,25 @@ public class LineageFactionData extends FactionData {
 
         locationsById.clear();
         var removedMismatchedReserveEntries = 0;
+        var convertedPendingFounderQueens = 0;
         if (tag.contains(NBT_LOCATIONS)) {
             var listTag = tag.getList(NBT_LOCATIONS, Tag.TAG_COMPOUND);
             for (var i = 0; i < listTag.size(); i++) {
                 var locationTag = listTag.getCompound(i);
                 var location = HiveLocation.load(locationTag);
+                if (locationTag.getBoolean(LEGACY_NBT_PENDING_FOUNDER_QUEEN)) {
+                    var queenType = Queen.getType(variant);
+                    if (queenType != null) {
+                        location.localReserves().tryAdd((EntityType<?>) queenType, 1);
+                        convertedPendingFounderQueens++;
+                    }
+                }
                 removedMismatchedReserveEntries += location.localReserves().removeVariantMismatches(variant);
                 locationsById.put(location.id(), location);
             }
+        }
+        if (convertedPendingFounderQueens > 0) {
+            markDirty();
         }
         if (removedMismatchedReserveEntries > 0) {
             Alien.LOGGER.warn(

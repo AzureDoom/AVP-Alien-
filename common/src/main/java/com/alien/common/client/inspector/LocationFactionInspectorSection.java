@@ -326,9 +326,6 @@ public final class LocationFactionInspectorSection extends AbstractHiveInspector
                 ),
                 metric("Peak xeno", String.valueOf(s.getInt(HiveInspectionSnapshot.K_PEAK_XENO)))
             );
-            if (s.getBoolean(HiveInspectionSnapshot.K_PENDING_FOUNDER_QUEEN)) {
-                rowY = HiveInspectorRender.drawRow(graphics, font, x, rowY, width, "Founder queen", "pending");
-            }
             var evac = s.getLong(HiveInspectionSnapshot.K_EVACUATING_TICKS);
             if (evac > 0) {
                 rowY = HiveInspectorRender.drawRow(graphics, font, x, rowY, width, "Evacuating", HiveInspectorRender.formatTicks(evac) + " left");

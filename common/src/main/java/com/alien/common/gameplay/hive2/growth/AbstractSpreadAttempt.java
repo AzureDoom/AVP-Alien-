@@ -2,6 +2,7 @@ package com.alien.common.gameplay.hive2.growth;
 
 import com.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
 import com.alien.common.gameplay.hive2.config.HiveConfig;
 import com.alien.common.gameplay.hive2.faction.HiveLocationFactionProvisioner;
@@ -161,7 +162,7 @@ public final class AbstractSpreadAttempt {
             RESULT_SUCCESS,
             candidateChunk,
             locationId,
-            "Minted a pending-founder-queen location with bootstrap worker reserves."
+            "Minted a location with queen and bootstrap worker reserves."
         );
 
         Alien.LOGGER.info(
@@ -254,11 +255,12 @@ public final class AbstractSpreadAttempt {
 
         claimInitialCore(level, location, candidate, currentTick);
 
-        location.setPendingFounderQueen(true);
-
-        // Bootstrap workers. The pending founder queen will pull them into the world when she materializes.
+        var queenType = Queen.getType(lineage.variant());
         var droneType = Drone.getType(lineage.variant());
         var runnerType = Runner.getType(lineage.variant());
+        if (queenType != null) {
+            location.localReserves().tryAdd((EntityType<?>) queenType, 1);
+        }
         if (droneType != null) {
             location.localReserves().tryAdd((EntityType<?>) droneType, 1);
         }

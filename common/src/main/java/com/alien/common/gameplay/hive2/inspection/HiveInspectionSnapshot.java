@@ -114,8 +114,6 @@ public final class HiveInspectionSnapshot {
 
     public static final String K_RESERVES_BY_TYPE = "ReservesByType";
 
-    public static final String K_PENDING_FOUNDER_QUEEN = "PendingFounderQueen";
-
     public static final String K_LINEAGE_MEMBER_COUNT = "LineageMembers";
 
     public static final String K_LOCATION_FACTION_MEMBER_COUNT = "LocationFactionMembers";
@@ -301,8 +299,6 @@ public final class HiveInspectionSnapshot {
         var claimedChunks = location.claimedChunks();
         tag.putInt(K_CLAIMED_CHUNKS, claimedChunks.size());
         tag.putInt(K_DECORATED_CHUNKS, location.decoratedChunks().size());
-        tag.putBoolean(K_PENDING_FOUNDER_QUEEN, location.pendingFounderQueen());
-
         var serverLevel = server != null ? server.getLevel(location.dimension()) : null;
         var chunksLoaded = countLoadedChunks(location, serverLevel);
         tag.putInt(K_CHUNKS_LOADED, chunksLoaded);

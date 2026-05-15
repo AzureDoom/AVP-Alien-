@@ -11,6 +11,6 @@ public final class HiveLocationBootstrapProtection {
     private HiveLocationBootstrapProtection() {}
 
     public static boolean isProtected(HiveLocation location, HiveConfig config) {
-        return location.pendingFounderQueen() || location.ageInTicks() < config.locationBootstrapGraceTicks();
+        return location.ageInTicks() < config.locationBootstrapGraceTicks();
     }
 }

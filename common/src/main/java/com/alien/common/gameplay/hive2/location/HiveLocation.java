@@ -91,8 +91,6 @@ public final class HiveLocation {
 
     private static final String NBT_LOCAL_RESERVES = "LocalReserves";
 
-    private static final String NBT_PENDING_FOUNDER_QUEEN = "PendingFounderQueen";
-
     private static final String NBT_LEADERSHIP = "Leadership";
 
     private static final String NBT_REMOVAL_REASON = "RemovalReason";
@@ -186,8 +184,6 @@ public final class HiveLocation {
 
     private final HiveLocationReserves localReserves;
 
-    private boolean pendingFounderQueen;
-
     private final HiveLocationLeadership leadership;
 
     private final com.alien.common.gameplay.hive2.vent.HiveVentManager ventManager;
@@ -239,7 +235,6 @@ public final class HiveLocation {
         this.chunkClaimTicks = new HashMap<>();
         this.decoratedChunks = new HashSet<>();
         this.localReserves = new HiveLocationReserves(this::lineageVariantOrNull);
-        this.pendingFounderQueen = false;
         this.leadership = new HiveLocationLeadership();
         this.ventManager = new com.alien.common.gameplay.hive2.vent.HiveVentManager();
         this.loadedMembersByType = new HashMap<>();
@@ -441,14 +436,6 @@ public final class HiveLocation {
         return localReserves;
     }
 
-    public boolean pendingFounderQueen() {
-        return pendingFounderQueen;
-    }
-
-    public void setPendingFounderQueen(boolean pendingFounderQueen) {
-        this.pendingFounderQueen = pendingFounderQueen;
-    }
-
     public HiveLocationLeadership leadership() {
         return leadership;
     }
@@ -594,10 +581,6 @@ public final class HiveLocation {
         localReserves.save(reservesTag);
         tag.put(NBT_LOCAL_RESERVES, reservesTag);
 
-        if (pendingFounderQueen) {
-            tag.putBoolean(NBT_PENDING_FOUNDER_QUEEN, true);
-        }
-
         var leadershipTag = new CompoundTag();
         leadership.save(leadershipTag);
         tag.put(NBT_LEADERSHIP, leadershipTag);
@@ -681,8 +664,6 @@ public final class HiveLocation {
         if (tag.contains(NBT_LOCAL_RESERVES)) {
             location.localReserves.load(tag.getCompound(NBT_LOCAL_RESERVES));
         }
-
-        location.pendingFounderQueen = tag.getBoolean(NBT_PENDING_FOUNDER_QUEEN);
 
         if (tag.contains(NBT_LEADERSHIP)) {
             location.leadership.load(tag.getCompound(NBT_LEADERSHIP));

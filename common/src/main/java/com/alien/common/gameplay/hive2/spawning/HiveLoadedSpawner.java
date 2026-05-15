@@ -3,15 +3,11 @@ package com.alien.common.gameplay.hive2.spawning;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.AlienSpawning;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
-import com.alien.common.gameplay.hive2.faction.LineageFactionData;
-import com.alien.common.gameplay.hive2.faction.LocationMembership;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
-import com.alien.common.gameplay.hive2.location.HiveLocationReserves;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.gameplay.hive2.location.HiveLocationSpacing;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -19,7 +15,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.levelgen.Heightmap;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -33,14 +28,6 @@ public final class HiveLoadedSpawner {
 
     private static final int PLAYER_CHUNK_RANGE = MAX_DISTANCE_FROM_PLAYER_BLOCKS / 16;
 
-    private static final int FOUNDER_QUEEN_CAVE_COLUMNS_PER_SCAN = 32;
-
-    private static final int FOUNDER_QUEEN_SURFACE_ATTEMPTS = 64;
-
-    private static final int ENTOURAGE_SPAWN_ATTEMPTS = 24;
-
-    private static final int ENTOURAGE_SPAWN_RADIUS = 4;
-
     private HiveLoadedSpawner() {}
 
     public static void scanAndSpawn(MinecraftServer server) {
@@ -53,11 +40,6 @@ public final class HiveLoadedSpawner {
 
             var level = server.getLevel(location.dimension());
             if (level == null) {
-                continue;
-            }
-
-            if (location.pendingFounderQueen()) {
-                trySpawnPendingFounderQueen(level, location);
                 continue;
             }
 
@@ -112,7 +94,7 @@ public final class HiveLoadedSpawner {
         HiveLocation location,
         List<ServerPlayer> players
     ) {
-        var type = pickWeightedReserveType(level, location.localReserves());
+        var type = pickWeightedReserveType(level, location);
         if (type == null) {
             return null;
         }
@@ -123,43 +105,24 @@ public final class HiveLoadedSpawner {
             return null;
         }
 
-        return type.spawn(level, pos, MobSpawnType.NATURAL);
+        var spawnType = type.is(AlienEntityTypeTags.QUEENS) ? MobSpawnType.MOB_SUMMONED : MobSpawnType.NATURAL;
+        var entity = type.spawn(level, pos, spawnType);
+        if (entity instanceof Queen queen && location.founderId() == null) {
+            location.setFounderId(queen.getUUID());
+        }
+        return entity;
     }
 
-    private static @Nullable Entity trySpawnPendingFounderQueen(ServerLevel level, HiveLocation location) {
-        var queenType = queenTypeFor(location);
-        if (queenType == null) {
-            return null;
+    private static @Nullable EntityType<?> pickWeightedReserveType(ServerLevel level, HiveLocation location) {
+        var reserves = location.localReserves();
+        if (location.founderId() == null) {
+            for (var type : reserves.getAvailableEntityTypes()) {
+                if (type.is(AlienEntityTypeTags.QUEENS)) {
+                    return type;
+                }
+            }
         }
 
-        var pos = pickFounderQueenSpawnPosition(level, location, queenType);
-        if (pos == null) {
-            return null;
-        }
-
-        var entity = queenType.spawn(level, pos, MobSpawnType.MOB_SUMMONED);
-        if (!(entity instanceof Queen queen)) {
-            return null;
-        }
-
-        queen.setPersistenceRequired();
-        location.setFounderId(queen.getUUID());
-        location.setPendingFounderQueen(false);
-        LocationMembership.join(location, queen);
-        spawnLocalReservesWithFounder(level, location, queen.blockPosition());
-
-        return queen;
-    }
-
-    private static @Nullable EntityType<? extends Alien> queenTypeFor(HiveLocation location) {
-        var faction = com.alien.Alien.MOD.factions().get(location.lineageFactionId());
-        if (faction == null || !(faction.data() instanceof LineageFactionData lineage)) {
-            return null;
-        }
-        return Queen.getType(lineage.variant());
-    }
-
-    private static @Nullable EntityType<?> pickWeightedReserveType(ServerLevel level, HiveLocationReserves reserves) {
         var weightedTypes = new ArrayList<WeightedType>();
         var totalWeight = 0;
 
@@ -283,141 +246,6 @@ public final class HiveLoadedSpawner {
             return false;
         }
         return true;
-    }
-
-    private static @Nullable BlockPos pickFounderQueenSpawnPosition(
-        ServerLevel level,
-        HiveLocation location,
-        EntityType<?> queenType
-    ) {
-        var candidateChunks = loadedCoreChunks(level, location);
-        if (candidateChunks.isEmpty()) {
-            return null;
-        }
-
-        var cavePos = pickFounderQueenCavePosition(level, location, queenType, candidateChunks);
-        if (cavePos != null) {
-            return cavePos;
-        }
-
-        return pickFounderQueenSurfacePosition(level, location, queenType, candidateChunks);
-    }
-
-    private static @Nullable BlockPos pickFounderQueenCavePosition(
-        ServerLevel level,
-        HiveLocation location,
-        EntityType<?> queenType,
-        List<ChunkPos> candidateChunks
-    ) {
-        for (var columnAttempt = 0; columnAttempt < FOUNDER_QUEEN_CAVE_COLUMNS_PER_SCAN; columnAttempt++) {
-            var chunk = candidateChunks.get(level.random.nextInt(candidateChunks.size()));
-            var x = chunk.x * 16 + level.random.nextInt(16);
-            var z = chunk.z * 16 + level.random.nextInt(16);
-            var surfaceY = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
-            var minY = level.getMinBuildHeight() + 1;
-            var maxY = Math.min(surfaceY - 1, level.getMaxBuildHeight() - 1);
-
-            for (var y = maxY; y >= minY; y--) {
-                var pos = new BlockPos(x, y, z);
-                if (!level.canSeeSky(pos) && isValidFounderQueenSpawnPosition(level, location, pos, queenType)) {
-                    return pos;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    private static @Nullable BlockPos pickFounderQueenSurfacePosition(
-        ServerLevel level,
-        HiveLocation location,
-        EntityType<?> queenType,
-        List<ChunkPos> candidateChunks
-    ) {
-        for (var attempt = 0; attempt < FOUNDER_QUEEN_SURFACE_ATTEMPTS; attempt++) {
-            var chunk = candidateChunks.get(level.random.nextInt(candidateChunks.size()));
-            var x = chunk.x * 16 + level.random.nextInt(16);
-            var z = chunk.z * 16 + level.random.nextInt(16);
-            var y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
-            var pos = new BlockPos(x, y, z);
-
-            if (isValidFounderQueenSpawnPosition(level, location, pos, queenType)) {
-                return pos;
-            }
-        }
-
-        return null;
-    }
-
-    private static List<ChunkPos> loadedCoreChunks(ServerLevel level, HiveLocation location) {
-        var centerChunk = new ChunkPos(location.centerPos());
-        var coreRadius = HiveLocationRegistry.INSTANCE.config().initialHiveLocationClaimRadiusChunks();
-
-        return location.claimedChunks()
-            .stream()
-            .filter(chunk -> HiveLocationSpacing.chunkDistance(chunk, centerChunk) <= coreRadius)
-            .filter(chunk -> level.getChunkSource().hasChunk(chunk.x, chunk.z))
-            .toList();
-    }
-
-    private static boolean isValidFounderQueenSpawnPosition(
-        ServerLevel level,
-        HiveLocation location,
-        BlockPos pos,
-        EntityType<?> queenType
-    ) {
-        return HiveLocationSpawnGate.locationContaining(level, pos) == location
-            && isValidForcedSpawnPosition(level, pos, queenType);
-    }
-
-    private static void spawnLocalReservesWithFounder(ServerLevel level, HiveLocation location, BlockPos founderPos) {
-        for (var type : new ArrayList<>(location.localReserves().getAvailableEntityTypes())) {
-            if (!type.is(AlienEntityTypeTags.XENOMORPHS) || type.is(AlienEntityTypeTags.QUEENS)) {
-                continue;
-            }
-
-            var count = location.localReserves().getCount(type);
-            for (var i = 0; i < count; i++) {
-                var pos = pickEntourageSpawnPosition(level, location, founderPos, type);
-                if (pos == null) {
-                    break;
-                }
-                if (type.spawn(level, pos, MobSpawnType.MOB_SUMMONED) == null) {
-                    break;
-                }
-            }
-        }
-    }
-
-    private static @Nullable BlockPos pickEntourageSpawnPosition(
-        ServerLevel level,
-        HiveLocation location,
-        BlockPos founderPos,
-        EntityType<?> type
-    ) {
-        for (var attempt = 0; attempt < ENTOURAGE_SPAWN_ATTEMPTS; attempt++) {
-            var x = founderPos.getX() + level.random.nextInt(ENTOURAGE_SPAWN_RADIUS * 2 + 1) - ENTOURAGE_SPAWN_RADIUS;
-            var y = founderPos.getY() + level.random.nextInt(5) - 2;
-            var z = founderPos.getZ() + level.random.nextInt(ENTOURAGE_SPAWN_RADIUS * 2 + 1) - ENTOURAGE_SPAWN_RADIUS;
-            var pos = new BlockPos(x, Math.clamp(y, level.getMinBuildHeight() + 1, level.getMaxBuildHeight() - 1), z);
-            if (HiveLocationSpawnGate.locationContaining(level, pos) == location && isValidForcedSpawnPosition(level, pos, type)) {
-                return pos;
-            }
-        }
-
-        return null;
-    }
-
-    private static boolean isValidForcedSpawnPosition(ServerLevel level, BlockPos pos, EntityType<?> type) {
-        var floorPos = pos.below();
-        var floorState = level.getBlockState(floorPos);
-        if (!floorState.isFaceSturdy(level, floorPos, Direction.UP)) {
-            return false;
-        }
-        if (!level.getBlockState(pos).getFluidState().isEmpty()) {
-            return false;
-        }
-        return level.noCollision(type.getSpawnAABB(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5));
     }
 
     private static boolean isValidPlayerDistance(ServerLevel level, BlockPos pos) {
