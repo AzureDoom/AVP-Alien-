@@ -5,6 +5,8 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
 import com.alien.common.gameplay.hive2.config.HiveConfig;
+import com.alien.common.gameplay.hive2.convoy.Convoy;
+import com.alien.common.gameplay.hive2.convoy.ConvoyId;
 import com.alien.common.gameplay.hive2.economy.CastePopulation;
 import com.alien.common.gameplay.hive2.faction.HiveLocationFactionProvisioner;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
@@ -20,6 +22,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
@@ -202,7 +205,9 @@ public final class AbstractSpreadAttempt {
 
         // Found.
         var founderGroup = founderParty.drainFrom(sourceLocation);
-        var locationId = mintAbstractLocation(serverLevel, lineage, lineageId, candidateChunk, currentTick, founderGroup);
+        var location = mintAbstractLocation(serverLevel, lineage, lineageId, candidateChunk, currentTick);
+        dispatchFounderConvoy(lineage, lineageId, sourceLocation, location, founderGroup, currentTick);
+        var locationId = location.id();
 
         sourceLocation.setLastAbstractSpreadTick(currentTick);
         record(
@@ -212,7 +217,7 @@ public final class AbstractSpreadAttempt {
             RESULT_SUCCESS,
             candidateChunk,
             locationId,
-            "Transferred " + founderGroup.composition().getCount() + " founder reserves into a new location."
+            "Dispatched " + founderGroup.composition().getCount() + " founder reserves by convoy to the new location."
         );
 
         Alien.LOGGER.info(
@@ -307,13 +312,12 @@ public final class AbstractSpreadAttempt {
         return null;
     }
 
-    private static HiveLocationId mintAbstractLocation(
+    private static HiveLocation mintAbstractLocation(
         ServerLevel level,
         LineageFactionData lineage,
         ResourceLocation lineageId,
         ChunkPos candidate,
-        long currentTick,
-        FounderGroup founderGroup
+        long currentTick
     ) {
         var locationId = HiveLocationIds.create();
         var centerPos = candidate.getMiddleBlockPosition(64); // Y is approximate; chunk-load corrects later
@@ -329,10 +333,6 @@ public final class AbstractSpreadAttempt {
 
         claimInitialCore(level, location, candidate, currentTick);
 
-        for (var entry : founderGroup.composition().getBackingMap().entrySet()) {
-            location.localReserves().tryAdd(entry.getKey(), Math.max(0, entry.getValue()));
-        }
-
         location.setBiomass(0);
         location.setLastGrowthTick(currentTick);
         location.setLastPassiveClaimTick(currentTick);
@@ -340,7 +340,35 @@ public final class AbstractSpreadAttempt {
         lineage.addLocation(location);
         HiveLocationRegistry.INSTANCE.register(location);
 
-        return locationId;
+        return location;
+    }
+
+    private static void dispatchFounderConvoy(
+        LineageFactionData lineage,
+        ResourceLocation lineageId,
+        HiveLocation sourceLocation,
+        HiveLocation destinationLocation,
+        FounderGroup founderGroup,
+        long currentTick
+    ) {
+        var convoy = new Convoy.Reinforcement(
+            ConvoyId.fresh(),
+            lineageId,
+            sourceLocation.dimension(),
+            sourceLocation.id(),
+            destinationLocation.id(),
+            centerOf(sourceLocation.centerPos()),
+            destinationLocation.centerPos(),
+            founderGroup.composition(),
+            currentTick
+        );
+
+        lineage.convoys().add(convoy);
+        lineage.markDirty();
+    }
+
+    private static Vec3 centerOf(net.minecraft.core.BlockPos pos) {
+        return new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
     }
 
     private static void claimInitialCore(ServerLevel level, HiveLocation location, ChunkPos centerChunk, long currentTick) {
