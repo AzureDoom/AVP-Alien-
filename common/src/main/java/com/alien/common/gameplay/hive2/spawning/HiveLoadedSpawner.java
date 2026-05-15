@@ -118,6 +118,7 @@ public final class HiveLoadedSpawner {
     private static @Nullable EntityType<?> pickWeightedReserveType(ServerLevel level, HiveLocation location) {
         var reserves = location.localReserves();
         var knownQueenCount = CastePopulation.countKnownCaste(location, AlienEntityTypeTags.QUEENS);
+        var knownHarbingerCount = CastePopulation.countKnownCaste(location, AlienEntityTypeTags.HARBINGERS);
         if (knownQueenCount <= 0) {
             for (var type : reserves.getAvailableEntityTypes()) {
                 if (type.is(AlienEntityTypeTags.QUEENS)) {
@@ -134,6 +135,9 @@ public final class HiveLoadedSpawner {
                 continue;
             }
             if (type.is(AlienEntityTypeTags.QUEENS) && knownQueenCount > 0) {
+                continue;
+            }
+            if (type.is(AlienEntityTypeTags.HARBINGERS) && knownHarbingerCount > 0) {
                 continue;
             }
 

@@ -163,6 +163,9 @@ public final class HiveBalanceTask {
         if (outputType == null) {
             return false;
         }
+        if (outputType.is(AlienEntityTypeTags.HARBINGERS) && CastePopulation.countCaste(location, AlienEntityTypeTags.HARBINGERS) >= 1) {
+            return false;
+        }
 
         var recipe = HiveRecipeRegistry.forOutputEntity(outputType);
         if (recipe == null) {
