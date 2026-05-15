@@ -68,6 +68,7 @@ public record HiveConfig(
     int maxLineageSpreadChunks,
     long lineageSpreadCooldownTicks,
     int maxLocationsPerLineage,
+    int minimumPopulationForHiveSpread,
     long foragerJoinTicks,
 
     // ---------- § 10 Growth ----------
@@ -176,6 +177,7 @@ public record HiveConfig(
             32, // maxLineageSpreadChunks
             30L * TICKS_PER_MINUTE, // lineageSpreadCooldownTicks
             16, // maxLocationsPerLineage
+            100, // minimumPopulationForHiveSpread
             30L * TICKS_PER_SECOND, // foragerJoinTicks
 
             // § 10 Growth

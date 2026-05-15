@@ -5,6 +5,7 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
 import com.alien.common.gameplay.hive2.config.HiveConfig;
+import com.alien.common.gameplay.hive2.economy.CastePopulation;
 import com.alien.common.gameplay.hive2.faction.HiveLocationFactionProvisioner;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.id.HiveLocationId;
@@ -51,6 +52,8 @@ public final class AbstractSpreadAttempt {
     private static final String RESULT_SOURCE_INACTIVE = "source_inactive";
 
     private static final String RESULT_SPREAD_DISABLED = "spread_disabled";
+
+    private static final String RESULT_INSUFFICIENT_POPULATION = "insufficient_population";
 
     private static final String RESULT_OCCUPIED = "occupied";
 
@@ -120,6 +123,20 @@ public final class AbstractSpreadAttempt {
 
         if (!sourceLocation.isAlive()) {
             record(sourceLocation, lineage, currentTick, RESULT_SOURCE_INACTIVE, null, null, "Source location is not alive.");
+            return null;
+        }
+
+        var sourcePopulation = CastePopulation.totalTrackedPopulation(sourceLocation);
+        if (sourcePopulation < config.minimumPopulationForHiveSpread()) {
+            record(
+                sourceLocation,
+                lineage,
+                currentTick,
+                RESULT_INSUFFICIENT_POPULATION,
+                null,
+                null,
+                "Source population is " + sourcePopulation + "/" + config.minimumPopulationForHiveSpread() + "."
+            );
             return null;
         }
 
