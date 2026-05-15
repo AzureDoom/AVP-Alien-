@@ -3,6 +3,7 @@ package com.alien.common.gameplay.hive2.spawning;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.AlienSpawning;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
+import com.alien.common.gameplay.hive2.economy.CastePopulation;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.gameplay.hive2.location.HiveLocationSpacing;
@@ -116,7 +117,8 @@ public final class HiveLoadedSpawner {
 
     private static @Nullable EntityType<?> pickWeightedReserveType(ServerLevel level, HiveLocation location) {
         var reserves = location.localReserves();
-        if (location.founderId() == null) {
+        var knownQueenCount = CastePopulation.countKnownCaste(location, AlienEntityTypeTags.QUEENS);
+        if (knownQueenCount <= 0) {
             for (var type : reserves.getAvailableEntityTypes()) {
                 if (type.is(AlienEntityTypeTags.QUEENS)) {
                     return type;
@@ -129,6 +131,9 @@ public final class HiveLoadedSpawner {
 
         for (var type : reserves.getAvailableEntityTypes()) {
             if (!type.is(AlienEntityTypeTags.XENOMORPHS)) {
+                continue;
+            }
+            if (type.is(AlienEntityTypeTags.QUEENS) && knownQueenCount > 0) {
                 continue;
             }
 

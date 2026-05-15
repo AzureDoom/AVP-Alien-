@@ -2,6 +2,7 @@ package com.alien.common.gameplay.hive2.lifecycle;
 
 import com.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
+import com.alien.common.gameplay.hive2.economy.CastePopulation;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.id.LineageIds;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
@@ -114,6 +115,9 @@ public final class QueenlessMaturationTask {
                 location.setQueenlessLeaderSnapshot(null);
                 location.setQueenlessMaturationLastAdvanceTick(Long.MIN_VALUE);
             }
+            return;
+        }
+        if (CastePopulation.countCaste(location, AlienEntityTypeTags.QUEENS) > 0) {
             return;
         }
 

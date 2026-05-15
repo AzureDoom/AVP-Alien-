@@ -55,13 +55,17 @@ public final class CastePopulation {
 
     /** Count of one caste (known location members + reserves) in this location. */
     public static int countCaste(HiveLocation location, TagKey<EntityType<?>> caste) {
+        return countKnownCaste(location, caste) + location.localReserves().getCountMatching(type -> type.is(caste));
+    }
+
+    /** Count of one caste from persisted known members only; reserve entries are intentionally excluded. */
+    public static int countKnownCaste(HiveLocation location, TagKey<EntityType<?>> caste) {
         var count = 0;
         for (var entry : location.knownMembersByType().entrySet()) {
             if (entry.getKey().is(caste)) {
                 count += entry.getValue().size();
             }
         }
-        count += location.localReserves().getCountMatching(type -> type.is(caste));
         return count;
     }
 
