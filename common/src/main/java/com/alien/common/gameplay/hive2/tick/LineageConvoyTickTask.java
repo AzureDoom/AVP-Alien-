@@ -14,11 +14,13 @@ import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.id.LineageIds;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
+import com.alien.common.registry.init.AlienMobEffects;
 import com.alien.common.registry.init.AlienSoundEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.effect.MobEffectInstance;
 
 /**
  * Per-server-tick driver for in-flight convoys. Walks every loaded lineage's convoy list, advances each convoy's
@@ -33,6 +35,8 @@ import net.minecraft.sounds.SoundSource;
 public final class LineageConvoyTickTask {
 
     private static final long RAID_WARNING_LEAD_TICKS = 20L * 60L;
+
+    private static final int MARKED_FOR_DEATH_REFRESH_TICKS = 20 * 10;
 
     private LineageConvoyTickTask() {}
 
@@ -84,6 +88,7 @@ public final class LineageConvoyTickTask {
                     }
 
                     if (!raid.returningHome()) {
+                        refreshMarkedForDeath(raid, server);
                         updateRaidTargetPos(raid, server);
                         maybeWarnRaidTarget(raid, server, lineage, config);
                     }
@@ -115,6 +120,29 @@ public final class LineageConvoyTickTask {
         }
 
         ConvoyBossBars.retain(activeConvoyIds);
+    }
+
+    private static void refreshMarkedForDeath(Convoy.Raid raid, MinecraftServer server) {
+        var player = server.getPlayerList().getPlayer(raid.targetPlayerId());
+        if (player == null || !player.isAlive()) {
+            return;
+        }
+
+        var currentEffect = player.getEffect(AlienMobEffects.getMarkedForDeathHolder());
+        if (currentEffect != null && currentEffect.getDuration() > MARKED_FOR_DEATH_REFRESH_TICKS / 2) {
+            return;
+        }
+
+        player.addEffect(
+            new MobEffectInstance(
+                AlienMobEffects.getMarkedForDeathHolder(),
+                MARKED_FOR_DEATH_REFRESH_TICKS,
+                0,
+                false,
+                false,
+                true
+            )
+        );
     }
 
     /** Refreshes a raid's last-known target position when its target player is online + same dim + alive. */

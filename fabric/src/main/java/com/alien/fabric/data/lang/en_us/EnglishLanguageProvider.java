@@ -49,6 +49,7 @@ public class EnglishLanguageProvider extends FabricLanguageProvider {
         builder.add(AlienMobEffects.getBloodLossHolder().value(), "Blood Loss");
         builder.add(AlienMobEffects.getMetamorphosisHolder().value(), "Metamorphosis");
         builder.add(AlienMobEffects.getScourgeHolder().value(), "Scourge");
+        builder.add(AlienMobEffects.getMarkedForDeathHolder().value(), "Marked for Death");
 
         // Potions
         builder.add("item.minecraft.potion.effect.blood_loss", "Potion of Blood Loss");
