@@ -138,7 +138,7 @@ public class Alien {
         MOD.events().onFactionsLoaded().register(Alien::rebuildHive2RegistryFromFactions);
         MOD.events().onServerStopped().register(server -> HiveLocationRegistry.INSTANCE.clear());
 
-        // Hive2: defensive cleanup when any lineage faction is removed (admin removal, civil war, absorption, etc.).
+        // Hive2: defensive cleanup when any lineage faction is removed (admin removal, absorption, etc.).
         MOD.events()
             .onFactionRemove()
             .register(com.alien.common.gameplay.hive2.lifecycle.Hive2FactionRemoveListener::onFactionRemoved);

@@ -121,9 +121,6 @@ public final class LineageFactionInspectorSection extends AbstractHiveInspectorS
             if (s.getBoolean(HiveInspectionSnapshot.K_PENDING_EMPRESS)) {
                 rowY = HiveInspectorRender.drawNote(graphics, font, x, rowY, width, "Pending empress emergence");
             }
-            if (s.getBoolean(HiveInspectionSnapshot.K_PENDING_CIVIL_WAR)) {
-                rowY = HiveInspectorRender.drawNote(graphics, font, x, rowY, width, "Pending civil war");
-            }
         }
 
         rowY += InspectorStyle.ROW_GAP;

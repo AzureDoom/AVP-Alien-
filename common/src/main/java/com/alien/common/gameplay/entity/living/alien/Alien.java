@@ -744,7 +744,7 @@ public abstract class Alien extends Monster implements DataUser {
                 attributeKillToLineages(player.getUUID(), serverLevel.getGameTime());
             }
             ConvoyMemberTracker.unregisterKilled(this);
-            // Hive2 empress death → civil-war flag consumed by CivilWarHandler.
+            // Hive2 empress death clears the lineage's empress slot so the next emergence ritual can fire.
             if (getType().is(AlienEntityTypeTags.EMPRESSES)) {
                 onEmpressDied();
             }
@@ -762,21 +762,14 @@ public abstract class Alien extends Monster implements DataUser {
             if (faction == null || !(faction.data() instanceof LineageFactionData lineage)) {
                 continue;
             }
-            // Multi-location lineage with empress dying → civil war queued for Phase 11.
-            // Single-location lineage just loses its empress (no civil war; she stays as a forager record).
-            if (lineage.locationsById().size() >= 2) {
-                lineage.setPendingCivilWar(true);
-            }
-            // Either way, clear the empress slot so the next emergence ritual can fire.
             if (getUUID().equals(lineage.empressId())) {
                 lineage.setEmpressId(null);
             }
             com.alien.Alien.LOGGER.info(
-                "Hive2: empress {} died — lineage {} has {} location(s); pendingCivilWar={}",
+                "Hive2: empress {} died — lineage {} has {} location(s); empress slot cleared",
                 getUUID(),
                 factionId,
-                lineage.locationsById().size(),
-                lineage.pendingCivilWar()
+                lineage.locationsById().size()
             );
         }
     }

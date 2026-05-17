@@ -133,8 +133,6 @@ public final class HiveInspectionSnapshot {
 
     public static final String K_PENDING_EMPRESS = "PendingEmpress";
 
-    public static final String K_PENDING_CIVIL_WAR = "PendingCivilWar";
-
     public static final String K_LINEAGE_MEMBER_TOTAL = "LineageMemberTotal";
 
     public static final String K_LOCATION_COUNT = "LocationCount";
@@ -405,7 +403,6 @@ public final class HiveInspectionSnapshot {
             tag.putUUID(K_EMPRESS_ID, data.empressId());
         }
         tag.putBoolean(K_PENDING_EMPRESS, data.pendingEmpressEmergence());
-        tag.putBoolean(K_PENDING_CIVIL_WAR, data.pendingCivilWar());
 
         var memberCount = faction.membership().getMembers().size();
         tag.putInt(K_LINEAGE_MEMBER_TOTAL, memberCount);
@@ -675,7 +672,6 @@ public final class HiveInspectionSnapshot {
                 row.putString(K_REMOVAL_REASON, lineage.removalReason().typeKind());
             }
             row.putBoolean(K_PENDING_EMPRESS, lineage.pendingEmpressEmergence());
-            row.putBoolean(K_PENDING_CIVIL_WAR, lineage.pendingCivilWar());
             lineagesList.add(row);
         }
         tag.put(K_LINEAGES, lineagesList);

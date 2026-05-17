@@ -50,10 +50,6 @@ public final class LineageAbsorptionTask {
             if (faction == null || !(faction.data() instanceof LineageFactionData lineage) || !lineage.isAlive()) {
                 continue;
             }
-            // Skip lineages currently in pendingCivilWar — they're about to be torn apart.
-            if (lineage.pendingCivilWar()) {
-                continue;
-            }
             bucket
                 .computeIfAbsent(new BucketKey(lineage.variant(), lineage.dimension()), $ -> new ArrayList<>())
                 .add(new LineageInfo(factionId, lineage, chunksOf(lineage)));

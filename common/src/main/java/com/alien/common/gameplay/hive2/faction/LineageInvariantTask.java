@@ -3,7 +3,6 @@ package com.alien.common.gameplay.hive2.faction;
 import com.alien.Alien;
 import com.alien.common.gameplay.hive2.growth.ContestResolutionTask;
 import com.alien.common.gameplay.hive2.id.LineageIds;
-import com.alien.common.gameplay.hive2.lifecycle.CivilWarHandler;
 import com.alien.common.gameplay.hive2.lifecycle.LineageAbsorptionTask;
 import com.alien.common.gameplay.hive2.lifecycle.QueenlessMaturationTask;
 import com.blib.api.common.faction.v1.FactionMember;
@@ -20,8 +19,6 @@ import java.util.UUID;
  * <ul>
  * <li><b>Variant matching</b>: for each lineage, scan its loaded members across all owned locations. Members whose
  * entity-type variant doesn't match the lineage's variant are evicted from BLib membership. (Phase 9.)</li>
- * <li><b>Civil war dispatch</b>: any lineage with {@code pendingCivilWar=true} is shattered into successor lineages via
- * {@link CivilWarHandler}. (Phase 11.)</li>
  * <li><b>Lifecycle</b>: drive location dormancy + death, lineage absorption, lineage death (Phase 11). Each is a
  * separate static task.</li>
  * </ul>
@@ -37,7 +34,7 @@ public final class LineageInvariantTask {
     }
 
     /**
-     * Slow-cadence scan: variant invariants, civil war, maturation, absorption, contests. Called from
+     * Slow-cadence scan: variant invariants, maturation, absorption, contests. Called from
      * {@link com.alien.common.gameplay.hive2.location.HiveLocationRegistry#tick} every
      * {@code lineageScanIntervalTicks}. Per-tick death checks (location dormancy, lineage death) run independently
      * every tick from {@code HiveLocationRegistry.tick} directly — they are NOT routed through this method.
@@ -46,19 +43,14 @@ public final class LineageInvariantTask {
         // 1. Variant invariants — evict variant-mismatched members.
         scanVariantInvariants();
 
-        // 2. Civil war first — must run before absorption so the new successor lineages enter the rest of the
-        // pipeline cleanly.
-        CivilWarHandler.scanAndHandle(server);
-
-        // 3. Queenless lineage maturation — lets civil-war successors (and any other queenless lineage) advance
-        // their leader through the queen-track growth stages over time. Runs after civil war so freshly-minted
-        // successor lineages get tagged on the same scan.
+        // 2. Queenless lineage maturation — lets queenless lineages advance their leader through the queen-track
+        // growth stages over time.
         QueenlessMaturationTask.scanAll(server);
 
-        // 4. Lineage absorption — same-variant cross-lineage merging.
+        // 3. Lineage absorption — same-variant cross-lineage merging.
         LineageAbsorptionTask.scanAll(server);
 
-        // 5. Contested chunk resolution.
+        // 4. Contested chunk resolution.
         ContestResolutionTask.scanAll(server);
     }
 

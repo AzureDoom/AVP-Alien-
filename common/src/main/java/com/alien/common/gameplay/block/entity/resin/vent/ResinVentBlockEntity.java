@@ -63,7 +63,7 @@ public class ResinVentBlockEntity extends BlockEntity implements GameEventListen
         }
         var ventVariant = ventVariantTypeOption.unwrap().variant();
 
-        // Re-resolve every tick: the chunk's owning location may have changed (claim transfer, civil war, death).
+        // Re-resolve every tick: the chunk's owning location may have changed (claim transfer or death).
         var owningLocation = HiveLocationRegistry.INSTANCE.getByChunk(level.dimension(), new ChunkPos(ventPos));
 
         if (owningLocation == null) {

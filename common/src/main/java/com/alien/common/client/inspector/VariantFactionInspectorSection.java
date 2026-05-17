@@ -258,15 +258,8 @@ public final class VariantFactionInspectorSection extends AbstractHiveInspectorS
 
     private static String lineageState(CompoundTag row) {
         var pendingEmpress = row.getBoolean(HiveInspectionSnapshot.K_PENDING_EMPRESS);
-        var pendingCivilWar = row.getBoolean(HiveInspectionSnapshot.K_PENDING_CIVIL_WAR);
-        if (pendingEmpress && pendingCivilWar) {
-            return "empress, civil war";
-        }
         if (pendingEmpress) {
             return "empress";
-        }
-        if (pendingCivilWar) {
-            return "civil war";
         }
         return "stable";
     }

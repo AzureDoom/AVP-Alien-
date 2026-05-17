@@ -39,7 +39,7 @@ import java.util.UUID;
  * Per {@code HIVE_REDESIGN_12_PERFORMANCE.md} § 3, this class also carries its location records as nested NBT — they're
  * persisted with the lineage shard, not separately.
  * <p>
- * Phase 1 ships the data shape only. Member-tracking, the empress, civil war, and convoys all attach in later phases
+ * Phase 1 ships the data shape only. Member-tracking, the empress, and convoys all attach in later phases
  * (referenced fields are present but inert for now).
  * <p>
  * See {@code HIVE_REDESIGN_01_FACTIONS.md} § 2.
@@ -61,8 +61,6 @@ public class LineageFactionData extends FactionData {
     private static final String NBT_AGE_IN_TICKS = "AgeInTicks";
 
     private static final String NBT_PENDING_EMPRESS_EMERGENCE = "PendingEmpressEmergence";
-
-    private static final String NBT_PENDING_CIVIL_WAR = "PendingCivilWar";
 
     private static final String NBT_LINEAGE_NUMBER = "LineageNumber";
 
@@ -101,8 +99,6 @@ public class LineageFactionData extends FactionData {
 
     private boolean pendingEmpressEmergence;
 
-    private boolean pendingCivilWar;
-
     /** Per-variant lineage index assigned at mint (used in {@link FactionNaming} paths). -1 = unassigned. */
     private long lineageNumber;
 
@@ -139,7 +135,6 @@ public class LineageFactionData extends FactionData {
         this.empressId = null;
         this.ageInTicks = 0L;
         this.pendingEmpressEmergence = false;
-        this.pendingCivilWar = false;
         this.lineageNumber = -1L;
         this.nextLocationNumber = 0L;
         this.locationsById = new LinkedHashMap<>();
@@ -159,7 +154,7 @@ public class LineageFactionData extends FactionData {
         // Reactive variant guard: lineage factions accept only members of their own variant. Reject mismatches
         // immediately by removing them. (Proactive guards in LocationMembership.join and
         // FactionMembershipTransfer.apply catch the common paths; this is defense-in-depth for direct addEntity calls
-        // — civil war partition, queenless maturation, debug commands, etc.)
+        // from queenless maturation, debug commands, etc.)
         if (!FactionVariantPolicy.variantMatches(entity, variant) && factionId != null) {
             Alien.LOGGER.warn(
                 "Hive2: evicting variant-mismatched member {} (type={}) from lineage {} (variant={})",
@@ -370,15 +365,6 @@ public class LineageFactionData extends FactionData {
         markDirty();
     }
 
-    public boolean pendingCivilWar() {
-        return pendingCivilWar;
-    }
-
-    public void setPendingCivilWar(boolean pendingCivilWar) {
-        this.pendingCivilWar = pendingCivilWar;
-        markDirty();
-    }
-
     public Map<HiveLocationId, HiveLocation> locationsById() {
         return locationsById;
     }
@@ -498,7 +484,6 @@ public class LineageFactionData extends FactionData {
 
         this.ageInTicks = tag.getLong(NBT_AGE_IN_TICKS);
         this.pendingEmpressEmergence = tag.getBoolean(NBT_PENDING_EMPRESS_EMERGENCE);
-        this.pendingCivilWar = tag.getBoolean(NBT_PENDING_CIVIL_WAR);
         this.lineageNumber = tag.contains(NBT_LINEAGE_NUMBER) ? tag.getLong(NBT_LINEAGE_NUMBER) : -1L;
         this.nextLocationNumber = tag.getLong(NBT_NEXT_LOCATION_NUMBER);
 
@@ -605,7 +590,6 @@ public class LineageFactionData extends FactionData {
 
         tag.putLong(NBT_AGE_IN_TICKS, ageInTicks);
         tag.putBoolean(NBT_PENDING_EMPRESS_EMERGENCE, pendingEmpressEmergence);
-        tag.putBoolean(NBT_PENDING_CIVIL_WAR, pendingCivilWar);
         if (lineageNumber >= 0) {
             tag.putLong(NBT_LINEAGE_NUMBER, lineageNumber);
         }

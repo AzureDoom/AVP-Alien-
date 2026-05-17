@@ -509,7 +509,7 @@ public final class HiveLocation {
         // periodic outer-edge top-up from HIVE_REDESIGN_05_RESERVES.md § 3 row 3.
     }
 
-    /** Called by the registry when this location is unregistered (lineage absorbed, civil war, location death). */
+    /** Called by the registry when this location is unregistered (lineage absorbed or location death). */
     public void onUnregistered() {
         if (bossBar != null) {
             bossBar.onRemoved();
