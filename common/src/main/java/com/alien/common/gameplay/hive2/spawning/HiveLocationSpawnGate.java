@@ -15,8 +15,8 @@ import org.jetbrains.annotations.Nullable;
  * <li><b>Reserves</b> — the location has at least one of the requested entity type in its local reserves.</li>
  * </ol>
  * <p>
- * Caste-distance restrictions were removed because they conflicted with surface spawning expectations — castes can
- * now spawn anywhere within the location's claimed chunks subject only to reserves and vanilla monster rules.
+ * Caste-distance restrictions were removed because they conflicted with surface spawning expectations — castes can now
+ * spawn anywhere within the location's claimed chunks subject only to reserves and vanilla monster rules.
  * <p>
  * Returns the matching {@link HiveLocation} on success so callers can decrement reserves on the actual spawn.
  */

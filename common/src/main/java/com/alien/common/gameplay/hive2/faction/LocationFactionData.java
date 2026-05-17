@@ -14,10 +14,10 @@ import org.jetbrains.annotations.Nullable;
  * Per-{@link com.alien.common.gameplay.hive2.location.HiveLocation} faction. The faction id equals the location's
  * {@link HiveLocationId} ResourceLocation, so {@code factions().get(location.id().value())} returns the right faction.
  * <p>
- * This tier owns the BLib chunk claims for the location and also tracks "born here" membership — aliens spawned from this
- * location's machinery (founder queen, post-transition xenomorphs in claimed chunks, in-place reinforcements, etc.).
- * BLib's persistent UUID-keyed membership survives chunk unloads, so location death can be keyed off real membership
- * rather than the load-state-sensitive {@code loadedMembersByType} on
+ * This tier owns the BLib chunk claims for the location and also tracks "born here" membership — aliens spawned from
+ * this location's machinery (founder queen, post-transition xenomorphs in claimed chunks, in-place reinforcements,
+ * etc.). BLib's persistent UUID-keyed membership survives chunk unloads, so location death can be keyed off real
+ * membership rather than the load-state-sensitive {@code loadedMembersByType} on
  * {@link com.alien.common.gameplay.hive2.location.HiveLocation}.
  * <p>
  * The {@link #locationId} backref lets the reactive {@link #onMemberAdded(FactionMember, Entity)} guard look up the

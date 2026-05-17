@@ -4,7 +4,11 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.Objects;
 
-public record HivePolicyKey<T>(ResourceLocation id, Class<T> type) {
+public record HivePolicyKey<T>(
+    ResourceLocation id,
+    Class<T> type
+) {
+
     public HivePolicyKey {
         Objects.requireNonNull(id, "id");
         Objects.requireNonNull(type, "type");

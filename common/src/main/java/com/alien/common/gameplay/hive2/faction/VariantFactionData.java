@@ -132,7 +132,6 @@ public class VariantFactionData extends FactionData {
                 queenMotherIdsByDimension.put(dim, entry.getUUID(NBT_UUID_KEY));
             }
         }
-
     }
 
     @Override
@@ -149,6 +148,5 @@ public class VariantFactionData extends FactionData {
             queenMothers.add(entryTag);
         }
         tag.put(NBT_QUEEN_MOTHERS, queenMothers);
-
     }
 }

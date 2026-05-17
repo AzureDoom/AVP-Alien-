@@ -10,8 +10,8 @@ import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.network.payload.C2SRequestHiveInspectionPayload;
 import com.alien.common.network.payload.S2CHiveInspectionPayload;
 import com.blib.api.common.faction.v1.Faction;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.HashMap;

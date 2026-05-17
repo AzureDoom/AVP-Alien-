@@ -47,11 +47,43 @@ public final class LocationFactionInspectorSection extends AbstractHiveInspector
             rowY += InspectorStyle.CONTENT_PADDING / 2;
 
             if (s.contains(HiveInspectionSnapshot.K_REMOVAL_REASON)) {
-                rowY = HiveInspectorRender.drawRow(graphics, font, x, rowY, width, "Removal", s.getString(HiveInspectionSnapshot.K_REMOVAL_REASON));
+                rowY = HiveInspectorRender.drawRow(
+                    graphics,
+                    font,
+                    x,
+                    rowY,
+                    width,
+                    "Removal",
+                    s.getString(HiveInspectionSnapshot.K_REMOVAL_REASON)
+                );
             }
-            rowY = HiveInspectorRender.drawClippedRow(graphics, font, x, rowY, width, "ID", s.getString(HiveInspectionSnapshot.K_LOCATION_ID));
-            rowY = HiveInspectorRender.drawClippedRow(graphics, font, x, rowY, width, "Lineage ID", s.getString(HiveInspectionSnapshot.K_LINEAGE_FACTION_ID));
-            rowY = HiveInspectorRender.drawRow(graphics, font, x, rowY, width, "Dimension", s.getString(HiveInspectionSnapshot.K_DIMENSION));
+            rowY = HiveInspectorRender.drawClippedRow(
+                graphics,
+                font,
+                x,
+                rowY,
+                width,
+                "ID",
+                s.getString(HiveInspectionSnapshot.K_LOCATION_ID)
+            );
+            rowY = HiveInspectorRender.drawClippedRow(
+                graphics,
+                font,
+                x,
+                rowY,
+                width,
+                "Lineage ID",
+                s.getString(HiveInspectionSnapshot.K_LINEAGE_FACTION_ID)
+            );
+            rowY = HiveInspectorRender.drawRow(
+                graphics,
+                font,
+                x,
+                rowY,
+                width,
+                "Dimension",
+                s.getString(HiveInspectionSnapshot.K_DIMENSION)
+            );
             rowY = HiveInspectorRender.drawMetricStrip(
                 graphics,
                 font,
@@ -328,7 +360,15 @@ public final class LocationFactionInspectorSection extends AbstractHiveInspector
             );
             var evac = s.getLong(HiveInspectionSnapshot.K_EVACUATING_TICKS);
             if (evac > 0) {
-                rowY = HiveInspectorRender.drawRow(graphics, font, x, rowY, width, "Evacuating", HiveInspectorRender.formatTicks(evac) + " left");
+                rowY = HiveInspectorRender.drawRow(
+                    graphics,
+                    font,
+                    x,
+                    rowY,
+                    width,
+                    "Evacuating",
+                    HiveInspectorRender.formatTicks(evac) + " left"
+                );
             }
         }
 
@@ -381,7 +421,7 @@ public final class LocationFactionInspectorSection extends AbstractHiveInspector
     private static String candidateChunk(CompoundTag tag) {
         if (
             !tag.contains(HiveInspectionSnapshot.K_SPREAD_LAST_ATTEMPT_CANDIDATE_CHUNK_X) ||
-            !tag.contains(HiveInspectionSnapshot.K_SPREAD_LAST_ATTEMPT_CANDIDATE_CHUNK_Z)
+                !tag.contains(HiveInspectionSnapshot.K_SPREAD_LAST_ATTEMPT_CANDIDATE_CHUNK_Z)
         ) {
             return "none";
         }

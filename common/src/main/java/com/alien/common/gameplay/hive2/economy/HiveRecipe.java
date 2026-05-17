@@ -8,8 +8,8 @@ import net.minecraft.world.entity.EntityType;
 import java.util.List;
 
 /**
- * Datapack-defined recipe for producing one {@code outputEntity} in a hive location's reserves. Inputs: a flat
- * resource cost (biomass / royal jelly / scourge jelly) and a list of prerequisite entity counts in the location's local
+ * Datapack-defined recipe for producing one {@code outputEntity} in a hive location's reserves. Inputs: a flat resource
+ * cost (biomass / royal jelly / scourge jelly) and a list of prerequisite entity counts in the location's local
  * reserves that get consumed.
  */
 public record HiveRecipe(

@@ -46,11 +46,43 @@ public final class LineageFactionInspectorSection extends AbstractHiveInspectorS
             rowY += InspectorStyle.CONTENT_PADDING / 2;
 
             if (s.contains(HiveInspectionSnapshot.K_REMOVAL_REASON)) {
-                rowY = HiveInspectorRender.drawRow(graphics, font, x, rowY, width, "Removal", s.getString(HiveInspectionSnapshot.K_REMOVAL_REASON));
+                rowY = HiveInspectorRender.drawRow(
+                    graphics,
+                    font,
+                    x,
+                    rowY,
+                    width,
+                    "Removal",
+                    s.getString(HiveInspectionSnapshot.K_REMOVAL_REASON)
+                );
             }
-            rowY = HiveInspectorRender.drawClippedRow(graphics, font, x, rowY, width, "ID", s.getString(HiveInspectionSnapshot.K_FACTION_ID));
-            rowY = HiveInspectorRender.drawRow(graphics, font, x, rowY, width, "Variant", s.getString(HiveInspectionSnapshot.K_VARIANT_NAME));
-            rowY = HiveInspectorRender.drawRow(graphics, font, x, rowY, width, "Dimension", s.getString(HiveInspectionSnapshot.K_DIMENSION));
+            rowY = HiveInspectorRender.drawClippedRow(
+                graphics,
+                font,
+                x,
+                rowY,
+                width,
+                "ID",
+                s.getString(HiveInspectionSnapshot.K_FACTION_ID)
+            );
+            rowY = HiveInspectorRender.drawRow(
+                graphics,
+                font,
+                x,
+                rowY,
+                width,
+                "Variant",
+                s.getString(HiveInspectionSnapshot.K_VARIANT_NAME)
+            );
+            rowY = HiveInspectorRender.drawRow(
+                graphics,
+                font,
+                x,
+                rowY,
+                width,
+                "Dimension",
+                s.getString(HiveInspectionSnapshot.K_DIMENSION)
+            );
             rowY = HiveInspectorRender.drawMetricStrip(
                 graphics,
                 font,
@@ -173,8 +205,19 @@ public final class LineageFactionInspectorSection extends AbstractHiveInspectorS
                         rowY,
                         width,
                         metric("Dim", row.getString(HiveInspectionSnapshot.K_DIMENSION)),
-                        metric("Current", coords(row, HiveInspectionSnapshot.K_CURRENT_X, HiveInspectionSnapshot.K_CURRENT_Y, HiveInspectionSnapshot.K_CURRENT_Z)),
-                        metric("Target", coords(row, HiveInspectionSnapshot.K_DEST_X, HiveInspectionSnapshot.K_DEST_Y, HiveInspectionSnapshot.K_DEST_Z)),
+                        metric(
+                            "Current",
+                            coords(
+                                row,
+                                HiveInspectionSnapshot.K_CURRENT_X,
+                                HiveInspectionSnapshot.K_CURRENT_Y,
+                                HiveInspectionSnapshot.K_CURRENT_Z
+                            )
+                        ),
+                        metric(
+                            "Target",
+                            coords(row, HiveInspectionSnapshot.K_DEST_X, HiveInspectionSnapshot.K_DEST_Y, HiveInspectionSnapshot.K_DEST_Z)
+                        ),
                         metric("Dispatched", String.valueOf(row.getLong(HiveInspectionSnapshot.K_DISPATCHED_TICK))),
                         metric("Biomass", String.valueOf(row.getInt(HiveInspectionSnapshot.K_BIOMASS_PAYLOAD))),
                         metric("Empress", row.getBoolean(HiveInspectionSnapshot.K_CARRIES_EMPRESS) ? "yes" : "no")
@@ -232,7 +275,17 @@ public final class LineageFactionInspectorSection extends AbstractHiveInspectorS
 
         rowY += InspectorStyle.ROW_GAP;
         var locations = listOrEmpty(s, HiveInspectionSnapshot.K_LOCATIONS);
-        var locationsSection = drawCollapsibleSectionHeader(graphics, font, x, rowY, width, "locations", "Locations (" + locations.size() + ")", mouseX, mouseY);
+        var locationsSection = drawCollapsibleSectionHeader(
+            graphics,
+            font,
+            x,
+            rowY,
+            width,
+            "locations",
+            "Locations (" + locations.size() + ")",
+            mouseX,
+            mouseY
+        );
         rowY = locationsSection.nextY();
         if (locationsSection.expanded()) {
             rowY += InspectorStyle.CONTENT_PADDING / 2;

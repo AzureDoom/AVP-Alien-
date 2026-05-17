@@ -46,6 +46,7 @@ blib {
     maven {
         repository 'https://maven.bvanseghi.dev/avp_human'
         repository 'https://maven.bvanseghi.dev/avp_predator'
+        repository 'https://maven.bvanseghi.dev/blib_engine'
 
         publish {
             url = 'https://maven.bvanseghi.dev/avp_alien/'

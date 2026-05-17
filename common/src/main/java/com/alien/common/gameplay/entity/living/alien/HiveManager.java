@@ -159,8 +159,8 @@ public class HiveManager implements NBTSerializable {
     }
 
     /**
-     * Per-lineage shed check. If this alien has stayed outside its lineage territory long enough, remove its live entity
-     * and return the unit to its owning hive location reserves.
+     * Per-lineage shed check. If this alien has stayed outside its lineage territory long enough, remove its live
+     * entity and return the unit to its owning hive location reserves.
      * <p>
      * Empresses and location leaders are exempt. Playable xenomorphs (parked future direction) will be exempt via a
      * one-line {@code instanceof Player} check that's currently unreachable since {@link Alien} doesn't extend Player.

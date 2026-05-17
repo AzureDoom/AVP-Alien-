@@ -9,8 +9,8 @@ import com.alien.common.gameplay.hive2.id.HiveLocationId;
 import com.alien.common.gameplay.hive2.id.HiveLocationIds;
 import com.alien.common.gameplay.hive2.id.LineageIds;
 import com.alien.common.gameplay.hive2.tick.HiveLocationLoadedTickTask;
-import com.alien.common.gameplay.hive2.tick.LineageConvoyTickTask;
 import com.alien.common.gameplay.hive2.tick.HiveLocationSlowTickTask;
+import com.alien.common.gameplay.hive2.tick.LineageConvoyTickTask;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -264,8 +264,7 @@ public final class HiveLocationRegistry {
                     }
 
                     if (
-                        HiveLocationSpacing.chunkDistance(new ChunkPos(location.centerPos()), candidate)
-                            < minimumDistanceChunks
+                        HiveLocationSpacing.chunkDistance(new ChunkPos(location.centerPos()), candidate) < minimumDistanceChunks
                     ) {
                         return location;
                     }

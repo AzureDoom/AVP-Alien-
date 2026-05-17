@@ -32,7 +32,8 @@ import java.util.UUID;
  * <ul>
  * <li>Empress-gated.</li>
  * <li>Triggered when a player has at least {@code raidThresholdKills} kills in the aggro window.</li>
- * <li>Source = the largest qualifying location ({@code claimedChunks ≥ raidMinLocationSizeChunks}) with a harbinger.</li>
+ * <li>Source = the largest qualifying location ({@code claimedChunks ≥ raidMinLocationSizeChunks}) with a
+ * harbinger.</li>
  * <li>Per-source cooldown so the same source doesn't spam raids.</li>
  * <li>Composition drained from source reserves, limited to xenomorphs whose hive recipe costs scourge jelly.</li>
  * <li>Expires {@code raidExpiryTicks} after dispatch (default 30 minutes).</li>

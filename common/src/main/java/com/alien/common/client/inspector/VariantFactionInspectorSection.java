@@ -46,8 +46,24 @@ public final class VariantFactionInspectorSection extends AbstractHiveInspectorS
         if (identity.expanded()) {
             rowY += InspectorStyle.CONTENT_PADDING / 2;
 
-            rowY = HiveInspectorRender.drawClippedRow(graphics, font, x, rowY, width, "ID", s.getString(HiveInspectionSnapshot.K_FACTION_ID));
-            rowY = HiveInspectorRender.drawRow(graphics, font, x, rowY, width, "Variant", s.getString(HiveInspectionSnapshot.K_VARIANT_NAME));
+            rowY = HiveInspectorRender.drawClippedRow(
+                graphics,
+                font,
+                x,
+                rowY,
+                width,
+                "ID",
+                s.getString(HiveInspectionSnapshot.K_FACTION_ID)
+            );
+            rowY = HiveInspectorRender.drawRow(
+                graphics,
+                font,
+                x,
+                rowY,
+                width,
+                "Variant",
+                s.getString(HiveInspectionSnapshot.K_VARIANT_NAME)
+            );
             rowY = HiveInspectorRender.drawMetricStrip(
                 graphics,
                 font,
@@ -143,7 +159,17 @@ public final class VariantFactionInspectorSection extends AbstractHiveInspectorS
         }
 
         rowY += InspectorStyle.ROW_GAP;
-        var lineagesSection = drawCollapsibleSectionHeader(graphics, font, x, rowY, width, "lineages", "Lineages (" + lineages.size() + ")", mouseX, mouseY);
+        var lineagesSection = drawCollapsibleSectionHeader(
+            graphics,
+            font,
+            x,
+            rowY,
+            width,
+            "lineages",
+            "Lineages (" + lineages.size() + ")",
+            mouseX,
+            mouseY
+        );
         rowY = lineagesSection.nextY();
         if (lineagesSection.expanded()) {
             rowY += InspectorStyle.CONTENT_PADDING / 2;
@@ -173,17 +199,33 @@ public final class VariantFactionInspectorSection extends AbstractHiveInspectorS
                         metric("Biomass", String.valueOf(row.getLong(HiveInspectionSnapshot.K_BIOMASS))),
                         metric("Royal", String.valueOf(row.getLong(HiveInspectionSnapshot.K_ROYAL_JELLY))),
                         metric("Scourge", String.valueOf(row.getLong(HiveInspectionSnapshot.K_SCOURGE_JELLY))),
-                        metric("Pop", row.getLong(HiveInspectionSnapshot.K_TOTAL_POP) + "/" + row.getLong(HiveInspectionSnapshot.K_POP_CAP)),
+                        metric(
+                            "Pop",
+                            row.getLong(HiveInspectionSnapshot.K_TOTAL_POP) + "/" + row.getLong(HiveInspectionSnapshot.K_POP_CAP)
+                        ),
                         metric("Loaded", String.valueOf(row.getInt(HiveInspectionSnapshot.K_LOADED_MEMBER_TOTAL))),
                         metric("Local res", String.valueOf(row.getInt(HiveInspectionSnapshot.K_LOCAL_RESERVE_TOTAL))),
-                        metric("Convoys", row.getInt(HiveInspectionSnapshot.K_CONVOY_COUNT) + "/" + row.getInt(HiveInspectionSnapshot.K_CONVOY_MEMBER_TOTAL)),
+                        metric(
+                            "Convoys",
+                            row.getInt(HiveInspectionSnapshot.K_CONVOY_COUNT) + "/" + row.getInt(
+                                HiveInspectionSnapshot.K_CONVOY_MEMBER_TOTAL
+                            )
+                        ),
                         metric(
                             "Chunks",
                             row.getInt(HiveInspectionSnapshot.K_CHUNKS_LOADED) + "/" + row.getInt(HiveInspectionSnapshot.K_CLAIMED_CHUNKS)
                         ),
                         metric("State", lineageState(row))
                     );
-                    rowY = HiveInspectorRender.drawClippedRow(graphics, font, x, rowY, width, "ID", row.getString(HiveInspectionSnapshot.K_FACTION_ID));
+                    rowY = HiveInspectorRender.drawClippedRow(
+                        graphics,
+                        font,
+                        x,
+                        rowY,
+                        width,
+                        "ID",
+                        row.getString(HiveInspectionSnapshot.K_FACTION_ID)
+                    );
                     if (row.hasUUID(HiveInspectionSnapshot.K_FOUNDER_ID)) {
                         rowY = HiveInspectorRender.drawRow(
                             graphics,

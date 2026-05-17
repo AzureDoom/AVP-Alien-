@@ -40,8 +40,8 @@ import java.util.Random;
  * </ul>
  * <p>
  * The candidate position is picked uniformly within the spread zone of the source location. We reject if the
- * candidate's chunk is already in any existing location's claimed territory or has been previously
- * decorated. Otherwise: found a new location with bootstrap reserves and bump the source location's spread tick.
+ * candidate's chunk is already in any existing location's claimed territory or has been previously decorated.
+ * Otherwise: found a new location with bootstrap reserves and bump the source location's spread tick.
  */
 public final class AbstractSpreadAttempt {
 
@@ -410,6 +410,7 @@ public final class AbstractSpreadAttempt {
         String result,
         String detail
     ) {
+
         private static CandidateValidation accept() {
             return new CandidateValidation(true, "", "");
         }
@@ -431,6 +432,7 @@ public final class AbstractSpreadAttempt {
         int minSize,
         int maxSize
     ) {
+
         private static @Nullable FounderParty forLineage(LineageFactionData lineage, HiveConfig config) {
             var queenType = Queen.getType(lineage.variant());
             var droneType = Drone.getType(lineage.variant());

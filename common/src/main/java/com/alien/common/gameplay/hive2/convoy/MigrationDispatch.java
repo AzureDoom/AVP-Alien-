@@ -18,8 +18,8 @@ import org.jetbrains.annotations.Nullable;
  * Migration dispatch and execution. Two trigger paths in Phase 8b:
  * <ul>
  * <li><b>Auto</b>: any location whose {@code claimedChunks.size() <= migrationTerritoryFloorChunks} (default 2) is
- * evacuated, provided the lineage has an empress alive and ≥ 1 sister, and the source is past its bootstrap
- * protection window.</li>
+ * evacuated, provided the lineage has an empress alive and ≥ 1 sister, and the source is past its bootstrap protection
+ * window.</li>
  * <li><b>Admin</b>: {@link #forceMigration(MinecraftServer, HiveLocation, LineageFactionData)} — trigger any evacuation
  * regardless of conditions, useful for testing.</li>
  * </ul>

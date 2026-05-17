@@ -22,8 +22,8 @@ import java.util.ArrayList;
  * {@link com.alien.common.gameplay.hive2.config.HiveConfig#scourgeJellyTicksPerHarbingerProduction()}, grant +1
  * scourge.</li>
  * </ul>
- * Grants are capped by claimed chunk count; overflow is discarded (the accumulator is still subtracted so the same
- * tick budget isn't re-banked into the next minute).
+ * Grants are capped by claimed chunk count; overflow is discarded (the accumulator is still subtracted so the same tick
+ * budget isn't re-banked into the next minute).
  * <p>
  * Producers in the location's persisted known-member index and local reserves contribute, so persistent royal/harbinger
  * entities keep producing after their chunks unload.
@@ -88,7 +88,10 @@ public final class JellyProduction {
         }
     }
 
-    private static int countTaggedProducers(HiveLocation location, net.minecraft.tags.TagKey<net.minecraft.world.entity.EntityType<?>> tag) {
+    private static int countTaggedProducers(
+        HiveLocation location,
+        net.minecraft.tags.TagKey<net.minecraft.world.entity.EntityType<?>> tag
+    ) {
         var count = 0;
         for (var entry : location.knownMembersByType().entrySet()) {
             if (entry.getKey().is(tag)) {

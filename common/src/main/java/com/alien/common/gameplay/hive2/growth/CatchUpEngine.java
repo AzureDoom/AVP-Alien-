@@ -1,7 +1,7 @@
 package com.alien.common.gameplay.hive2.growth;
 
-import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.economy.CastePopulation;
+import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import net.minecraft.server.level.ServerLevel;

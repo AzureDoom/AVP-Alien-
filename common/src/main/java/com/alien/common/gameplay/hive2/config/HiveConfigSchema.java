@@ -322,6 +322,7 @@ public final class HiveConfigSchema {
     }
 
     public enum ValueType {
+
         INT("integer"),
         LONG("long"),
         DOUBLE("decimal"),

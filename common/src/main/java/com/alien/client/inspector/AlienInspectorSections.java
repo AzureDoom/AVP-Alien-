@@ -4,7 +4,7 @@ import com.alien.common.client.inspector.HiveConfigInspectorSection;
 import com.alien.common.client.inspector.LineageFactionInspectorSection;
 import com.alien.common.client.inspector.LocationFactionInspectorSection;
 import com.alien.common.client.inspector.VariantFactionInspectorSection;
-import com.blib.api.client.engine.v1.inspector.InspectorSectionRegistry;
+import com.blib.engine.api.client.v1.inspector.InspectorSectionRegistry;
 
 /**
  * Single registration entry point for AVP-Alien's contributions to the BLib engine workspace's Inspector panel. Called

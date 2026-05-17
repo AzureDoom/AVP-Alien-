@@ -32,8 +32,8 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * One queen's bloodline. Lives in a single dimension; owns one or more {@link HiveLocation}s and can eventually have
- * an empress.
+ * One queen's bloodline. Lives in a single dimension; owns one or more {@link HiveLocation}s and can eventually have an
+ * empress.
  * <p>
  * Per {@code HIVE_REDESIGN_12_PERFORMANCE.md} § 3, this class also carries its location records as nested NBT — they're
  * persisted with the lineage shard, not separately.

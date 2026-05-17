@@ -86,7 +86,18 @@ public final class HiveInspectorRender {
 
     /** Indented label + value row for repeated child entries. */
     public static int drawSubRow(GuiGraphics graphics, Font font, int x, int y, int width, String label, String value) {
-        return drawLabelValueRow(graphics, font, x, y, width, SUBROW_INDENT, label, value, InspectorStyle.LABEL_COLOR, InspectorStyle.VALUE_COLOR);
+        return drawLabelValueRow(
+            graphics,
+            font,
+            x,
+            y,
+            width,
+            SUBROW_INDENT,
+            label,
+            value,
+            InspectorStyle.LABEL_COLOR,
+            InspectorStyle.VALUE_COLOR
+        );
     }
 
     public static CountColumns countColumns(int width, int widestEntityWidth, int widestCountWidth) {

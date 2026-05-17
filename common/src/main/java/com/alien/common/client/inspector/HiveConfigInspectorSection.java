@@ -7,10 +7,10 @@ import com.alien.common.gameplay.hive2.inspection.HiveInspectionSnapshot;
 import com.alien.common.network.payload.C2SRequestHiveInspectionPayload;
 import com.alien.common.network.payload.C2SUpdateHiveConfigPayload;
 import com.alien.common.registry.init.AlienFactionDataTypes;
-import com.blib.api.client.engine.v1.inspector.CollapsibleInspectorSections;
-import com.blib.api.client.engine.v1.inspector.InspectorSection;
-import com.blib.api.client.engine.v1.selection.FactionInspectionView;
-import com.blib.api.client.engine.v1.selection.FactionSelection;
+import com.blib.engine.api.client.v1.inspector.CollapsibleInspectorSections;
+import com.blib.engine.api.client.v1.inspector.InspectorSection;
+import com.blib.engine.api.client.v1.selection.FactionInspectionView;
+import com.blib.engine.api.client.v1.selection.FactionSelection;
 import com.blib.engine.ui.EngineFont;
 import com.blib.engine.ui.layout.UiText;
 import com.blib.engine.ui.panel.details.InspectorStyle;
@@ -86,7 +86,16 @@ public final class HiveConfigInspectorSection implements InspectorSection<Factio
         }
 
         lastRenderedFactionId = target.factionId();
-        return renderConfig(graphics, EngineFont.get(), x, y, width, cached.data().getCompound(HiveInspectionSnapshot.K_HIVE_CONFIG), mouseX, mouseY);
+        return renderConfig(
+            graphics,
+            EngineFont.get(),
+            x,
+            y,
+            width,
+            cached.data().getCompound(HiveInspectionSnapshot.K_HIVE_CONFIG),
+            mouseX,
+            mouseY
+        );
     }
 
     @Override
@@ -201,7 +210,10 @@ public final class HiveConfigInspectorSection implements InspectorSection<Factio
     }
 
     private Checkbox checkboxFor(Field field) {
-        return checkboxes.computeIfAbsent(field.name(), name -> new Checkbox(false, value -> commit(field.name(), Boolean.toString(value))));
+        return checkboxes.computeIfAbsent(
+            field.name(),
+            name -> new Checkbox(false, value -> commit(field.name(), Boolean.toString(value)))
+        );
     }
 
     private void commit(String fieldName, String value) {

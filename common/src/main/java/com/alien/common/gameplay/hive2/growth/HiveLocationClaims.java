@@ -189,9 +189,11 @@ public final class HiveLocationClaims {
             var current = queue.removeFirst();
             for (var offset : CARDINAL_OFFSETS) {
                 var neighbor = new ChunkPos(current.x + offset[0], current.z + offset[1]);
-                if (neighbor.equals(excludedChunk)
-                    || connected.contains(neighbor)
-                    || !location.claimedChunks().contains(neighbor)) {
+                if (
+                    neighbor.equals(excludedChunk)
+                        || connected.contains(neighbor)
+                        || !location.claimedChunks().contains(neighbor)
+                ) {
                     continue;
                 }
                 connected.add(neighbor);

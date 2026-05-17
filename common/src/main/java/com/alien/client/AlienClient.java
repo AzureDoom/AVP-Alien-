@@ -2,7 +2,6 @@ package com.alien.client;
 
 import com.alien.Alien;
 import com.alien.AlienResources;
-import com.alien.client.inspector.AlienInspectorSections;
 import com.alien.client.particle.AcidParticleProvider;
 import com.alien.client.particle.BlueAcidParticleProvider;
 import com.alien.client.particle.IrradiatedAcidParticleProvider;
@@ -56,6 +55,7 @@ import com.alien.common.registry.init.block.IrradiatedAlienResinBlocks;
 import com.alien.common.registry.init.block.NetherAlienResinBlocks;
 import com.alien.common.registry.init.item.AlienArmorItems;
 import com.alien.common.registry.init.item.AlienItems;
+import com.alien.compatibility.blib_engine.BLibEngine;
 import com.blib.api.client.mod.v1.BLibClientMod;
 import com.blib.api.common.registry.v1.BLibHolder;
 import net.minecraft.client.renderer.RenderType;
@@ -82,7 +82,7 @@ public class AlienClient {
 
         // Engine workspace: add hive-specific inspector sections under the generic faction inspector so picking an AVP
         // faction in the FactionBrowser reveals biomass/jelly/caste/territory/leadership/vigilance data.
-        AlienInspectorSections.register();
+        BLibEngine.registerInspectorSections();
 
         MOD.events().onClientSetup().register(() -> {
             registerEntityHeadData();

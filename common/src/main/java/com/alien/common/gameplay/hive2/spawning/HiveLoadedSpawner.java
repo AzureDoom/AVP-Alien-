@@ -282,5 +282,8 @@ public final class HiveLoadedSpawner {
         return hasPlayerInRange;
     }
 
-    private record WeightedType(EntityType<?> type, int weight) {}
+    private record WeightedType(
+        EntityType<?> type,
+        int weight
+    ) {}
 }

@@ -289,13 +289,16 @@ public final class HiveBalanceTask {
     }
 
     private enum RecipePopulationMode {
+
         NET_GAIN {
+
             @Override
             boolean matches(int netPopulationChange) {
                 return netPopulationChange > 0;
             }
         },
         NEUTRAL {
+
             @Override
             boolean matches(int netPopulationChange) {
                 return netPopulationChange == 0;

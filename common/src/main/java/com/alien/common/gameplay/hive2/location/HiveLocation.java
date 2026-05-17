@@ -753,11 +753,17 @@ public final class HiveLocation {
         @Nullable HiveLocationId createdLocationId,
         String detail
     ) {
+
         private static final String NBT_TICK = "Tick";
+
         private static final String NBT_RESULT = "Result";
+
         private static final String NBT_CANDIDATE_CHUNK_X = "CandidateChunkX";
+
         private static final String NBT_CANDIDATE_CHUNK_Z = "CandidateChunkZ";
+
         private static final String NBT_CREATED_LOCATION_ID = "CreatedLocationId";
+
         private static final String NBT_DETAIL = "Detail";
 
         public AbstractSpreadAttemptDebug {

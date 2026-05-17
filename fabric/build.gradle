@@ -11,6 +11,7 @@ dependencies {
     // Compatibility
     blibModCompileOnly "com.avp.human:avp_human-fabric-1.21.1:${project.avp_human_version}"
     blibModCompileOnly "com.avp.predator:avp_predator-fabric-1.21.1:${project.avp_predator_version}"
+    blibMod "com.blib.engine:blib_engine-fabric-1.21.1:${project.blib_engine_version}"
 
     blibMod "maven.modrinth:gigeresque:${project.gigeresque_modrinth_version}"
     // Required for gigeresque.

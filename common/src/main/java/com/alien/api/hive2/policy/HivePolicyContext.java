@@ -17,6 +17,7 @@ public record HivePolicyContext(
     @Nullable LineageFactionData lineage,
     HiveConfig config
 ) {
+
     public HivePolicyContext {
         Objects.requireNonNull(config, "config");
     }

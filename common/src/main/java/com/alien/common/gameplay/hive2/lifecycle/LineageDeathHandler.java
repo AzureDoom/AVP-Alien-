@@ -17,8 +17,7 @@ import java.util.ArrayList;
  * {@link LocationDeathHandler#killNaturalDecay}. The natural-decay path removes the per-location faction and releases
  * chunks.</li>
  * <li><b>Members empty AND locationsById empty</b> → kill the lineage immediately. Sets
- * {@link LineageRemovalReason.NoLocationsRemain} and calls
- * {@code Alien.MOD.factions().remove(lineageId)}.</li>
+ * {@link LineageRemovalReason.NoLocationsRemain} and calls {@code Alien.MOD.factions().remove(lineageId)}.</li>
  * </ul>
  * <p>
  * The shed path ({@code HiveManager.tryShedFromLineages}) removes the last alien synchronously, then discards the
@@ -96,8 +95,8 @@ public final class LineageDeathHandler {
     }
 
     /**
-     * Forces lineage death now. Sets removal reason and removes from BLib.
-     * Idempotent — a lineage already dead returns false.
+     * Forces lineage death now. Sets removal reason and removes from BLib. Idempotent — a lineage already dead returns
+     * false.
      */
     public static boolean kill(ResourceLocation lineageId) {
         var faction = Alien.MOD.factions().get(lineageId);

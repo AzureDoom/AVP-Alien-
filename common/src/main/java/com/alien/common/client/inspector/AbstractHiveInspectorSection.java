@@ -2,10 +2,10 @@ package com.alien.common.client.inspector;
 
 import com.alien.Alien;
 import com.alien.common.network.payload.C2SRequestHiveInspectionPayload;
-import com.blib.api.client.engine.v1.inspector.CollapsibleInspectorSections;
-import com.blib.api.client.engine.v1.inspector.InspectorSection;
-import com.blib.api.client.engine.v1.selection.FactionInspectionView;
-import com.blib.api.client.engine.v1.selection.FactionSelection;
+import com.blib.engine.api.client.v1.inspector.CollapsibleInspectorSections;
+import com.blib.engine.api.client.v1.inspector.InspectorSection;
+import com.blib.engine.api.client.v1.selection.FactionInspectionView;
+import com.blib.engine.api.client.v1.selection.FactionSelection;
 import com.blib.engine.ui.EngineFont;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
