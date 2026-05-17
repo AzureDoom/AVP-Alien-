@@ -8,7 +8,6 @@ import com.alien.common.gameplay.hive2.convoy.ConvoyBossBars;
 import com.alien.common.gameplay.hive2.convoy.ConvoyId;
 import com.alien.common.gameplay.hive2.convoy.ConvoyInterception;
 import com.alien.common.gameplay.hive2.convoy.ConvoyMemberTracker;
-import com.alien.common.gameplay.hive2.convoy.ConvoySpeedTable;
 import com.alien.common.gameplay.hive2.convoy.ConvoyTravel;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.id.LineageIds;
@@ -36,7 +35,9 @@ public final class LineageConvoyTickTask {
 
     private static final long RAID_WARNING_LEAD_TICKS = 20L * 60L;
 
-    private static final int MARKED_FOR_DEATH_REFRESH_TICKS = 20 * 10;
+    private static final int MARKED_FOR_DEATH_ACTIVE_RAID_TICKS = 20 * 10;
+
+    private static final int MARKED_FOR_DEATH_DURATION_DRIFT_TICKS = 20;
 
     private LineageConvoyTickTask() {}
 
@@ -91,8 +92,8 @@ public final class LineageConvoyTickTask {
                     }
 
                     if (!raid.returningHome()) {
-                        refreshMarkedForDeath(raid, server);
                         updateRaidTargetPos(raid, server);
+                        refreshMarkedForDeath(raid, server, config);
                         maybeWarnRaidTarget(raid, server, lineage, config);
                         if (raid.shouldStartWaveBreak()) {
                             raid.startWaveBreak(currentTick);
@@ -139,27 +140,47 @@ public final class LineageConvoyTickTask {
         ConvoyBossBars.retain(activeConvoyIds);
     }
 
-    private static void refreshMarkedForDeath(Convoy.Raid raid, MinecraftServer server) {
+    private static void refreshMarkedForDeath(Convoy.Raid raid, MinecraftServer server, HiveConfig config) {
         var player = server.getPlayerList().getPlayer(raid.targetPlayerId());
         if (player == null || !player.isAlive()) {
             return;
         }
 
+        var duration = markedForDeathDurationTicks(raid, config);
         var currentEffect = player.getEffect(AlienMobEffects.getMarkedForDeathHolder());
-        if (currentEffect != null && currentEffect.getDuration() > MARKED_FOR_DEATH_REFRESH_TICKS / 2) {
+        if (
+            currentEffect != null
+                && Math.abs(currentEffect.getDuration() - duration) <= MARKED_FOR_DEATH_DURATION_DRIFT_TICKS
+        ) {
             return;
         }
 
-        player.addEffect(
+        player.forceAddEffect(
             new MobEffectInstance(
                 AlienMobEffects.getMarkedForDeathHolder(),
-                MARKED_FOR_DEATH_REFRESH_TICKS,
+                duration,
                 0,
                 false,
                 false,
                 true
-            )
+            ),
+            null
         );
+    }
+
+    private static int markedForDeathDurationTicks(Convoy.Raid raid, HiveConfig config) {
+        if (!raid.materializedMembers().isEmpty()) {
+            return MARKED_FOR_DEATH_ACTIVE_RAID_TICKS;
+        }
+
+        var ticksToArrival = ConvoyTravel.ticksToArrival(raid, config);
+        if (ticksToArrival <= 0L || ticksToArrival == Long.MAX_VALUE) {
+            return MARKED_FOR_DEATH_ACTIVE_RAID_TICKS;
+        }
+        if (ticksToArrival >= Integer.MAX_VALUE) {
+            return Integer.MAX_VALUE;
+        }
+        return (int) ticksToArrival;
     }
 
     /** Refreshes a raid's last-known target position when its target player is online + same dim + alive. */
@@ -260,12 +281,7 @@ public final class LineageConvoyTickTask {
             return;
         }
 
-        var blocksPerTick = ConvoySpeedTable.blocksPerTick(raid, config);
-        if (blocksPerTick <= 0.0) {
-            return;
-        }
-
-        var ticksToArrival = (long) Math.ceil(ConvoyTravel.distanceToTarget(raid) / blocksPerTick);
+        var ticksToArrival = ConvoyTravel.ticksToArrival(raid, config);
         if (ticksToArrival > RAID_WARNING_LEAD_TICKS) {
             return;
         }

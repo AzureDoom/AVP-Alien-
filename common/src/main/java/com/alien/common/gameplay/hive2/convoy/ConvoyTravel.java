@@ -53,6 +53,19 @@ public final class ConvoyTravel {
         return convoy.currentPos().distanceTo(target);
     }
 
+    /**
+     * Ticks until the convoy reaches its configured arrival radius around the target.
+     */
+    public static long ticksToArrival(Convoy convoy, HiveConfig config) {
+        var blocksPerTick = ConvoySpeedTable.blocksPerTick(convoy, config);
+        if (blocksPerTick <= 0.0) {
+            return Long.MAX_VALUE;
+        }
+
+        var distanceUntilArrival = Math.max(0.0, distanceToTarget(convoy) - config.arrivalRadiusBlocks());
+        return (long) Math.ceil(distanceUntilArrival / blocksPerTick);
+    }
+
     private static Vec3 targetFor(Convoy convoy) {
         if (convoy instanceof Convoy.Reinforcement reinforcement) {
             return centerOf(reinforcement.destinationPos());
