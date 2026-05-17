@@ -57,6 +57,12 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
 
     private static final float MAX_BREAKABLE_DESTROY_TIME = 6.0F;
 
+    private static final float HIVE_INTRUDER_PATH_SEARCH_RANGE = 256.0F;
+
+    private static final int HIVE_INTRUDER_MAX_PATH_LENGTH = 512;
+
+    private static final int HIVE_INTRUDER_TARGET_MEMORY_TICKS = 3 * 20;
+
     public final DataAccessor<Integer> attackDurationInTicks;
 
     public final DataAccessor<Integer> attackId;
@@ -85,6 +91,8 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
 
     private final PathNavigator pathNavigator;
 
+    private final PathNavigator hiveIntruderPathNavigator;
+
     private final XenomorphConfig config;
 
     private final AttackCooldownTracker cooldownTracker;
@@ -92,6 +100,10 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
     private @Nullable AttackType activeAttack;
 
     private @Nullable AttackExecutor activeExecutor;
+
+    private @Nullable LivingEntity hiveIntruderTarget;
+
+    private int hiveIntruderTargetExpiresAtTick;
 
     private boolean wasUnderwaterLastTick;
 
@@ -126,6 +138,7 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
             })
             .build();
         this.pathNavigator = createPathNavigator(level, config.pathConfig());
+        this.hiveIntruderPathNavigator = createPathNavigator(level, config.pathConfig(), createHiveIntruderSearchConfig());
         this.cooldownTracker = new AttackCooldownTracker();
         this.wasUnderwaterLastTick = false;
 
@@ -134,6 +147,12 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
     }
 
     private PathNavigator createPathNavigator(Level level, XenomorphPathConfig pathConfig) {
+        var followRange = (float) getAttributeValue(Attributes.FOLLOW_RANGE);
+
+        return createPathNavigator(level, pathConfig, SearchConfig.fromFollowRange(followRange));
+    }
+
+    private PathNavigator createPathNavigator(Level level, XenomorphPathConfig pathConfig, SearchConfig searchConfig) {
         var evaluatorConfig = TerrainEvaluatorConfig.builder()
             .addTerrain(TerrainType.GROUND, 1.0f)
             .addTerrain(TerrainType.WATER, 4.0f)
@@ -150,10 +169,8 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
             .withCanOpenDoors(pathConfig.canOpenDoors())
             .build();
 
-        var followRange = (float) getAttributeValue(Attributes.FOLLOW_RANGE);
-
         var navigatorConfig = PathNavigatorConfig.builder(evaluatorConfig)
-            .withSearchConfig(SearchConfig.fromFollowRange(followRange))
+            .withSearchConfig(searchConfig)
             .build();
 
         var classificationCache = TerrainCacheRegistry.getOrCreate(level, evaluatorConfig.getTerrainClassifier());
@@ -161,9 +178,20 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         return new PathNavigator(level, navigatorConfig, classificationCache);
     }
 
+    private SearchConfig createHiveIntruderSearchConfig() {
+        var searchConfig = SearchConfig.fromFollowRange(HIVE_INTRUDER_PATH_SEARCH_RANGE);
+
+        return new SearchConfig(
+            searchConfig.maxSearchNodes(),
+            searchConfig.heuristicWeight(),
+            HIVE_INTRUDER_MAX_PATH_LENGTH,
+            searchConfig.elevationWeight()
+        );
+    }
+
     @Override
     public final PathNavigator getPathNavigator() {
-        return pathNavigator;
+        return getHiveIntruderTargetOrNull() != null ? hiveIntruderPathNavigator : pathNavigator;
     }
 
     @Override
@@ -303,6 +331,7 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
 
         if (!level().isClientSide) {
             cooldownTracker.tick();
+            clearExpiredHiveIntruderTarget();
         }
 
         if (!level().isClientSide && isLunging.get() && onGround()) {
@@ -416,6 +445,48 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         }
 
         super.setTarget(livingEntity);
+    }
+
+    public void setHiveIntruderTarget(LivingEntity livingEntity) {
+        if (cocoonManager.isLocked()) {
+            return;
+        }
+
+        var activeTarget = getHiveIntruderTargetOrNull();
+
+        if (activeTarget != livingEntity) {
+            hiveIntruderPathNavigator.stop();
+        }
+
+        hiveIntruderTarget = livingEntity;
+        hiveIntruderTargetExpiresAtTick = tickCount + HIVE_INTRUDER_TARGET_MEMORY_TICKS;
+        setTarget(livingEntity);
+    }
+
+    public @Nullable LivingEntity getHiveIntruderTargetOrNull() {
+        if (hiveIntruderTarget == null || tickCount > hiveIntruderTargetExpiresAtTick) {
+            return null;
+        }
+
+        if (hiveIntruderTarget.isRemoved() || !AlienPredicates.canContinueTargeting(this, hiveIntruderTarget)) {
+            return null;
+        }
+
+        return hiveIntruderTarget;
+    }
+
+    private void clearExpiredHiveIntruderTarget() {
+        if (hiveIntruderTarget != null && getHiveIntruderTargetOrNull() == null) {
+            var expiredTarget = hiveIntruderTarget;
+
+            hiveIntruderTarget = null;
+            hiveIntruderTargetExpiresAtTick = 0;
+            hiveIntruderPathNavigator.stop();
+
+            if (expiredTarget == getTarget()) {
+                setTarget(null);
+            }
+        }
     }
 
     private void tryAlertNearbyXenomorphs() {

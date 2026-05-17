@@ -60,8 +60,8 @@ public final class HiveTerritoryAggroTask {
             }
 
             var target = nearestTarget(xenomorph, playersInTerritory);
-            if (target != null && target != xenomorph.getTarget()) {
-                xenomorph.setTarget(target);
+            if (target != null) {
+                xenomorph.setHiveIntruderTarget(target);
             }
         }
     }

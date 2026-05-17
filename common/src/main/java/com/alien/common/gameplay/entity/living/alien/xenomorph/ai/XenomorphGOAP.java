@@ -4,6 +4,7 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.CombatActions;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.CombatGoals;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.CombatSensors;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.XenomorphTargetSensors;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.dig.DigActions;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.dig.DigSensors;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg.EggActions;
@@ -25,7 +26,6 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.resin.ResinSen
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.vent.VentActions;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.vent.VentGoals;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.vent.VentSensors;
-import com.alien.common.util.AlienPredicates;
 import com.blib.api.common.goap.v1.GOAPSensors;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
 import com.just.ai.goap.Agent;
@@ -143,9 +143,7 @@ public class XenomorphGOAP {
 
         graphBuilder.addAction(CombatActions.MELEE_ATTACK);
 
-        graphBuilder.addSensor(
-            GOAPSensors.nearbyAttackableTargetsFactory(AlienPredicates::canTarget)
-        );
+        graphBuilder.addSensor(XenomorphTargetSensors.NEARBY_ATTACKABLE_TARGETS);
         graphBuilder.addSensor(GOAPSensors.NEAREST_ATTACKABLE_TARGETS);
         graphBuilder.addSensor(GOAPSensors.NEAREST_ATTACKABLE_TARGET);
         graphBuilder.addSensor(GOAPSensors.HAS_ATTACK_TARGET);
