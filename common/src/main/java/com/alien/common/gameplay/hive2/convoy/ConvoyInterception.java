@@ -31,7 +31,7 @@ public final class ConvoyInterception {
         );
 
         var spawnedCount = convoy instanceof Convoy.Raid raid
-            ? ConvoyMaterialization.spawnNextRaidWave(level, raid, spawnPos, player)
+            ? ConvoyMaterialization.spawnNextRaidWave(level, raid, spawnPos, player, server.overworld().getGameTime())
             : ConvoyMaterialization.spawnAll(level, convoy, spawnPos, player);
 
         if (spawnedCount <= 0) {

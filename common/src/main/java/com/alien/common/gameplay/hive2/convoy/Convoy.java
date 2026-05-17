@@ -372,6 +372,10 @@ public sealed interface Convoy {
      */
     final class Raid implements Convoy {
 
+        public static final int WAVE_COUNT = 5;
+
+        public static final long WAVE_BREAK_TICKS = 20L * 10L;
+
         private final ConvoyId id;
 
         private final ResourceLocation lineageFactionId;
@@ -393,6 +397,12 @@ public sealed interface Convoy {
         private boolean warningIssued;
 
         private int nextWaveIndex;
+
+        private int activeWaveIndex;
+
+        private int activeWaveInitialCount;
+
+        private long waveBreakStartedTick;
 
         private boolean returningHome;
 
@@ -456,6 +466,9 @@ public sealed interface Convoy {
                 materializedMembers,
                 false,
                 0,
+                -1,
+                0,
+                -1L,
                 false,
                 null,
                 null,
@@ -490,6 +503,9 @@ public sealed interface Convoy {
                 materializedMembers,
                 warningIssued,
                 0,
+                -1,
+                0,
+                -1L,
                 false,
                 null,
                 null,
@@ -510,6 +526,9 @@ public sealed interface Convoy {
             Map<UUID, EntityType<?>> materializedMembers,
             boolean warningIssued,
             int nextWaveIndex,
+            int activeWaveIndex,
+            int activeWaveInitialCount,
+            long waveBreakStartedTick,
             boolean returningHome,
             @Nullable HiveLocationId returnLocationId,
             @Nullable BlockPos returnPos,
@@ -527,6 +546,9 @@ public sealed interface Convoy {
             this.materializedMembers = new ConvoyMaterializedMembers(materializedMembers);
             this.warningIssued = warningIssued;
             this.nextWaveIndex = Math.max(0, nextWaveIndex);
+            this.activeWaveIndex = activeWaveIndex;
+            this.activeWaveInitialCount = Math.max(0, activeWaveInitialCount);
+            this.waveBreakStartedTick = waveBreakStartedTick;
             this.returningHome = returningHome;
             this.returnLocationId = returnLocationId;
             this.returnPos = returnPos;
@@ -623,6 +645,59 @@ public sealed interface Convoy {
 
         public void advanceWave() {
             nextWaveIndex++;
+        }
+
+        public int activeWaveIndex() {
+            return activeWaveIndex;
+        }
+
+        public int activeWaveInitialCount() {
+            return activeWaveInitialCount;
+        }
+
+        public long waveBreakStartedTick() {
+            return waveBreakStartedTick;
+        }
+
+        public void beginWave(int waveIndex, int spawnedCount) {
+            this.activeWaveIndex = Math.clamp(waveIndex, 0, WAVE_COUNT - 1);
+            this.activeWaveInitialCount = Math.max(1, spawnedCount);
+            this.nextWaveIndex = Math.max(nextWaveIndex, this.activeWaveIndex + 1);
+            this.waveBreakStartedTick = -1L;
+        }
+
+        public boolean shouldStartWaveBreak() {
+            return activeWaveIndex >= 0
+                && waveBreakStartedTick < 0L
+                && materializedMembers().isEmpty()
+                && composition().getCount() > 0;
+        }
+
+        public void startWaveBreak(long currentTick) {
+            this.waveBreakStartedTick = currentTick;
+        }
+
+        public boolean isWaveBreakActive(long currentTick) {
+            return waveBreakStartedTick >= 0L && currentTick < waveBreakStartedTick + WAVE_BREAK_TICKS;
+        }
+
+        public float waveBreakProgress(long currentTick) {
+            if (waveBreakStartedTick < 0L) {
+                return 1.0F;
+            }
+            var elapsed = currentTick - waveBreakStartedTick;
+            return Math.clamp(elapsed / (float) WAVE_BREAK_TICKS, 0.0F, 1.0F);
+        }
+
+        public boolean canSpawnWave(long currentTick) {
+            return waveBreakStartedTick < 0L || currentTick >= waveBreakStartedTick + WAVE_BREAK_TICKS;
+        }
+
+        public int displayWaveIndex() {
+            if (activeWaveIndex >= 0 && (!materializedMembers().isEmpty() || composition().getCount() <= 0)) {
+                return Math.clamp(activeWaveIndex, 0, WAVE_COUNT - 1);
+            }
+            return Math.clamp(nextWaveIndex, 0, WAVE_COUNT - 1);
         }
 
         public boolean returningHome() {

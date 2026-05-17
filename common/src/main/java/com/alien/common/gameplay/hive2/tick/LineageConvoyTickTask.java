@@ -42,6 +42,7 @@ public final class LineageConvoyTickTask {
 
     public static void run(MinecraftServer server) {
         var config = HiveLocationRegistry.INSTANCE.config();
+        var currentTick = server.overworld().getGameTime();
         var activeConvoyIds = new java.util.HashSet<ConvoyId>();
 
         for (var factionId : new java.util.ArrayList<>(Alien.MOD.factions().getAllIds())) {
@@ -93,6 +94,10 @@ public final class LineageConvoyTickTask {
                         refreshMarkedForDeath(raid, server);
                         updateRaidTargetPos(raid, server);
                         maybeWarnRaidTarget(raid, server, lineage, config);
+                        if (raid.shouldStartWaveBreak()) {
+                            raid.startWaveBreak(currentTick);
+                            anyChanged = true;
+                        }
                     }
                 }
 

@@ -1,5 +1,6 @@
 package com.alien.common.gameplay.hive2.convoy;
 
+import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.gameplay.hive2.spawning.ReserveSpawnUtil;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import net.minecraft.core.BlockPos;
@@ -13,17 +14,23 @@ import net.minecraft.world.entity.MobSpawnType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 final class ConvoyMaterialization {
 
-    private static final int RAID_WAVE_COUNT = 5;
-
-    private static final int RAID_LAST_WAVE_INDEX = RAID_WAVE_COUNT - 1;
+    private static final int RAID_LAST_WAVE_INDEX = Convoy.Raid.WAVE_COUNT - 1;
 
     private static final int SPAWN_SEARCH_RADIUS_BLOCKS = 8;
 
     private static final int SPAWN_SEARCH_BLOCKS_ABOVE_ORIGIN = 12;
+
+    private static final double RAID_SPAWN_ARC_RADIANS = Math.toRadians(115.0);
+
+    private static final int RAID_MIN_SPAWN_DISTANCE_BLOCKS = 14;
+
+    private static final int RAID_MAX_SPAWN_DISTANCE_BLOCKS = 24;
 
     private ConvoyMaterialization() {}
 
@@ -31,19 +38,28 @@ final class ConvoyMaterialization {
         return spawnEntities(level, convoy, expandComposition(convoy, false), spawnPos, targetPlayer);
     }
 
-    static int spawnNextRaidWave(ServerLevel level, Convoy.Raid raid, BlockPos spawnPos, ServerPlayer targetPlayer) {
+    static int spawnNextRaidWave(
+        ServerLevel level,
+        Convoy.Raid raid,
+        BlockPos spawnPos,
+        ServerPlayer targetPlayer,
+        long currentTick
+    ) {
+        if (!raid.canSpawnWave(currentTick)) {
+            return 0;
+        }
+
         while (raid.composition().getCount() > 0) {
+            var waveIndex = Math.min(raid.nextWaveIndex(), RAID_LAST_WAVE_INDEX);
             var wave = selectRaidWave(raid);
             if (wave.isEmpty()) {
                 raid.advanceWave();
                 continue;
             }
 
-            var spawnedCount = spawnEntities(level, raid, wave, spawnPos, targetPlayer);
+            var spawnedCount = spawnRaidWaveEntities(level, raid, wave, spawnPos, targetPlayer);
             if (spawnedCount > 0) {
-                if (raid.nextWaveIndex() < RAID_WAVE_COUNT) {
-                    raid.advanceWave();
-                }
+                raid.beginWave(waveIndex, spawnedCount);
                 return spawnedCount;
             }
 
@@ -92,7 +108,7 @@ final class ConvoyMaterialization {
     ) {
         var spawnedCount = 0;
         for (var entityType : entityTypes) {
-            var spawned = spawnRelaxed(entityType, level, spawnPos);
+            var spawned = spawnRelaxed(entityType, level, spawnPos, null);
             if (spawned == null) {
                 continue;
             }
@@ -112,8 +128,87 @@ final class ConvoyMaterialization {
         return spawnedCount;
     }
 
-    private static @Nullable Entity spawnRelaxed(EntityType<?> entityType, ServerLevel level, BlockPos origin) {
-        var spawnPos = findGroundSpawnPos(entityType, level, origin);
+    private static int spawnRaidWaveEntities(
+        ServerLevel level,
+        Convoy.Raid raid,
+        List<EntityType<?>> entityTypes,
+        BlockPos spawnPos,
+        ServerPlayer targetPlayer
+    ) {
+        var origins = raidSpawnOrigins(level, raid, spawnPos, targetPlayer, entityTypes.size());
+        var usedSpawnPositions = new HashSet<BlockPos>();
+        var spawnedCount = 0;
+
+        for (var i = 0; i < entityTypes.size(); i++) {
+            var entityType = entityTypes.get(i);
+            var origin = origins.get(i);
+            var spawned = spawnRelaxed(entityType, level, origin, usedSpawnPositions);
+            if (spawned == null) {
+                continue;
+            }
+
+            ReserveSpawnUtil.markSpawnedFromReserves(spawned);
+            if (spawned instanceof Mob mob) {
+                mob.setTarget(targetPlayer);
+            }
+            ConvoyMemberTracker.markSpawned(raid, spawned);
+
+            raid.composition().add(entityType, -1);
+            spawnedCount++;
+        }
+
+        return spawnedCount;
+    }
+
+    private static List<BlockPos> raidSpawnOrigins(
+        ServerLevel level,
+        Convoy.Raid raid,
+        BlockPos fallbackOrigin,
+        @Nullable ServerPlayer targetPlayer,
+        int count
+    ) {
+        var targetPos = targetPlayer == null ? fallbackOrigin : targetPlayer.blockPosition();
+        var baseAngle = raidApproachAngle(raid, targetPos, fallbackOrigin);
+        var origins = new ArrayList<BlockPos>(count);
+        var distanceRange = RAID_MAX_SPAWN_DISTANCE_BLOCKS - RAID_MIN_SPAWN_DISTANCE_BLOCKS;
+
+        for (var i = 0; i < count; i++) {
+            var fraction = count <= 1 ? 0.5 : i / (double) (count - 1);
+            var angleJitter = (level.random.nextDouble() - 0.5) * 0.28;
+            var angle = baseAngle + (fraction - 0.5) * RAID_SPAWN_ARC_RADIANS + angleJitter;
+            var distance = RAID_MIN_SPAWN_DISTANCE_BLOCKS
+                + (distanceRange <= 0 ? 0 : level.random.nextInt(distanceRange + 1));
+
+            var x = targetPos.getX() + (int) Math.round(Math.cos(angle) * distance);
+            var z = targetPos.getZ() + (int) Math.round(Math.sin(angle) * distance);
+            origins.add(new BlockPos(x, targetPos.getY(), z));
+        }
+
+        return origins;
+    }
+
+    private static double raidApproachAngle(Convoy.Raid raid, BlockPos targetPos, BlockPos fallbackOrigin) {
+        var source = HiveLocationRegistry.INSTANCE.get(raid.sourceLocationId());
+        var sourcePos = source == null ? fallbackOrigin : source.centerPos();
+        var dx = sourcePos.getX() - targetPos.getX();
+        var dz = sourcePos.getZ() - targetPos.getZ();
+        if (dx == 0 && dz == 0) {
+            dx = fallbackOrigin.getX() - targetPos.getX();
+            dz = fallbackOrigin.getZ() - targetPos.getZ();
+        }
+        if (dx == 0 && dz == 0) {
+            return 0.0;
+        }
+        return Math.atan2(dz, dx);
+    }
+
+    private static @Nullable Entity spawnRelaxed(
+        EntityType<?> entityType,
+        ServerLevel level,
+        BlockPos origin,
+        @Nullable Set<BlockPos> usedSpawnPositions
+    ) {
+        var spawnPos = findGroundSpawnPos(entityType, level, origin, usedSpawnPositions);
         if (spawnPos == null) {
             return null;
         }
@@ -134,10 +229,18 @@ final class ConvoyMaterialization {
             mob.finalizeSpawn(level, level.getCurrentDifficultyAt(spawnPos), MobSpawnType.MOB_SUMMONED, null);
         }
         level.addFreshEntityWithPassengers(entity);
+        if (usedSpawnPositions != null) {
+            usedSpawnPositions.add(spawnPos);
+        }
         return entity;
     }
 
-    private static @Nullable BlockPos findGroundSpawnPos(EntityType<?> entityType, ServerLevel level, BlockPos origin) {
+    private static @Nullable BlockPos findGroundSpawnPos(
+        EntityType<?> entityType,
+        ServerLevel level,
+        BlockPos origin,
+        @Nullable Set<BlockPos> usedSpawnPositions
+    ) {
         for (var radius = 0; radius <= SPAWN_SEARCH_RADIUS_BLOCKS; radius++) {
             for (var dx = -radius; dx <= radius; dx++) {
                 for (var dz = -radius; dz <= radius; dz++) {
@@ -146,7 +249,7 @@ final class ConvoyMaterialization {
                     }
 
                     var columnOrigin = origin.offset(dx, 0, dz);
-                    var pos = findGroundSpawnPosInColumn(entityType, level, columnOrigin);
+                    var pos = findGroundSpawnPosInColumn(entityType, level, columnOrigin, usedSpawnPositions);
                     if (pos != null) {
                         return pos;
                     }
@@ -159,7 +262,8 @@ final class ConvoyMaterialization {
     private static @Nullable BlockPos findGroundSpawnPosInColumn(
         EntityType<?> entityType,
         ServerLevel level,
-        BlockPos origin
+        BlockPos origin,
+        @Nullable Set<BlockPos> usedSpawnPositions
     ) {
         var minY = level.getMinBuildHeight() + 1;
         var maxY = level.getMaxBuildHeight() - 2;
@@ -167,6 +271,9 @@ final class ConvoyMaterialization {
 
         for (var y = startY; y >= minY; y--) {
             var pos = new BlockPos(origin.getX(), y, origin.getZ());
+            if (usedSpawnPositions != null && usedSpawnPositions.contains(pos)) {
+                continue;
+            }
             if (isValidGroundSpawnPos(entityType, level, pos)) {
                 return pos;
             }

@@ -143,7 +143,13 @@ public final class ConvoyArrival {
         }
 
         var targetPlayer = server.getPlayerList().getPlayer(raid.targetPlayerId());
-        var spawnedCount = ConvoyMaterialization.spawnNextRaidWave(serverLevel, raid, spawnPos, targetPlayer);
+        var spawnedCount = ConvoyMaterialization.spawnNextRaidWave(
+            serverLevel,
+            raid,
+            spawnPos,
+            targetPlayer,
+            server.overworld().getGameTime()
+        );
         if (spawnedCount <= 0) {
             return false;
         }

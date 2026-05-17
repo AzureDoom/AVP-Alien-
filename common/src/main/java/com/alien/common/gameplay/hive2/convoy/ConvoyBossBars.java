@@ -24,9 +24,10 @@ public final class ConvoyBossBars {
 
     public static void tick(MinecraftServer server, Convoy convoy, LineageFactionData lineage, HiveConfig config) {
         var state = BARS.computeIfAbsent(convoy.id(), id -> createState(convoy));
+        var currentTick = server.overworld().getGameTime();
         state.bossEvent().setName(title(convoy));
         state.bossEvent().setColor(colorFor(convoy));
-        state.bossEvent().setProgress(progress(convoy, state.initialCount()));
+        state.bossEvent().setProgress(progress(convoy, state.initialCount(), currentTick));
         updateTrackingPlayers(server, convoy, lineage, config, state.bossEvent());
     }
 
@@ -58,11 +59,14 @@ public final class ConvoyBossBars {
 
     private static BarState createState(Convoy convoy) {
         var event = new ServerBossEvent(title(convoy), colorFor(convoy), BossEvent.BossBarOverlay.PROGRESS);
-        event.setProgress(progress(convoy, Math.max(1, memberCount(convoy))));
+        event.setProgress(1.0F);
         return new BarState(Math.max(1, memberCount(convoy)), event);
     }
 
     private static Component title(Convoy convoy) {
+        if (convoy instanceof Convoy.Raid raid) {
+            return Component.literal("Raid - wave " + (raid.displayWaveIndex() + 1) + "/" + Convoy.Raid.WAVE_COUNT);
+        }
         return Component.literal("Convoy: " + typeName(convoy) + " (" + memberCount(convoy) + ")");
     }
 
@@ -89,10 +93,28 @@ public final class ConvoyBossBars {
         return BossEvent.BossBarColor.WHITE;
     }
 
-    private static float progress(Convoy convoy, int initialCount) {
+    private static float progress(Convoy convoy, int initialCount, long currentTick) {
+        if (convoy instanceof Convoy.Raid raid) {
+            return raidProgress(raid, currentTick);
+        }
+
         var initial = Math.max(1, initialCount);
         var current = Math.max(0, memberCount(convoy));
         return Math.clamp(current / (float) initial, 0.0F, 1.0F);
+    }
+
+    private static float raidProgress(Convoy.Raid raid, long currentTick) {
+        if (
+            raid.waveBreakStartedTick() >= 0L
+                && raid.materializedMembers().isEmpty()
+                && raid.composition().getCount() > 0
+        ) {
+            return raid.waveBreakProgress(currentTick);
+        }
+        if (raid.activeWaveInitialCount() <= 0) {
+            return 1.0F;
+        }
+        return Math.clamp(raid.materializedMembers().size() / (float) raid.activeWaveInitialCount(), 0.0F, 1.0F);
     }
 
     private static int memberCount(Convoy convoy) {
