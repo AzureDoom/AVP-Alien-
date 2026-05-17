@@ -16,7 +16,8 @@ import net.minecraft.server.level.ServerLevel;
  * <li>Phase 3 — leader pick, boss bar progress / visibility.</li>
  * <li>Phase 7 — every-tick {@link LoadedBiomassTicker} for player-nearby locations + per-tick {@link CatchUpEngine} for
  * claim attempts (the engine is idempotent on elapsed=0, so it's free to call when biomass hasn't moved).</li>
- * <li>Phase 8 (later) — convoy manifestation interactions on this location's chunks.</li>
+ * <li>Territory defense — loaded hive xenomorphs aggro players standing in claimed chunks.</li>
+ * <li>Phase 8 — convoy manifestation interactions on this location's chunks.</li>
  * </ul>
  * <p>
  * See {@code HIVE_REDESIGN_12_PERFORMANCE.md} § 1.
@@ -50,6 +51,10 @@ public final class HiveLocationLoadedTickTask {
         var currentTick = serverLevel.getGameTime();
         if (!hasLoadedClaimedChunk(serverLevel, location)) {
             return;
+        }
+
+        if (HiveTerritoryAggroTask.shouldFire(currentTick)) {
+            HiveTerritoryAggroTask.run(serverLevel, location);
         }
 
         // Loaded biomass income — only for player-nearby locations (proxy: boss bar is showing). Cheap to call,
