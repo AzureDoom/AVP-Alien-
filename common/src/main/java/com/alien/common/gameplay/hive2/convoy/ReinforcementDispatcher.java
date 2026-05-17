@@ -8,9 +8,12 @@ import com.alien.common.gameplay.hive2.id.LineageIds;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.gameplay.hive2.location.HiveLocationReserves;
+import com.alien.common.registry.ReinforcementProfileRegistry;
 import com.blib.api.common.entity.v1.EntityReserves;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -62,7 +65,7 @@ public final class ReinforcementDispatcher {
                 continue;
             }
 
-            scanLineage(factionId, lineage, currentTick, config);
+            scanLineage(factionId, lineage, currentTick, config, server.overworld().random);
         }
     }
 
@@ -70,8 +73,10 @@ public final class ReinforcementDispatcher {
         ResourceLocation lineageFactionId,
         LineageFactionData lineage,
         long currentTick,
-        HiveConfig config
+        HiveConfig config,
+        RandomSource random
     ) {
+        var profile = ReinforcementProfileRegistry.forVariant(lineage.variant());
         var donors = new ArrayList<HiveLocation>();
         var receivers = new ArrayList<HiveLocation>();
 
@@ -79,7 +84,7 @@ public final class ReinforcementDispatcher {
             if (!location.isAlive()) {
                 continue;
             }
-            var reserveTotal = location.localReserves().getCount();
+            var reserveTotal = location.localReserves().getCountMatching(profile::matches);
             var threshold = Math.max(1, config.populationPerChunk());
 
             if (reserveTotal >= threshold * 2) {
@@ -99,7 +104,7 @@ public final class ReinforcementDispatcher {
                 continue;
             }
 
-            var convoy = mintConvoy(donor, receiver, lineageFactionId, currentTick, config);
+            var convoy = mintConvoy(donor, receiver, lineageFactionId, currentTick, config, profile, random);
             if (convoy == null) {
                 continue;
             }
@@ -153,9 +158,11 @@ public final class ReinforcementDispatcher {
         HiveLocation receiver,
         ResourceLocation lineageFactionId,
         long currentTick,
-        HiveConfig config
+        HiveConfig config,
+        ReinforcementProfile profile,
+        RandomSource random
     ) {
-        var available = donor.localReserves().getCount();
+        var available = donor.localReserves().getCountMatching(profile::matches);
         if (available <= 0) {
             return null;
         }
@@ -163,7 +170,7 @@ public final class ReinforcementDispatcher {
         var size = Math.min(available, config.reinforcementMaxSize());
         size = Math.max(size, Math.min(available, config.reinforcementMinSize()));
 
-        var composition = drainComposition(donor.localReserves(), size);
+        var composition = drainComposition(donor.localReserves(), size, profile, random);
         if (composition.getCount() == 0) {
             return null;
         }
@@ -187,26 +194,35 @@ public final class ReinforcementDispatcher {
         );
     }
 
-    /** Draws up to {@code count} members from the donor's reserves, round-robin across available types. */
-    private static EntityReserves drainComposition(HiveLocationReserves donorReserves, int count) {
+    /** Draws up to {@code count} profile-eligible members from the donor's reserves. */
+    private static EntityReserves drainComposition(
+        HiveLocationReserves donorReserves,
+        int count,
+        ReinforcementProfile profile,
+        RandomSource random
+    ) {
         var composition = new EntityReserves();
         var remaining = count;
-        var available = new ArrayList<>(donorReserves.getAvailableEntityTypes());
-
-        while (remaining > 0 && !available.isEmpty()) {
-            var iterator = available.iterator();
-            while (iterator.hasNext() && remaining > 0) {
-                var type = iterator.next();
-                if (donorReserves.trySpawn(type)) {
-                    composition.add(type, 1);
-                    remaining--;
-                    if (donorReserves.getCount(type) <= 0) {
-                        iterator.remove();
-                    }
-                } else {
-                    iterator.remove();
-                }
+        var selectedByPool = new HashMap<Integer, Integer>();
+        var inventory = new RaidWaveSelection.Inventory() {
+            @Override
+            public Iterable<EntityType<?>> availableTypes() {
+                return donorReserves.getAvailableEntityTypes();
             }
+
+            @Override
+            public int count(EntityType<?> type) {
+                return donorReserves.getCount(type);
+            }
+        };
+
+        while (remaining > 0) {
+            var type = RaidWaveSelection.chooseType(profile.pools(), inventory, selectedByPool, random);
+            if (type == null || !donorReserves.trySpawn(type)) {
+                break;
+            }
+            composition.add(type, 1);
+            remaining--;
         }
 
         return composition;

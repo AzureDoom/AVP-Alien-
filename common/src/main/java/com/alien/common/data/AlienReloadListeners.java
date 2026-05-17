@@ -20,6 +20,9 @@ public class AlienReloadListeners {
     public static final PreparableReloadListener RAID_WAVE_PROFILE_RELOAD_LISTENER =
         new RaidWaveProfileReloadListener();
 
+    public static final PreparableReloadListener REINFORCEMENT_PROFILE_RELOAD_LISTENER =
+        new ReinforcementProfileReloadListener();
+
     public static void initialize() {
         REGISTRY.register(
             FormSizeScaleReloadListener.DIRECTORY_NAME,
@@ -36,6 +39,11 @@ public class AlienReloadListeners {
         REGISTRY.register(
             RaidWaveProfileReloadListener.DIRECTORY_NAME,
             RAID_WAVE_PROFILE_RELOAD_LISTENER,
+            PackType.SERVER_DATA
+        );
+        REGISTRY.register(
+            ReinforcementProfileReloadListener.DIRECTORY_NAME,
+            REINFORCEMENT_PROFILE_RELOAD_LISTENER,
             PackType.SERVER_DATA
         );
     }
