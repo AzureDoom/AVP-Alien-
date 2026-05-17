@@ -110,6 +110,7 @@ public final class ConvoyCodec {
         var composition = new CompoundTag();
         composition.put("reserves", EntityReserves.CODEC.encode(BLibCodecs.Schema.NBT, convoy.composition()));
         tag.put(NBT_COMPOSITION, composition);
+        tag.put(NBT_MATERIALIZED_MEMBERS, encodeMaterializedMembers(convoy.materializedMembers()));
 
         tag.putLong(NBT_DISPATCHED_TICK, convoy.dispatchedTick());
 
@@ -131,7 +132,6 @@ public final class ConvoyCodec {
             tag.putUUID(NBT_TARGET_PLAYER_ID, raid.targetPlayerId());
             tag.putIntArray(NBT_LAST_KNOWN_TARGET_POS, encodeBlockPos(raid.lastKnownTargetPos()));
             tag.putLong(NBT_EXPIRES_AT_TICK, raid.expiresAtTick());
-            tag.put(NBT_MATERIALIZED_MEMBERS, encodeMaterializedMembers(raid.materializedMembers()));
             tag.putBoolean(NBT_WARNING_ISSUED, raid.warningIssued());
             tag.putBoolean(NBT_RETURNING_HOME, raid.returningHome());
             if (raid.returnLocationId() != null) {
@@ -161,6 +161,7 @@ public final class ConvoyCodec {
         EntityReserves.CODEC.decode(BLibCodecs.Schema.NBT, compositionTag)
             .inspectErr(failure -> Alien.LOGGER.error("Failed to load convoy composition: {}", failure))
             .ifOk(loaded -> composition.putAll(loaded.getBackingMap()));
+        var materializedMembers = decodeMaterializedMembers(tag.getList(NBT_MATERIALIZED_MEMBERS, Tag.TAG_COMPOUND));
 
         return switch (type) {
             case TYPE_REINFORCEMENT -> new Convoy.Reinforcement(
@@ -172,6 +173,7 @@ public final class ConvoyCodec {
                 currentPos,
                 decodeBlockPos(tag.getIntArray(NBT_DESTINATION_POS)),
                 composition,
+                materializedMembers,
                 dispatchedTick
             );
             case TYPE_MIGRATION -> new Convoy.Migration(
@@ -183,6 +185,7 @@ public final class ConvoyCodec {
                 currentPos,
                 decodeBlockPos(tag.getIntArray(NBT_DESTINATION_POS)),
                 composition,
+                materializedMembers,
                 tag.getInt(NBT_BIOMASS_PAYLOAD),
                 tag.getBoolean(NBT_CARRIES_EMPRESS),
                 dispatchedTick
@@ -196,7 +199,7 @@ public final class ConvoyCodec {
                 currentPos,
                 decodeBlockPos(tag.getIntArray(NBT_LAST_KNOWN_TARGET_POS)),
                 composition,
-                decodeMaterializedMembers(tag.getList(NBT_MATERIALIZED_MEMBERS, Tag.TAG_COMPOUND)),
+                materializedMembers,
                 tag.getBoolean(NBT_WARNING_ISSUED),
                 tag.getBoolean(NBT_RETURNING_HOME),
                 tag.contains(NBT_RETURN_LOCATION_ID)

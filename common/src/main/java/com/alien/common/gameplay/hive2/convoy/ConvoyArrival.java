@@ -29,7 +29,7 @@ public final class ConvoyArrival {
         }
 
         if (convoy instanceof Convoy.Reinforcement reinforcement) {
-            arriveReinforcement(reinforcement);
+            arriveReinforcement(server, reinforcement);
             return true;
         }
 
@@ -50,7 +50,8 @@ public final class ConvoyArrival {
         return true;
     }
 
-    private static void arriveReinforcement(Convoy.Reinforcement reinforcement) {
+    private static void arriveReinforcement(MinecraftServer server, Convoy.Reinforcement reinforcement) {
+        ConvoyMemberTracker.recallMaterializedMembers(server, reinforcement);
         var destinationLocation = HiveLocationRegistry.INSTANCE.get(reinforcement.destinationLocationId());
 
         if (destinationLocation == null) {
@@ -78,6 +79,7 @@ public final class ConvoyArrival {
     }
 
     private static void arriveMigration(MinecraftServer server, Convoy.Migration migration, LineageFactionData lineage) {
+        ConvoyMemberTracker.recallMaterializedMembers(server, migration);
         var destination = HiveLocationRegistry.INSTANCE.get(migration.destinationLocationId());
 
         if (destination == null) {
@@ -154,7 +156,7 @@ public final class ConvoyArrival {
     }
 
     private static void arriveReturningRaid(MinecraftServer server, Convoy.Raid raid, LineageFactionData lineage) {
-        RaidMemberTracker.recallMaterializedMembers(server, raid);
+        ConvoyMemberTracker.recallMaterializedMembers(server, raid);
 
         var destination = raid.returnLocationId() == null ? null : HiveLocationRegistry.INSTANCE.get(raid.returnLocationId());
         if (destination == null || !destination.isAlive()) {

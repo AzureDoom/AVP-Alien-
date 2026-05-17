@@ -7,9 +7,9 @@ import com.alien.common.gameplay.hive2.convoy.ConvoyArrival;
 import com.alien.common.gameplay.hive2.convoy.ConvoyBossBars;
 import com.alien.common.gameplay.hive2.convoy.ConvoyId;
 import com.alien.common.gameplay.hive2.convoy.ConvoyInterception;
+import com.alien.common.gameplay.hive2.convoy.ConvoyMemberTracker;
 import com.alien.common.gameplay.hive2.convoy.ConvoySpeedTable;
 import com.alien.common.gameplay.hive2.convoy.ConvoyTravel;
-import com.alien.common.gameplay.hive2.convoy.RaidMemberTracker;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.id.LineageIds;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
@@ -74,11 +74,13 @@ public final class LineageConvoyTickTask {
                         }
                         anyChanged = true;
                     }
+                }
 
-                    if (RaidMemberTracker.returnMissingMaterializedMembers(server, raid) > 0) {
-                        anyChanged = true;
-                    }
+                if (ConvoyMemberTracker.returnMissingMaterializedMembers(server, convoy) > 0) {
+                    anyChanged = true;
+                }
 
+                if (convoy instanceof Convoy.Raid raid) {
                     if (raid.composition().getCount() <= 0 && raid.materializedMembers().isEmpty()) {
                         ConvoyBossBars.remove(convoy);
                         activeConvoyIds.remove(convoy.id());
@@ -105,6 +107,16 @@ public final class LineageConvoyTickTask {
                 }
 
                 ConvoyTravel.tick(convoy, config);
+
+                if (
+                    ConvoyMemberTracker.returnDistantMaterializedMembers(
+                        server,
+                        convoy,
+                        materializedMemberLeashDistanceSqr(config)
+                    ) > 0
+                ) {
+                    anyChanged = true;
+                }
 
                 if (ConvoyArrival.checkArrival(server, convoy, lineage, config)) {
                     ConvoyBossBars.remove(convoy);
@@ -162,8 +174,13 @@ public final class LineageConvoyTickTask {
         return player != null && !player.isAlive();
     }
 
+    private static double materializedMemberLeashDistanceSqr(HiveConfig config) {
+        var distance = config.manifestDistanceBlocks();
+        return (double) distance * distance;
+    }
+
     private static boolean beginRaidReturnHome(Convoy.Raid raid, MinecraftServer server, LineageFactionData lineage) {
-        var recalled = RaidMemberTracker.recallMaterializedMembers(server, raid);
+        var recalled = ConvoyMemberTracker.recallMaterializedMembers(server, raid);
         var destination = pickReturnLocation(raid, lineage);
         if (destination == null) {
             Alien.LOGGER.info(

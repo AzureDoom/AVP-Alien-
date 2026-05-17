@@ -10,7 +10,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -45,6 +44,14 @@ public sealed interface Convoy {
 
     EntityReserves composition();
 
+    Map<UUID, EntityType<?>> materializedMembers();
+
+    void trackMaterializedMember(UUID memberId, EntityType<?> entityType);
+
+    EntityType<?> untrackMaterializedMember(UUID memberId);
+
+    int materializedCountMatching(Predicate<EntityType<?>> predicate);
+
     long dispatchedTick();
 
     /**
@@ -70,6 +77,8 @@ public sealed interface Convoy {
 
         private final EntityReserves composition;
 
+        private final ConvoyMaterializedMembers materializedMembers;
+
         private final long dispatchedTick;
 
         private Vec3 currentPos;
@@ -85,6 +94,32 @@ public sealed interface Convoy {
             EntityReserves composition,
             long dispatchedTick
         ) {
+            this(
+                id,
+                lineageFactionId,
+                dimension,
+                sourceLocationId,
+                destinationLocationId,
+                currentPos,
+                destinationPos,
+                composition,
+                Map.of(),
+                dispatchedTick
+            );
+        }
+
+        public Reinforcement(
+            ConvoyId id,
+            ResourceLocation lineageFactionId,
+            ResourceKey<Level> dimension,
+            HiveLocationId sourceLocationId,
+            HiveLocationId destinationLocationId,
+            Vec3 currentPos,
+            BlockPos destinationPos,
+            EntityReserves composition,
+            Map<UUID, EntityType<?>> materializedMembers,
+            long dispatchedTick
+        ) {
             this.id = id;
             this.lineageFactionId = lineageFactionId;
             this.dimension = dimension;
@@ -93,6 +128,7 @@ public sealed interface Convoy {
             this.currentPos = currentPos;
             this.destinationPos = destinationPos;
             this.composition = composition;
+            this.materializedMembers = new ConvoyMaterializedMembers(materializedMembers);
             this.dispatchedTick = dispatchedTick;
         }
 
@@ -124,6 +160,26 @@ public sealed interface Convoy {
         @Override
         public EntityReserves composition() {
             return composition;
+        }
+
+        @Override
+        public Map<UUID, EntityType<?>> materializedMembers() {
+            return materializedMembers.members();
+        }
+
+        @Override
+        public void trackMaterializedMember(UUID memberId, EntityType<?> entityType) {
+            materializedMembers.track(memberId, entityType);
+        }
+
+        @Override
+        public EntityType<?> untrackMaterializedMember(UUID memberId) {
+            return materializedMembers.untrack(memberId);
+        }
+
+        @Override
+        public int materializedCountMatching(Predicate<EntityType<?>> predicate) {
+            return materializedMembers.countMatching(predicate);
         }
 
         @Override
@@ -164,6 +220,8 @@ public sealed interface Convoy {
 
         private final EntityReserves composition;
 
+        private final ConvoyMaterializedMembers materializedMembers;
+
         private final int biomassPayload;
 
         private final boolean carriesEmpress;
@@ -185,6 +243,36 @@ public sealed interface Convoy {
             boolean carriesEmpress,
             long dispatchedTick
         ) {
+            this(
+                id,
+                lineageFactionId,
+                dimension,
+                sourceLocationId,
+                destinationLocationId,
+                currentPos,
+                destinationPos,
+                composition,
+                Map.of(),
+                biomassPayload,
+                carriesEmpress,
+                dispatchedTick
+            );
+        }
+
+        public Migration(
+            ConvoyId id,
+            ResourceLocation lineageFactionId,
+            ResourceKey<Level> dimension,
+            HiveLocationId sourceLocationId,
+            HiveLocationId destinationLocationId,
+            Vec3 currentPos,
+            BlockPos destinationPos,
+            EntityReserves composition,
+            Map<UUID, EntityType<?>> materializedMembers,
+            int biomassPayload,
+            boolean carriesEmpress,
+            long dispatchedTick
+        ) {
             this.id = id;
             this.lineageFactionId = lineageFactionId;
             this.dimension = dimension;
@@ -193,6 +281,7 @@ public sealed interface Convoy {
             this.currentPos = currentPos;
             this.destinationPos = destinationPos;
             this.composition = composition;
+            this.materializedMembers = new ConvoyMaterializedMembers(materializedMembers);
             this.biomassPayload = biomassPayload;
             this.carriesEmpress = carriesEmpress;
             this.dispatchedTick = dispatchedTick;
@@ -226,6 +315,26 @@ public sealed interface Convoy {
         @Override
         public EntityReserves composition() {
             return composition;
+        }
+
+        @Override
+        public Map<UUID, EntityType<?>> materializedMembers() {
+            return materializedMembers.members();
+        }
+
+        @Override
+        public void trackMaterializedMember(UUID memberId, EntityType<?> entityType) {
+            materializedMembers.track(memberId, entityType);
+        }
+
+        @Override
+        public EntityType<?> untrackMaterializedMember(UUID memberId) {
+            return materializedMembers.untrack(memberId);
+        }
+
+        @Override
+        public int materializedCountMatching(Predicate<EntityType<?>> predicate) {
+            return materializedMembers.countMatching(predicate);
         }
 
         @Override
@@ -275,9 +384,7 @@ public sealed interface Convoy {
 
         private final EntityReserves composition;
 
-        private final Map<UUID, EntityType<?>> materializedMembers;
-
-        private final EntityReserves materializedComposition;
+        private final ConvoyMaterializedMembers materializedMembers;
 
         private final long dispatchedTick;
 
@@ -316,7 +423,7 @@ public sealed interface Convoy {
                 currentPos,
                 lastKnownTargetPos,
                 composition,
-                new HashMap<>(),
+                Map.of(),
                 dispatchedTick,
                 expiresAtTick
             );
@@ -412,8 +519,7 @@ public sealed interface Convoy {
             this.currentPos = currentPos;
             this.lastKnownTargetPos = lastKnownTargetPos;
             this.composition = composition;
-            this.materializedMembers = new HashMap<>(materializedMembers);
-            this.materializedComposition = buildMaterializedComposition(materializedMembers);
+            this.materializedMembers = new ConvoyMaterializedMembers(materializedMembers);
             this.warningIssued = warningIssued;
             this.returningHome = returningHome;
             this.returnLocationId = returnLocationId;
@@ -452,35 +558,24 @@ public sealed interface Convoy {
             return composition;
         }
 
+        @Override
         public Map<UUID, EntityType<?>> materializedMembers() {
-            return materializedMembers;
+            return materializedMembers.members();
         }
 
+        @Override
         public void trackMaterializedMember(UUID memberId, EntityType<?> entityType) {
-            var previous = materializedMembers.put(memberId, entityType);
-            if (previous != null) {
-                materializedComposition.add(previous, -1);
-            }
-            materializedComposition.add(entityType, 1);
+            materializedMembers.track(memberId, entityType);
         }
 
-        public void untrackMaterializedMember(UUID memberId) {
-            var previous = materializedMembers.remove(memberId);
-            if (previous != null) {
-                materializedComposition.add(previous, -1);
-            }
+        @Override
+        public EntityType<?> untrackMaterializedMember(UUID memberId) {
+            return materializedMembers.untrack(memberId);
         }
 
+        @Override
         public int materializedCountMatching(Predicate<EntityType<?>> predicate) {
-            return materializedComposition.getCountMatching(predicate);
-        }
-
-        private static EntityReserves buildMaterializedComposition(Map<UUID, EntityType<?>> members) {
-            var composition = new EntityReserves();
-            for (var entityType : members.values()) {
-                composition.add(entityType, 1);
-            }
-            return composition;
+            return materializedMembers.countMatching(predicate);
         }
 
         @Override

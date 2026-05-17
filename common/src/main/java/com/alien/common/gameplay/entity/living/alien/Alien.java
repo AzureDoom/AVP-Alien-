@@ -5,8 +5,8 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
 import com.alien.common.gameplay.hive2.convoy.ConvoyId;
-import com.alien.common.gameplay.hive2.convoy.RaidMemberTracker;
-import com.alien.common.gameplay.hive2.convoy.RaidMembership;
+import com.alien.common.gameplay.hive2.convoy.ConvoyMemberTracker;
+import com.alien.common.gameplay.hive2.convoy.ConvoyMembership;
 import com.alien.common.gameplay.hive2.faction.HiveMemberLocationResolver;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.faction.LocationMembership;
@@ -74,6 +74,8 @@ public abstract class Alien extends Monster implements DataUser {
 
     private static final String NBT_HOST_TYPE = "hostType";
 
+    private static final String NBT_CONVOY_MEMBERSHIP = "Hive2ConvoyMembership";
+
     private static final String NBT_RAID_MEMBERSHIP = "Hive2RaidMembership";
 
     public final DataAccessor<Boolean> hasTarget;
@@ -92,7 +94,7 @@ public abstract class Alien extends Monster implements DataUser {
 
     private Option<EntityType<?>> hostTypeOption;
 
-    private @Nullable RaidMembership raidMembership;
+    private @Nullable ConvoyMembership convoyMembership;
 
     private int lastHurtTimeInTicks;
 
@@ -284,7 +286,7 @@ public abstract class Alien extends Monster implements DataUser {
 
     @Override
     public void tick() {
-        if (!level().isClientSide && RaidMemberTracker.discardStaleLoadedMember(this)) {
+        if (!level().isClientSide && ConvoyMemberTracker.discardStaleLoadedMember(this)) {
             discard();
             return;
         }
@@ -642,7 +644,7 @@ public abstract class Alien extends Monster implements DataUser {
 
     @Override
     public boolean shouldBeSaved() {
-        if (raidMembership != null) {
+        if (convoyMembership != null) {
             return false;
         }
         return super.shouldBeSaved();
@@ -666,7 +668,7 @@ public abstract class Alien extends Monster implements DataUser {
         // Hive2: hive-owned xenomorphs always return to their owning location's reserves when vanilla despawns them,
         // even if they wandered into an unclaimed chunk. Feral xenomorphs still count as strain leaks.
         if (getType().is(AlienEntityTypeTags.XENOMORPHS)) {
-            if (RaidMemberTracker.returnDespawned(this)) {
+            if (ConvoyMemberTracker.returnDespawned(this)) {
                 return;
             }
             if (returnLocation != null && returnToHiveLocation(returnLocation)) {
@@ -737,7 +739,7 @@ public abstract class Alien extends Monster implements DataUser {
             if (killer instanceof ServerPlayer player && level() instanceof ServerLevel serverLevel) {
                 attributeKillToLineages(player.getUUID(), serverLevel.getGameTime());
             }
-            RaidMemberTracker.unregisterKilled(this);
+            ConvoyMemberTracker.unregisterKilled(this);
             // Hive2 empress death → civil-war flag consumed by CivilWarHandler.
             if (getType().is(AlienEntityTypeTags.EMPRESSES)) {
                 onEmpressDied();
@@ -812,16 +814,7 @@ public abstract class Alien extends Monster implements DataUser {
 
             entityTypeHolderOptional.ifPresent($ -> this.hostTypeOption = Option.some(BuiltInRegistries.ENTITY_TYPE.get(resourceLocation)));
         }
-        this.raidMembership = null;
-        if (compoundTag.contains(NBT_RAID_MEMBERSHIP)) {
-            var raidTag = compoundTag.getCompound(NBT_RAID_MEMBERSHIP);
-            if (raidTag.contains("LineageFactionId") && raidTag.hasUUID("RaidId")) {
-                this.raidMembership = new RaidMembership(
-                    ResourceLocation.parse(raidTag.getString("LineageFactionId")),
-                    new ConvoyId(raidTag.getUUID("RaidId"))
-                );
-            }
-        }
+        this.convoyMembership = loadConvoyMembership(compoundTag);
     }
 
     @Override
@@ -834,12 +827,43 @@ public abstract class Alien extends Monster implements DataUser {
             var resourceLocation = BuiltInRegistries.ENTITY_TYPE.getKey(hostTypeOption.unwrap());
             compoundTag.putString(NBT_HOST_TYPE, resourceLocation.toString());
         });
-        if (raidMembership != null) {
-            var raidTag = new CompoundTag();
-            raidTag.putString("LineageFactionId", raidMembership.lineageFactionId().toString());
-            raidTag.putUUID("RaidId", raidMembership.raidId().value());
-            compoundTag.put(NBT_RAID_MEMBERSHIP, raidTag);
+        if (convoyMembership != null) {
+            var convoyTag = new CompoundTag();
+            convoyTag.putString("LineageFactionId", convoyMembership.lineageFactionId().toString());
+            convoyTag.putUUID("ConvoyId", convoyMembership.convoyId().value());
+            compoundTag.put(NBT_CONVOY_MEMBERSHIP, convoyTag);
         }
+    }
+
+    private @Nullable ConvoyMembership loadConvoyMembership(CompoundTag compoundTag) {
+        if (compoundTag.contains(NBT_CONVOY_MEMBERSHIP)) {
+            var convoyTag = compoundTag.getCompound(NBT_CONVOY_MEMBERSHIP);
+            return loadConvoyMembershipTag(convoyTag);
+        }
+        if (compoundTag.contains(NBT_RAID_MEMBERSHIP)) {
+            var raidTag = compoundTag.getCompound(NBT_RAID_MEMBERSHIP);
+            return loadConvoyMembershipTag(raidTag);
+        }
+        return null;
+    }
+
+    private @Nullable ConvoyMembership loadConvoyMembershipTag(CompoundTag membershipTag) {
+        if (!membershipTag.contains("LineageFactionId")) {
+            return null;
+        }
+        if (membershipTag.hasUUID("ConvoyId")) {
+            return new ConvoyMembership(
+                ResourceLocation.parse(membershipTag.getString("LineageFactionId")),
+                new ConvoyId(membershipTag.getUUID("ConvoyId"))
+            );
+        }
+        if (membershipTag.hasUUID("RaidId")) {
+            return new ConvoyMembership(
+                ResourceLocation.parse(membershipTag.getString("LineageFactionId")),
+                new ConvoyId(membershipTag.getUUID("RaidId"))
+            );
+        }
+        return null;
     }
 
     public MoltingManager getMoltingManager() {
@@ -854,16 +878,16 @@ public abstract class Alien extends Monster implements DataUser {
         return hiveManager;
     }
 
-    public @Nullable RaidMembership raidMembership() {
-        return raidMembership;
+    public @Nullable ConvoyMembership convoyMembership() {
+        return convoyMembership;
     }
 
-    public void setRaidMembership(RaidMembership raidMembership) {
-        this.raidMembership = raidMembership;
+    public void setConvoyMembership(ConvoyMembership convoyMembership) {
+        this.convoyMembership = convoyMembership;
     }
 
-    public void clearRaidMembership() {
-        this.raidMembership = null;
+    public void clearConvoyMembership() {
+        this.convoyMembership = null;
     }
 
     public Option<EntityType<?>> getHostType() {

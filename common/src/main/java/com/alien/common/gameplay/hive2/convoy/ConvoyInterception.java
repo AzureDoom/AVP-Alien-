@@ -43,7 +43,7 @@ public final class ConvoyInterception {
             spawnPos,
             spawnedCount
         );
-        return !(convoy instanceof Convoy.Raid);
+        return false;
     }
 
     private static ServerPlayer firstInterceptingPlayer(java.util.List<ServerPlayer> players, Convoy convoy, HiveConfig config) {

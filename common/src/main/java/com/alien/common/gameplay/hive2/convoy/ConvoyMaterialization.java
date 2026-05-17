@@ -33,9 +33,7 @@ final class ConvoyMaterialization {
                         mob.setPersistenceRequired();
                     }
                 }
-                if (convoy instanceof Convoy.Raid raid) {
-                    RaidMemberTracker.markSpawned(raid, spawned);
-                }
+                ConvoyMemberTracker.markSpawned(convoy, spawned);
 
                 convoy.composition().add(entityType, -1);
                 spawnedCount++;
