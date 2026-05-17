@@ -433,6 +433,12 @@ public class LineageFactionData extends FactionData {
         return pruned == null ? 0 : pruned.size();
     }
 
+    public void clearKillAttributionForPlayer(UUID playerId) {
+        if (killAttributionByPlayer.remove(playerId) != null) {
+            markDirty();
+        }
+    }
+
     private void pruneKillTimestamps(UUID playerId, List<Long> timestamps, long currentTick, long aggroWindowTicks) {
         var changed = timestamps.removeIf(t -> currentTick - t > aggroWindowTicks);
         if (!timestamps.isEmpty()) {

@@ -80,7 +80,17 @@ public final class RaidDispatch {
     ) {
         var currentTick = server.overworld().getGameTime();
         var config = HiveLocationRegistry.INSTANCE.config();
-        return tryDispatchAgainstPlayer(server, lineage, lineageFactionId, targetPlayer.getUUID(), targetPlayer, currentTick, config);
+        return tryDispatchAgainstPlayer(
+            server,
+            lineage,
+            lineageFactionId,
+            targetPlayer.getUUID(),
+            targetPlayer,
+            currentTick,
+            config,
+            false,
+            false
+        );
     }
 
     private static void scanLineage(
@@ -109,7 +119,7 @@ public final class RaidDispatch {
                 continue;
             }
 
-            tryDispatchAgainstPlayer(server, lineage, lineageFactionId, playerId, targetPlayer, currentTick, config);
+            tryDispatchAgainstPlayer(server, lineage, lineageFactionId, playerId, targetPlayer, currentTick, config, true, true);
         }
     }
 
@@ -120,8 +130,14 @@ public final class RaidDispatch {
         UUID playerId,
         ServerPlayer targetPlayer,
         long currentTick,
-        HiveConfig config
+        HiveConfig config,
+        boolean consumeKillAttribution,
+        boolean blockExistingTargetRaid
     ) {
+        if (blockExistingTargetRaid && hasActiveOutboundRaidAgainst(lineage, playerId)) {
+            return false;
+        }
+
         var source = pickLargestEligibleSource(lineage, currentTick, config);
         if (source == null) {
             return false;
@@ -162,6 +178,9 @@ public final class RaidDispatch {
         );
 
         lineage.convoys().add(raid);
+        if (consumeKillAttribution) {
+            lineage.clearKillAttributionForPlayer(playerId);
+        }
         lineage.markDirty();
         lastDispatchTickByLocation.put(source.id(), currentTick);
 
@@ -174,6 +193,19 @@ public final class RaidDispatch {
         );
 
         return true;
+    }
+
+    private static boolean hasActiveOutboundRaidAgainst(LineageFactionData lineage, UUID playerId) {
+        for (var convoy : lineage.convoys()) {
+            if (
+                convoy instanceof Convoy.Raid raid
+                    && !raid.returningHome()
+                    && raid.targetPlayerId().equals(playerId)
+            ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static @Nullable HiveLocation pickLargestEligibleSource(
