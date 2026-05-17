@@ -1,7 +1,7 @@
 package com.alien.common.data;
 
 import com.alien.Alien;
-import com.alien.common.gameplay.hive2.economy.HiveUnitPurchase;
+import com.alien.common.gameplay.hive.economy.HiveUnitPurchase;
 import com.alien.common.registry.HiveUnitPurchaseRegistry;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

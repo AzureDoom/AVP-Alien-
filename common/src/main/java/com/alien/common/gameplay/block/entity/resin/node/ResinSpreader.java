@@ -1,9 +1,9 @@
 package com.alien.common.gameplay.block.entity.resin.node;
 
 import com.alien.Alien;
-import com.alien.common.gameplay.hive2.faction.LineageFactionData;
-import com.alien.common.gameplay.hive2.id.HiveLocationId;
-import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
+import com.alien.common.gameplay.hive.faction.LineageFactionData;
+import com.alien.common.gameplay.hive.id.HiveLocationId;
+import com.alien.common.gameplay.hive.location.HiveLocationRegistry;
 import com.blib.api.common.nbt.v1.model.NBTSerializable;
 import com.mojang.serialization.Dynamic;
 import net.minecraft.core.BlockPos;

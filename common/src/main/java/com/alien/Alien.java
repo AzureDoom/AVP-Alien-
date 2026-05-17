@@ -5,9 +5,9 @@ import com.alien.common.data.fixer.migration.AlienDataMigrations;
 import com.alien.common.gameplay.advancement.AlienAdvancementEvents;
 import com.alien.common.gameplay.entity.dismemberment.AlienLimbDefinitions;
 import com.alien.common.gameplay.entity.dismemberment.AlienLimbDrops;
-import com.alien.common.gameplay.hive2.growth.ResinDecorator;
-import com.alien.common.gameplay.hive2.lifecycle.QueenSettlementDetector;
-import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
+import com.alien.common.gameplay.hive.growth.ResinDecorator;
+import com.alien.common.gameplay.hive.lifecycle.QueenSettlementDetector;
+import com.alien.common.gameplay.hive.location.HiveLocationRegistry;
 import com.alien.common.gameplay.level.saveddata.QueenSpawnChunkData;
 import com.alien.common.network.AlienNetworking;
 import com.alien.common.property.AlienPropertyAccess;
@@ -133,37 +133,37 @@ public class Alien {
         AlienReloadListeners.initialize();
         AlienAdvancementEvents.initialize();
 
-        MOD.events().postLevelTick().register(Alien::tickHive2Registry);
+        MOD.events().postLevelTick().register(Alien::tickHiveRegistry);
         MOD.events().postLevelTick().register(Alien::tickQueenSpawnCooldown);
         MOD.events().onTagsUpdated().register(Alien::onTagsUpdated);
 
-        MOD.events().onFactionsLoaded().register(Alien::rebuildHive2RegistryFromFactions);
+        MOD.events().onFactionsLoaded().register(Alien::rebuildHiveRegistryFromFactions);
         MOD.events().onServerStopped().register(server -> HiveLocationRegistry.INSTANCE.clear());
 
-        // Hive2: defensive cleanup when any lineage faction is removed.
+        // Hive: defensive cleanup when any lineage faction is removed.
         MOD.events()
             .onFactionRemove()
-            .register(com.alien.common.gameplay.hive2.lifecycle.Hive2FactionRemoveListener::onFactionRemoved);
+            .register(com.alien.common.gameplay.hive.lifecycle.HiveFactionRemoveListener::onFactionRemoved);
         MOD.events().onServerStopped().register(server -> QueenSettlementDetector.clear());
         MOD.events()
             .onServerStopped()
-            .register(server -> com.alien.common.gameplay.hive2.convoy.ReinforcementDispatcher.clear());
+            .register(server -> com.alien.common.gameplay.hive.convoy.ReinforcementDispatcher.clear());
         MOD.events()
             .onServerStopped()
-            .register(server -> com.alien.common.gameplay.hive2.convoy.RaidDispatch.clear());
+            .register(server -> com.alien.common.gameplay.hive.convoy.RaidDispatch.clear());
         MOD.events()
             .onServerStopped()
-            .register(server -> com.alien.common.gameplay.hive2.convoy.ConvoyBossBars.clear());
+            .register(server -> com.alien.common.gameplay.hive.convoy.ConvoyBossBars.clear());
         MOD.events()
             .onServerStopped()
-            .register(server -> com.alien.common.gameplay.hive2.empress.EmpressEmergenceRitual.clear());
+            .register(server -> com.alien.common.gameplay.hive.empress.EmpressEmergenceRitual.clear());
 
-        // Hive2: variant-faction join is event-driven. Catches every alien that loads from disk
+        // Hive: variant-faction join is event-driven. Catches every alien that loads from disk
         // (the finalizeSpawn hook covers fresh spawns). Idempotent — see
         // HiveManager.ensureVariantFactionMembership.
         MOD.events().onEntityLoad().register(Alien::onAlienEntityLoaded);
 
-        // Hive2: chunk-load decoration + on-demand catch-up. Fires for every loaded chunk; the decorator
+        // Hive: chunk-load decoration + on-demand catch-up. Fires for every loaded chunk; the decorator
         // exits early for chunks not owned by any location.
         MOD.events()
             .onChunkLoad()
@@ -176,11 +176,11 @@ public class Alien {
         }
     }
 
-    public static void rebuildHive2RegistryFromFactions(MinecraftServer server) {
+    public static void rebuildHiveRegistryFromFactions(MinecraftServer server) {
         // Phase 12 migrator: convert any legacy avp_alien:hive/* factions into the new lineage + location
-        // structure after BLib's faction store is definitely loaded. Idempotent — does nothing on a clean hive2-only
+        // structure after BLib's faction store is definitely loaded. Idempotent — does nothing on a clean hive-only
         // world.
-        com.alien.common.gameplay.hive2.migration.OldHiveMigrator.run(server);
+        com.alien.common.gameplay.hive.migration.OldHiveMigrator.run(server);
         HiveLocationRegistry.INSTANCE.rebuildFromFactions();
         HiveLocationRegistry.INSTANCE.repairTerritoryClaims(server);
     }
@@ -189,7 +189,7 @@ public class Alien {
      * Single per-server-tick driver for the new hive system. Gated to Overworld so it fires once per server tick total;
      * the registry itself iterates every dimension internally (fixes {@code HIVE_SYSTEM_ANALYSIS.md} § 9.1.2).
      */
-    private static void tickHive2Registry(Level level) {
+    private static void tickHiveRegistry(Level level) {
         if (level.isClientSide || !level.dimension().equals(Level.OVERWORLD)) {
             return;
         }

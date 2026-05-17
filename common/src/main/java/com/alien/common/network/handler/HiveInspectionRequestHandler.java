@@ -1,12 +1,12 @@
 package com.alien.common.network.handler;
 
 import com.alien.Alien;
-import com.alien.common.gameplay.hive2.faction.LineageFactionData;
-import com.alien.common.gameplay.hive2.faction.LocationFactionData;
-import com.alien.common.gameplay.hive2.faction.VariantFactionData;
-import com.alien.common.gameplay.hive2.id.HiveLocationId;
-import com.alien.common.gameplay.hive2.inspection.HiveInspectionSnapshot;
-import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
+import com.alien.common.gameplay.hive.faction.LineageFactionData;
+import com.alien.common.gameplay.hive.faction.LocationFactionData;
+import com.alien.common.gameplay.hive.faction.VariantFactionData;
+import com.alien.common.gameplay.hive.id.HiveLocationId;
+import com.alien.common.gameplay.hive.inspection.HiveInspectionSnapshot;
+import com.alien.common.gameplay.hive.location.HiveLocationRegistry;
 import com.alien.common.network.payload.C2SRequestHiveInspectionPayload;
 import com.alien.common.network.payload.S2CHiveInspectionPayload;
 import com.blib.api.common.faction.v1.Faction;
@@ -77,7 +77,7 @@ public final class HiveInspectionRequestHandler {
         }
     }
 
-    private static com.alien.common.gameplay.hive2.location.HiveLocation rebuildAndRetryLocationLookup(
+    private static com.alien.common.gameplay.hive.location.HiveLocation rebuildAndRetryLocationLookup(
         ServerPlayer player,
         ResourceLocation factionId,
         HiveLocationId locationId
@@ -93,10 +93,10 @@ public final class HiveInspectionRequestHandler {
 
         LAST_LOCATION_REBUILD_TICK_BY_FACTION.put(factionId, currentTick);
         Alien.LOGGER.warn(
-            "Hive2 inspector could not resolve location {}; rebuilding hive indexes from loaded factions.",
+            "Hive inspector could not resolve location {}; rebuilding hive indexes from loaded factions.",
             factionId
         );
-        Alien.rebuildHive2RegistryFromFactions(player.server);
+        Alien.rebuildHiveRegistryFromFactions(player.server);
         return HiveLocationRegistry.INSTANCE.get(locationId);
     }
 

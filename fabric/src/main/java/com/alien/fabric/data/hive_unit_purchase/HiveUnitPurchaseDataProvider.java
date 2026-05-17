@@ -1,8 +1,8 @@
 package com.alien.fabric.data.hive_unit_purchase;
 
 import com.alien.common.data.HiveUnitPurchaseReloadListener;
-import com.alien.common.gameplay.hive2.economy.HiveUnitPurchase;
-import com.alien.common.gameplay.hive2.economy.HiveUnitPurchaseCondition;
+import com.alien.common.gameplay.hive.economy.HiveUnitPurchase;
+import com.alien.common.gameplay.hive.economy.HiveUnitPurchaseCondition;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.mojang.serialization.JsonOps;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;

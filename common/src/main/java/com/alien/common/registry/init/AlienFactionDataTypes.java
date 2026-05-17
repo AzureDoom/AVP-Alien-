@@ -2,9 +2,9 @@ package com.alien.common.registry.init;
 
 import com.alien.Alien;
 import com.alien.common.gameplay.hive.HiveFactionData;
-import com.alien.common.gameplay.hive2.faction.LineageFactionData;
-import com.alien.common.gameplay.hive2.faction.LocationFactionData;
-import com.alien.common.gameplay.hive2.faction.VariantFactionData;
+import com.alien.common.gameplay.hive.faction.LineageFactionData;
+import com.alien.common.gameplay.hive.faction.LocationFactionData;
+import com.alien.common.gameplay.hive.faction.VariantFactionData;
 import com.blib.api.common.faction.v1.FactionData;
 import com.blib.api.common.faction.v1.FactionDataType;
 import com.blib.api.common.registry.v1.BLibBuiltInRegistries;

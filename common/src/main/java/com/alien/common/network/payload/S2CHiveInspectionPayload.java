@@ -13,9 +13,9 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Server → client: hive inspection snapshot. The {@code kind} discriminator tags the payload as a Location, Lineage, or
- * Variant snapshot (one of {@link com.alien.common.gameplay.hive2.inspection.HiveInspectionSnapshot#KIND_LOCATION} /
+ * Variant snapshot (one of {@link com.alien.common.gameplay.hive.inspection.HiveInspectionSnapshot#KIND_LOCATION} /
  * {@code KIND_LINEAGE} / {@code KIND_VARIANT}); the {@code data} tag holds the snapshot built by
- * {@link com.alien.common.gameplay.hive2.inspection.HiveInspectionSnapshot}. Sent in reply to
+ * {@link com.alien.common.gameplay.hive.inspection.HiveInspectionSnapshot}. Sent in reply to
  * {@link C2SRequestHiveInspectionPayload} and consumed by {@code ClientHiveInspectionCache}.
  */
 public record S2CHiveInspectionPayload(

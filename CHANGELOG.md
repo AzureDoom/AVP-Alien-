@@ -9,7 +9,7 @@
   - Hives are now represented as variant, lineage, and location factions instead of the old single hive object.
   - Hive membership is global rather than tied to one dimension, so hive members remain part of their hive lineage even after dimension travel or entity transitions.
   - Hive data now persists lineage/location state, reserves, convoy state, raid anger, claimed chunks, jelly resources, and other long-lived hive runtime data.
-  - Old hive debug state and outdated hive debug properties were removed and replaced by the new `hive2` debug/inspection tools.
+  - Old hive debug state and outdated hive debug properties were removed and replaced by the new `hive` debug/inspection tools.
 - Replaced the old natural xenomorph spawning model.
   - Vanilla xenomorph spawn registrations and generated NeoForge biome modifiers were removed.
   - Queens no longer use the old random natural spawn registration path.
@@ -83,7 +83,7 @@
   - Added placeable and wearable crusher heads.
   - Added queen head shields and crusher head shields for normal, aberrant, nether, and irradiated variants.
   - Head and shield behavior is now data-driven.
-- Added the new hive2 location system.
+- Added the new hive location system.
   - Queens can found hive locations after settling.
   - Locations start with a 3x3 claimed chunk area.
   - Location claims are kept connected and protect the center chunk.
@@ -153,7 +153,7 @@
   - Raid eligibility is derived from the active raid wave profile data.
   - Prowlers are included in default raid profiles.
 - Added hive inspection, commands, and UI improvements.
-  - Added `hive2` debug commands, including location inspection, lineage inspection, forced raids, convoy inspection, and location removal tools.
+  - Added `hive` debug commands, including location inspection, lineage inspection, forced raids, convoy inspection, and location removal tools.
   - Added server-to-client hive inspection payloads and client hive inspection cache support.
   - Exposed hive configuration in the engine inspector.
   - Added economy, spread, reserve, convoy, and contested-claim diagnostics to hive inspection.
@@ -286,4 +286,4 @@
 - Added hive inspection networking for client-side inspector UI.
 - Added BLib faction data types for variant, lineage, and location hive data.
 - Added support for rebuilding hive location indexes from loaded BLib factions.
-- Added old hive migration support and migration logging for moving legacy hive data into the hive2 model.
+- Added old hive migration support and migration logging for moving legacy hive data into the hive model.

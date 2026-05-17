@@ -2,8 +2,8 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.queen;
 
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.entity.living.alien.ovipositor.Ovipositor;
-import com.alien.common.gameplay.hive2.location.HiveLocation;
-import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
+import com.alien.common.gameplay.hive.location.HiveLocation;
+import com.alien.common.gameplay.hive.location.HiveLocationRegistry;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.entity.v1.EntityUtil;
@@ -123,8 +123,8 @@ public class OvipositorManager implements NBTSerializable {
     }
 
     /**
-     * Hive2: the queen needs to be standing inside an alive, calm hive location with at least 3 loaded xenomorphs in
-     * its territory.
+     * Hive: the queen needs to be standing inside an alive, calm hive location with at least 3 loaded xenomorphs in its
+     * territory.
      */
     private boolean hasEnoughLocalSupport() {
         var location = currentLocation();

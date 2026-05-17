@@ -2,8 +2,8 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.empress;
 
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.entity.living.alien.ovipositor.Ovipositor;
-import com.alien.common.gameplay.hive2.location.HiveLocation;
-import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
+import com.alien.common.gameplay.hive.location.HiveLocation;
+import com.alien.common.gameplay.hive.location.HiveLocationRegistry;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.entity.v1.EntityUtil;

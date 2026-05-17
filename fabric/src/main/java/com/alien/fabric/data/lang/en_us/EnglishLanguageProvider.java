@@ -81,7 +81,7 @@ public class EnglishLanguageProvider extends FabricLanguageProvider {
         // Advancements
         EnUsAdvancementProvider.CONSUMER.accept(builder);
 
-        // Hive2 boss bars — per-variant title key, format must match HiveLocationBossBar.VARIANT_TITLE_KEYS.
+        // Hive boss bars — per-variant title key, format must match HiveLocationBossBar.VARIANT_TITLE_KEYS.
         for (var alienVariant : AlienVariant.values()) {
             var prefix = switch (alienVariant) {
                 case ABERRANT -> "Aberrant ";

@@ -2,9 +2,9 @@ package com.alien.common.gameplay.entity.living.alien;
 
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.block.entity.resin.node.ChargeCursor;
-import com.alien.common.gameplay.hive2.location.HiveLocation;
-import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
-import com.alien.common.gameplay.hive2.spawning.HiveLocationSpawnGate;
+import com.alien.common.gameplay.hive.location.HiveLocation;
+import com.alien.common.gameplay.hive.location.HiveLocationRegistry;
+import com.alien.common.gameplay.hive.spawning.HiveLocationSpawnGate;
 import com.alien.common.gameplay.level.gameevent.listener.ResinSpreadListener;
 import com.alien.common.model.alien.variant.AlienVariantType;
 import com.alien.common.model.resin.ResinData;
@@ -228,7 +228,7 @@ public class ResinManager implements GameEventListener.Provider<ResinSpreadListe
     }
 
     /**
-     * "Is in a hive that's calm enough to spread resin." Under hive2, "in a hive" means inside a claimed chunk of any
+     * "Is in a hive that's calm enough to spread resin." Under hive, "in a hive" means inside a claimed chunk of any
      * location; the angry check is the location's boss-bar angry state.
      */
     private boolean isInsideHiveForResinSpread() {

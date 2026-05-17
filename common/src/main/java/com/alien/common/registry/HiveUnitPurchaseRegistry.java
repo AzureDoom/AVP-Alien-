@@ -1,6 +1,6 @@
 package com.alien.common.registry;
 
-import com.alien.common.gameplay.hive2.economy.HiveUnitPurchase;
+import com.alien.common.gameplay.hive.economy.HiveUnitPurchase;
 import net.minecraft.world.entity.EntityType;
 import org.jetbrains.annotations.Nullable;
 

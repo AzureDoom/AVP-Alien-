@@ -1,7 +1,7 @@
 package com.alien.common.gameplay.entity.living.alien;
 
 import com.alien.common.data.AlienVariantTypes;
-import com.alien.common.gameplay.hive2.spawning.HiveLocationSpawnGate;
+import com.alien.common.gameplay.hive.spawning.HiveLocationSpawnGate;
 import com.alien.common.model.alien.variant.AlienVariantType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
@@ -61,7 +61,7 @@ public class AlienSpawning {
     }
 
     /**
-     * Hive2 spawn gate: a {@link com.alien.common.gameplay.hive2.location.HiveLocation} must contain this chunk, the
+     * Hive spawn gate: a {@link com.alien.common.gameplay.hive.location.HiveLocation} must contain this chunk, the
      * caste-distance rule must permit the entity at this distance from the location's center, and reserves must have
      * one available.
      */

@@ -1,7 +1,7 @@
 package com.alien.common.registry;
 
 import com.alien.AlienResources;
-import com.alien.common.gameplay.hive2.convoy.RaidWaveProfile;
+import com.alien.common.gameplay.hive.convoy.RaidWaveProfile;
 import com.alien.common.model.alien.variant.AlienVariant;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;

@@ -2,9 +2,9 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg_laying;
 
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.entity.living.alien.ovomorph.Ovomorph;
-import com.alien.common.gameplay.hive2.location.HiveLocation;
-import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
-import com.alien.common.gameplay.hive2.spawning.HiveLocationSpawnGate;
+import com.alien.common.gameplay.hive.location.HiveLocation;
+import com.alien.common.gameplay.hive.location.HiveLocationRegistry;
+import com.alien.common.gameplay.hive.spawning.HiveLocationSpawnGate;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.just.ai.goap.StateKey;

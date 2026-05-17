@@ -1,6 +1,6 @@
 package com.alien.common.client.inspector;
 
-import com.alien.common.gameplay.hive2.inspection.HiveInspectionSnapshot;
+import com.alien.common.gameplay.hive.inspection.HiveInspectionSnapshot;
 import com.alien.common.registry.init.AlienFactionDataTypes;
 import com.blib.engine.ui.panel.details.InspectorStyle;
 import net.minecraft.client.gui.Font;

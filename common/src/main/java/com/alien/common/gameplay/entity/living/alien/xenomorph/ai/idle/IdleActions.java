@@ -1,8 +1,8 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.ai.idle;
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
-import com.alien.common.gameplay.hive2.location.HiveLocation;
-import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
+import com.alien.common.gameplay.hive.location.HiveLocation;
+import com.alien.common.gameplay.hive.location.HiveLocationRegistry;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.goap.v1.GOAPSensors;
 import com.blib.api.common.goap.v1.action.ActionMasks;

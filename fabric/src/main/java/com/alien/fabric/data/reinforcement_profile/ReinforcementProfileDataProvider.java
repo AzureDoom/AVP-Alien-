@@ -2,8 +2,8 @@ package com.alien.fabric.data.reinforcement_profile;
 
 import com.alien.AlienResources;
 import com.alien.common.data.ReinforcementProfileReloadListener;
-import com.alien.common.gameplay.hive2.convoy.RaidWaveProfile;
-import com.alien.common.gameplay.hive2.convoy.ReinforcementProfile;
+import com.alien.common.gameplay.hive.convoy.RaidWaveProfile;
+import com.alien.common.gameplay.hive.convoy.ReinforcementProfile;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.ReinforcementProfileRegistry;
 import com.alien.common.registry.init.AlienEntityTypes;
