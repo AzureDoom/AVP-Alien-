@@ -135,6 +135,7 @@ public class AlienAdvancementProvider {
         var royalAlienKillerAdvancement = addRoyalAlienKillerAdvancement(alienKillerAdvancement, consumer);
         var harbingerKillerAdvancement = addHarbingerKillerAdvancement(royalAlienKillerAdvancement, consumer);
         var raidDefeatAdvancement = addRaidDefeatAdvancement(harbingerKillerAdvancement, consumer);
+        var dualVariantRaidsAdvancement = addDualVariantRaidsAdvancement(raidDefeatAdvancement, consumer);
         var hiveBusterAdvancement = addHiveBusterAdvancement(royalAlienKillerAdvancement, consumer);
         var lineageKillerAdvancement = addLineageKillerAdvancement(hiveBusterAdvancement, consumer);
         var xenocideAdvancement = addXenocideAdvancement(royalAlienKillerAdvancement, consumer);
@@ -322,6 +323,30 @@ public class AlienAdvancementProvider {
             )
             .rewards(AdvancementRewards.Builder.experience(100))
             .save(consumer, AlienAdvancements.DEFEAT_A_RAID.resourceLocation().toString());
+    }
+
+    private static AdvancementHolder addDualVariantRaidsAdvancement(
+        AdvancementHolder parent,
+        Consumer<AdvancementHolder> consumer
+    ) {
+        return Advancement.Builder.advancement()
+            .addCriterion(
+                "dual_variant_raids",
+                CriteriaTriggers.IMPOSSIBLE.createCriterion(new ImpossibleTrigger.TriggerInstance())
+            )
+            .parent(parent)
+            .display(
+                AlienItems.RAW_SCOURGE_JELLY.get(),
+                AlienAdvancements.DUAL_VARIANT_RAIDS.titleComponent(),
+                AlienAdvancements.DUAL_VARIANT_RAIDS.descriptionComponent(),
+                null,
+                AdvancementType.CHALLENGE,
+                true,
+                true,
+                false
+            )
+            .rewards(AdvancementRewards.Builder.experience(100))
+            .save(consumer, AlienAdvancements.DUAL_VARIANT_RAIDS.resourceLocation().toString());
     }
 
     private static AdvancementHolder addXenocideAdvancement(AdvancementHolder parent, Consumer<AdvancementHolder> consumer) {

@@ -22,6 +22,13 @@ public class EnUsAdvancementProvider {
 
         addAdvancement(
             builder,
+            AlienAdvancements.DUAL_VARIANT_RAIDS,
+            "Two Hives, One Problem",
+            "Have raids from two different xenomorph variants hunting you at the same time"
+        );
+
+        addAdvancement(
+            builder,
             AlienAdvancements.ROOT,
             "AVP: Aliens",
             "In Minecraft, no one can hear you scream"

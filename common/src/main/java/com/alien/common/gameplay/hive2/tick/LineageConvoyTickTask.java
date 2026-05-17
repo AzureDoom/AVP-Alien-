@@ -15,6 +15,7 @@ import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.id.LineageIds;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
+import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienMobEffects;
 import com.alien.common.registry.init.AlienSoundEvents;
 import net.minecraft.ChatFormatting;
@@ -22,6 +23,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.UUID;
 
 /**
  * Per-server-tick driver for in-flight convoys. Walks every loaded lineage's convoy list, advances each convoy's
@@ -152,6 +157,40 @@ public final class LineageConvoyTickTask {
         }
 
         ConvoyBossBars.retain(activeConvoyIds);
+        grantDualVariantRaidAdvancements(server);
+    }
+
+    private static void grantDualVariantRaidAdvancements(MinecraftServer server) {
+        var variantsByPlayer = new HashMap<UUID, HashSet<AlienVariant>>();
+
+        for (var factionId : new java.util.ArrayList<>(Alien.MOD.factions().getAllIds())) {
+            if (!LineageIds.isLineageId(factionId)) {
+                continue;
+            }
+            var faction = Alien.MOD.factions().get(factionId);
+            if (faction == null || !(faction.data() instanceof LineageFactionData lineage) || !lineage.isAlive()) {
+                continue;
+            }
+
+            for (var convoy : lineage.convoys()) {
+                if (!(convoy instanceof Convoy.Raid raid) || raid.returningHome() || !isRaidTargetValid(raid, server)) {
+                    continue;
+                }
+                variantsByPlayer
+                    .computeIfAbsent(raid.targetPlayerId(), $ -> new HashSet<>())
+                    .add(lineage.variant());
+            }
+        }
+
+        for (var entry : variantsByPlayer.entrySet()) {
+            if (entry.getValue().size() < 2) {
+                continue;
+            }
+            var player = server.getPlayerList().getPlayer(entry.getKey());
+            if (player != null) {
+                AlienAdvancements.DUAL_VARIANT_RAIDS.grant(player);
+            }
+        }
     }
 
     private static void refreshMarkedForDeath(Convoy.Raid raid, MinecraftServer server, HiveConfig config) {
