@@ -205,6 +205,7 @@ public final class ReinforcementDispatcher {
         var remaining = count;
         var selectedByPool = new HashMap<Integer, Integer>();
         var inventory = new RaidWaveSelection.Inventory() {
+
             @Override
             public Iterable<EntityType<?>> availableTypes() {
                 return donorReserves.getAvailableEntityTypes();

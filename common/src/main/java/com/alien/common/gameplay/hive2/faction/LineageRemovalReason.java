@@ -1,6 +1,7 @@
 package com.alien.common.gameplay.hive2.faction;
 
 import net.minecraft.nbt.CompoundTag;
+
 /**
  * The recorded cause of a lineage faction's removal. Sealed so we can add cases later without breaking exhaustive
  * switches.

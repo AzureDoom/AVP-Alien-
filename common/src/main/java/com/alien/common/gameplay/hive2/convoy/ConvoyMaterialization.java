@@ -78,6 +78,7 @@ final class ConvoyMaterialization {
         var selected = new ArrayList<EntityType<?>>(desiredCount);
         var selectedCounts = new HashMap<EntityType<?>, Integer>();
         var inventory = new RaidWaveSelection.Inventory() {
+
             @Override
             public Iterable<EntityType<?>> availableTypes() {
                 return raid.composition().getAvailableEntityTypes();

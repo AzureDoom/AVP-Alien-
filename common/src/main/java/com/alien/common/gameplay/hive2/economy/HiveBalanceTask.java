@@ -187,9 +187,10 @@ public final class HiveBalanceTask {
         }
 
         var biomassCost = biomassCost(purchase, location);
-        if (location.biomass() < biomassCost
-            || location.royalJelly() < purchase.royalJelly()
-            || location.scourgeJelly() < purchase.scourgeJelly()
+        if (
+            location.biomass() < biomassCost
+                || location.royalJelly() < purchase.royalJelly()
+                || location.scourgeJelly() < purchase.scourgeJelly()
         ) {
             return false;
         }

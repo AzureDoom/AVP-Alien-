@@ -9,8 +9,8 @@ import net.minecraft.resources.ResourceLocation;
  * Defensive cleanup when BLib removes a lineage faction:
  * <ul>
  * <li>Drop any registry entries pointing at the dead lineage. The active lineage-removal path
- * ({@link LineageDeathHandler}) already does this, but defensive cleanup catches admin-removed factions,
- * NBT-corruption recoveries, and any removal path that bypasses the normal handler.</li>
+ * ({@link LineageDeathHandler}) already does this, but defensive cleanup catches admin-removed factions, NBT-corruption
+ * recoveries, and any removal path that bypasses the normal handler.</li>
  * </ul>
  * <p>
  * Wired from the mod entry point via {@code MOD.events().onFactionRemove().register(...)}.

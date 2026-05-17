@@ -218,7 +218,10 @@ public record RaidWaveProfile(List<Wave> waves) {
         }
     }
 
-    public record Guarantee(int count, List<PoolEntry> pools) {
+    public record Guarantee(
+        int count,
+        List<PoolEntry> pools
+    ) {
 
         public static final Codec<Guarantee> CODEC = RecordCodecBuilder.<Guarantee>create(
             instance -> instance.group(

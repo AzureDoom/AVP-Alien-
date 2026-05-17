@@ -39,8 +39,8 @@ import java.util.UUID;
  * Per {@code HIVE_REDESIGN_12_PERFORMANCE.md} § 3, this class also carries its location records as nested NBT — they're
  * persisted with the lineage shard, not separately.
  * <p>
- * Phase 1 ships the data shape only. Member-tracking, the empress, and convoys all attach in later phases
- * (referenced fields are present but inert for now).
+ * Phase 1 ships the data shape only. Member-tracking, the empress, and convoys all attach in later phases (referenced
+ * fields are present but inert for now).
  * <p>
  * See {@code HIVE_REDESIGN_01_FACTIONS.md} § 2.
  */

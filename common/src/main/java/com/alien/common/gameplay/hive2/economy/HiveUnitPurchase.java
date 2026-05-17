@@ -8,9 +8,9 @@ import net.minecraft.world.entity.EntityType;
 import java.util.List;
 
 /**
- * Datapack-defined purchase for producing one {@code outputEntity} in a hive location's reserves. Inputs: a flat resource
- * cost (biomass / royal jelly / scourge jelly) and a list of prerequisite entity counts in the location's local
- * reserves that get consumed.
+ * Datapack-defined purchase for producing one {@code outputEntity} in a hive location's reserves. Inputs: a flat
+ * resource cost (biomass / royal jelly / scourge jelly) and a list of prerequisite entity counts in the location's
+ * local reserves that get consumed.
  */
 public record HiveUnitPurchase(
     EntityType<?> outputEntity,
@@ -32,9 +32,11 @@ public record HiveUnitPurchase(
                 .forGetter(HiveUnitPurchase::populationBiomassCostScale),
             Codec.INT.optionalFieldOf("royal_jelly", 0).forGetter(HiveUnitPurchase::royalJelly),
             Codec.INT.optionalFieldOf("scourge_jelly", 0).forGetter(HiveUnitPurchase::scourgeJelly),
-            InputEntity.CODEC.listOf().optionalFieldOf("input_entities", List.of())
+            InputEntity.CODEC.listOf()
+                .optionalFieldOf("input_entities", List.of())
                 .forGetter(HiveUnitPurchase::inputEntities),
-            HiveUnitPurchaseCondition.CODEC.listOf().optionalFieldOf("conditions", List.of())
+            HiveUnitPurchaseCondition.CODEC.listOf()
+                .optionalFieldOf("conditions", List.of())
                 .forGetter(HiveUnitPurchase::conditions)
         ).apply(instance, HiveUnitPurchase::new)
     );

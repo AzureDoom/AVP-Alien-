@@ -375,6 +375,7 @@ public sealed interface Convoy {
         public static final int WAVE_COUNT = 5;
 
         public enum ReturnHomeReason {
+
             NONE("none"),
             TARGET_UNAVAILABLE("target_unavailable"),
             TARGET_DEFEATED("target_defeated");

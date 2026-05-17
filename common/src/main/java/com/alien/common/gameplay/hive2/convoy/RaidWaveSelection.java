@@ -108,10 +108,14 @@ final class RaidWaveSelection {
     }
 
     interface Inventory {
+
         Iterable<EntityType<?>> availableTypes();
 
         int count(EntityType<?> type);
     }
 
-    private record PoolMatch(int index, RaidWaveProfile.PoolEntry pool) {}
+    private record PoolMatch(
+        int index,
+        RaidWaveProfile.PoolEntry pool
+    ) {}
 }

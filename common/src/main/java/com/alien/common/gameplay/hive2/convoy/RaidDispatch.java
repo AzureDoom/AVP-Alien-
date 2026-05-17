@@ -32,8 +32,8 @@ import java.util.UUID;
  * <ul>
  * <li>Empress-gated.</li>
  * <li>Triggered when a player has at least {@code raidThresholdKills} kills in the aggro window.</li>
- * <li>Source = the largest qualifying location ({@code claimedChunks ≥ raidMinLocationSizeChunks}) that can satisfy
- * the lineage variant's raid wave profile.</li>
+ * <li>Source = the largest qualifying location ({@code claimedChunks ≥ raidMinLocationSizeChunks}) that can satisfy the
+ * lineage variant's raid wave profile.</li>
  * <li>Per-source cooldown so the same source doesn't spam raids.</li>
  * <li>Composition drained from source reserves using the active datapack raid wave profile.</li>
  * <li>Persists until the target player dies, then returns to a live lineage location when possible.</li>
@@ -279,6 +279,7 @@ public final class RaidDispatch {
         RandomSource random
     ) {
         var inventory = new RaidWaveSelection.Inventory() {
+
             @Override
             public Iterable<EntityType<?>> availableTypes() {
                 return donorReserves.getAvailableEntityTypes();
