@@ -36,6 +36,13 @@ public class EnUsAdvancementProvider {
 
         addAdvancement(
             builder,
+            AlienAdvancements.KILL_A_LINEAGE,
+            "Bloodline Ended",
+            "Destroy a xenomorph lineage"
+        );
+
+        addAdvancement(
+            builder,
             AlienAdvancements.KILL_A_ROYAL_ALIEN,
             "Regicide",
             "Kill a royal alien"

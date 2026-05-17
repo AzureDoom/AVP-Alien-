@@ -74,6 +74,8 @@ public class LineageFactionData extends FactionData {
 
     private static final String NBT_KILL_ATTRIBUTION_BY_PLAYER = "KillAttributionByPlayer";
 
+    private static final String NBT_LINEAGE_KILL_CREDIT_PLAYER_ID = "LineageKillCreditPlayerId";
+
     private static final String NBT_REMOVAL_REASON = "RemovalReason";
 
     private static final AlienVariant DEFAULT_VARIANT = AlienVariant.NORMAL;
@@ -116,6 +118,8 @@ public class LineageFactionData extends FactionData {
      */
     private final Map<UUID, List<Long>> killAttributionByPlayer;
 
+    private @Nullable UUID lineageKillCreditPlayerId;
+
     private @Nullable LineageRemovalReason removalReason;
 
     public LineageFactionData() {
@@ -132,6 +136,7 @@ public class LineageFactionData extends FactionData {
         this.locationsById = new LinkedHashMap<>();
         this.convoys = new ArrayList<>();
         this.killAttributionByPlayer = new HashMap<>();
+        this.lineageKillCreditPlayerId = null;
         this.removalReason = null;
     }
 
@@ -396,6 +401,16 @@ public class LineageFactionData extends FactionData {
             markDirty();
         }
         timestamps.add(currentTick);
+        lineageKillCreditPlayerId = playerId;
+        markDirty();
+    }
+
+    public @Nullable UUID lineageKillCreditPlayerId() {
+        return lineageKillCreditPlayerId;
+    }
+
+    public void recordLineageKillCredit(UUID playerId) {
+        lineageKillCreditPlayerId = playerId;
         markDirty();
     }
 
@@ -536,6 +551,10 @@ public class LineageFactionData extends FactionData {
             }
         }
 
+        lineageKillCreditPlayerId = tag.hasUUID(NBT_LINEAGE_KILL_CREDIT_PLAYER_ID)
+            ? tag.getUUID(NBT_LINEAGE_KILL_CREDIT_PLAYER_ID)
+            : null;
+
         if (tag.contains(NBT_REMOVAL_REASON)) {
             this.removalReason = LineageRemovalReason.load(tag.getCompound(NBT_REMOVAL_REASON));
         }
@@ -594,6 +613,10 @@ public class LineageFactionData extends FactionData {
                 listTag.add(entryTag);
             }
             tag.put(NBT_KILL_ATTRIBUTION_BY_PLAYER, listTag);
+        }
+
+        if (lineageKillCreditPlayerId != null) {
+            tag.putUUID(NBT_LINEAGE_KILL_CREDIT_PLAYER_ID, lineageKillCreditPlayerId);
         }
 
         if (removalReason != null) {

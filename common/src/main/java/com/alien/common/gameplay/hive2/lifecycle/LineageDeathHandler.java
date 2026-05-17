@@ -1,6 +1,7 @@
 package com.alien.common.gameplay.hive2.lifecycle;
 
 import com.alien.Alien;
+import com.alien.common.data.AlienAdvancements;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.faction.LineageRemovalReason;
 import com.alien.common.gameplay.hive2.id.LineageIds;
@@ -57,7 +58,7 @@ public final class LineageDeathHandler {
         }
 
         for (var lineageId : deathQueue) {
-            kill(lineageId);
+            kill(server, lineageId);
         }
     }
 
@@ -95,12 +96,13 @@ public final class LineageDeathHandler {
      * Forces lineage death now. Sets removal reason and removes from BLib. Idempotent — a lineage already dead returns
      * false.
      */
-    public static boolean kill(ResourceLocation lineageId) {
+    public static boolean kill(MinecraftServer server, ResourceLocation lineageId) {
         var faction = Alien.MOD.factions().get(lineageId);
         if (faction == null || !(faction.data() instanceof LineageFactionData lineage) || !lineage.isAlive()) {
             return false;
         }
 
+        grantKillLineageAdvancement(server, lineage);
         lineage.setRemovalReason(new LineageRemovalReason.NoLocationsRemain());
         Alien.MOD.factions().remove(lineageId);
 
@@ -109,6 +111,18 @@ public final class LineageDeathHandler {
             lineageId
         );
         return true;
+    }
+
+    private static void grantKillLineageAdvancement(MinecraftServer server, LineageFactionData lineage) {
+        var playerId = lineage.lineageKillCreditPlayerId();
+        if (playerId == null) {
+            return;
+        }
+
+        var player = server.getPlayerList().getPlayer(playerId);
+        if (player != null) {
+            AlienAdvancements.KILL_A_LINEAGE.grant(player);
+        }
     }
 
 }

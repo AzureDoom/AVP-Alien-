@@ -14,6 +14,7 @@
 
 ## ✨ What's New
 - Added an advancement for killing a harbinger.
+- Added an advancement for destroying a xenomorph lineage.
 - Added blood loss mob effect.
 - Added raw scourge jelly item.
 - Added scourge jelly block.

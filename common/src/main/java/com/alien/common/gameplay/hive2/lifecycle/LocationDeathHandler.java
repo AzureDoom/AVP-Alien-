@@ -37,6 +37,9 @@ public final class LocationDeathHandler {
         LineageFactionData lineage,
         UUID killerId
     ) {
+        if (lineage.locationsById().size() == 1 && lineage.locationsById().containsKey(location.id())) {
+            lineage.recordLineageKillCredit(killerId);
+        }
         kill(level, location, lineage, new HiveLocationRemovalReason.KilledByPlayer(killerId), true);
     }
 

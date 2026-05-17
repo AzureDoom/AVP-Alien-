@@ -135,6 +135,7 @@ public class AlienAdvancementProvider {
         var royalAlienKillerAdvancement = addRoyalAlienKillerAdvancement(alienKillerAdvancement, consumer);
         var harbingerKillerAdvancement = addHarbingerKillerAdvancement(royalAlienKillerAdvancement, consumer);
         var hiveBusterAdvancement = addHiveBusterAdvancement(royalAlienKillerAdvancement, consumer);
+        var lineageKillerAdvancement = addLineageKillerAdvancement(hiveBusterAdvancement, consumer);
         var xenocideAdvancement = addXenocideAdvancement(royalAlienKillerAdvancement, consumer);
 
         var shearAnOvomorphAdvancement = Advancement.Builder.advancement()
@@ -338,6 +339,24 @@ public class AlienAdvancementProvider {
             )
             .rewards(AdvancementRewards.Builder.experience(100))
             .save(consumer, AlienAdvancements.KILL_A_HIVE.resourceLocation().toString());
+    }
+
+    private static AdvancementHolder addLineageKillerAdvancement(AdvancementHolder parent, Consumer<AdvancementHolder> consumer) {
+        return Advancement.Builder.advancement()
+            .addCriterion("kill_a_lineage", CriteriaTriggers.IMPOSSIBLE.createCriterion(new ImpossibleTrigger.TriggerInstance()))
+            .parent(parent)
+            .display(
+                AlienBlocks.ROYAL_JELLY_BLOCK.get(),
+                AlienAdvancements.KILL_A_LINEAGE.titleComponent(),
+                AlienAdvancements.KILL_A_LINEAGE.descriptionComponent(),
+                null,
+                AdvancementType.CHALLENGE,
+                true,
+                true,
+                false
+            )
+            .rewards(AdvancementRewards.Builder.experience(100))
+            .save(consumer, AlienAdvancements.KILL_A_LINEAGE.resourceLocation().toString());
     }
 
     private static AdvancementHolder addRemoveEmbryoWithChorusFruitAdvancement(
