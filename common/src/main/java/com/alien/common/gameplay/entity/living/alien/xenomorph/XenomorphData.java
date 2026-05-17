@@ -22,8 +22,6 @@ public class XenomorphData implements NBTSerializable {
 
     private int lastAlertedHurtTimestamp;
 
-    private int lastPathFailureTick;
-
     private int parallelDigCount = 2;
 
     private int lastCrawlTick;
@@ -61,18 +59,6 @@ public class XenomorphData implements NBTSerializable {
 
     public void setLastAlertedHurtTimestamp(int timestamp) {
         this.lastAlertedHurtTimestamp = timestamp;
-    }
-
-    public int getLastPathFailureTick() {
-        return lastPathFailureTick;
-    }
-
-    public void setLastPathFailureTick(int tick) {
-        this.lastPathFailureTick = tick;
-    }
-
-    public void clearPathFailure() {
-        this.lastPathFailureTick = 0;
     }
 
     public int getLastCrawlTick() {

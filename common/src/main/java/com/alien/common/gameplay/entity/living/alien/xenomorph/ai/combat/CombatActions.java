@@ -2,7 +2,6 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat;
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.action.MeleeAttackAction;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.dig.DigSensors;
 import com.blib.api.common.block.v1.BlockBreakProgressManager;
 import com.blib.api.common.goap.v1.GOAPSensors;
 import com.blib.api.common.goap.v1.action.ActionMasks;
@@ -32,7 +31,6 @@ public class CombatActions {
         .addMasks(ActionMasks.MOVE)
         .addPrecondition(GOAPSensors.HAS_ATTACK_TARGET.key(), Expressions.Boolean.isTrue())
         .addPrecondition(CombatSensors.IS_TARGET_IN_MELEE_RANGE.key(), Expressions.Boolean.isFalse())
-        .addPrecondition(DigSensors.IS_PATH_TO_TARGET_BLOCKED.key(), Expressions.Boolean.isFalse())
         .addEffect(CombatSensors.IS_TARGET_IN_MELEE_RANGE.key().asDerived(), true)
         .withPerformCallback(CombatActions::performMoveToTarget)
         .withFinishCallback(CombatActions::finishMoveToTarget)
@@ -94,10 +92,7 @@ public class CombatActions {
         return switch (result) {
             case FINISHED, MOVING -> Action.Signal.CONTINUE;
             case WAITING_FOR_BLOCK_BREAK -> handleBlockBreak(context);
-            case NO_PATH -> {
-                context.getActor().getXenomorphData().setLastPathFailureTick(context.getActor().tickCount);
-                yield Action.Signal.ABORT;
-            }
+            case NO_PATH -> Action.Signal.ABORT;
         };
     }
 
@@ -238,16 +233,12 @@ public class CombatActions {
             blackboard.set(KEY_LAST_DISTANCE_TO_TARGET, currentDistance);
             blackboard.set(KEY_LAST_PROGRESS_TICK, xenomorph.tickCount);
         } else if (xenomorph.tickCount - lastProgressTick >= STUCK_THRESHOLD_IN_TICKS) {
-            xenomorph.getXenomorphData().setLastPathFailureTick(xenomorph.tickCount);
             return Action.Signal.ABORT;
         }
 
         return switch (MoveToPosAction.perform(context, attackTarget.position(), 1.1)) {
             case FINISHED, MOVING -> Action.Signal.CONTINUE;
-            case NO_PATH -> {
-                xenomorph.getXenomorphData().setLastPathFailureTick(xenomorph.tickCount);
-                yield Action.Signal.ABORT;
-            }
+            case NO_PATH -> Action.Signal.ABORT;
         };
     }
 

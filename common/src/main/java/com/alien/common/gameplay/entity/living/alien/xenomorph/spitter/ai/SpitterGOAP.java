@@ -20,7 +20,6 @@ public class SpitterGOAP {
     public static final Graph<Spitter> GRAPH = Graph.<Spitter>builder()
         .apply(XenomorphGOAP::addSensorsPackage)
         .apply(SpitterGOAP::addCombatPackage)
-        .apply(XenomorphGOAP::addDigPackage)
         .apply(XenomorphGOAP::addIdlePackage)
         .apply(b -> XenomorphGOAP.addLungePackage(b, LUNGE_CONFIG))
         .apply(SpitterGOAP::addSpitPackage)

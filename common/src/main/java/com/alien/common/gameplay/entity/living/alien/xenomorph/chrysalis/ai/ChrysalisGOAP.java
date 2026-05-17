@@ -13,7 +13,6 @@ public class ChrysalisGOAP {
     public static final Graph<Chrysalis> GRAPH = Graph.<Chrysalis>builder()
         .apply(XenomorphGOAP::addSensorsPackage)
         .apply(XenomorphGOAP::addCombatPackageWithoutMove)
-        .apply(XenomorphGOAP::addDigPackage)
         .apply(XenomorphGOAP::addIdlePackage)
         .apply(ChrysalisGOAP::addRollPackage)
         .apply(ChrysalisGOAP::addChrysalisMovePackage)
