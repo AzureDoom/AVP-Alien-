@@ -16,28 +16,28 @@ public class EnUsAdvancementProvider {
         addAdvancement(
             builder,
             AlienAdvancements.BLOCK_SPITTER_SPIT_WITH_HEAD_SHIELD,
-            "Spit Shield",
+            "Spitshined",
             "Block a spitter's spit attack with a xenomorph head shield"
         );
 
         addAdvancement(
             builder,
             AlienAdvancements.DEFEAT_A_RAID,
-            "Stand Your Ground",
+            "Shadow Legend",
             "Defeat a xenomorph raid"
         );
 
         addAdvancement(
             builder,
             AlienAdvancements.DUAL_VARIANT_RAIDS,
-            "Two Hives, One Problem",
+            "Common Enemy",
             "Have raids from two different xenomorph variants hunting you at the same time"
         );
 
         addAdvancement(
             builder,
             AlienAdvancements.LEAD_RAID_TO_ENEMY_HIVE,
-            "Enemy of My Enemy",
+            "And Hell Followed With Them",
             "Lead a raid to a hive of a different xenomorph variant"
         );
 
@@ -65,7 +65,7 @@ public class EnUsAdvancementProvider {
         addAdvancement(
             builder,
             AlienAdvancements.KILL_A_LINEAGE,
-            "Bloodline Ended",
+            "End of the Bloodline",
             "Destroy a xenomorph lineage"
         );
 
@@ -80,7 +80,35 @@ public class EnUsAdvancementProvider {
             builder,
             AlienAdvancements.KILL_ALL_ALIENS,
             "Xenocide",
-            "Kill one of every alien"
+            "Complete every variant xenocide advancement"
+        );
+
+        addAdvancement(
+            builder,
+            AlienAdvancements.KILL_ALL_ABERRANT_ALIENS,
+            "Aberrant Xenocide",
+            "Kill one of every aberrant alien"
+        );
+
+        addAdvancement(
+            builder,
+            AlienAdvancements.KILL_ALL_IRRADIATED_ALIENS,
+            "Irradiated Xenocide",
+            "Kill one of every irradiated alien"
+        );
+
+        addAdvancement(
+            builder,
+            AlienAdvancements.KILL_ALL_NETHER_ALIENS,
+            "Nether Xenocide",
+            "Kill one of every nether alien"
+        );
+
+        addAdvancement(
+            builder,
+            AlienAdvancements.KILL_ALL_NORMAL_ALIENS,
+            "Classic Xenocide",
+            "Kill one of every normal alien"
         );
 
         addAdvancement(
@@ -88,6 +116,13 @@ public class EnUsAdvancementProvider {
             AlienAdvancements.KILL_AN_ALIEN,
             "Imperfect Organism",
             "Kill an alien and live to tell the tale"
+        );
+
+        addAdvancement(
+            builder,
+            AlienAdvancements.KILL_AN_EMPRESS,
+            "Not Empressed",
+            "Kill an empress"
         );
 
         addAdvancement(

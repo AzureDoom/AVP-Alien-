@@ -47,6 +47,7 @@ public class EnglishLanguageProvider extends FabricLanguageProvider {
 
         // Effects
         builder.add(AlienMobEffects.getBloodLossHolder().value(), "Blood Loss");
+        builder.add(AlienMobEffects.getFrenzyHolder().value(), "Frenzy");
         builder.add(AlienMobEffects.getMetamorphosisHolder().value(), "Metamorphosis");
         builder.add(AlienMobEffects.getScourgeHolder().value(), "Scourge");
         builder.add(AlienMobEffects.getMarkedForDeathHolder().value(), "Marked for Death");
