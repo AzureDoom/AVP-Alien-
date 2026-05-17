@@ -169,7 +169,7 @@ public record RaidWaveProfile(List<Wave> waves) {
         public static final Codec<Wave> CODEC = RecordCodecBuilder.<Wave>create(
             instance -> instance.group(
                 Codec.INT.fieldOf("size").forGetter(Wave::size),
-                Codec.LONG.optionalFieldOf("buffer_ticks", DEFAULT_BUFFER_TICKS).forGetter(Wave::bufferTicks),
+                Codec.LONG.fieldOf("buffer_ticks").forGetter(Wave::bufferTicks),
                 Guarantee.CODEC.listOf().optionalFieldOf("guaranteed", List.of()).forGetter(Wave::guaranteed),
                 RandomSelection.POOLS_CODEC.fieldOf("random").forGetter(Wave::pools)
             ).apply(instance, Wave::new)
@@ -269,6 +269,10 @@ public record RaidWaveProfile(List<Wave> waves) {
 
         public static PoolEntry tagPool(TagKey<EntityType<?>> tag, int weight, int maxCount) {
             return new PoolEntry(Optional.empty(), Optional.of(tag.location()), weight, maxCount);
+        }
+
+        public static PoolEntry entityPool(EntityType<?> entityType, int weight, int maxCount) {
+            return new PoolEntry(Optional.of(entityType), Optional.empty(), weight, maxCount);
         }
 
         public boolean matches(EntityType<?> entityType) {
