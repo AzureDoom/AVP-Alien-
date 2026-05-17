@@ -2,8 +2,8 @@ package com.alien.common.registry.init;
 
 import com.alien.Alien;
 import com.alien.common.gameplay.command.count.CountCommand;
-import com.alien.common.gameplay.command.hive.CurrentHiveLayerCommand;
 import com.alien.common.gameplay.command.hive.NearestHiveCommand;
+import com.alien.common.gameplay.hive2.command.Hive2DebugCommands;
 import com.blib.api.common.registry.v1.impl.BLibCommandRegistry;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
@@ -25,11 +25,8 @@ public class AlienCommands {
                         .then(
                             Commands.literal("hive")
                                 .then(NearestHiveCommand.create())
-                                .then(
-                                    Commands.literal("layer")
-                                        .then(CurrentHiveLayerCommand.create())
-                                )
                         )
+                        .then(Hive2DebugCommands.create())
                 )
         );
     }

@@ -1,46 +1,33 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.boiler;
 
-import com.alien.common.constant.animation.BoilerAnimationRefs;
 import com.blib.api.client.animation.v1.command.AzCommand;
 import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
 
 public class BoilerAnimationDispatcher {
 
-    private static final AzCommand CRAWL = AzCommand.create(
-        BoilerAnimationRefs.FULL_BODY_CONTROLLER_NAME,
-        BoilerAnimationRefs.CRAWL_ANIMATION_NAME,
-        AzPlayBehaviors.LOOP
-    );
+    private static final AzCommand<Boiler> CRAWL = AzCommand.<Boiler>idempotent()
+        .play(BoilerAnimationRefs.FULL_BODY, BoilerAnimationRefs.CRAWL_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
 
-    private static final AzCommand CRAWL_HOLD = AzCommand.create(
-        BoilerAnimationRefs.FULL_BODY_CONTROLLER_NAME,
-        BoilerAnimationRefs.CRAWL_ANIMATION_NAME,
-        AzPlayBehaviors.HOLD_ON_LAST_FRAME
-    );
+    private static final AzCommand<Boiler> CRAWL_HOLD = AzCommand.<Boiler>idempotent()
+        .play(BoilerAnimationRefs.FULL_BODY, BoilerAnimationRefs.CRAWL_ANIMATION_NAME, AzPlayBehaviors.HOLD_ON_LAST_FRAME)
+        .build();
 
-    private static final AzCommand IDLE = AzCommand.create(
-        BoilerAnimationRefs.FULL_BODY_CONTROLLER_NAME,
-        BoilerAnimationRefs.IDLE_ANIMATION_NAME,
-        AzPlayBehaviors.LOOP
-    );
+    private static final AzCommand<Boiler> IDLE = AzCommand.<Boiler>idempotent()
+        .play(BoilerAnimationRefs.FULL_BODY, BoilerAnimationRefs.IDLE_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
 
-    private static final AzCommand RUN = AzCommand.create(
-        BoilerAnimationRefs.FULL_BODY_CONTROLLER_NAME,
-        BoilerAnimationRefs.RUN_ANIMATION_NAME,
-        AzPlayBehaviors.LOOP
-    );
+    private static final AzCommand<Boiler> RUN = AzCommand.<Boiler>idempotent()
+        .play(BoilerAnimationRefs.FULL_BODY, BoilerAnimationRefs.RUN_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
 
-    private static final AzCommand SWIM = AzCommand.create(
-        BoilerAnimationRefs.FULL_BODY_CONTROLLER_NAME,
-        BoilerAnimationRefs.SWIM_ANIMATION_NAME,
-        AzPlayBehaviors.LOOP
-    );
+    private static final AzCommand<Boiler> SWIM = AzCommand.<Boiler>idempotent()
+        .play(BoilerAnimationRefs.FULL_BODY, BoilerAnimationRefs.SWIM_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
 
-    private static final AzCommand WALK = AzCommand.create(
-        BoilerAnimationRefs.FULL_BODY_CONTROLLER_NAME,
-        BoilerAnimationRefs.WALK_ANIMATION_NAME,
-        AzPlayBehaviors.LOOP
-    );
+    private static final AzCommand<Boiler> WALK = AzCommand.<Boiler>idempotent()
+        .play(BoilerAnimationRefs.FULL_BODY, BoilerAnimationRefs.WALK_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
 
     private final Boiler boiler;
 
@@ -49,27 +36,27 @@ public class BoilerAnimationDispatcher {
     }
 
     public void crawl() {
-        CRAWL.sendForEntity(boiler);
+        CRAWL.dispatchForEntity(boiler);
     }
 
     public void crawlHold() {
-        CRAWL_HOLD.sendForEntity(boiler);
+        CRAWL_HOLD.dispatchForEntity(boiler);
     }
 
     public void idle() {
-        IDLE.sendForEntity(boiler);
+        IDLE.dispatchForEntity(boiler);
     }
 
     public void run() {
-        RUN.sendForEntity(boiler);
+        RUN.dispatchForEntity(boiler);
     }
 
     public void swim() {
-        SWIM.sendForEntity(boiler);
+        SWIM.dispatchForEntity(boiler);
     }
 
     public void walk() {
-        WALK.sendForEntity(boiler);
+        WALK.dispatchForEntity(boiler);
     }
 
 }

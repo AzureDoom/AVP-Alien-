@@ -1,0 +1,237 @@
+package com.alien.common.gameplay.entity.living.alien.xenomorph.ai;
+
+import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.CombatActions;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.CombatGoals;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.CombatSensors;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.dig.DigActions;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.dig.DigSensors;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg.EggActions;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg.EggGoals;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg.EggSensors;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg_laying.EggLayer;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg_laying.EggLayingActions;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg_laying.EggLayingGoals;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg_laying.EggLayingSensors;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.idle.IdleActions;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.idle.IdleGoals;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.idle.IdleSensors;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.lunge.LungeActions;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.lunge.LungeConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.lunge.LungeSensors;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.resin.ResinActions;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.resin.ResinGoals;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.resin.ResinSensors;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.vent.VentActions;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.vent.VentGoals;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.vent.VentSensors;
+import com.alien.common.util.AlienPredicates;
+import com.blib.api.common.goap.v1.GOAPSensors;
+import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
+import com.just.ai.goap.Agent;
+import com.just.ai.goap.graph.Graph;
+import com.just.ai.goap.plan.ReplanPolicies;
+
+public class XenomorphGOAP {
+
+    public static <T extends Xenomorph> Graph.Builder<T> applyBaseGraph(Graph.Builder<T> graphBuilder) {
+        return graphBuilder
+            .apply(XenomorphGOAP::addSensorsPackage)
+            .apply(XenomorphGOAP::addCombatPackage)
+            .apply(XenomorphGOAP::addDigPackage)
+            .apply(XenomorphGOAP::addIdlePackage);
+    }
+
+    public static <T extends Xenomorph> Graph.Builder<T> applyBaseGraphWithoutDig(Graph.Builder<T> graphBuilder) {
+        return graphBuilder
+            .apply(XenomorphGOAP::addSensorsPackage)
+            .apply(XenomorphGOAP::addCombatPackage)
+            .apply(XenomorphGOAP::addDigSensorsPackage)
+            .apply(XenomorphGOAP::addIdlePackage);
+    }
+
+    public static <T extends Xenomorph & EggLayer> Graph.Builder<T> applyEggLayingOnlyGraph(Graph.Builder<T> graphBuilder) {
+        return graphBuilder.apply(XenomorphGOAP::addEggLayingPackage);
+    }
+
+    public static <T extends Xenomorph> Agent.Builder<T> applyBaseAgentProperties(Agent.Builder<T> agentBuilder) {
+        return agentBuilder.withReplanPolicy(
+            ReplanPolicies.anyOf(
+                ReplanPolicies.ifNoActivePlans(),
+                ReplanPolicies.custom(context -> {
+                    var actor = context.agent().getActor();
+
+                    if (actor instanceof PathNavigatorUser user && user.getPathNavigator().isWaitingForBlockBreak()) {
+                        return false;
+                    }
+
+                    return actor.tickCount % 20 == 0;
+                }),
+                ReplanPolicies.custom(context -> {
+                    var isOnFire = context.worldState().getOrDefault(GOAPSensors.IS_ON_FIRE.key(), false);
+                    var wasOnFire = context.previousWorldState().getOrDefault(GOAPSensors.IS_ON_FIRE.key(), false);
+                    return !wasOnFire && isOnFire;
+                }),
+                ReplanPolicies.custom(context -> {
+                    var currentHealthRatio = context.worldState().getOrDefault(GOAPSensors.HEALTH_RATIO.key(), 0F);
+                    var previousHealthRatio = context.previousWorldState().getOrDefault(GOAPSensors.HEALTH_RATIO.key(), 0F);
+                    return currentHealthRatio < previousHealthRatio;
+                })
+            )
+        );
+    }
+
+    public static <T extends Xenomorph> Agent.Builder<T> applySpecialAttackAgentProperties(
+        Agent.Builder<T> agentBuilder
+    ) {
+        return agentBuilder.withReplanPolicy(
+            ReplanPolicies.anyOf(
+                ReplanPolicies.custom(
+                    context -> !context.agent().getActor().isExecutingTriggeredAttack() && !context.agent().hasPlan()
+                ),
+                ReplanPolicies.custom(context -> {
+                    var actor = context.agent().getActor();
+
+                    if (actor.isExecutingTriggeredAttack()) {
+                        return false;
+                    }
+
+                    if (actor instanceof PathNavigatorUser user && user.getPathNavigator().isWaitingForBlockBreak()) {
+                        return false;
+                    }
+
+                    return actor.tickCount % 20 == 0;
+                }),
+                ReplanPolicies.custom(context -> {
+                    if (context.agent().getActor().isExecutingTriggeredAttack()) {
+                        return false;
+                    }
+
+                    var isOnFire = context.worldState().getOrDefault(GOAPSensors.IS_ON_FIRE.key(), false);
+                    var wasOnFire = context.previousWorldState().getOrDefault(GOAPSensors.IS_ON_FIRE.key(), false);
+                    return !wasOnFire && isOnFire;
+                }),
+                ReplanPolicies.custom(context -> {
+                    if (context.agent().getActor().isExecutingTriggeredAttack()) {
+                        return false;
+                    }
+
+                    var currentHealthRatio = context.worldState().getOrDefault(GOAPSensors.HEALTH_RATIO.key(), 0F);
+                    var previousHealthRatio = context.previousWorldState().getOrDefault(GOAPSensors.HEALTH_RATIO.key(), 0F);
+                    return currentHealthRatio < previousHealthRatio;
+                })
+            )
+        );
+    }
+
+    public static <T extends Xenomorph> Graph.Builder<T> addSensorsPackage(Graph.Builder<T> graphBuilder) {
+        graphBuilder.addSensor(GOAPSensors.IS_ON_GROUND);
+        graphBuilder.addSensor(GOAPSensors.IS_ON_FIRE);
+        graphBuilder.addSensor(GOAPSensors.HEALTH_RATIO);
+
+        return graphBuilder;
+    }
+
+    public static <T extends Xenomorph> Graph.Builder<T> addCombatPackage(Graph.Builder<T> graphBuilder) {
+        addCombatPackageWithoutMove(graphBuilder);
+        graphBuilder.addAction(CombatActions.MOVE_TO_TARGET);
+        return graphBuilder;
+    }
+
+    public static <T extends Xenomorph> Graph.Builder<T> addCombatPackageWithoutMove(Graph.Builder<T> graphBuilder) {
+        graphBuilder.addGoal(CombatGoals.KILL_TARGET);
+
+        graphBuilder.addAction(CombatActions.MELEE_ATTACK);
+
+        graphBuilder.addSensor(
+            GOAPSensors.nearbyAttackableTargetsFactory(AlienPredicates::canTarget)
+        );
+        graphBuilder.addSensor(GOAPSensors.NEAREST_ATTACKABLE_TARGETS);
+        graphBuilder.addSensor(GOAPSensors.NEAREST_ATTACKABLE_TARGET);
+        graphBuilder.addSensor(GOAPSensors.HAS_ATTACK_TARGET);
+        graphBuilder.addSensor(CombatSensors.IS_TARGET_IN_MELEE_RANGE);
+
+        return graphBuilder;
+    }
+
+    public static <T extends Xenomorph> Graph.Builder<T> addDigPackage(Graph.Builder<T> graphBuilder) {
+        graphBuilder.addAction(DigActions.DIG_TO_TARGET);
+
+        addDigSensorsPackage(graphBuilder);
+
+        return graphBuilder;
+    }
+
+    public static <T extends Xenomorph> Graph.Builder<T> addDigSensorsPackage(Graph.Builder<T> graphBuilder) {
+        graphBuilder.addSensor(DigSensors.IS_PATH_TO_TARGET_BLOCKED);
+
+        return graphBuilder;
+    }
+
+    public static <T extends Xenomorph> Graph.Builder<T> addIdlePackage(Graph.Builder<T> graphBuilder) {
+        graphBuilder.addGoal(IdleGoals.SATISFY_BOREDOM);
+
+        graphBuilder.addAction(IdleActions.WANDER);
+
+        graphBuilder.addSensor(IdleSensors.IS_BORED);
+
+        return graphBuilder;
+    }
+
+    public static <T extends Xenomorph> Graph.Builder<T> addLungePackage(Graph.Builder<T> graphBuilder, LungeConfig config) {
+        var lungeSensor = LungeSensors.<T>createLungeRangeSensor(config);
+
+        graphBuilder.addAction(LungeActions.createLungeAtTarget(lungeSensor.key()));
+        graphBuilder.addSensor(lungeSensor);
+
+        return graphBuilder;
+    }
+
+    public static <T extends Xenomorph> Graph.Builder<T> addEggPackage(Graph.Builder<T> graphBuilder) {
+        graphBuilder.addGoal(EggGoals.FETCH_EGG);
+        graphBuilder.addGoal(EggGoals.DELIVER_EGG);
+
+        graphBuilder.addAction(EggActions.PICK_UP_EGG);
+        graphBuilder.addAction(EggActions.DROP_OFF_EGG);
+
+        graphBuilder.addSensor(EggSensors.HAS_TARGET_OVOMORPH);
+        graphBuilder.addSensor(EggSensors.IS_CARRYING_OVOMORPH);
+
+        return graphBuilder;
+    }
+
+    public static <T extends Xenomorph> Graph.Builder<T> addVentPackage(Graph.Builder<T> graphBuilder) {
+        graphBuilder.addGoal(VentGoals.CREATE_VENT);
+
+        graphBuilder.addAction(VentActions.CREATE_VENT);
+
+        graphBuilder.addSensor(VentSensors.CAN_CREATE_VENT);
+        graphBuilder.addSensor(VentSensors.HAS_VENT_TARGET);
+
+        return graphBuilder;
+    }
+
+    public static <T extends Xenomorph> Graph.Builder<T> addResinPackage(Graph.Builder<T> graphBuilder) {
+        graphBuilder.addGoal(ResinGoals.SPREAD_RESIN);
+
+        graphBuilder.addAction(ResinActions.SPREAD_RESIN);
+
+        graphBuilder.addSensor(ResinSensors.CAN_SPREAD_RESIN);
+
+        return graphBuilder;
+    }
+
+    public static <T extends Xenomorph & EggLayer> Graph.Builder<T> addEggLayingPackage(Graph.Builder<T> graphBuilder) {
+        graphBuilder.addGoal(EggLayingGoals.LAY_EGG);
+
+        graphBuilder.addAction(EggLayingActions.layEgg());
+
+        graphBuilder.addSensor(EggLayingSensors.canLayEgg());
+
+        return graphBuilder;
+    }
+
+    private XenomorphGOAP() {
+        throw new UnsupportedOperationException();
+    }
+}

@@ -1,12 +1,16 @@
 package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
+import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.Crusher;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.CrusherAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
+import com.alien.common.util.AzAlienHeadAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
-import com.blib.api.client.animation.v1.controller.AzAnimationController;
-import com.blib.api.client.animation.v1.controller.AzAnimationControllerContainer;
+import com.blib.api.client.animation.v1.track.AzAnimationTrack;
+import com.blib.api.client.animation.v1.track.AzAnimationTrackContainer;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,32 +20,36 @@ public class CrusherAnimator extends AzEntityAnimator<Crusher> {
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
 
+    private int previousAttackId = Integer.MIN_VALUE;
+
+    private final CocoonAnimationStateTracker<Crusher> cocoonAnimationStateTracker = new CocoonAnimationStateTracker<>();
+
     public CrusherAnimator() {
         super(AzAnimatorConfig.defaultConfig());
     }
 
     @Override
-    public void registerControllers(AzAnimationControllerContainer<Crusher> animationControllerContainer) {
-        animationControllerContainer.add(
-            AzAnimationController.builder(this, AzAlienAnimationUtil.BODY_CONTROLLER_NAME)
+    public void registerTracks(AzAnimationTrackContainer<Crusher> animationTrackContainer) {
+        animationTrackContainer.add(
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.BODY)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, AzAlienAnimationUtil.HEAD_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.HEAD)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, AzAlienAnimationUtil.LEFT_ARM_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_ARM)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, AzAlienAnimationUtil.LEFT_LEG_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_LEG)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, AzAlienAnimationUtil.RIGHT_ARM_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_ARM)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, AzAlienAnimationUtil.RIGHT_LEG_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_LEG)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, AzAlienAnimationUtil.TAIL_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.TAIL)
                 .setTransitionLength(5)
                 .build()
         );
@@ -56,11 +64,40 @@ public class CrusherAnimator extends AzEntityAnimator<Crusher> {
     public void setCustomAnimations(Crusher animatable, float partialTicks) {
         super.setCustomAnimations(animatable, partialTicks);
 
+        if (cocoonAnimationStateTracker.run(animatable)) {
+            return;
+        }
+
+        AzAlienHeadAnimationUtil.applyHeadLookFromBindPose(animatable, context(), partialTicks, "gNeck");
+
         runPassiveAnimations(animatable);
     }
 
     private void runPassiveAnimations(Crusher crusher) {
         var dispatcher = crusher.getAnimationDispatcher();
+
+        if (crusher.isLunging.get()) {
+            dispatcher.lunge();
+            return;
+        }
+
+        var attackType = crusher.attackType.get();
+        var attackId = crusher.attackId.get();
+
+        if (!attackType.isNone()) {
+            if (attackId != previousAttackId) {
+                var speed = calculateAttackSpeed(crusher, attackType);
+
+                if (attackType == Crusher.BITE)
+                    dispatcher.biteAttack(speed);
+                else if (attackType == Crusher.TAIL)
+                    dispatcher.tailAttack(speed);
+
+                previousAttackId = attackId;
+            }
+            return;
+        }
+
         var isMovingOnGround = crusher.isMovingHorizontally.get() && crusher.onGround();
         Runnable animFunction;
 
@@ -79,5 +116,26 @@ public class CrusherAnimator extends AzEntityAnimator<Crusher> {
         }
 
         animFunction.run();
+    }
+
+    private float calculateAttackSpeed(Crusher crusher, AttackType attackType) {
+        String animationName;
+
+        if (attackType == Crusher.BITE)
+            animationName = CrusherAnimationRefs.BITEATTACK_HEAD_ANIMATION_NAME;
+        else if (attackType == Crusher.TAIL)
+            animationName = CrusherAnimationRefs.TAILATTACK_TAIL_ANIMATION_NAME;
+        else
+            animationName = null;
+
+        var durationInTicks = crusher.attackDurationInTicks.get();
+
+        if (animationName == null || durationInTicks <= 0) {
+            return 1.0f;
+        }
+
+        var animation = getAnimation(crusher, animationName);
+
+        return (float) (animation.length() / durationInTicks);
     }
 }

@@ -1,9 +1,18 @@
 package com.alien.common.gameplay.entity.living.alien;
 
 import com.alien.common.data.AlienVariantTypes;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
-import com.alien.common.gameplay.level.saveddata.HiveLevelData;
+import com.alien.common.gameplay.hive2.convoy.ConvoyId;
+import com.alien.common.gameplay.hive2.convoy.ConvoyMemberTracker;
+import com.alien.common.gameplay.hive2.convoy.ConvoyMembership;
+import com.alien.common.gameplay.hive2.faction.HiveMemberLocationResolver;
+import com.alien.common.gameplay.hive2.faction.LineageFactionData;
+import com.alien.common.gameplay.hive2.faction.LocationMembership;
+import com.alien.common.gameplay.hive2.location.HiveLocation;
+import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
+import com.alien.common.gameplay.hive2.spawning.ReserveSpawnUtil;
 import com.alien.common.gameplay.level.saveddata.StrainLeakData;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienDataSyncKeys;
@@ -17,8 +26,11 @@ import com.alien.compatibility.avp_human.GeneManagerProxy;
 import com.alien.compatibility.avp_predator.AVPPredator;
 import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.data_sync.v1.model.DataUser;
+import com.blib.api.common.dismemberment.v1.Dismemberable;
+import com.blib.api.common.dismemberment.v1.LimbCategories;
+import com.blib.api.common.dismemberment.v1.LimbDefinitionRegistry;
+import com.blib.api.common.dismemberment.v1.LimbDismemberer;
 import com.blib.api.common.entity.v1.MovementAnalyzer;
-import com.blib.api.common.entity.v1.vibration.VibrationSystemManager;
 import com.blib.mod.common.registry.init.BLibDataSyncKeys;
 import com.human.common.gameplay.gene.Genes;
 import com.human.common.registry.key.HumanBiomeKeys;
@@ -33,6 +45,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.util.Mth;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -50,24 +63,26 @@ import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.Minecart;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.gameevent.DynamicGameEventListener;
 import net.minecraft.world.level.pathfinder.PathType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
-import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
 public abstract class Alien extends Monster implements DataUser {
 
     private static final String NBT_HOST_TYPE = "hostType";
 
-    private static final String NBT_JELLY_COUNT = "jellyCount";
+    private static final String NBT_CONVOY_MEMBERSHIP = "Hive2ConvoyMembership";
+
+    private static final String NBT_RAID_MEMBERSHIP = "Hive2RaidMembership";
 
     public final DataAccessor<Boolean> hasTarget;
 
     public final DataAccessor<Boolean> isPoisoned;
+
+    public final DataAccessor<Float> moltAlpha;
 
     public final DataAccessor<Boolean> isMovingHorizontally;
 
@@ -75,11 +90,11 @@ public abstract class Alien extends Monster implements DataUser {
 
     protected final MovementAnalyzer movementAnalyzer;
 
-    private final VibrationSystemManager vibrationSystemManager;
+    private final MoltingManager moltingManager;
 
     private Option<EntityType<?>> hostTypeOption;
 
-    private int jellyCount;
+    private @Nullable ConvoyMembership convoyMembership;
 
     private int lastHurtTimeInTicks;
 
@@ -88,14 +103,14 @@ public abstract class Alien extends Monster implements DataUser {
 
         this.hasTarget = new DataAccessor<>(this, BLibDataSyncKeys.ENTITY_HAS_TARGET.get());
         this.isPoisoned = new DataAccessor<>(this, AlienDataSyncKeys.ALIEN_IS_POISONED.get());
+        this.moltAlpha = new DataAccessor<>(this, AlienDataSyncKeys.ALIEN_MOLT_ALPHA.get());
         this.isMovingHorizontally = new DataAccessor<>(this, BLibDataSyncKeys.ENTITY_IS_MOVING_HORIZONTALLY.get());
 
         this.hiveManager = new HiveManager(this);
         this.movementAnalyzer = new MovementAnalyzer(this);
-        this.vibrationSystemManager = createVibrationSystemManager();
+        this.moltingManager = new MoltingManager(this);
 
         this.hostTypeOption = Option.ofNullable(getDefaultHostType(entityType));
-        this.jellyCount = 0;
         this.lastHurtTimeInTicks = 0;
     }
 
@@ -103,13 +118,16 @@ public abstract class Alien extends Monster implements DataUser {
 
     protected abstract float getHealthRegenPerSecond();
 
-    protected VibrationSystemManager createVibrationSystemManager() {
-        return new VibrationSystemManager(this, 2.5F, 32);
-    }
-
     @Override
     public float maxUpStep() {
         return 1.5F;
+    }
+
+    @Override
+    public void push(Entity entity) {
+        if (entity instanceof Alien) {
+            super.push(entity);
+        }
     }
 
     private EntityType<? extends Entity> getDefaultHostType(EntityType<? extends Alien> entityType) {
@@ -144,12 +162,8 @@ public abstract class Alien extends Monster implements DataUser {
     @Override
     public void setTarget(@Nullable LivingEntity livingEntity) {
         super.setTarget(livingEntity);
-
-        if (livingEntity instanceof ServerPlayer player) {
-            hiveManager.hive()
-                .filter(hive -> hive.getSpaceManager().isEntityWithinHive(player))
-                .ifSome(hive -> hive.getBossBarManager().trackPlayer(player));
-        }
+        // Hive2: the per-location boss bar auto-adds in-range players via HiveLocationBossBar.updateTrackingPlayers
+        // every 20 ticks; no manual track-on-target hook needed.
     }
 
     public AlienVariant getVariant() {
@@ -188,14 +202,6 @@ public abstract class Alien extends Monster implements DataUser {
         }
     }
 
-    public int getJellyCount() {
-        return jellyCount;
-    }
-
-    public void setJellyCount(int jellyCount) {
-        this.jellyCount = Math.max(jellyCount, 0);
-    }
-
     public boolean isPoisoned() {
         return isPoisoned.get();
     }
@@ -214,7 +220,11 @@ public abstract class Alien extends Monster implements DataUser {
 
     @Override
     protected final boolean canAddPassenger(@NotNull Entity passenger) {
-        return super.canAddPassenger(passenger) && canEntityRideAlien(passenger);
+        return getPassengers().size() < getMaxPassengerCount() && canEntityRideAlien(passenger);
+    }
+
+    protected int getMaxPassengerCount() {
+        return 1;
     }
 
     protected boolean canAlienRideVehicle(@NotNull Entity vehicle) {
@@ -233,42 +243,57 @@ public abstract class Alien extends Monster implements DataUser {
         @NotNull MobSpawnType spawnType,
         @Nullable SpawnGroupData spawnGroupData
     ) {
-        var alienVariantType = AlienVariantTypes.getFor(getVariant());
+        // Hive2: variant-faction join is event-driven. finalizeSpawn fires once per fresh-spawned alien
+        // (natural, spawn egg, command). Idempotent — see HiveManager.ensureVariantFactionMembership.
+        hiveManager.ensureVariantFactionMembership();
 
-        HiveLevelData.getOrCreate(level.getLevel())
-            .andThen(
-                hiveLevelData -> hiveLevelData.findNearestHive(
-                    blockPosition(),
-                    // Find the nearest hive for this alien type's variant type.
-                    hive -> Objects.equals(hive.getVariant(), alienVariantType.variant())
-                )
-            )
-            .ifSome(hive -> {
-                var joinedHiveSuccessfully = hiveManager.tryJoinHive(hive);
-
-                if (joinedHiveSuccessfully) {
-                    // Decrease the reserve count for this entity's type.
-                    hive.getReserveManager().add(getType(), -1);
-
-                    // Apply genetics of hive leader to this alien.
-                    hive.getLeadershipManager()
-                        .getLeader()
-                        .map(GeneManagerProxy::getOrCreate)
-                        .ifSome(leaderGeneContainer -> {
-                            var selfGeneContainer = GeneManagerProxy.getOrCreate(this);
-                            leaderGeneContainer.transfer(selfGeneContainer, true);
-                        });
+        // Hive2: if this alien spawned inside a location that has it in its reserves, decrement the reserves and
+        // copy genes from the location's leader (preserves the legacy "spawned alien inherits leader's genes"
+        // behavior).
+        var locationAtPos = HiveLocationRegistry.INSTANCE.getByChunk(
+            level.getLevel().dimension(),
+            new net.minecraft.world.level.ChunkPos(blockPosition())
+        );
+        if (locationAtPos != null && locationAtPos.isAlive()) {
+            if (locationAtPos.localReserves().getCount(getType()) > 0) {
+                if (locationAtPos.localReserves().trySpawn(getType())) {
+                    ReserveSpawnUtil.markSpawnedFromReserves(this);
                 }
-            });
+            }
+
+            var leaderId = locationAtPos.leadership().getLeaderIdOrNull();
+            if (leaderId != null) {
+                var leaderEntity = level.getLevel().getEntity(leaderId);
+                if (leaderEntity instanceof Alien leaderAlien) {
+                    var leaderGeneContainer = GeneManagerProxy.getOrCreate(leaderAlien);
+                    var selfGeneContainer = GeneManagerProxy.getOrCreate(this);
+                    leaderGeneContainer.transfer(selfGeneContainer, true);
+                }
+            }
+
+            // Hive2: any xenomorph spawning into a claimed chunk auto-joins both the owning lineage and the location
+            // faction. Covers natural spawns, spawn eggs, /summon, and MOB_SUMMONED reinforcements/raid units that
+            // funnel through finalizeSpawn. (Note: EntityTransitionUtil.transitionInto does NOT call finalizeSpawn —
+            // transitions carry membership over explicitly via FactionMembershipTransfer.) The Phase 9 invariant task
+            // evicts variant mismatches, so cross-variant strangers don't stick.
+            if (getType().is(AlienEntityTypeTags.XENOMORPHS)) {
+                LocationMembership.join(locationAtPos, this);
+            }
+        }
 
         return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
     }
 
     @Override
     public void tick() {
+        if (!level().isClientSide && ConvoyMemberTracker.discardStaleLoadedMember(this)) {
+            discard();
+            return;
+        }
+
         super.tick();
         hiveManager.tick();
-        vibrationSystemManager.tick();
+        moltingManager.tick();
 
         if (!level().isClientSide) {
             movementAnalyzer.tick();
@@ -293,11 +318,6 @@ public abstract class Alien extends Monster implements DataUser {
             applyDynamicAttributes();
             becomeIrradiated();
         }
-    }
-
-    @Override
-    public void updateDynamicGameEventListener(@NotNull BiConsumer<DynamicGameEventListener<?>, ServerLevel> biConsumer) {
-        vibrationSystemManager.updateDynamicGameEventListener(biConsumer);
     }
 
     /**
@@ -354,9 +374,12 @@ public abstract class Alien extends Monster implements DataUser {
                 && AlienVariantTypes.getFor(getVariant()).canReproduce()
                 // AND the entity killed was not an alien (hive wars shouldn't result in endless growth)...
                 && !entity.getType().is(AlienEntityTypeTags.ALIENS)
-            // TODO: Only "wild" hives should have spontaneous growth from mob kills.
         ) {
-            hiveManager.hive().ifSome(hive -> {
+            // Hive2: add a bonus drone or runner (depending on host type) to the reserves of the location whose
+            // chunk this alien is standing in. No-op when the alien is outside any claimed chunk — feral aliens
+            // don't generate reserves.
+            var location = HiveLocationRegistry.INSTANCE.getByChunk(level.dimension(), chunkPosition());
+            if (location != null && location.isAlive()) {
                 var wasRunnerHostKilled = entity.getType().is(AlienEntityTypeTags.RUNNER_HOSTS);
 
                 var bonusCount = switch (getGeneManager()) {
@@ -368,18 +391,34 @@ public abstract class Alien extends Monster implements DataUser {
                 };
 
                 var alienEntityType = wasRunnerHostKilled
-                    ? Runner.getType(hive.getVariant())
-                    : Drone.getType(hive.getVariant());
+                    ? Runner.getType(getVariant())
+                    : Drone.getType(getVariant());
 
-                hive.getReserveManager().add(alienEntityType, bonusCount);
-            });
+                location.localReserves().tryAdd((EntityType<?>) alienEntityType, bonusCount);
+            }
         }
 
         return killedEntity;
     }
 
+    /** Floor chance per limb for an explosion to tear it off, applied even on grazing hits. */
+    private static final float EXPLOSION_LIMB_BASE_CHANCE = 0.10F;
+
+    /** Bonus chance per limb scaled by how much of the alien's max health the explosion consumed (capped at 1×). */
+    private static final float EXPLOSION_LIMB_DAMAGE_BONUS = 0.40F;
+
+    /** Floor chance per leg for a fall to break it off, applied even on shallow drops that still register damage. */
+    private static final float FALL_LEG_BASE_CHANCE = 0.05F;
+
+    /** Bonus chance per leg scaled by how much of the alien's max health the fall consumed (capped at 1×). */
+    private static final float FALL_LEG_DAMAGE_BONUS = 0.30F;
+
+    /** Bonus chance per leg scaled by how depleted the alien's health is post-fall (capped at 1×). */
+    private static final float FALL_LEG_LOW_HEALTH_BONUS = 0.30F;
+
     @Override
     public boolean hurt(@NotNull DamageSource damageSource, float damage) {
+        var healthBefore = getHealth();
         var isHurt = super.hurt(damageSource, damage);
 
         if (isHurt) {
@@ -404,9 +443,144 @@ public abstract class Alien extends Monster implements DataUser {
                 var randomPos = AcidBleedUtil.computeRandomPosFromBoundingBox(this);
                 AcidBleedUtil.spawnAcid(this, damage, randomPos);
             }
+
+            if (!level().isClientSide && damageSource.is(DamageTypeTags.IS_EXPLOSION)) {
+                var damageDealt = Math.max(0F, healthBefore - getHealth());
+
+                if (damageDealt > 0F) {
+                    rollExplosionDismemberment(damageDealt);
+                }
+            }
+
+            if (!level().isClientSide && damageSource.is(DamageTypeTags.IS_FALL)) {
+                var damageDealt = Math.max(0F, healthBefore - getHealth());
+
+                if (damageDealt > 0F) {
+                    rollFallLegDismemberment(damageDealt);
+                }
+            }
         }
 
         return isHurt;
+    }
+
+    /**
+     * Rolls each registered limb independently for explosion-driven dismemberment. Probability per limb scales with how
+     * much of max health the explosion stripped, so tossing TNT under a drone is much more dangerous than catching the
+     * edge of a creeper blast.
+     * <p>
+     * Eligibility rules:
+     * <ul>
+     * <li>Head-category limbs are only eligible if the explosion <em>killed</em> the alien — surviving an explosion
+     * never costs you your head.</li>
+     * <li>Leg-category limbs are off-limits for xenomorphs whose {@code CrawlingManager} reports
+     * {@code canCrawl() == false} — they wouldn't be able to crawl after, and standing on remaining legs reads
+     * weird.</li>
+     * <li>Arm- and tail-category limbs are always eligible.</li>
+     * </ul>
+     */
+    private void rollExplosionDismemberment(float damageDealt) {
+        if (!(this instanceof Dismemberable dismemberable)) {
+            return;
+        }
+
+        var manager = dismemberable.getDismembermentManager();
+
+        if (manager == null) {
+            return;
+        }
+
+        var definitions = LimbDefinitionRegistry.getDefinitions(getType());
+
+        if (definitions.isEmpty()) {
+            return;
+        }
+
+        var maxHealth = getMaxHealth();
+        var damageRatio = maxHealth > 0F ? Mth.clamp(damageDealt / maxHealth, 0F, 1F) : 0F;
+        var perLimbChance = Mth.clamp(
+            EXPLOSION_LIMB_BASE_CHANCE + EXPLOSION_LIMB_DAMAGE_BONUS * damageRatio,
+            0F,
+            1F
+        );
+
+        var canLoseLegs = !(this instanceof Xenomorph xeno) || xeno.getCrawlingManager().canCrawl();
+        var killedByExplosion = isDeadOrDying();
+
+        for (var definition : definitions) {
+            if (manager.isDetached(definition)) {
+                continue;
+            }
+
+            var category = definition.category();
+
+            if (category.equals(LimbCategories.HEAD) && !killedByExplosion) {
+                continue;
+            }
+
+            if (!canLoseLegs && category.equals(LimbCategories.LEG)) {
+                continue;
+            }
+
+            if (random.nextFloat() < perLimbChance) {
+                LimbDismemberer.detach(this, definition.id(), null);
+            }
+        }
+    }
+
+    /**
+     * Rolls each leg-category limb independently for fall-driven dismemberment. Only crawl-capable xenomorphs are
+     * eligible — losing a leg forces them into a crawl, so a mob that can't crawl would otherwise be stuck. Probability
+     * scales with both the fraction of max health the fall consumed and how depleted the alien's remaining health is,
+     * so a beat-up xeno hitting the ground hard is far more likely to come up missing a leg than a healthy one taking a
+     * shallow drop.
+     */
+    private void rollFallLegDismemberment(float damageDealt) {
+        if (!(this instanceof Xenomorph xeno) || !xeno.getCrawlingManager().canCrawl()) {
+            return;
+        }
+
+        if (!(this instanceof Dismemberable dismemberable)) {
+            return;
+        }
+
+        var manager = dismemberable.getDismembermentManager();
+
+        if (manager == null) {
+            return;
+        }
+
+        var legDefinitions = LimbDefinitionRegistry.getDefinitionsByCategory(getType(), LimbCategories.LEG);
+
+        if (legDefinitions.isEmpty()) {
+            return;
+        }
+
+        var maxHealth = getMaxHealth();
+
+        if (maxHealth <= 0F) {
+            return;
+        }
+
+        var damageRatio = Mth.clamp(damageDealt / maxHealth, 0F, 1F);
+        var lowHealthRatio = Mth.clamp(1F - getHealth() / maxHealth, 0F, 1F);
+        var perLegChance = Mth.clamp(
+            FALL_LEG_BASE_CHANCE
+                + FALL_LEG_DAMAGE_BONUS * damageRatio
+                + FALL_LEG_LOW_HEALTH_BONUS * lowHealthRatio,
+            0F,
+            1F
+        );
+
+        for (var definition : legDefinitions) {
+            if (manager.isDetached(definition)) {
+                continue;
+            }
+
+            if (random.nextFloat() < perLegChance) {
+                LimbDismemberer.detach(this, definition.id(), null);
+            }
+        }
     }
 
     // Prevent the alien from drowning or otherwise running out of air.
@@ -453,59 +627,164 @@ public abstract class Alien extends Monster implements DataUser {
 
     @Override
     public boolean isPersistenceRequired() {
-        return super.isPersistenceRequired()
-            || hiveManager.hive()
-                .filter(
-                    // If the hive is angry, then the alien shouldn't despawn.
-                    hive -> hive.isAngry()
-                        // OR if this alien is the hive leader, then they shouldn't despawn, either.
-                        || hive.getLeadershipManager().isLeader(this)
-                )
-                .isSome();
+        if (super.isPersistenceRequired()) {
+            return true;
+        }
+        // Hive2: an alien is persistent if it's standing in a hive2 location and either (a) the location's boss bar
+        // is angry (an active fight), or (b) it's the location's current leader.
+        var location = HiveLocationRegistry.INSTANCE.getByChunk(level().dimension(), chunkPosition());
+        if (location == null) {
+            return false;
+        }
+        var bossBar = location.bossBar();
+        var bossBarAngry = bossBar != null && bossBar.isAngry();
+        var isLeader = location.leadership().isLeader(this);
+        return bossBarAngry || isLeader;
+    }
+
+    @Override
+    public boolean shouldBeSaved() {
+        if (convoyMembership != null) {
+            return false;
+        }
+        return super.shouldBeSaved();
+    }
+
+    @Override
+    public void checkDespawn() {
+        var wasAlive = isAlive() && !isRemoved();
+        var returnLocation = wasAlive && getType().is(AlienEntityTypeTags.XENOMORPHS)
+            ? reserveReturnLocation()
+            : null;
+
+        super.checkDespawn();
+
+        if (wasAlive && isRemoved()) {
+            onDespawned(returnLocation);
+        }
+    }
+
+    private void onDespawned(@Nullable HiveLocation returnLocation) {
+        // Hive2: hive-owned xenomorphs always return to their owning location's reserves when vanilla despawns them,
+        // even if they wandered into an unclaimed chunk. Feral xenomorphs still count as strain leaks.
+        if (getType().is(AlienEntityTypeTags.XENOMORPHS)) {
+            if (ConvoyMemberTracker.returnDespawned(this)) {
+                return;
+            }
+            if (returnLocation != null && returnToHiveLocation(returnLocation)) {
+                return;
+            }
+
+            onStrainLeak();
+        }
+    }
+
+    private @Nullable HiveLocation reserveReturnLocation() {
+        var ownedLocation = HiveMemberLocationResolver.reserveReturnLocation(this);
+        if (ownedLocation != null) {
+            return ownedLocation;
+        }
+
+        return HiveLocationRegistry.INSTANCE.getByChunk(level().dimension(), chunkPosition());
+    }
+
+    private boolean returnToHiveLocation(HiveLocation location) {
+        return location.localReserves().addReturningMember(getType(), 1);
+    }
+
+    private void onStrainLeak() {
+        StrainLeakData.getOrCreate(level())
+            .ifSome(strainLeakData -> {
+                var alienVariant = getVariant();
+                var wasAlienVariantAlreadyPresent = strainLeakData.hasVariant(alienVariant);
+                var alienVariantType = AlienVariantTypes.getFor(this);
+
+                if (!(level() instanceof ServerLevel serverLevel)) {
+                    return;
+                }
+
+                var strainBasedLeakMessage = getStrainLeakMessageForVariant(alienVariant);
+
+                if (strainBasedLeakMessage == null) {
+                    return;
+                }
+
+                strainLeakData.add(alienVariant, 1);
+
+                if (!wasAlienVariantAlreadyPresent) {
+                    for (var player : serverLevel.players()) {
+                        player.sendSystemMessage(
+                            Component.literal(strainBasedLeakMessage)
+                                .withStyle(alienVariantType.chatColor(), ChatFormatting.ITALIC)
+                        );
+                    }
+                }
+            });
     }
 
     @Override
     public void remove(@NotNull RemovalReason removalReason) {
         super.remove(removalReason);
+        // Hive2: BLib's faction system handles removal cleanup automatically when the entity is killed or
+        // discarded — no manual hive.removeHiveMember call needed.
+    }
 
-        switch (removalReason) {
-            case KILLED -> hiveManager.hive().ifSome(hive -> hive.removeHiveMember(this));
-            case DISCARDED -> hiveManager.hive().ifSome(hive -> {
-                hive.removeHiveMember(this);
+    @Override
+    public void die(@NotNull DamageSource damageSource) {
+        // Hive2 raid attribution: if a player gets the kill credit, record it against every lineage this alien
+        // belongs to. Defers to vanilla's getKillCredit so indirect kills (TNT, fall damage from broken block,
+        // etc) count when vanilla counts them.
+        if (getType().is(AlienEntityTypeTags.XENOMORPHS)) {
+            var killer = getKillCredit();
+            if (
+                !ConvoyMemberTracker.isRaidMember(this)
+                    && killer instanceof ServerPlayer player
+                    && level() instanceof ServerLevel serverLevel
+            ) {
+                attributeKillToLineages(player.getUUID(), serverLevel.getGameTime());
+            }
+            ConvoyMemberTracker.unregisterKilled(this);
+            // Hive2 empress death clears the lineage's empress slot so the next emergence ritual can fire.
+            if (getType().is(AlienEntityTypeTags.EMPRESSES)) {
+                onEmpressDied();
+            }
+        }
 
-                if (hive.getSpaceManager().isEntityWithinHive(this)) {
-                    hive.getReserveManager().add(getType(), 1);
-                } else {
-                    StrainLeakData.getOrCreate(level())
-                        .ifSome(strainLeakData -> {
-                            var alienVariant = getVariant();
-                            var wasAlienVariantAlreadyPresent = strainLeakData.hasVariant(alienVariant);
-                            var alienVariantType = AlienVariantTypes.getFor(this);
+        super.die(damageSource);
+    }
 
-                            if (!(level() instanceof ServerLevel serverLevel)) {
-                                return;
-                            }
+    private void onEmpressDied() {
+        for (var factionId : com.alien.Alien.MOD.factions().getFactionIds(getUUID())) {
+            if (!com.alien.common.gameplay.hive2.id.LineageIds.isLineageId(factionId)) {
+                continue;
+            }
+            var faction = com.alien.Alien.MOD.factions().get(factionId);
+            if (faction == null || !(faction.data() instanceof LineageFactionData lineage)) {
+                continue;
+            }
+            if (getUUID().equals(lineage.empressId())) {
+                lineage.setEmpressId(null);
+            }
+            com.alien.Alien.LOGGER.info(
+                "Hive2: empress {} died — lineage {} has {} location(s); empress slot cleared",
+                getUUID(),
+                factionId,
+                lineage.locationsById().size()
+            );
+        }
+    }
 
-                            var strainBasedLeakMessage = getStrainLeakMessageForVariant(alienVariant);
-
-                            if (strainBasedLeakMessage == null) {
-                                return;
-                            }
-
-                            strainLeakData.add(alienVariant, 1);
-
-                            if (!wasAlienVariantAlreadyPresent) {
-                                for (var player : serverLevel.players()) {
-                                    player.sendSystemMessage(
-                                        Component.literal(strainBasedLeakMessage)
-                                            .withStyle(alienVariantType.chatColor(), ChatFormatting.ITALIC)
-                                    );
-                                }
-                            }
-                        });
-                }
-            });
-            case UNLOADED_TO_CHUNK, UNLOADED_WITH_PLAYER, CHANGED_DIMENSION -> { /* NO-OP */ }
+    private void attributeKillToLineages(java.util.UUID playerId, long currentTick) {
+        var aggroWindow = com.alien.common.gameplay.hive2.location.HiveLocationRegistry.INSTANCE.config().raidAggroWindowTicks();
+        for (var factionId : com.alien.Alien.MOD.factions().getFactionIds(getUUID())) {
+            if (!com.alien.common.gameplay.hive2.id.LineageIds.isLineageId(factionId)) {
+                continue;
+            }
+            var faction = com.alien.Alien.MOD.factions().get(factionId);
+            if (faction == null || !(faction.data() instanceof LineageFactionData lineage)) {
+                continue;
+            }
+            lineage.recordKillByPlayer(playerId, currentTick, aggroWindow);
         }
     }
 
@@ -523,10 +802,7 @@ public abstract class Alien extends Monster implements DataUser {
     public void readAdditionalSaveData(@NotNull CompoundTag compoundTag) {
         super.readAdditionalSaveData(compoundTag);
         hiveManager.load(compoundTag);
-
-        if (compoundTag.contains(NBT_JELLY_COUNT)) {
-            setJellyCount(compoundTag.getInt(NBT_JELLY_COUNT));
-        }
+        moltingManager.load(compoundTag);
 
         if (compoundTag.contains(NBT_HOST_TYPE)) {
             var resourceLocationString = compoundTag.getString(NBT_HOST_TYPE);
@@ -535,18 +811,60 @@ public abstract class Alien extends Monster implements DataUser {
 
             entityTypeHolderOptional.ifPresent($ -> this.hostTypeOption = Option.some(BuiltInRegistries.ENTITY_TYPE.get(resourceLocation)));
         }
+        this.convoyMembership = loadConvoyMembership(compoundTag);
     }
 
     @Override
     public void addAdditionalSaveData(@NotNull CompoundTag compoundTag) {
         super.addAdditionalSaveData(compoundTag);
         hiveManager.save(compoundTag);
-        compoundTag.putInt(NBT_JELLY_COUNT, getJellyCount());
+        moltingManager.save(compoundTag);
 
         hostTypeOption.ifSome(hostType -> {
             var resourceLocation = BuiltInRegistries.ENTITY_TYPE.getKey(hostTypeOption.unwrap());
             compoundTag.putString(NBT_HOST_TYPE, resourceLocation.toString());
         });
+        if (convoyMembership != null) {
+            var convoyTag = new CompoundTag();
+            convoyTag.putString("LineageFactionId", convoyMembership.lineageFactionId().toString());
+            convoyTag.putUUID("ConvoyId", convoyMembership.convoyId().value());
+            compoundTag.put(NBT_CONVOY_MEMBERSHIP, convoyTag);
+        }
+    }
+
+    private @Nullable ConvoyMembership loadConvoyMembership(CompoundTag compoundTag) {
+        if (compoundTag.contains(NBT_CONVOY_MEMBERSHIP)) {
+            var convoyTag = compoundTag.getCompound(NBT_CONVOY_MEMBERSHIP);
+            return loadConvoyMembershipTag(convoyTag);
+        }
+        if (compoundTag.contains(NBT_RAID_MEMBERSHIP)) {
+            var raidTag = compoundTag.getCompound(NBT_RAID_MEMBERSHIP);
+            return loadConvoyMembershipTag(raidTag);
+        }
+        return null;
+    }
+
+    private @Nullable ConvoyMembership loadConvoyMembershipTag(CompoundTag membershipTag) {
+        if (!membershipTag.contains("LineageFactionId")) {
+            return null;
+        }
+        if (membershipTag.hasUUID("ConvoyId")) {
+            return new ConvoyMembership(
+                ResourceLocation.parse(membershipTag.getString("LineageFactionId")),
+                new ConvoyId(membershipTag.getUUID("ConvoyId"))
+            );
+        }
+        if (membershipTag.hasUUID("RaidId")) {
+            return new ConvoyMembership(
+                ResourceLocation.parse(membershipTag.getString("LineageFactionId")),
+                new ConvoyId(membershipTag.getUUID("RaidId"))
+            );
+        }
+        return null;
+    }
+
+    public MoltingManager getMoltingManager() {
+        return moltingManager;
     }
 
     public GeneManagerProxy getGeneManager() {
@@ -557,6 +875,18 @@ public abstract class Alien extends Monster implements DataUser {
         return hiveManager;
     }
 
+    public @Nullable ConvoyMembership convoyMembership() {
+        return convoyMembership;
+    }
+
+    public void setConvoyMembership(ConvoyMembership convoyMembership) {
+        this.convoyMembership = convoyMembership;
+    }
+
+    public void clearConvoyMembership() {
+        this.convoyMembership = null;
+    }
+
     public Option<EntityType<?>> getHostType() {
         return hostTypeOption;
     }
@@ -565,16 +895,8 @@ public abstract class Alien extends Monster implements DataUser {
         return lastHurtTimeInTicks;
     }
 
-    public @Nullable Integer getMaxJellyToGrowth() {
-        return null;
-    }
-
     public MovementAnalyzer getMovementAnalyzer() {
         return movementAnalyzer;
-    }
-
-    public VibrationSystemManager getVibrationSystemManager() {
-        return vibrationSystemManager;
     }
 
     public void setHostType(EntityType<?> hostType) {

@@ -2,6 +2,7 @@ package com.alien.client.render.entity;
 
 import com.alien.client.animation.entity.WarriorAnimator;
 import com.alien.client.render.AlienRenderResourceCache;
+import com.alien.client.render.layer.MoltLayer;
 import com.alien.client.render.layer.RadiationGlowLayer;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.warrior.Warrior;
 import com.alien.common.model.alien.variant.AlienVariant;
@@ -23,6 +24,7 @@ public class WarriorRenderer extends AzEntityRenderer<Warrior> {
                 .setRenderType(WarriorRenderer::renderType)
                 .setAnimatorProvider(WarriorAnimator::new)
                 .addRenderLayer(new RadiationGlowLayer<>())
+                .addRenderLayer(new MoltLayer<>())
                 .setShadowRadius(0.5F)
                 .build(),
             context

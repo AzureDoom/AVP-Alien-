@@ -1,92 +1,80 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.praetorian;
 
-import com.alien.common.constant.ArmorConstants;
-import com.alien.common.constant.ArmorToughnessConstants;
-import com.alien.common.constant.AttackDamageConstants;
-import com.alien.common.constant.FollowRangeConstants;
-import com.alien.common.constant.HealthConstants;
-import com.alien.common.constant.HealthRegenConstants;
-import com.alien.common.constant.KnockbackResistanceConstants;
-import com.alien.common.constant.MoveSpeedConstants;
 import com.alien.common.gameplay.entity.living.alien.Alien;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphPathConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.praetorian.ai.PraetorianGOAP;
 import com.alien.common.model.alien.variant.AlienVariant;
-import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
+import com.blib.api.common.entity.v1.PlayerStatConstants;
+import com.blib.api.common.goap.v1.GOAPUser;
+import com.just.ai.goap.Agent;
+import com.just.ai.goap.graph.Graph;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-public class Praetorian extends Xenomorph {
+public class Praetorian extends Xenomorph implements GOAPUser<Praetorian> {
 
-    public static AttributeSupplier.Builder createPraetorianAttributes() {
-        return Alien.createAlienAttributes()
-            .add(Attributes.ARMOR, ArmorConstants.PRAETORIAN_ARMOR)
-            .add(Attributes.ARMOR_TOUGHNESS, ArmorToughnessConstants.PRAETORIAN_ARMOR_TOUGHNESS)
-            .add(Attributes.ATTACK_DAMAGE, AttackDamageConstants.PRAETORIAN_ATTACK_DAMAGE)
-            .add(Attributes.FOLLOW_RANGE, FollowRangeConstants.PRAETORIAN_FOLLOW_RANGE)
-            .add(Attributes.KNOCKBACK_RESISTANCE, KnockbackResistanceConstants.PRAETORIAN_KNOCKBACK_RESISTANCE)
-            .add(Attributes.MAX_HEALTH, HealthConstants.PRAETORIAN_HEALTH)
-            .add(Attributes.MOVEMENT_SPEED, MoveSpeedConstants.PRAETORIAN_SPEED);
-    }
+    public static final AttackType CLAW = AttackType.builder("praetorian_claw")
+        .defaultDurationInTicks(10)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    public static final AttackType BITE = AttackType.builder("praetorian_bite")
+        .defaultDurationInTicks(8)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    public static final AttackType TAIL = AttackType.builder("praetorian_tail")
+        .defaultDurationInTicks(12)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    private static final XenomorphConfig CONFIG = XenomorphConfig.builder(XenomorphPathConfig.LARGE_DOOR, Praetorian::getType)
+        .attackConfig(
+            XenomorphAttackConfig.builder()
+                .addRegular(CLAW)
+                .addRegular(BITE)
+                .addRegular(TAIL)
+                .build()
+        )
+        .parallelDigCount(2)
+        .pushedByFluid(false)
+        .build();
 
     private final PraetorianAnimationDispatcher animationDispatcher;
 
     public Praetorian(EntityType<? extends Praetorian> entityType, Level level) {
-        super(entityType, level);
+        super(entityType, level, CONFIG);
         this.animationDispatcher = new PraetorianAnimationDispatcher(this);
     }
 
-    @Override
-    public @Nullable EntityType<? extends Alien> getTypeForVariant(AlienVariant alienVariant) {
-        return getType(alienVariant);
+    public static AttributeSupplier.Builder createPraetorianAttributes() {
+        return Alien.createAlienAttributes()
+            .add(Attributes.ARMOR, 12.0F)
+            .add(Attributes.ARMOR_TOUGHNESS, 12.0F)
+            .add(Attributes.ATTACK_DAMAGE, PlayerStatConstants.BASE_HEALTH * 0.75F)
+            .add(Attributes.FOLLOW_RANGE, 35F)
+            .add(Attributes.KNOCKBACK_RESISTANCE, 0.7f)
+            .add(Attributes.MAX_HEALTH, PlayerStatConstants.BASE_HEALTH * 5F)
+            .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1.2F);
     }
 
     @Override
-    protected @Nullable ResinData createResinData() {
-        return new ResinData(0, 64, 1, 20);
+    public Agent.Builder<Praetorian> blib$applyGOAPAgentProperties(Agent.Builder<Praetorian> agentBuilder) {
+        return PraetorianGOAP.applyAgentProperties(agentBuilder);
     }
 
     @Override
-    protected float getHealthRegenPerSecond() {
-        return HealthRegenConstants.PRAETORIAN_HEALTH_REGEN;
-    }
-
-    @Override
-    public void runAttackAnimations() {
-        var attackType = random.nextInt(0, 3);
-
-        playSound(
-            AlienSoundEvents.ENTITY_XENOMORPH_ATTACK.get(),
-            getSoundVolume(),
-            (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F
-        );
-
-        switch (attackType) {
-            case 0 -> animationDispatcher.rightClawAttack();
-            case 1 -> animationDispatcher.biteAttack();
-            default -> animationDispatcher.tailAttack();
-        }
-    }
-
-    // Praetorians are too large to be pushed by fluids.
-    @Override
-    public boolean isPushedByFluid() {
-        return false;
-    }
-
-    // Praetorians are too large to be pushed.
-    @Override
-    public boolean isPushable() {
-        return false;
-    }
-
-    @Override
-    public Integer getMaxJellyToGrowth() {
-        return 9;
+    public @Nullable Graph<Praetorian> blib$getGOAPGraphOrNull() {
+        return getActiveGOAPGraph(PraetorianGOAP.GRAPH);
     }
 
     public PraetorianAnimationDispatcher getAnimationDispatcher() {

@@ -2,6 +2,8 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.queen;
 
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.entity.living.alien.ovipositor.Ovipositor;
+import com.alien.common.gameplay.hive2.location.HiveLocation;
+import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.entity.v1.EntityUtil;
@@ -10,6 +12,7 @@ import com.blib.api.common.time.v1.Cooldown;
 import com.just.core.functional.option.Option;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,6 +62,10 @@ public class OvipositorManager implements NBTSerializable {
             return;
         }
 
+        if (!tryPayCreationCost()) {
+            return;
+        }
+
         createOvipositor();
         ovipositorCreationCooldown.reset();
     }
@@ -104,16 +111,70 @@ public class OvipositorManager implements NBTSerializable {
             && AlienVariantTypes.getFor(queen.getVariant()).canReproduce()
             && !queen.isPoisoned()
             && !ovipositorCreationCooldown.isActive()
-            && queen.getHiveManager()
-                .hive()
-                .isSomeAnd(
-                    hive -> hive.isAlive()
-                        && !hive.isAngry()
-                        && hive.getMembershipManager()
-                            .getMembersMatching(entityType -> entityType.is(AlienEntityTypeTags.XENOMORPHS))
-                            .size() > 2
-                )
+            && isStandingOnVariantResin()
+            && hasEnoughLocalSupport()
             && canOvipositorFit();
+    }
+
+    private boolean isStandingOnVariantResin() {
+        return queen.level()
+            .getBlockState(queen.blockPosition().below())
+            .is(AlienVariantTypes.getFor(queen.getVariant()).resinBlockTag());
+    }
+
+    /**
+     * Hive2: the queen needs to be standing inside an alive, calm hive location with at least 3 loaded xenomorphs in
+     * its territory.
+     */
+    private boolean hasEnoughLocalSupport() {
+        var location = currentLocation();
+        if (location == null || !location.isAlive()) {
+            return false;
+        }
+        if (!isNearHiveCenter(location)) {
+            return false;
+        }
+        var bossBar = location.bossBar();
+        if (bossBar != null && bossBar.isAngry()) {
+            return false;
+        }
+        var loadedXenoCount = location.loadedMembersByType()
+            .entrySet()
+            .stream()
+            .filter(entry -> entry.getKey().is(AlienEntityTypeTags.XENOMORPHS))
+            .mapToInt(entry -> entry.getValue().size())
+            .sum();
+        return loadedXenoCount > 2;
+    }
+
+    private boolean tryPayCreationCost() {
+        var location = currentLocation();
+        if (location == null || !location.isAlive()) {
+            return false;
+        }
+
+        var cost = HiveLocationRegistry.INSTANCE.config().ovipositorCreationBiomassCost();
+        if (cost <= 0) {
+            return true;
+        }
+        if (location.biomass() < cost) {
+            return false;
+        }
+
+        location.setBiomass(location.biomass() - cost);
+        return true;
+    }
+
+    private @Nullable HiveLocation currentLocation() {
+        return HiveLocationRegistry.INSTANCE.getByChunk(queen.level().dimension(), new ChunkPos(queen.blockPosition()));
+    }
+
+    private boolean isNearHiveCenter(HiveLocation location) {
+        var centerChunk = new ChunkPos(location.centerPos());
+        var queenChunk = new ChunkPos(queen.blockPosition());
+        var dx = Math.abs(centerChunk.x - queenChunk.x);
+        var dz = Math.abs(centerChunk.z - queenChunk.z);
+        return Math.max(dx, dz) <= 1;
     }
 
     private boolean canOvipositorFit() {
@@ -149,7 +210,7 @@ public class OvipositorManager implements NBTSerializable {
 
             var aboveBlockState = queen.level().getBlockState(blockPos.above());
             isSupported = (aboveBlockState.isAir() || aboveBlockState.canBeReplaced())
-                && !(blockState.isAir() || blockState.canBeReplaced());
+                && blockState.is(AlienVariantTypes.getFor(queen.getVariant()).resinBlockTag());
 
             stepsDown++;
         }

@@ -1,8 +1,10 @@
 package com.alien.fabric.data;
 
+import com.alien.compatibility.avp_human.AVPHuman;
 import com.alien.fabric.data.advancement.AdvancementProvider;
 import com.alien.fabric.data.damage_type.DamageTypeBootstrapper;
 import com.alien.fabric.data.damage_type.DamageTypeProvider;
+import com.alien.fabric.data.form_size_scale.FormSizeScaleSubProvider;
 import com.alien.fabric.data.gene_bonus_data.GeneBonusDataSubProvider;
 import com.alien.fabric.data.growth_stages.GrowthStageSubProvider;
 import com.alien.fabric.data.infections.InfectionSubProvider;
@@ -12,6 +14,7 @@ import com.alien.fabric.data.loot.BlockLootTableProvider;
 import com.alien.fabric.data.loot.EntityLootTableProvider;
 import com.alien.fabric.data.model.BlockModelProvider;
 import com.alien.fabric.data.model.ItemModelProvider;
+import com.alien.fabric.data.raid_wave.RaidWaveProfileDataProvider;
 import com.alien.fabric.data.recipe.RecipeProvider;
 import com.alien.fabric.data.tag.AlienBiomeTagProvider;
 import com.alien.fabric.data.tag.AlienBlockTagProvider;
@@ -61,8 +64,14 @@ public class AlienDataGenerator implements DataGeneratorEntrypoint {
         pack.addProvider(AlienJukeboxSongsProvider::new);
 
         // Custom Providers
-        pack.addProvider(GeneBonusDataSubProvider::new);
+        if (AVPHuman.MOD.isLoaded()) {
+            pack.addProvider(GeneBonusDataSubProvider::new);
+        }
+
+        pack.addProvider(FormSizeScaleSubProvider::new);
         pack.addProvider(GrowthStageSubProvider::new);
+        pack.addProvider(com.alien.fabric.data.hive_recipe.HiveRecipeDataProvider::new);
+        pack.addProvider(RaidWaveProfileDataProvider::new);
         pack.addProvider(InfectionSubProvider::new);
     }
 

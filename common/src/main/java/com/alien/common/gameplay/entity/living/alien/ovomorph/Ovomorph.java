@@ -1,10 +1,8 @@
 package com.alien.common.gameplay.entity.living.alien.ovomorph;
 
-import com.alien.common.constant.HealthConstants;
-import com.alien.common.constant.HealthRegenConstants;
-import com.alien.common.constant.KnockbackResistanceConstants;
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.entity.living.alien.Alien;
+import com.alien.common.gameplay.entity.living.alien.GrowthManager;
 import com.alien.common.gameplay.entity.living.alien.ovomorph.ai.OvomorphGOAP;
 import com.alien.common.model.alien.HatchState;
 import com.alien.common.model.alien.variant.AlienVariant;
@@ -14,10 +12,12 @@ import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.util.AlienPredicates;
 import com.blib.api.common.data_sync.v1.DataAccessor;
+import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.entity.v1.vibration.VibrationSystemManager;
 import com.blib.api.common.goap.v1.GOAPUser;
+import com.just.ai.goap.graph.Graph;
 import com.just.core.functional.option.Option;
-import com.just.goap.graph.Graph;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -31,13 +31,18 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gameevent.DynamicGameEventListener;
 import net.minecraft.world.level.gameevent.GameEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.BiConsumer;
+
 public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
 
     public static final HatchState DEFAULT_HATCH_STATE = HatchState.SLEEPING;
+
+    private static final int HOST_VIBRATION_RADIUS = 8;
 
     public static AttributeSupplier.Builder createOvomorphAttributes() {
         return Alien.createAlienAttributes()
@@ -45,8 +50,8 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
             .add(Attributes.ARMOR_TOUGHNESS, 0f)
             .add(Attributes.ATTACK_DAMAGE, 0f)
             .add(Attributes.FOLLOW_RANGE, 0f)
-            .add(Attributes.KNOCKBACK_RESISTANCE, KnockbackResistanceConstants.OVOMORPH_KNOCKBACK_RESISTANCE)
-            .add(Attributes.MAX_HEALTH, HealthConstants.OVOMORPH_HEALTH)
+            .add(Attributes.KNOCKBACK_RESISTANCE, 1f)
+            .add(Attributes.MAX_HEALTH, PlayerStatConstants.BASE_HEALTH * 1.5F)
             .add(Attributes.MOVEMENT_SPEED, 0f);
     }
 
@@ -56,7 +61,11 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
 
     public final DataAccessor<Boolean> isRooted;
 
+    private final GrowthManager growthManager;
+
     private final OvomorphAnimationDispatcher animationDispatcher;
+
+    private final VibrationSystemManager vibrationSystemManager;
 
     private final HatchManager hatchManager;
 
@@ -71,9 +80,16 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
         this.maxSpawnCount = new DataAccessor<>(this, AlienDataSyncKeys.OVOMORPH_MAXIMUM_SPAWN_COUNT.get());
         this.isRooted = new DataAccessor<>(this, AlienDataSyncKeys.OVOMORPH_IS_ROOTED.get());
 
+        this.growthManager = new GrowthManager(this);
         this.animationDispatcher = new OvomorphAnimationDispatcher(this);
         this.hatchManager = new HatchManager(this, 3 * 20, 3 * 20);
         this.wantsPickup = false;
+        this.vibrationSystemManager = new VibrationSystemManager(this, 2.5F, HOST_VIBRATION_RADIUS);
+    }
+
+    @Override
+    public void updateDynamicGameEventListener(@NotNull BiConsumer<DynamicGameEventListener<?>, ServerLevel> biConsumer) {
+        vibrationSystemManager.updateDynamicGameEventListener(biConsumer);
     }
 
     @Override
@@ -87,14 +103,11 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
     }
 
     @Override
-    protected VibrationSystemManager createVibrationSystemManager() {
-        return new VibrationSystemManager(this, 2.5F, 8);
-    }
-
-    @Override
     public void tick() {
         super.tick();
+        growthManager.tick();
         hatchManager.tick();
+        vibrationSystemManager.tick();
 
         if (!level().isClientSide) {
             this.wantsPickup = canBePickedUp();
@@ -261,7 +274,7 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
 
     @Override
     protected float getHealthRegenPerSecond() {
-        return HealthRegenConstants.OVOMORPH_HEALTH_REGEN;
+        return 0.5F;
     }
 
     public HatchManager getHatchManager() {
@@ -279,6 +292,10 @@ public class Ovomorph extends Alien implements GOAPUser<Ovomorph>, Shearable {
 
     public OvomorphAnimationDispatcher getAnimationDispatcher() {
         return animationDispatcher;
+    }
+
+    public VibrationSystemManager getVibrationSystemManager() {
+        return vibrationSystemManager;
     }
 
     public static @Nullable EntityType<? extends Ovomorph> getType(AlienVariant alienVariant, boolean isRoyal) {

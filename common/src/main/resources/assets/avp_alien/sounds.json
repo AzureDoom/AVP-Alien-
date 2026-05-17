@@ -143,6 +143,71 @@
     ],
     "subtitle": "subtitles.entity.queen.step_thump_rock"
   },
+  "entity.empress.arm_attack": {
+    "sounds": [
+      "avp_alien:entity/queen/attack/arm_attack"
+    ],
+    "subtitle": "subtitles.entity.empress.arm_attack"
+  },
+  "entity.empress.back_hand_attack": {
+    "sounds": [
+      "avp_alien:entity/queen/attack/back_hand_attack"
+    ],
+    "subtitle": "subtitles.entity.empress.back_hand_attack"
+  },
+  "entity.empress.ram_attack": {
+    "sounds": [
+      "avp_alien:entity/queen/attack/ram_attack"
+    ],
+    "subtitle": "subtitles.entity.empress.ram_attack"
+  },
+  "entity.empress.scream": {
+    "sounds": [
+      "avp_alien:entity/queen/attack/scream"
+    ],
+    "subtitle": "subtitles.entity.empress.scream"
+  },
+  "entity.empress.tail_attack": {
+    "sounds": [
+      "avp_alien:entity/queen/attack/tail_attack"
+    ],
+    "subtitle": "subtitles.entity.empress.tail_attack"
+  },
+  "entity.empress.death": {
+    "sounds": [
+      "avp_alien:entity/queen/death/death"
+    ],
+    "subtitle": "subtitles.entity.empress.death"
+  },
+  "entity.empress.hurt": {
+    "sounds": [
+      "avp_alien:entity/queen/hurt/hurt_0",
+      "avp_alien:entity/queen/hurt/hurt_1",
+      "avp_alien:entity/queen/hurt/hurt_2",
+      "avp_alien:entity/queen/hurt/hurt_3",
+      "avp_alien:entity/queen/hurt/hurt_4"
+    ],
+    "subtitle": "subtitles.entity.empress.hurt"
+  },
+  "entity.empress.idle": {
+    "sounds": [
+      "avp_alien:entity/queen/idle/idle1",
+      "avp_alien:entity/queen/idle/idle2"
+    ],
+    "subtitle": "subtitles.entity.empress.idle"
+  },
+  "entity.empress.step_thump": {
+    "sounds": [
+      "avp_alien:entity/queen/movement/step_thump"
+    ],
+    "subtitle": "subtitles.entity.empress.step_thump"
+  },
+  "entity.empress.step_thump_rock": {
+    "sounds": [
+      "avp_alien:entity/queen/movement/step_thump_rock"
+    ],
+    "subtitle": "subtitles.entity.empress.step_thump_rock"
+  },
   "entity.xenomorph.attack": {
     "sounds": [
       "avp_alien:entity/xenomorph/attack/attack0",

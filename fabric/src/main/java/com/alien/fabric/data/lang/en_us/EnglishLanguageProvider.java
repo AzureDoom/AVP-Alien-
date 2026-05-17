@@ -1,6 +1,7 @@
 package com.alien.fabric.data.lang.en_us;
 
-import com.alien.common.gameplay.hive.HiveBossBarManager;
+import com.alien.common.model.alien.variant.AlienVariant;
+import com.alien.common.registry.init.AlienMobEffects;
 import com.alien.fabric.data.lang.en_us.provider.EnUsAdvancementProvider;
 import com.alien.fabric.data.lang.en_us.provider.EnUsBiomeTagProvider;
 import com.alien.fabric.data.lang.en_us.provider.EnUsBlockProvider;
@@ -18,6 +19,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
 import net.minecraft.core.HolderLookup;
 
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
 public class EnglishLanguageProvider extends FabricLanguageProvider {
@@ -37,7 +39,31 @@ public class EnglishLanguageProvider extends FabricLanguageProvider {
         // Death messages
         builder.add("death.attack.acid", "%1$s vaporized in acid");
         builder.add("death.attack.chestbursting", "%1$s gave birth");
+        builder.add("death.attack.ravager_claw", "%1$s was torn apart");
+        builder.add("death.attack.ravager_claw.player", "%1$s was torn apart by %2$s");
+        builder.add("death.attack.ravager_special", "%1$s was eviscerated");
+        builder.add("death.attack.ravager_special.player", "%1$s was eviscerated by %2$s");
         builder.add("death.attack.smothering", "%1$s was smothered to death");
+
+        // Effects
+        builder.add(AlienMobEffects.getBloodLossHolder().value(), "Blood Loss");
+        builder.add(AlienMobEffects.getMetamorphosisHolder().value(), "Metamorphosis");
+        builder.add(AlienMobEffects.getScourgeHolder().value(), "Scourge");
+        builder.add(AlienMobEffects.getMarkedForDeathHolder().value(), "Marked for Death");
+
+        // Potions
+        builder.add("item.minecraft.potion.effect.blood_loss", "Potion of Blood Loss");
+        builder.add("item.minecraft.splash_potion.effect.blood_loss", "Splash Potion of Blood Loss");
+        builder.add("item.minecraft.lingering_potion.effect.blood_loss", "Lingering Potion of Blood Loss");
+        builder.add("item.minecraft.tipped_arrow.effect.blood_loss", "Arrow of Blood Loss");
+        builder.add("item.minecraft.potion.effect.metamorphosis", "Potion of Metamorphosis");
+        builder.add("item.minecraft.splash_potion.effect.metamorphosis", "Splash Potion of Metamorphosis");
+        builder.add("item.minecraft.lingering_potion.effect.metamorphosis", "Lingering Potion of Metamorphosis");
+        builder.add("item.minecraft.tipped_arrow.effect.metamorphosis", "Arrow of Metamorphosis");
+        builder.add("item.minecraft.potion.effect.scourge", "Potion of Scourge");
+        builder.add("item.minecraft.splash_potion.effect.scourge", "Splash Potion of Scourge");
+        builder.add("item.minecraft.lingering_potion.effect.scourge", "Lingering Potion of Scourge");
+        builder.add("item.minecraft.tipped_arrow.effect.scourge", "Arrow of Scourge");
 
         // Entities
         EnUsEntityProvider.CONSUMER.accept(builder);
@@ -54,17 +80,17 @@ public class EnglishLanguageProvider extends FabricLanguageProvider {
         // Advancements
         EnUsAdvancementProvider.CONSUMER.accept(builder);
 
-        // Hive boss bars
-        HiveBossBarManager.ALIEN_VARIANT_TO_TRANSLATABLE_STRING_MAP.forEach((alienVariant, translationKey) -> {
+        // Hive2 boss bars — per-variant title key, format must match HiveLocationBossBar.VARIANT_TITLE_KEYS.
+        for (var alienVariant : AlienVariant.values()) {
             var prefix = switch (alienVariant) {
                 case ABERRANT -> "Aberrant ";
                 case IRRADIATED -> "Irradiated ";
                 case NETHER -> "Nether ";
                 case NORMAL -> "";
             };
-
+            var translationKey = "bossbar.avp.hive." + alienVariant.name().toLowerCase(Locale.US) + ".title";
             builder.add(translationKey, prefix + "Hive");
-        });
+        }
 
         // Configs
         EnUsConfigProvider.CONSUMER.accept(builder);

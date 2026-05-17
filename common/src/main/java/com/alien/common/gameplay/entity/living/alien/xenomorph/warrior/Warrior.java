@@ -1,91 +1,85 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.warrior;
 
-import com.alien.common.constant.ArmorConstants;
-import com.alien.common.constant.AttackDamageConstants;
-import com.alien.common.constant.FollowRangeConstants;
-import com.alien.common.constant.HealthConstants;
-import com.alien.common.constant.HealthRegenConstants;
-import com.alien.common.constant.KnockbackResistanceConstants;
-import com.alien.common.constant.MoveSpeedConstants;
 import com.alien.common.gameplay.entity.living.alien.Alien;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphPathConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.warrior.ai.WarriorGOAP;
 import com.alien.common.model.alien.variant.AlienVariant;
-import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
-import com.blib.api.common.entity.v1.ai.goal.combat.LungeAtTargetGoal;
+import com.blib.api.common.entity.v1.PlayerStatConstants;
+import com.blib.api.common.goap.v1.GOAPUser;
+import com.just.ai.goap.Agent;
+import com.just.ai.goap.graph.Graph;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-public class Warrior extends Xenomorph {
+public class Warrior extends Xenomorph implements GOAPUser<Warrior> {
 
-    public static AttributeSupplier.Builder createWarriorAttributes() {
-        return Alien.createAlienAttributes()
-            .add(Attributes.ARMOR, ArmorConstants.WARRIOR_ARMOR)
-            .add(Attributes.ARMOR_TOUGHNESS, 0f)
-            .add(Attributes.ATTACK_DAMAGE, AttackDamageConstants.WARRIOR_ATTACK_DAMAGE)
-            .add(Attributes.FOLLOW_RANGE, FollowRangeConstants.WARRIOR_FOLLOW_RANGE)
-            .add(Attributes.KNOCKBACK_RESISTANCE, KnockbackResistanceConstants.WARRIOR_KNOCKBACK_RESISTANCE)
-            .add(Attributes.MAX_HEALTH, HealthConstants.WARRIOR_HEALTH)
-            .add(Attributes.MOVEMENT_SPEED, MoveSpeedConstants.WARRIOR_SPEED);
-    }
+    public static final AttackType CLAW = AttackType.builder("warrior_claw")
+        .defaultDurationInTicks(10)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    public static final AttackType BITE = AttackType.builder("warrior_bite")
+        .defaultDurationInTicks(8)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    public static final AttackType TAIL = AttackType.builder("warrior_tail")
+        .defaultDurationInTicks(12)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    private static final XenomorphConfig CONFIG = XenomorphConfig.builder(XenomorphPathConfig.MEDIUM_DOOR, Warrior::getType)
+        .attackConfig(
+            XenomorphAttackConfig.builder()
+                .addRegular(CLAW)
+                .addRegular(BITE)
+                .addRegular(TAIL)
+                .build()
+        )
+        .build();
 
     private final WarriorAnimationDispatcher animationDispatcher;
 
     public Warrior(EntityType<? extends Warrior> entityType, Level level) {
-        super(entityType, level);
+        super(entityType, level, CONFIG);
         this.animationDispatcher = new WarriorAnimationDispatcher(this);
     }
 
-    @Override
-    public @Nullable EntityType<? extends Alien> getTypeForVariant(AlienVariant alienVariant) {
-        return getType(alienVariant);
+    public static AttributeSupplier.Builder createWarriorAttributes() {
+        return Alien.createAlienAttributes()
+            .add(Attributes.ARMOR, 8.0F)
+            .add(Attributes.ARMOR_TOUGHNESS, 0f)
+            .add(Attributes.ATTACK_DAMAGE, PlayerStatConstants.BASE_HEALTH * 0.5F)
+            .add(Attributes.FOLLOW_RANGE, 35F)
+            .add(Attributes.KNOCKBACK_RESISTANCE, 0.5f)
+            .add(Attributes.MAX_HEALTH, PlayerStatConstants.BASE_HEALTH * 3F)
+            .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1.1F);
     }
 
     @Override
-    protected float getHealthRegenPerSecond() {
-        return HealthRegenConstants.WARRIOR_HEALTH_REGEN;
+    public Agent.Builder<Warrior> blib$applyGOAPAgentProperties(Agent.Builder<Warrior> agentBuilder) {
+        return WarriorGOAP.applyAgentProperties(agentBuilder);
     }
 
     @Override
-    protected @Nullable ResinData createResinData() {
-        return new ResinData(0, 32, 1, 20);
+    public @Nullable Graph<Warrior> blib$getGOAPGraphOrNull() {
+        return getActiveGOAPGraph(WarriorGOAP.GRAPH);
     }
 
     @Override
-    protected void registerGoals() {
-        super.registerGoals();
-        goalSelector.addGoal(3, new LungeAtTargetGoal(this, 0.1F, 20 * 5, 6, 15).setOnLungeCallback(this::runLungeAnimation));
-    }
-
-    @Override
-    public void runAttackAnimations() {
-        var attackType = random.nextInt(0, 3);
-
-        playSound(
-            AlienSoundEvents.ENTITY_XENOMORPH_ATTACK.get(),
-            getSoundVolume(),
-            (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F
-        );
-
-        switch (attackType) {
-            case 0 -> animationDispatcher.rightClawAttack();
-            case 1 -> animationDispatcher.biteAttack();
-            default -> animationDispatcher.tailAttack();
-        }
-    }
-
-    private void runLungeAnimation() {
-        playSound(AlienSoundEvents.ENTITY_XENOMORPH_LUNGE.get(), getSoundVolume(), (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F);
-        animationDispatcher.lunge();
-    }
-
-    @Override
-    public Integer getMaxJellyToGrowth() {
-        return 4;
+    public void runDigAnimation() {
+        playAttackSound();
+        attackType.set(CLAW);
+        beginAttack(CLAW.defaultDurationInTicks());
     }
 
     public WarriorAnimationDispatcher getAnimationDispatcher() {

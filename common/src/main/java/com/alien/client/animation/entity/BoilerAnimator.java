@@ -1,12 +1,14 @@
 package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
-import com.alien.common.constant.animation.BoilerAnimationRefs;
+import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.boiler.Boiler;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.boiler.BoilerAnimationRefs;
+import com.alien.common.util.AzAlienHeadAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
-import com.blib.api.client.animation.v1.controller.AzAnimationController;
-import com.blib.api.client.animation.v1.controller.AzAnimationControllerContainer;
+import com.blib.api.client.animation.v1.track.AzAnimationTrack;
+import com.blib.api.client.animation.v1.track.AzAnimationTrackContainer;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,14 +18,16 @@ public class BoilerAnimator extends AzEntityAnimator<Boiler> {
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
 
+    private final CocoonAnimationStateTracker<Boiler> cocoonAnimationStateTracker = new CocoonAnimationStateTracker<>();
+
     public BoilerAnimator() {
         super(AzAnimatorConfig.defaultConfig());
     }
 
     @Override
-    public void registerControllers(AzAnimationControllerContainer<Boiler> animationControllerContainer) {
-        animationControllerContainer.add(
-            AzAnimationController.builder(this, BoilerAnimationRefs.FULL_BODY_CONTROLLER_NAME)
+    public void registerTracks(AzAnimationTrackContainer<Boiler> animationTrackContainer) {
+        animationTrackContainer.add(
+            AzAnimationTrack.builder(this, BoilerAnimationRefs.FULL_BODY)
                 .setTransitionLength(5)
                 .build()
         );
@@ -37,6 +41,12 @@ public class BoilerAnimator extends AzEntityAnimator<Boiler> {
     @Override
     public void setCustomAnimations(Boiler animatable, float partialTicks) {
         super.setCustomAnimations(animatable, partialTicks);
+
+        if (cocoonAnimationStateTracker.run(animatable)) {
+            return;
+        }
+
+        AzAlienHeadAnimationUtil.applyHeadLookFromBindPose(animatable, context(), partialTicks, "gNeck");
 
         runPassiveAnimations(animatable);
     }

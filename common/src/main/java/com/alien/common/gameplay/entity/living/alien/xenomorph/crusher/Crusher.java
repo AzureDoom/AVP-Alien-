@@ -1,99 +1,75 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.crusher;
 
-import com.alien.common.constant.ArmorConstants;
-import com.alien.common.constant.ArmorToughnessConstants;
-import com.alien.common.constant.AttackDamageConstants;
-import com.alien.common.constant.FollowRangeConstants;
-import com.alien.common.constant.HealthConstants;
-import com.alien.common.constant.HealthRegenConstants;
-import com.alien.common.constant.KnockbackResistanceConstants;
-import com.alien.common.constant.MoveSpeedConstants;
 import com.alien.common.gameplay.entity.living.alien.Alien;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphNavigationManager;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphPathConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.ai.CrusherGOAP;
 import com.alien.common.model.alien.variant.AlienVariant;
-import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
-import com.blib.api.common.entity.v1.ai.goal.combat.LungeAtTargetGoal;
+import com.blib.api.common.entity.v1.PlayerStatConstants;
+import com.blib.api.common.goap.v1.GOAPUser;
+import com.just.ai.goap.Agent;
+import com.just.ai.goap.graph.Graph;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class Crusher extends Xenomorph {
+public class Crusher extends Xenomorph implements GOAPUser<Crusher> {
+
+    public static final AttackType BITE = AttackType.builder("crusher_bite")
+        .defaultDurationInTicks(12)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    public static final AttackType TAIL = AttackType.builder("crusher_tail")
+        .defaultDurationInTicks(15)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
 
     public static AttributeSupplier.Builder createCrusherAttributes() {
         return Alien.createAlienAttributes()
-            .add(Attributes.ARMOR, ArmorConstants.CRUSHER_ARMOR)
-            .add(Attributes.ARMOR_TOUGHNESS, ArmorToughnessConstants.CRUSHER_ARMOR_TOUGHNESS)
-            .add(Attributes.ATTACK_DAMAGE, AttackDamageConstants.CRUSHER_ATTACK_DAMAGE)
-            .add(Attributes.FOLLOW_RANGE, FollowRangeConstants.CRUSHER_FOLLOW_RANGE)
-            .add(Attributes.KNOCKBACK_RESISTANCE, KnockbackResistanceConstants.CRUSHER_KNOCKBACK_RESISTANCE)
-            .add(Attributes.MAX_HEALTH, HealthConstants.CRUSHER_HEALTH)
-            .add(Attributes.MOVEMENT_SPEED, MoveSpeedConstants.CRUSHER_SPEED);
+            .add(Attributes.ARMOR, 12.0F)
+            .add(Attributes.ARMOR_TOUGHNESS, 12.0F)
+            .add(Attributes.ATTACK_DAMAGE, PlayerStatConstants.BASE_HEALTH * 0.75F)
+            .add(Attributes.FOLLOW_RANGE, 35F)
+            .add(Attributes.KNOCKBACK_RESISTANCE, 0.7f)
+            .add(Attributes.MAX_HEALTH, PlayerStatConstants.BASE_HEALTH * 5F)
+            .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1.2F);
     }
 
     private final CrusherAnimationDispatcher animationDispatcher;
 
     public Crusher(EntityType<? extends Crusher> entityType, Level level) {
-        super(entityType, level);
+        super(
+            entityType,
+            level,
+            XenomorphConfig.builder(XenomorphPathConfig.WIDE, Crusher::getType)
+                .attackConfig(
+                    XenomorphAttackConfig.builder()
+                        .addRegular(BITE)
+                        .addRegular(TAIL)
+                        .build()
+                )
+                .parallelDigCount(2)
+                .build()
+        );
         this.animationDispatcher = new CrusherAnimationDispatcher(this);
     }
 
     @Override
-    public @Nullable EntityType<? extends Alien> getTypeForVariant(AlienVariant alienVariant) {
-        return getType(alienVariant);
+    public Agent.Builder<Crusher> blib$applyGOAPAgentProperties(Agent.Builder<Crusher> agentBuilder) {
+        return CrusherGOAP.applyAgentProperties(agentBuilder);
     }
 
     @Override
-    protected @Nullable ResinData createResinData() {
-        return new ResinData(0, 16, 1, 20);
-    }
-
-    @Override
-    protected void registerGoals() {
-        super.registerGoals();
-        goalSelector.addGoal(3, new LungeAtTargetGoal(this, 0.05F, 20 * 7, 6, 12).setOnLungeCallback(this::runLungeAnimation));
-    }
-
-    @Override
-    protected @NotNull XenomorphNavigationManager createNavigationManager() {
-        return new XenomorphNavigationManager(this, moveControl, 1.2, 2);
-    }
-
-    @Override
-    public void runAttackAnimations() {
-        var isClawAttack = random.nextBoolean();
-
-        playSound(
-            AlienSoundEvents.ENTITY_XENOMORPH_ATTACK.get(),
-            getSoundVolume(),
-            (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F
-        );
-
-        if (isClawAttack) {
-            animationDispatcher.biteAttack();
-        } else {
-            animationDispatcher.tailAttack();
-        }
-    }
-
-    private void runLungeAnimation() {
-        playSound(AlienSoundEvents.ENTITY_XENOMORPH_LUNGE.get(), getSoundVolume(), (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F);
-        animationDispatcher.lunge();
-    }
-
-    @Override
-    protected float getHealthRegenPerSecond() {
-        return HealthRegenConstants.CRUSHER_HEALTH_REGEN;
-    }
-
-    @Override
-    public Integer getMaxJellyToGrowth() {
-        return 2;
+    public @Nullable Graph<Crusher> blib$getGOAPGraphOrNull() {
+        return getActiveGOAPGraph(CrusherGOAP.GRAPH);
     }
 
     public CrusherAnimationDispatcher getAnimationDispatcher() {

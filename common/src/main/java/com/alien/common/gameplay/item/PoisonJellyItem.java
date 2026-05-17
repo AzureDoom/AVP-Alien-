@@ -25,7 +25,6 @@ public class PoisonJellyItem extends Item {
         if (
             livingEntity instanceof Alien alien
                 && !alien.isPoisoned()
-                && alien.getMaxJellyToGrowth() != null
         ) {
             alien.setPoisoned(true);
             itemStack.consume(1, player);

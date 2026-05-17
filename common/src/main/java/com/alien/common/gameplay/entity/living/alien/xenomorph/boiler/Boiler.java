@@ -1,128 +1,102 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.boiler;
 
-import com.alien.common.constant.ArmorConstants;
-import com.alien.common.constant.AttackDamageConstants;
-import com.alien.common.constant.FollowRangeConstants;
-import com.alien.common.constant.HealthConstants;
-import com.alien.common.constant.HealthRegenConstants;
-import com.alien.common.constant.KnockbackResistanceConstants;
-import com.alien.common.constant.MoveSpeedConstants;
-import com.alien.common.gameplay.ai.InvestigateVibrationGoal;
 import com.alien.common.gameplay.entity.living.alien.Alien;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ExplosiveXenomorphUtil;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphPathConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.boiler.ai.BoilerGOAP;
 import com.alien.common.model.alien.variant.AlienVariant;
-import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienEntityTypes;
-import com.alien.common.util.AcidBleedUtil;
-import net.minecraft.core.BlockPos;
+import com.blib.api.common.entity.v1.PlayerStatConstants;
+import com.blib.api.common.entity.v1.vibration.VibrationSystemManager;
+import com.blib.api.common.goap.v1.GOAPUser;
+import com.just.ai.goap.Agent;
+import com.just.ai.goap.graph.Graph;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gameevent.DynamicGameEventListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.function.BiConsumer;
 
-public class Boiler extends Xenomorph {
+public class Boiler extends Xenomorph implements GOAPUser<Boiler> {
+
+    private static final XenomorphConfig CONFIG = XenomorphConfig.builder(XenomorphPathConfig.MEDIUM_DOOR, Boiler::getType)
+        .parallelDigCount(2)
+        .build();
 
     public static AttributeSupplier.Builder createBoilerAttributes() {
         return Alien.createAlienAttributes()
-            .add(Attributes.ARMOR, ArmorConstants.BOILER_ARMOR)
+            .add(Attributes.ARMOR, 2.0F)
             .add(Attributes.ARMOR_TOUGHNESS, 0f)
-            .add(Attributes.ATTACK_DAMAGE, AttackDamageConstants.BOILER_ATTACK_DAMAGE)
-            .add(Attributes.FOLLOW_RANGE, FollowRangeConstants.BOILER_FOLLOW_RANGE)
-            .add(Attributes.KNOCKBACK_RESISTANCE, KnockbackResistanceConstants.BOILER_KNOCKBACK_RESISTANCE)
-            .add(Attributes.MAX_HEALTH, HealthConstants.BOILER_HEALTH)
-            .add(Attributes.MOVEMENT_SPEED, MoveSpeedConstants.BOILER_SPEED);
+            .add(Attributes.ATTACK_DAMAGE, PlayerStatConstants.BASE_HEALTH * 0.25F)
+            .add(Attributes.FOLLOW_RANGE, 16F)
+            .add(Attributes.KNOCKBACK_RESISTANCE, 0.3f)
+            .add(Attributes.MAX_HEALTH, PlayerStatConstants.BASE_HEALTH * 2F)
+            .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1F);
     }
 
     private final BoilerAnimationDispatcher animationDispatcher;
 
+    private final VibrationSystemManager vibrationSystemManager;
+
+    private final BoilerData boilerData;
+
     public Boiler(EntityType<? extends Boiler> entityType, Level level) {
-        super(entityType, level);
+        super(entityType, level, CONFIG);
         this.animationDispatcher = new BoilerAnimationDispatcher(this);
+        this.vibrationSystemManager = new VibrationSystemManager(this, 2.5F, 32);
+        this.boilerData = new BoilerData();
     }
 
     @Override
-    public @Nullable EntityType<? extends Alien> getTypeForVariant(AlienVariant alienVariant) {
-        return getType(alienVariant);
+    public Agent.Builder<Boiler> blib$applyGOAPAgentProperties(Agent.Builder<Boiler> agentBuilder) {
+        return BoilerGOAP.applyAgentProperties(agentBuilder);
     }
 
     @Override
-    protected @Nullable ResinData createResinData() {
-        return null;
+    public @Nullable Graph<Boiler> blib$getGOAPGraphOrNull() {
+        return getActiveGOAPGraph(BoilerGOAP.GRAPH);
     }
 
     @Override
-    protected void registerGoals() {
-        super.registerGoals();
-        goalSelector.addGoal(3, new InvestigateVibrationGoal(this));
+    public void tick() {
+        super.tick();
+        vibrationSystemManager.tick();
+        boilerData.tick();
     }
 
     @Override
-    protected boolean canTargetInitially(LivingEntity target) {
-        return target.distanceToSqr(this) <= 4 * 4
-            && super.canTargetInitially(target);
+    public void updateDynamicGameEventListener(@NotNull BiConsumer<DynamicGameEventListener<?>, ServerLevel> biConsumer) {
+        vibrationSystemManager.updateDynamicGameEventListener(biConsumer);
     }
 
     @Override
     public boolean doHurtTarget(@NotNull Entity entity) {
         var radius = 2F;
-        level().explode(this, getX(), getY(), getZ(), radius, Level.ExplosionInteraction.MOB);
-        // TODO:
-        // this.spawnLingeringCloud();
+        ExplosiveXenomorphUtil.explodeWithAcid(this, radius, 3);
         triggerOnDeathMobEffects(RemovalReason.KILLED);
         discard();
-
-        // TODO: Redo the way acid strength is determined here, it isn't the greatest.
-        getBlockArea(blockPosition(), (int) radius, (int) radius, (int) radius)
-            .stream()
-            .filter(blockPos -> {
-                var blockState = level().getBlockState(blockPos);
-                return blockState.isAir() || blockState.canBeReplaced();
-            })
-            .forEach(blockPos -> AcidBleedUtil.spawnAcid(this, 3, blockPos.getCenter()));
 
         return true;
     }
 
-    // TODO: Move this to a util class.
-    private List<BlockPos> getBlockArea(BlockPos center, int radiusX, int radiusY, int radiusZ) {
-        var positions = new ArrayList<BlockPos>();
-
-        for (var dx = -radiusX; dx <= radiusX; dx++) {
-            for (var dy = -radiusY; dy <= radiusY; dy++) {
-                for (var dz = -radiusZ; dz <= radiusZ; dz++) {
-                    positions.add(center.offset(dx, dy, dz));
-                }
-            }
-        }
-
-        return positions;
-    }
-
-    @Override
-    protected void addDigToTargetGoal() {}
-
-    @Override
-    public void runAttackAnimations() {}
-
-    @Override
-    protected float getHealthRegenPerSecond() {
-        return HealthRegenConstants.BOILER_HEALTH_REGEN;
-    }
-
-    @Override
-    public Integer getMaxJellyToGrowth() {
-        return null;
-    }
-
     public BoilerAnimationDispatcher getAnimationDispatcher() {
         return animationDispatcher;
+    }
+
+    public VibrationSystemManager getVibrationSystemManager() {
+        return vibrationSystemManager;
+    }
+
+    public BoilerData getBoilerData() {
+        return boilerData;
     }
 
     public static EntityType<? extends Alien> getType(AlienVariant alienVariant) {

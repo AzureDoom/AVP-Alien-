@@ -4,6 +4,7 @@ import com.alien.Alien;
 import com.alien.common.registry.init.block.AlienResinBlocks;
 import com.alien.common.registry.init.creative_mode_tab.initializer.BlocksCreativeModeTabInitializer;
 import com.alien.common.registry.init.creative_mode_tab.initializer.CombatCreativeModeTabInitializer;
+import com.alien.common.registry.init.creative_mode_tab.initializer.FoodAndDrinksCreativeModeTabInitializer;
 import com.alien.common.registry.init.creative_mode_tab.initializer.IngredientsCreativeModeTabInitializer;
 import com.alien.common.registry.init.creative_mode_tab.initializer.SpawnEggsCreativeModeTabInitializer;
 import com.alien.common.registry.init.creative_mode_tab.initializer.ToolsAndUtilitiesCreativeModeTabInitializer;
@@ -18,6 +19,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -50,6 +52,12 @@ public class AlienCreativeModeTabs {
         AlienCreativeModeTabKeys.SPAWN_EGGS_KEY,
         () -> new ItemStack(AlienSpawnEggItems.QUEEN_SPAWN_EGG.get()),
         SpawnEggsCreativeModeTabInitializer.OUTPUT_CONSUMER
+    );
+
+    public static final BLibHolder<CreativeModeTab> FOOD_AND_DRINKS = create(
+        AlienCreativeModeTabKeys.FOOD_AND_DRINKS_KEY,
+        () -> new ItemStack(Items.POTION),
+        FoodAndDrinksCreativeModeTabInitializer.OUTPUT_CONSUMER
     );
 
     public static final BLibHolder<CreativeModeTab> TOOLS_AND_UTILITIES = create(

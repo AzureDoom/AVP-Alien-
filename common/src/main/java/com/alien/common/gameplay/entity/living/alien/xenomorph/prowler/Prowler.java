@@ -1,98 +1,78 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.prowler;
 
-import com.alien.common.constant.ArmorConstants;
-import com.alien.common.constant.AttackDamageConstants;
-import com.alien.common.constant.FollowRangeConstants;
-import com.alien.common.constant.HealthConstants;
-import com.alien.common.constant.HealthRegenConstants;
-import com.alien.common.constant.KnockbackResistanceConstants;
-import com.alien.common.constant.MoveSpeedConstants;
 import com.alien.common.gameplay.entity.living.alien.Alien;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphNavigationManager;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphPathConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.prowler.ai.ProwlerGOAP;
 import com.alien.common.model.alien.variant.AlienVariant;
-import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
-import com.blib.api.common.entity.v1.ai.goal.combat.LungeAtTargetGoal;
+import com.blib.api.common.entity.v1.PlayerStatConstants;
+import com.blib.api.common.goap.v1.GOAPUser;
+import com.just.ai.goap.Agent;
+import com.just.ai.goap.graph.Graph;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class Prowler extends Xenomorph {
+public class Prowler extends Xenomorph implements GOAPUser<Prowler> {
 
-    public static AttributeSupplier.Builder createProwlerAttributes() {
-        return Alien.createAlienAttributes()
-            .add(Attributes.ARMOR, ArmorConstants.PROWLER_ARMOR)
-            .add(Attributes.ARMOR_TOUGHNESS, 0f)
-            .add(Attributes.ATTACK_DAMAGE, AttackDamageConstants.PROWLER_ATTACK_DAMAGE)
-            .add(Attributes.FOLLOW_RANGE, FollowRangeConstants.PROWLER_FOLLOW_RANGE)
-            .add(Attributes.KNOCKBACK_RESISTANCE, KnockbackResistanceConstants.PROWLER_KNOCKBACK_RESISTANCE)
-            .add(Attributes.MAX_HEALTH, HealthConstants.PROWLER_HEALTH)
-            .add(Attributes.MOVEMENT_SPEED, MoveSpeedConstants.PROWLER_SPEED);
-    }
+    public static final AttackType CLAW = AttackType.builder("prowler_claw")
+        .defaultDurationInTicks(10)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    public static final AttackType BITE = AttackType.builder("prowler_bite")
+        .defaultDurationInTicks(8)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    public static final AttackType TAIL_QUAD = AttackType.builder("prowler_tail_quad")
+        .defaultDurationInTicks(10)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    private static final XenomorphConfig CONFIG = XenomorphConfig.builder(XenomorphPathConfig.SMALL_DOOR, Prowler::getType)
+        .attackConfig(
+            XenomorphAttackConfig.builder()
+                .addRegular(CLAW)
+                .addRegular(BITE)
+                .addRegular(TAIL_QUAD)
+                .build()
+        )
+        .build();
 
     private final ProwlerAnimationDispatcher animationDispatcher;
 
     public Prowler(EntityType<? extends Prowler> entityType, Level level) {
-        super(entityType, level);
+        super(entityType, level, CONFIG);
         this.animationDispatcher = new ProwlerAnimationDispatcher(this);
     }
 
-    @Override
-    public @Nullable EntityType<? extends Alien> getTypeForVariant(AlienVariant alienVariant) {
-        return getType(alienVariant);
+    public static AttributeSupplier.Builder createProwlerAttributes() {
+        return Alien.createAlienAttributes()
+            .add(Attributes.ARMOR, 8.0F)
+            .add(Attributes.ARMOR_TOUGHNESS, 0f)
+            .add(Attributes.ATTACK_DAMAGE, PlayerStatConstants.BASE_HEALTH * 0.5F)
+            .add(Attributes.FOLLOW_RANGE, 35F)
+            .add(Attributes.KNOCKBACK_RESISTANCE, 0.5f)
+            .add(Attributes.MAX_HEALTH, PlayerStatConstants.BASE_HEALTH * 3F)
+            .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1.1F);
     }
 
     @Override
-    protected @Nullable ResinData createResinData() {
-        return new ResinData(0, 16, 1, 20);
+    public Agent.Builder<Prowler> blib$applyGOAPAgentProperties(Agent.Builder<Prowler> agentBuilder) {
+        return ProwlerGOAP.applyAgentProperties(agentBuilder);
     }
 
     @Override
-    protected void registerGoals() {
-        super.registerGoals();
-        goalSelector.addGoal(3, new LungeAtTargetGoal(this, 0.05F, 20 * 7, 6, 12).setOnLungeCallback(this::runLungeAnimation));
-    }
-
-    @Override
-    protected @NotNull XenomorphNavigationManager createNavigationManager() {
-        return new XenomorphNavigationManager(this, moveControl, 1.2, 2);
-    }
-
-    @Override
-    public void runAttackAnimations() {
-        var attackType = random.nextInt(0, 3);
-
-        playSound(
-            AlienSoundEvents.ENTITY_XENOMORPH_ATTACK.get(),
-            getSoundVolume(),
-            (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F
-        );
-
-        switch (attackType) {
-            case 0 -> animationDispatcher.rightClawAttack();
-            case 1 -> animationDispatcher.biteAttack();
-            default -> animationDispatcher.tailAttackQuad();
-        }
-    }
-
-    private void runLungeAnimation() {
-        playSound(AlienSoundEvents.ENTITY_XENOMORPH_LUNGE.get(), getSoundVolume(), (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F);
-        animationDispatcher.lunge();
-    }
-
-    @Override
-    protected float getHealthRegenPerSecond() {
-        return HealthRegenConstants.PROWLER_HEALTH_REGEN;
-    }
-
-    @Override
-    public Integer getMaxJellyToGrowth() {
-        return 2;
+    public @Nullable Graph<Prowler> blib$getGOAPGraphOrNull() {
+        return getActiveGOAPGraph(ProwlerGOAP.GRAPH);
     }
 
     public ProwlerAnimationDispatcher getAnimationDispatcher() {

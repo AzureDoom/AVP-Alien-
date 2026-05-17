@@ -1,59 +1,66 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.crusher;
 
-import com.alien.common.constant.animation.CrusherAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.AzAnimationUtil;
 import com.blib.api.client.animation.v1.command.AzCommand;
 import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
-
-import java.util.Objects;
+import com.blib.api.client.animation.v1.command.policy.AzDispatchMode;
 
 public class CrusherAnimationDispatcher {
 
-    private static final AzCommand BITEATTACK_HEAD = AzCommand.create(
-        AzAlienAnimationUtil.HEAD_CONTROLLER_NAME,
-        CrusherAnimationRefs.BITEATTACK_HEAD_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
+    private static final AzCommand<Crusher> BITEATTACK_HEAD = AzCommand.<Crusher>replay()
+        .play(AzAlienAnimationUtil.HEAD, CrusherAnimationRefs.BITEATTACK_HEAD_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
+
+    private static final AzCommand<Crusher> IDLE_TAIL = AzCommand.<Crusher>idempotent()
+        .play(AzAlienAnimationUtil.TAIL, CrusherAnimationRefs.IDLE_TAIL_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
+
+    private static final AzCommand<Crusher> RUN_TAIL_PLAY_ONCE = AzCommand.<Crusher>replay()
+        .play(AzAlienAnimationUtil.TAIL, CrusherAnimationRefs.RUN_TAIL_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
+
+    private static final AzCommand<Crusher> IDLE_ALL = AzAnimationUtil.compose(
+        AzAlienAnimationUtil.XENO_LIMBS,
+        "idle",
+        AzPlayBehaviors.LOOP,
+        AzDispatchMode.PLAY_IF_NOT_PLAYING
     );
 
-    private static final AzCommand IDLE_TAIL = AzCommand.create(
-        AzAlienAnimationUtil.TAIL_CONTROLLER_NAME,
-        CrusherAnimationRefs.IDLE_TAIL_ANIMATION_NAME,
-        AzPlayBehaviors.LOOP
-    );
-
-    private static final AzCommand RUN_TAIL_PLAY_ONCE = AzCommand.create(
-        AzAlienAnimationUtil.TAIL_CONTROLLER_NAME,
-        CrusherAnimationRefs.RUN_TAIL_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
-    );
-
-    private static final AzCommand IDLE_ALL = AzAnimationUtil.compose(AzAlienAnimationUtil.XENO_LIMB_NAMES, "idle");
-
-    private static final AzCommand LEAP_ALL = AzCommand.compose(
+    private static final AzCommand<Crusher> LEAP_ALL = AzCommand.compose(
         AzAnimationUtil.compose(
-            AzAlienAnimationUtil.XENO_LIMB_NAMES.stream().filter(name -> !Objects.equals(name, "tail")).toList(),
+            AzAlienAnimationUtil.XENO_LIMBS.stream().filter(handle -> handle != AzAlienAnimationUtil.TAIL).toList(),
             "leap",
-            AzPlayBehaviors.PLAY_ONCE
+            AzPlayBehaviors.PLAY_ONCE,
+            AzDispatchMode.REPLAY
         ),
         RUN_TAIL_PLAY_ONCE
     );
 
-    private static final AzCommand RUN_ALL = AzAnimationUtil.compose(AzAlienAnimationUtil.XENO_LIMB_NAMES, "run");
-
-    private static final AzCommand SWIM_ALL = AzAnimationUtil.compose(AzAlienAnimationUtil.XENO_LIMB_NAMES, "swim");
-
-    private static final AzCommand TAILATTACK_TAIL = AzCommand.create(
-        AzAlienAnimationUtil.TAIL_CONTROLLER_NAME,
-        CrusherAnimationRefs.TAILATTACK_TAIL_ANIMATION_NAME,
-        AzPlayBehaviors.PLAY_ONCE
+    private static final AzCommand<Crusher> RUN_ALL = AzAnimationUtil.compose(
+        AzAlienAnimationUtil.XENO_LIMBS,
+        "run",
+        AzPlayBehaviors.LOOP,
+        AzDispatchMode.PLAY_IF_NOT_PLAYING
     );
 
-    private static final AzCommand WALK_ALL = AzCommand.compose(
+    private static final AzCommand<Crusher> SWIM_ALL = AzAnimationUtil.compose(
+        AzAlienAnimationUtil.XENO_LIMBS,
+        "swim",
+        AzPlayBehaviors.LOOP,
+        AzDispatchMode.PLAY_IF_NOT_PLAYING
+    );
+
+    private static final AzCommand<Crusher> TAILATTACK_TAIL = AzCommand.<Crusher>replay()
+        .play(AzAlienAnimationUtil.TAIL, CrusherAnimationRefs.TAILATTACK_TAIL_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
+
+    private static final AzCommand<Crusher> WALK_ALL = AzCommand.compose(
         AzAnimationUtil.compose(
-            AzAlienAnimationUtil.XENO_LIMB_NAMES.stream().filter(name -> !Objects.equals(name, "tail")).toList(),
+            AzAlienAnimationUtil.XENO_LIMBS.stream().filter(handle -> handle != AzAlienAnimationUtil.TAIL).toList(),
             "walk",
-            AzPlayBehaviors.LOOP
+            AzPlayBehaviors.LOOP,
+            AzDispatchMode.PLAY_IF_NOT_PLAYING
         ),
         IDLE_TAIL
     );
@@ -65,30 +72,46 @@ public class CrusherAnimationDispatcher {
     }
 
     public void biteAttack() {
-        BITEATTACK_HEAD.sendForEntity(crusher);
+        BITEATTACK_HEAD.dispatchForEntity(crusher);
+    }
+
+    public void biteAttack(float speed) {
+        AzCommand.<Crusher>replay()
+            .play(AzAlienAnimationUtil.HEAD, CrusherAnimationRefs.BITEATTACK_HEAD_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+            .setSpeed(AzAlienAnimationUtil.HEAD, speed)
+            .build()
+            .dispatchForEntity(crusher);
     }
 
     public void idle() {
-        IDLE_ALL.sendForEntity(crusher);
+        IDLE_ALL.dispatchForEntity(crusher);
     }
 
     public void lunge() {
-        LEAP_ALL.sendForEntity(crusher);
+        LEAP_ALL.dispatchForEntity(crusher);
     }
 
     public void run() {
-        RUN_ALL.sendForEntity(crusher);
+        RUN_ALL.dispatchForEntity(crusher);
     }
 
     public void swim() {
-        SWIM_ALL.sendForEntity(crusher);
+        SWIM_ALL.dispatchForEntity(crusher);
     }
 
     public void tailAttack() {
-        TAILATTACK_TAIL.sendForEntity(crusher);
+        TAILATTACK_TAIL.dispatchForEntity(crusher);
+    }
+
+    public void tailAttack(float speed) {
+        AzCommand.<Crusher>replay()
+            .play(AzAlienAnimationUtil.TAIL, CrusherAnimationRefs.TAILATTACK_TAIL_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+            .setSpeed(AzAlienAnimationUtil.TAIL, speed)
+            .build()
+            .dispatchForEntity(crusher);
     }
 
     public void walk() {
-        WALK_ALL.sendForEntity(crusher);
+        WALK_ALL.dispatchForEntity(crusher);
     }
 }

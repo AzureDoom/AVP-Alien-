@@ -15,6 +15,8 @@ public class AlienCreativeModeTabKeys {
 
     public static final ResourceKey<CreativeModeTab> SPAWN_EGGS_KEY = createResourceKey("alien_spawn_eggs");
 
+    public static final ResourceKey<CreativeModeTab> FOOD_AND_DRINKS_KEY = createResourceKey("alien_food_and_drinks");
+
     public static final ResourceKey<CreativeModeTab> TOOLS_AND_UTILITIES_KEY = createResourceKey("alien_tools_and_utilities");
 
     public static ResourceKey<CreativeModeTab> createResourceKey(String name) {

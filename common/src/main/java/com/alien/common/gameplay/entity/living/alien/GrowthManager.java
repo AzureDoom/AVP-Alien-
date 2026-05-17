@@ -1,6 +1,9 @@
 package com.alien.common.gameplay.entity.living.alien;
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.boiler.Boiler;
+import com.alien.common.gameplay.hive2.faction.FactionMembershipTransfer;
+import com.alien.common.gameplay.hive2.faction.LocationMembership;
+import com.alien.common.model.lifecycle.growth.GrowthRequirement;
 import com.alien.common.model.lifecycle.growth.GrowthStage;
 import com.alien.common.registry.GrowthStageRegistry;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
@@ -19,68 +22,69 @@ import net.minecraft.world.entity.EntityType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 
 public class GrowthManager implements NBTSerializable {
 
     private static final String GROWTH_TIME_IN_TICKS_TAG_KEY = "growthTimeInTicks";
 
-    private static final Set<String> TRANSITION_NBT_KEY_BLACKLIST = Util.make(() -> {
+    private static final int POST_MOLT_GROWTH_BUFFER_TICKS = 20;
+
+    public static final Set<String> TRANSITION_NBT_KEY_BLACKLIST = Util.make(() -> {
         var set = new HashSet<>(EntityTransitionUtil.DEFAULT_NBT_KEY_BLACKLIST);
         set.add(GROWTH_TIME_IN_TICKS_TAG_KEY);
+        set.add(MoltingManager.FORM_SCALE_PHASE_INDEX_TAG);
+        set.add(MoltingManager.FORM_SCALE_PHASE_TICKS_TAG);
+        set.add(MoltingManager.FORM_SCALE_TARGET_REACHED_TICKS_TAG);
+        set.add(com.alien.common.gameplay.entity.living.alien.xenomorph.CocoonManager.COCOON_STATE_TAG);
+        set.add(com.alien.common.gameplay.entity.living.alien.xenomorph.CocoonManager.COCOON_TARGET_TYPE_TAG);
+        set.add(com.alien.common.gameplay.entity.living.alien.xenomorph.CocoonManager.COCOON_SOURCE_TIME_TAG);
+        set.add(com.alien.common.gameplay.entity.living.alien.xenomorph.CocoonManager.COCOON_DESTINATION_TIME_TAG);
+        set.add(com.alien.common.gameplay.entity.living.alien.xenomorph.CocoonManager.COCOON_ELAPSED_TICKS_TAG);
         return set;
     });
 
     private final Alien entity;
 
-    private final @Nullable Consumer<Entity> onGrowUpCallback;
-
     private boolean growOverTime;
 
     private int growthTimeInTicks;
 
-    private int growthRetryTimeInTicks = 0;
+    private int growthRetryTimeInTicks;
 
     private boolean readyToGrow;
 
-    public GrowthManager(Alien entity) {
-        this(entity, null);
-    }
+    private @Nullable GrowthStage activeRequirementGrowthStage;
 
-    public GrowthManager(Alien entity, @Nullable Consumer<Entity> onGrowUpCallback) {
+    public GrowthManager(Alien entity) {
         this.entity = entity;
-        this.onGrowUpCallback = onGrowUpCallback;
         this.growOverTime = true;
         this.readyToGrow = false;
     }
 
     public void tick() {
-        if (
-            entity.level().isClientSide
-                || canNeverGrow()
-        ) {
+        if (entity.level().isClientSide || canNeverGrow()) {
             return;
         }
 
-        var growthStage = getNextGrowthStage();
+        var matchingStage = findActiveOrMatchingGrowthStage();
 
-        if (growthStage == null) {
+        if (matchingStage == null) {
             return;
         }
 
-        var canBypassGrowthTime = entity.getMaxJellyToGrowth() != null && entity.getJellyCount() >= entity.getMaxJellyToGrowth();
-
-        if (canBypassGrowthTime) {
-            // If we can bypass growing over time thanks to royal jelly, then do so.
-            this.readyToGrow = true;
+        if (matchingStage.hasRequirements()) {
+            tickEffectBasedGrowth(matchingStage);
         } else if (growOverTime) {
-            // Otherwise if we can't bypass growth time, tick the entity's growth progress.
-            growOverTime();
+            tickTimeBasedGrowth(matchingStage);
         }
 
         if (!readyToGrow) {
-            // If the entity isn't ready to grow, then don't continue any further.
+            return;
+        }
+
+        if (!entity.getMoltingManager().hasReachedTargetScaleFor(POST_MOLT_GROWTH_BUFFER_TICKS)) {
             return;
         }
 
@@ -90,102 +94,165 @@ public class GrowthManager implements NBTSerializable {
             return;
         }
 
-        // Growth attempts can fail for a lot of reasons. This switch covers every possible reason.
-        switch (grow()) {
-            case GrowthResult.AlreadyFullyGrown $ -> {/* NO-OP */}
-            case GrowthResult.CanNotGrow $ -> {/* NO-OP */}
-            case GrowthResult.Success $ -> {/* NO-OP */}
+        switch (grow(matchingStage)) {
+            case GrowthResult.AlreadyFullyGrown ignored -> {/* NO-OP */}
+            case GrowthResult.CanNotGrow ignored -> {/* NO-OP */}
+            case GrowthResult.CocoonStarted ignored -> {/* NO-OP */}
+            case GrowthResult.Success ignored -> {/* NO-OP */}
             case GrowthResult.FailedTransitionResult failedTransitionResult -> {
-                switch (failedTransitionResult.result) {
-                    case EntityTransitionUtil.EntityTransitionResult.ClientSide $1 -> {/* NO-OP */}
-                    case EntityTransitionUtil.EntityTransitionResult.EntityCreation $1 -> {/* NO-OP */}
-                    case EntityTransitionUtil.EntityTransitionResult.Obstructed $1 ->
-                        // If the entity failed to grow, then retry in 10 seconds.
-                        // TODO: Add particles here maybe if the alien can't grow up, to indicate "frustration"?
-                        // Apply a buffer time period before we retry growing.
-                        this.growthRetryTimeInTicks = 20 * 10;
-                    case EntityTransitionUtil.EntityTransitionResult.Success<?> $1 -> {/* NO-OP */ }
+                if (failedTransitionResult.result instanceof EntityTransitionUtil.EntityTransitionResult.Obstructed) {
+                    this.growthRetryTimeInTicks = 20 * 10;
                 }
             }
         }
     }
 
-    private @Nullable GrowthStage getNextGrowthStage() {
-        var hostType = entity.getHostType().unwrapOr(null);
-        return GrowthStageRegistry.getOrNull(hostType, entity.getType());
+    private @Nullable GrowthStage findActiveOrMatchingGrowthStage() {
+        if (activeRequirementGrowthStage != null) {
+            return activeRequirementGrowthStage;
+        }
+
+        return findMatchingGrowthStage();
     }
 
-    private void growOverTime() {
-        this.growthTimeInTicks++;
+    private @Nullable GrowthStage findMatchingGrowthStage() {
+        var hostType = entity.getHostType().unwrapOr(null);
+        var candidates = GrowthStageRegistry.getCandidates(hostType, entity.getType());
 
-        var growthStage = getNextGrowthStage();
+        for (var candidate : candidates) {
+            if (!candidate.hasRequirements()) {
+                return candidate;
+            }
 
-        if (growthStage == null) {
+            if (allRequirementsMet(candidate.requirements())) {
+                return candidate;
+            }
+        }
+
+        return null;
+    }
+
+    private boolean allRequirementsMet(List<GrowthRequirement> requirements) {
+        for (var requirement : requirements) {
+            if (!requirement.test(entity)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void tickEffectBasedGrowth(GrowthStage stage) {
+        var requirementsMet = allRequirementsMet(stage.requirements());
+
+        if (requirementsMet) {
+            activeRequirementGrowthStage = stage;
+        }
+
+        if (activeRequirementGrowthStage == null) {
+            this.readyToGrow = false;
             return;
         }
 
-        var requiredGrowthTimeInTicks = growthStage.growthTimeInTicks();
-        var growthTimeReductionMultiplier = 1F;
-
-        if (growthTimeInTicks < requiredGrowthTimeInTicks * growthTimeReductionMultiplier) {
+        if (!requirementsMet && !entity.getMoltingManager().isMolting() && !entity.getMoltingManager().hasReachedTargetScale()) {
+            activeRequirementGrowthStage = null;
+            this.readyToGrow = false;
             return;
         }
 
         this.readyToGrow = true;
     }
 
-    public GrowthResult grow() {
-        // Reset growth time at this point.
-        this.growthTimeInTicks = 0;
-        var growthStage = getNextGrowthStage();
+    private void tickTimeBasedGrowth(GrowthStage stage) {
+        this.growthTimeInTicks++;
 
-        if (growthStage == null) {
+        if (growthTimeInTicks >= stage.growthTimeInTicks()) {
+            this.readyToGrow = true;
+        }
+    }
+
+    public GrowthResult grow() {
+        var stage = findMatchingGrowthStage();
+
+        if (stage == null) {
             return GrowthResult.AlreadyFullyGrown.INSTANCE;
-        } else if (canNeverGrow()) {
+        }
+
+        return grow(stage);
+    }
+
+    /**
+     * Force-grows the entity into the {@code stage}'s {@code to} form, bypassing the stage's growth requirements (e.g.,
+     * the metamorphosis mob effect). Used by hive-driven maturation paths
+     * ({@link com.alien.common.gameplay.hive2.lifecycle.QueenlessMaturationTask}) where the requirement is the hive's
+     * social state rather than a player-applied effect.
+     * <p>
+     * Still respects {@link #canNeverGrow()} (poisoned/irradiated entities don't transition) and the cocoon pipeline
+     * for xenomorphs — visually identical to a regular grow, just without the requirement gate.
+     */
+    public GrowthResult forceGrow(GrowthStage growthStage) {
+        return grow(growthStage);
+    }
+
+    public GrowthResult grow(GrowthStage growthStage) {
+        this.growthTimeInTicks = 0;
+        this.readyToGrow = false;
+        this.activeRequirementGrowthStage = null;
+
+        if (canNeverGrow()) {
             return GrowthResult.CanNotGrow.INSTANCE;
         }
 
         var nextFormType = growthStage.to();
-
         var canBecomeBoiler = canBecomeBoiler(nextFormType);
-
-        Entity nextForm;
 
         if (canBecomeBoiler) {
             nextFormType = Boiler.getType(entity.getVariant());
         }
 
+        removeRequirementEffects(growthStage);
+
+        if (entity instanceof com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph xenomorph) {
+            xenomorph.getCocoonManager().prepare(nextFormType, growthStage.cocooning());
+            return GrowthResult.CocoonStarted.INSTANCE;
+        }
+
+        // Snapshot hive2 faction membership before the transition discards the old entity (UUID is in the default
+        // blacklist, so the new entity has a fresh id and wouldn't otherwise inherit membership).
+        var factionSnapshot = FactionMembershipTransfer.snapshot(entity);
+
         var transitionResult = EntityTransitionUtil.transitionInto(entity, nextFormType, TRANSITION_NBT_KEY_BLACKLIST);
 
-        nextForm = switch (transitionResult) {
-            case EntityTransitionUtil.EntityTransitionResult.ClientSide ignored -> null;
-            case EntityTransitionUtil.EntityTransitionResult.EntityCreation ignored -> null;
-            case EntityTransitionUtil.EntityTransitionResult.Obstructed ignored -> null;
-            case EntityTransitionUtil.EntityTransitionResult.Success<?> success -> success.newEntity();
-        };
+        Entity nextForm = null;
+
+        if (transitionResult instanceof EntityTransitionUtil.EntityTransitionResult.Success<?> success) {
+            nextForm = success.newEntity();
+        }
 
         if (nextForm == null) {
             return new GrowthResult.FailedTransitionResult(transitionResult);
         }
 
-        if (nextForm instanceof Alien alien) {
-            var jellyCountToSubtract = entity.getMaxJellyToGrowth() == null
-                ? 0
-                : entity.getMaxJellyToGrowth();
-
-            alien.setJellyCount(entity.getJellyCount() - jellyCountToSubtract);
-        }
-
-        if (onGrowUpCallback != null) {
-            onGrowUpCallback.accept(nextForm);
+        // Carry over hive2 membership, and auto-join the parent location if the new form is a xenomorph in territory
+        // (covers the chestburster -> adolescent case where the old form wasn't a faction member).
+        FactionMembershipTransfer.apply(factionSnapshot, nextForm);
+        if (entity.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+            LocationMembership.autoJoinAtPosition(nextForm, serverLevel);
         }
 
         return new GrowthResult.Success(nextForm);
     }
 
     private boolean canNeverGrow() {
-        return entity.isPoisoned()
-            || entity.isIrradiated();
+        return entity.isPoisoned() || entity.isIrradiated();
+    }
+
+    private void removeRequirementEffects(GrowthStage stage) {
+        for (var requirement : stage.requirements()) {
+            if (requirement instanceof GrowthRequirement.MobEffectRequirement effectRequirement) {
+                entity.removeEffect(effectRequirement.effect());
+            }
+        }
     }
 
     private boolean canBecomeBoiler(EntityType<?> nextFormType) {
@@ -200,8 +267,7 @@ public class GrowthManager implements NBTSerializable {
         var isCurrentlyAdolescent = entity.getType().is(AlienEntityTypeTags.ADOLESCENTS);
         var willGrowIntoAdult = nextFormType.is(AlienEntityTypeTags.XENOMORPHS);
 
-        return isCurrentlyAdolescent
-            && willGrowIntoAdult;
+        return isCurrentlyAdolescent && willGrowIntoAdult;
     }
 
     private boolean shouldBecomeBoilerFromAcidVolatility() {
@@ -233,11 +299,8 @@ public class GrowthManager implements NBTSerializable {
             case FATAL -> true;
             case STABLE, UNSTABLE -> false;
             case VOLATILE -> {
-                // Ex. -2.75 -> 2.75
                 var totalGeneIntegrity = Math.abs(GeneIntegrityUtil.getTotalGeneticIntegrity(geneCarrier));
-                // Ex. 2.75 - 2 = 0.75
                 var chance = totalGeneIntegrity - Math.floor(totalGeneIntegrity);
-                // Ex. 0.75 means 75% chance to be a boiler.
                 yield entity.getRandom().nextDouble() < chance;
             }
         };
@@ -260,6 +323,11 @@ public class GrowthManager implements NBTSerializable {
         return this;
     }
 
+    public boolean hasActiveGrowthRequirement() {
+        var stage = activeRequirementGrowthStage != null ? activeRequirementGrowthStage : findMatchingGrowthStage();
+        return stage != null && stage.hasRequirements() && allRequirementsMet(stage.requirements());
+    }
+
     public sealed interface GrowthResult {
 
         enum AlreadyFullyGrown implements GrowthResult {
@@ -267,6 +335,10 @@ public class GrowthManager implements NBTSerializable {
         }
 
         enum CanNotGrow implements GrowthResult {
+            INSTANCE
+        }
+
+        enum CocoonStarted implements GrowthResult {
             INSTANCE
         }
 

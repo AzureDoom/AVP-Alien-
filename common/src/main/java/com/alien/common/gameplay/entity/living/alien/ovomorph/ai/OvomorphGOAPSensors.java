@@ -2,8 +2,8 @@ package com.alien.common.gameplay.entity.living.alien.ovomorph.ai;
 
 import com.alien.common.gameplay.entity.living.alien.ovomorph.Ovomorph;
 import com.alien.common.model.alien.HatchState;
-import com.just.goap.sensor.Sensor;
-import com.just.goap.sensor.Sensors;
+import com.just.ai.goap.sensor.Sensor;
+import com.just.ai.goap.sensor.Sensors;
 
 public class OvomorphGOAPSensors {
 

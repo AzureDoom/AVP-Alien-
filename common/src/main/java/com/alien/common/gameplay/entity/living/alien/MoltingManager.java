@@ -1,0 +1,304 @@
+package com.alien.common.gameplay.entity.living.alien;
+
+import com.alien.AlienResources;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
+import com.alien.common.model.lifecycle.growth.FormSizeScale;
+import com.alien.common.model.lifecycle.growth.MoltPhase;
+import com.alien.common.registry.FormSizeScaleRegistry;
+import com.alien.common.util.AlienPredicates;
+import com.blib.api.common.nbt.v1.model.NBTSerializable;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import org.jetbrains.annotations.Nullable;
+
+public class MoltingManager implements NBTSerializable {
+
+    public static final String FORM_SCALE_PHASE_INDEX_TAG = "formScalePhaseIndex";
+
+    public static final String FORM_SCALE_PHASE_TICKS_TAG = "formScalePhaseTicks";
+
+    public static final String FORM_SCALE_TARGET_REACHED_TICKS_TAG = "formScaleTargetReachedTicks";
+
+    private static final ResourceLocation FORM_SIZE_SCALE_MODIFIER = AlienResources.location("form_size_scale");
+
+    private static final int MOLT_FADE_TICKS = 20;
+
+    private static final int RECENTLY_HURT_WINDOW_IN_TICKS = 10 * 20;
+
+    private final Alien entity;
+
+    private int phaseIndex;
+
+    private int phaseElapsedTicks;
+
+    private int targetScaleReachedTicks;
+
+    private @Nullable FormSizeScale cachedData;
+
+    private boolean dataCacheDirty;
+
+    public MoltingManager(Alien entity) {
+        this.entity = entity;
+        this.phaseIndex = 0;
+        this.phaseElapsedTicks = 0;
+        this.targetScaleReachedTicks = Integer.MAX_VALUE;
+        this.dataCacheDirty = true;
+
+        var data = getData();
+
+        if (data != null) {
+            if (!data.isFullyMatured(phaseIndex)) {
+                this.targetScaleReachedTicks = 0;
+            }
+
+            applyScaleModifier(data);
+        }
+    }
+
+    public void tick() {
+        if (entity.level().isClientSide) {
+            return;
+        }
+
+        var data = getData();
+
+        if (data == null) {
+            targetScaleReachedTicks = Integer.MAX_VALUE;
+            return;
+        }
+
+        if (data.isFullyMatured(phaseIndex)) {
+            entity.moltAlpha.set(0F);
+            incrementTargetScaleReachedTicks();
+            return;
+        }
+
+        targetScaleReachedTicks = 0;
+
+        var currentPhase = data.phases().get(phaseIndex);
+
+        if (!isMolting(currentPhase) && shouldStartMoltImmediately()) {
+            if (!canStartMolting()) {
+                return;
+            }
+
+            phaseElapsedTicks = currentPhase.idleTicks();
+        }
+
+        if (willStartMolting(currentPhase) && !canStartMolting()) {
+            return;
+        }
+
+        phaseElapsedTicks++;
+
+        if (phaseElapsedTicks >= currentPhase.totalTicks()) {
+            phaseIndex++;
+            phaseElapsedTicks = 0;
+
+            if (data.isFullyMatured(phaseIndex)) {
+                targetScaleReachedTicks = 0;
+            }
+
+            applyScaleModifier(data);
+            entity.moltAlpha.set(0F);
+            return;
+        }
+
+        var moltAlpha = computeMoltAlpha(currentPhase);
+        entity.moltAlpha.set(moltAlpha);
+
+        if (isMolting(currentPhase)) {
+            applyScaleModifier(data);
+        }
+    }
+
+    public boolean hasReachedTargetScale() {
+        var data = getData();
+
+        if (data == null) {
+            return true;
+        }
+
+        return data.isFullyMatured(phaseIndex);
+    }
+
+    public boolean hasReachedTargetScaleFor(int ticks) {
+        return hasReachedTargetScale() && targetScaleReachedTicks >= ticks;
+    }
+
+    public float getCurrentScale() {
+        var data = getData();
+
+        if (data == null) {
+            return 1.0f;
+        }
+
+        if (data.isFullyMatured(phaseIndex)) {
+            return data.endScale();
+        }
+
+        var currentPhase = data.phases().get(phaseIndex);
+
+        if (!isMolting(currentPhase)) {
+            return data.scaleBeforePhase(phaseIndex);
+        }
+
+        var moltElapsed = phaseElapsedTicks - currentPhase.idleTicks();
+        var moltProgress = (float) moltElapsed / currentPhase.moltTicks();
+        var phaseStartScale = data.scaleBeforePhase(phaseIndex);
+        var phaseEndScale = data.scaleForPhase(phaseIndex);
+
+        return phaseStartScale + (phaseEndScale - phaseStartScale) * moltProgress;
+    }
+
+    public boolean isMolting() {
+        var data = getData();
+
+        if (data == null || data.isFullyMatured(phaseIndex)) {
+            return false;
+        }
+
+        return isMolting(data.phases().get(phaseIndex));
+    }
+
+    public void skipToFullMaturity() {
+        var data = getData();
+        if (data == null) {
+            targetScaleReachedTicks = Integer.MAX_VALUE;
+            entity.moltAlpha.set(0F);
+            return;
+        }
+
+        phaseIndex = data.phases().size();
+        phaseElapsedTicks = 0;
+        targetScaleReachedTicks = Integer.MAX_VALUE;
+        entity.moltAlpha.set(0F);
+        applyScaleModifier(data);
+    }
+
+    private boolean isMolting(MoltPhase phase) {
+        return phaseElapsedTicks >= phase.idleTicks();
+    }
+
+    private boolean shouldStartMoltImmediately() {
+        return entity instanceof Xenomorph xenomorph && xenomorph.getGrowthManager().hasActiveGrowthRequirement();
+    }
+
+    private boolean willStartMolting(MoltPhase phase) {
+        return !isMolting(phase) && phaseElapsedTicks + 1 >= phase.idleTicks();
+    }
+
+    private boolean canStartMolting() {
+        return !isVulnerableAndOnFire() && !wasRecentlyHurt() && entity.getTarget() == null && !hasNearbyAttackTarget();
+    }
+
+    private boolean isVulnerableAndOnFire() {
+        return entity.isOnFire() && !entity.fireImmune();
+    }
+
+    private boolean wasRecentlyHurt() {
+        var lastHurtTime = entity.getLastHurtTimeInTicks();
+        return lastHurtTime > 0 && entity.tickCount - lastHurtTime < RECENTLY_HURT_WINDOW_IN_TICKS;
+    }
+
+    private boolean hasNearbyAttackTarget() {
+        if (!(entity instanceof Xenomorph xenomorph)) {
+            return false;
+        }
+
+        return xenomorph.getEntitySenseCache()
+            .getByClass(LivingEntity.class)
+            .stream()
+            .anyMatch(potentialTarget -> AlienPredicates.canTarget(xenomorph, potentialTarget));
+    }
+
+    private float computeMoltAlpha(MoltPhase phase) {
+        if (!isMolting(phase)) {
+            var ticksUntilMolt = phase.idleTicks() - phaseElapsedTicks;
+
+            if (ticksUntilMolt <= MOLT_FADE_TICKS) {
+                return 1.0F - (float) ticksUntilMolt / MOLT_FADE_TICKS;
+            }
+
+            return 0F;
+        }
+
+        var moltElapsed = phaseElapsedTicks - phase.idleTicks();
+        var moltRemaining = phase.moltTicks() - moltElapsed;
+
+        if (moltRemaining <= MOLT_FADE_TICKS) {
+            return (float) moltRemaining / MOLT_FADE_TICKS;
+        }
+
+        return 1.0F;
+    }
+
+    private void applyScaleModifier(FormSizeScale data) {
+        var scaleInstance = entity.getAttribute(Attributes.SCALE);
+
+        if (scaleInstance == null) {
+            return;
+        }
+
+        var currentScale = getCurrentScale();
+        var modifierValue = currentScale - 1.0;
+
+        scaleInstance.removeModifier(FORM_SIZE_SCALE_MODIFIER);
+
+        if (Math.abs(modifierValue) > 0.001) {
+            scaleInstance.addTransientModifier(
+                new AttributeModifier(FORM_SIZE_SCALE_MODIFIER, modifierValue, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
+            );
+        }
+    }
+
+    private void incrementTargetScaleReachedTicks() {
+        if (targetScaleReachedTicks < Integer.MAX_VALUE) {
+            targetScaleReachedTicks++;
+        }
+    }
+
+    private @Nullable FormSizeScale getData() {
+        if (dataCacheDirty) {
+            cachedData = FormSizeScaleRegistry.get(entity.getType());
+            dataCacheDirty = false;
+        }
+
+        return cachedData;
+    }
+
+    @Override
+    public void load(CompoundTag compoundTag) {
+        if (compoundTag.contains(FORM_SCALE_PHASE_INDEX_TAG)) {
+            this.phaseIndex = compoundTag.getInt(FORM_SCALE_PHASE_INDEX_TAG);
+        }
+
+        if (compoundTag.contains(FORM_SCALE_PHASE_TICKS_TAG)) {
+            this.phaseElapsedTicks = compoundTag.getInt(FORM_SCALE_PHASE_TICKS_TAG);
+        }
+
+        if (compoundTag.contains(FORM_SCALE_TARGET_REACHED_TICKS_TAG)) {
+            this.targetScaleReachedTicks = compoundTag.getInt(FORM_SCALE_TARGET_REACHED_TICKS_TAG);
+        }
+
+        var data = getData();
+
+        if (data != null) {
+            if (!compoundTag.contains(FORM_SCALE_TARGET_REACHED_TICKS_TAG)) {
+                this.targetScaleReachedTicks = data.isFullyMatured(phaseIndex) ? Integer.MAX_VALUE : 0;
+            }
+
+            applyScaleModifier(data);
+        }
+    }
+
+    @Override
+    public void save(CompoundTag compoundTag) {
+        compoundTag.putInt(FORM_SCALE_PHASE_INDEX_TAG, phaseIndex);
+        compoundTag.putInt(FORM_SCALE_PHASE_TICKS_TAG, phaseElapsedTicks);
+        compoundTag.putInt(FORM_SCALE_TARGET_REACHED_TICKS_TAG, targetScaleReachedTicks);
+    }
+}

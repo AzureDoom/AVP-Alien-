@@ -12,8 +12,12 @@ public class EnUsEntityTypeTagProvider {
         builder.add(AlienEntityTypeTags.ACID_IMMUNE, "Acid Immune");
         builder.add(AlienEntityTypeTags.ALIENS, "Aliens");
         builder.add(AlienEntityTypeTags.CHESTBURSTERS, "Chestbursters");
+        builder.add(AlienEntityTypeTags.CARRIERS, "Carriers");
+        builder.add(AlienEntityTypeTags.CHRYSALISES, "Chrysalises");
         builder.add(AlienEntityTypeTags.DRONES, "Drones");
+        builder.add(AlienEntityTypeTags.EMPRESSES, "Empresses");
         builder.add(AlienEntityTypeTags.FACEHUGGERS, "Facehuggers");
+        builder.add(AlienEntityTypeTags.HARBINGERS, "Harbingers");
         builder.add(AlienEntityTypeTags.HATED_BY_XENOMORPHS, "Hated By Xenomorphs");
         builder.add(AlienEntityTypeTags.HIVE_ALIENS, "Hive Aliens");
         builder.add(AlienEntityTypeTags.HOSTS, "Hosts");
@@ -25,6 +29,9 @@ public class EnUsEntityTypeTagProvider {
         builder.add(AlienEntityTypeTags.PRAETORIANS, "Praetorians");
         builder.add(AlienEntityTypeTags.PREDALIENS, "Predaliens");
         builder.add(AlienEntityTypeTags.QUEENS, "Queens");
+        builder.add(AlienEntityTypeTags.RAVAGERS, "Ravagers");
+        builder.add(AlienEntityTypeTags.RAZOR_CLAWS, "Razor Claws");
+        builder.add(AlienEntityTypeTags.SCOURGE_ALIENS, "Scourge Aliens");
         builder.add(AlienEntityTypeTags.ROYAL_ALIENS, "Royal Aliens");
         builder.add(AlienEntityTypeTags.ROYAL_XENOMORPHS, "Royal Xenomorphs");
         builder.add(AlienEntityTypeTags.SPAWNS_IN_HIVE_DRONE_LAYER, "Spawns In Hive Drone Layer");

@@ -1,26 +1,26 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.drone;
 
-import com.alien.common.constant.ArmorConstants;
-import com.alien.common.constant.AttackDamageConstants;
-import com.alien.common.constant.FollowRangeConstants;
-import com.alien.common.constant.HealthConstants;
-import com.alien.common.constant.HealthRegenConstants;
-import com.alien.common.constant.KnockbackResistanceConstants;
-import com.alien.common.constant.MoveSpeedConstants;
-import com.alien.common.gameplay.ai.CreateVentGoal;
-import com.alien.common.gameplay.ai.DropOffEggGoal;
-import com.alien.common.gameplay.ai.PickUpEggGoal;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.EggCarrier;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.EggPickupManager;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.VentBuilder;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.VentData;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphPathConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.ai.DroneGOAP;
 import com.alien.common.model.alien.variant.AlienVariant;
-import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.entity.v1.EntityUtil;
-import com.blib.api.common.entity.v1.ai.goal.combat.LungeAtTargetGoal;
+import com.blib.api.common.entity.v1.PlayerStatConstants;
+import com.blib.api.common.goap.v1.GOAPUser;
+import com.just.ai.goap.Agent;
+import com.just.ai.goap.graph.Graph;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -33,46 +33,67 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
 
-public class Drone extends Xenomorph implements EggCarrier {
+public class Drone extends Xenomorph implements EggCarrier, GOAPUser<Drone>, VentBuilder {
+
+    public static final AttackType CLAW = AttackType.builder("drone_claw")
+        .defaultDurationInTicks(10)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    public static final AttackType BITE = AttackType.builder("drone_bite")
+        .defaultDurationInTicks(8)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    public static final AttackType TAIL = AttackType.builder("drone_tail")
+        .defaultDurationInTicks(12)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
 
     public static AttributeSupplier.Builder createDroneAttributes() {
         return Alien.createAlienAttributes()
-            .add(Attributes.ARMOR, ArmorConstants.DRONE_ARMOR)
+            .add(Attributes.ARMOR, 4.0F)
             .add(Attributes.ARMOR_TOUGHNESS, 0f)
-            .add(Attributes.ATTACK_DAMAGE, AttackDamageConstants.DRONE_ATTACK_DAMAGE)
-            .add(Attributes.FOLLOW_RANGE, FollowRangeConstants.DRONE_FOLLOW_RANGE)
-            .add(Attributes.KNOCKBACK_RESISTANCE, KnockbackResistanceConstants.DRONE_KNOCKBACK_RESISTANCE)
-            .add(Attributes.MAX_HEALTH, HealthConstants.DRONE_HEALTH)
-            .add(Attributes.MOVEMENT_SPEED, MoveSpeedConstants.DRONE_SPEED);
+            .add(Attributes.ATTACK_DAMAGE, PlayerStatConstants.BASE_HEALTH * 0.25F)
+            .add(Attributes.FOLLOW_RANGE, 35F)
+            .add(Attributes.KNOCKBACK_RESISTANCE, 0.3f)
+            .add(Attributes.MAX_HEALTH, PlayerStatConstants.BASE_HEALTH * 2F)
+            .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1F);
     }
 
     private final DroneAnimationDispatcher animationDispatcher;
 
     private final EggPickupManager eggPickupManager;
 
+    private final VentData ventData;
+
     public Drone(EntityType<? extends Drone> entityType, Level level) {
-        super(entityType, level);
+        super(
+            entityType,
+            level,
+            XenomorphConfig.builder(XenomorphPathConfig.MEDIUM_DOOR, Drone::getType)
+                .attackConfig(
+                    XenomorphAttackConfig.builder()
+                        .addRegular(CLAW)
+                        .addRegular(BITE)
+                        .addRegular(TAIL)
+                        .build()
+                )
+                .build()
+        );
         this.animationDispatcher = new DroneAnimationDispatcher(this);
         this.eggPickupManager = new EggPickupManager(this);
+        this.ventData = new VentData();
     }
 
     @Override
-    public @Nullable EntityType<? extends Alien> getTypeForVariant(AlienVariant alienVariant) {
-        return getType(alienVariant);
+    public Agent.Builder<Drone> blib$applyGOAPAgentProperties(Agent.Builder<Drone> agentBuilder) {
+        return DroneGOAP.applyAgentProperties(agentBuilder);
     }
 
     @Override
-    protected @Nullable ResinData createResinData() {
-        return new ResinData(0, 16, 1, 20);
-    }
-
-    @Override
-    protected void registerGoals() {
-        super.registerGoals();
-        goalSelector.addGoal(3, new LungeAtTargetGoal(this, 0.05F, 20 * 7, 6, 12).setOnLungeCallback(this::runLungeAnimation));
-        goalSelector.addGoal(4, new PickUpEggGoal<>(this));
-        goalSelector.addGoal(5, new DropOffEggGoal<>(this));
-        goalSelector.addGoal(6, new CreateVentGoal(this));
+    public @Nullable Graph<Drone> blib$getGOAPGraphOrNull() {
+        return getActiveGOAPGraph(DroneGOAP.GRAPH);
     }
 
     @Override
@@ -99,46 +120,31 @@ public class Drone extends Xenomorph implements EggCarrier {
     }
 
     @Override
-    public void runAttackAnimations() {
-        var attackType = random.nextInt(0, 3);
-
-        playSound(
-            AlienSoundEvents.ENTITY_XENOMORPH_ATTACK.get(),
-            getSoundVolume(),
-            (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F
-        );
-
-        switch (attackType) {
-            case 0 -> animationDispatcher.rightClawAttack();
-            case 1 -> animationDispatcher.biteAttack();
-            default -> animationDispatcher.tailAttack();
-        }
-    }
-
-    private void runLungeAnimation() {
-        playSound(AlienSoundEvents.ENTITY_XENOMORPH_LUNGE.get(), getSoundVolume(), (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F);
-        animationDispatcher.lunge();
-    }
-
-    @Override
     public void updateDynamicGameEventListener(@NotNull BiConsumer<DynamicGameEventListener<?>, ServerLevel> biConsumer) {
         super.updateDynamicGameEventListener(biConsumer);
         eggPickupManager.updateDynamicGameEventListener(biConsumer);
     }
 
     @Override
-    protected float getHealthRegenPerSecond() {
-        return HealthRegenConstants.DRONE_HEALTH_REGEN;
-    }
-
-    @Override
-    public Integer getMaxJellyToGrowth() {
-        return 2;
-    }
-
-    @Override
     public EggPickupManager getEggPickupManager() {
         return eggPickupManager;
+    }
+
+    @Override
+    public VentData getVentData() {
+        return ventData;
+    }
+
+    @Override
+    public void readAdditionalSaveData(@NotNull CompoundTag compoundTag) {
+        super.readAdditionalSaveData(compoundTag);
+        ventData.load(compoundTag);
+    }
+
+    @Override
+    public void addAdditionalSaveData(@NotNull CompoundTag compoundTag) {
+        super.addAdditionalSaveData(compoundTag);
+        ventData.save(compoundTag);
     }
 
     public DroneAnimationDispatcher getAnimationDispatcher() {

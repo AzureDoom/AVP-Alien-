@@ -1,12 +1,16 @@
 package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
+import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.praetorian.Praetorian;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.praetorian.PraetorianAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
+import com.alien.common.util.AzAlienHeadAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
-import com.blib.api.client.animation.v1.controller.AzAnimationController;
-import com.blib.api.client.animation.v1.controller.AzAnimationControllerContainer;
+import com.blib.api.client.animation.v1.track.AzAnimationTrack;
+import com.blib.api.client.animation.v1.track.AzAnimationTrackContainer;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,32 +20,36 @@ public class PraetorianAnimator extends AzEntityAnimator<Praetorian> {
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
 
+    private int previousAttackId = Integer.MIN_VALUE;
+
+    private final CocoonAnimationStateTracker<Praetorian> cocoonAnimationStateTracker = new CocoonAnimationStateTracker<>();
+
     public PraetorianAnimator() {
         super(AzAnimatorConfig.defaultConfig());
     }
 
     @Override
-    public void registerControllers(AzAnimationControllerContainer<Praetorian> animationControllerContainer) {
-        animationControllerContainer.add(
-            AzAnimationController.builder(this, AzAlienAnimationUtil.BODY_CONTROLLER_NAME)
+    public void registerTracks(AzAnimationTrackContainer<Praetorian> animationTrackContainer) {
+        animationTrackContainer.add(
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.BODY)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, AzAlienAnimationUtil.HEAD_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.HEAD)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, AzAlienAnimationUtil.LEFT_ARM_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_ARM)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, AzAlienAnimationUtil.LEFT_LEG_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_LEG)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, AzAlienAnimationUtil.RIGHT_ARM_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_ARM)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, AzAlienAnimationUtil.RIGHT_LEG_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_LEG)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, AzAlienAnimationUtil.TAIL_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.TAIL)
                 .setTransitionLength(5)
                 .build()
         );
@@ -56,11 +64,38 @@ public class PraetorianAnimator extends AzEntityAnimator<Praetorian> {
     public void setCustomAnimations(Praetorian animatable, float partialTicks) {
         super.setCustomAnimations(animatable, partialTicks);
 
+        if (cocoonAnimationStateTracker.run(animatable)) {
+            return;
+        }
+
+        AzAlienHeadAnimationUtil.applyHeadLookFromBindPose(animatable, context(), partialTicks, "gNeck");
+
         runPassiveAnimations(animatable);
     }
 
     private void runPassiveAnimations(Praetorian praetorian) {
         var dispatcher = praetorian.getAnimationDispatcher();
+
+        var attackType = praetorian.attackType.get();
+        var attackId = praetorian.attackId.get();
+
+        if (!attackType.isNone()) {
+            if (attackId != previousAttackId) {
+                var speed = calculateAttackSpeed(praetorian, attackType);
+
+                if (attackType == Praetorian.BITE) {
+                    dispatcher.biteAttack(speed);
+                } else if (attackType == Praetorian.CLAW) {
+                    dispatcher.rightClawAttack(speed);
+                } else if (attackType == Praetorian.TAIL) {
+                    dispatcher.tailAttack(speed);
+                }
+
+                previousAttackId = attackId;
+            }
+            return;
+        }
+
         var isMovingOnGround = praetorian.isMovingHorizontally.get() && praetorian.onGround();
         Runnable animFunction;
 
@@ -79,5 +114,29 @@ public class PraetorianAnimator extends AzEntityAnimator<Praetorian> {
         }
 
         animFunction.run();
+    }
+
+    private float calculateAttackSpeed(Praetorian praetorian, AttackType attackType) {
+        String animationName;
+
+        if (attackType == Praetorian.BITE) {
+            animationName = PraetorianAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME;
+        } else if (attackType == Praetorian.CLAW) {
+            animationName = PraetorianAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME;
+        } else if (attackType == Praetorian.TAIL) {
+            animationName = PraetorianAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME;
+        } else {
+            animationName = null;
+        }
+
+        var durationInTicks = praetorian.attackDurationInTicks.get();
+
+        if (animationName == null || durationInTicks <= 0) {
+            return 1.0f;
+        }
+
+        var animation = getAnimation(praetorian, animationName);
+
+        return (float) (animation.length() / durationInTicks);
     }
 }

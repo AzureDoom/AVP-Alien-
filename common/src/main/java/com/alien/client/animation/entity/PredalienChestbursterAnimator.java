@@ -1,12 +1,13 @@
 package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
-import com.alien.common.constant.animation.PredalienChestbursterAnimationRefs;
 import com.alien.common.gameplay.entity.living.alien.predalien_chestburster.PredalienChestburster;
+import com.alien.common.gameplay.entity.living.alien.predalien_chestburster.PredalienChestbursterAnimationRefs;
+import com.alien.common.util.AzAlienHeadAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
-import com.blib.api.client.animation.v1.controller.AzAnimationController;
-import com.blib.api.client.animation.v1.controller.AzAnimationControllerContainer;
+import com.blib.api.client.animation.v1.track.AzAnimationTrack;
+import com.blib.api.client.animation.v1.track.AzAnimationTrackContainer;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,12 +22,12 @@ public class PredalienChestbursterAnimator extends AzEntityAnimator<PredalienChe
     }
 
     @Override
-    public void registerControllers(AzAnimationControllerContainer<PredalienChestburster> animationControllerContainer) {
-        animationControllerContainer.add(
-            AzAnimationController.builder(this, PredalienChestbursterAnimationRefs.HEAD_CONTROLLER_NAME)
+    public void registerTracks(AzAnimationTrackContainer<PredalienChestburster> animationTrackContainer) {
+        animationTrackContainer.add(
+            AzAnimationTrack.builder(this, PredalienChestbursterAnimationRefs.HEAD)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, PredalienChestbursterAnimationRefs.TAIL_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, PredalienChestbursterAnimationRefs.TAIL)
                 .setTransitionLength(5)
                 .build()
         );
@@ -40,6 +41,8 @@ public class PredalienChestbursterAnimator extends AzEntityAnimator<PredalienChe
     @Override
     public void setCustomAnimations(PredalienChestburster animatable, float partialTicks) {
         super.setCustomAnimations(animatable, partialTicks);
+
+        AzAlienHeadAnimationUtil.applyHeadLookFromBindPose(animatable, context(), partialTicks, "gNeck");
 
         runPassiveAnimations(animatable);
     }

@@ -2,20 +2,16 @@ package com.alien.client.render.entity;
 
 import com.alien.client.animation.entity.AdolescentAnimator;
 import com.alien.client.render.AlienRenderResourceCache;
+import com.alien.client.render.layer.MoltLayer;
 import com.alien.common.gameplay.entity.living.alien.adolescent.Adolescent;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.blib.api.client.render.v1.entity.AzEntityRenderer;
 import com.blib.api.client.render.v1.entity.AzEntityRendererConfig;
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.NotNull;
 
 public class AdolescentRenderer extends AzEntityRenderer<Adolescent> {
-
-    private static final float DEFAULT_SHADOW_SIZE = 0.4F;
 
     private static final String NAME = "adolescent";
 
@@ -26,28 +22,10 @@ public class AdolescentRenderer extends AzEntityRenderer<Adolescent> {
             AzEntityRendererConfig.builder(AdolescentRenderer::modelLocation, AdolescentRenderer::textureLocation)
                 .setRenderType(AdolescentRenderer::renderType)
                 .setAnimatorProvider(AdolescentAnimator::new)
+                .addRenderLayer(new MoltLayer<>())
                 .build(),
             context
         );
-        this.shadowRadius = DEFAULT_SHADOW_SIZE;
-    }
-
-    @Override
-    public void render(
-        @NotNull Adolescent entity,
-        float entityYaw,
-        float partialTick,
-        @NotNull PoseStack poseStack,
-        @NotNull MultiBufferSource bufferSource,
-        int packedLight
-    ) {
-        var scale = 0.7F;
-        shadowRadius = DEFAULT_SHADOW_SIZE * scale;
-
-        poseStack.pushPose();
-        poseStack.scale(scale, scale, scale);
-        super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
-        poseStack.popPose();
     }
 
     private static ResourceLocation modelLocation(Adolescent adolescent) {

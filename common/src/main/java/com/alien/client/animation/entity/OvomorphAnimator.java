@@ -1,12 +1,12 @@
 package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
-import com.alien.common.constant.animation.OvomorphAnimationRefs;
 import com.alien.common.gameplay.entity.living.alien.ovomorph.Ovomorph;
+import com.alien.common.gameplay.entity.living.alien.ovomorph.OvomorphAnimationRefs;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
-import com.blib.api.client.animation.v1.controller.AzAnimationController;
-import com.blib.api.client.animation.v1.controller.AzAnimationControllerContainer;
+import com.blib.api.client.animation.v1.track.AzAnimationTrack;
+import com.blib.api.client.animation.v1.track.AzAnimationTrackContainer;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,9 +21,9 @@ public class OvomorphAnimator extends AzEntityAnimator<Ovomorph> {
     }
 
     @Override
-    public void registerControllers(AzAnimationControllerContainer<Ovomorph> animationControllerContainer) {
-        animationControllerContainer.add(
-            AzAnimationController.builder(this, OvomorphAnimationRefs.BASE_CONTROLLER_NAME)
+    public void registerTracks(AzAnimationTrackContainer<Ovomorph> animationTrackContainer) {
+        animationTrackContainer.add(
+            AzAnimationTrack.builder(this, OvomorphAnimationRefs.BASE)
                 .setTransitionLength(5)
                 .build()
         );

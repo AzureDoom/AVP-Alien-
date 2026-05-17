@@ -1,12 +1,12 @@
 package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
-import com.alien.common.constant.animation.FacehuggerAnimationRefs;
 import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.Facehugger;
+import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.FacehuggerAnimationRefs;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
-import com.blib.api.client.animation.v1.controller.AzAnimationController;
-import com.blib.api.client.animation.v1.controller.AzAnimationControllerContainer;
+import com.blib.api.client.animation.v1.track.AzAnimationTrack;
+import com.blib.api.client.animation.v1.track.AzAnimationTrackContainer;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,15 +21,15 @@ public class FacehuggerAnimator extends AzEntityAnimator<Facehugger> {
     }
 
     @Override
-    public void registerControllers(AzAnimationControllerContainer<Facehugger> animationControllerContainer) {
-        animationControllerContainer.add(
-            AzAnimationController.builder(this, FacehuggerAnimationRefs.LEGS_CONTROLLER_NAME)
+    public void registerTracks(AzAnimationTrackContainer<Facehugger> animationTrackContainer) {
+        animationTrackContainer.add(
+            AzAnimationTrack.builder(this, FacehuggerAnimationRefs.LEGS)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, FacehuggerAnimationRefs.LUNGS_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, FacehuggerAnimationRefs.LUNGS)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, FacehuggerAnimationRefs.TAIL_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, FacehuggerAnimationRefs.TAIL)
                 .setTransitionLength(5)
                 .build()
         );
@@ -58,6 +58,11 @@ public class FacehuggerAnimator extends AzEntityAnimator<Facehugger> {
 
         if (attachmentManager.isAttachedToHost() && facehugger.isAlive()) {
             dispatcher.hug();
+            return;
+        }
+
+        if (facehugger.isLunging.get()) {
+            dispatcher.lunge();
             return;
         }
 

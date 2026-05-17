@@ -1,0 +1,197 @@
+package com.alien.common.gameplay.entity.living.alien.xenomorph.burster;
+
+import com.alien.common.gameplay.entity.living.alien.Alien;
+import com.alien.common.gameplay.entity.living.alien.EggCarrier;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.EggPickupManager;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ExplosiveXenomorphUtil;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.VentBuilder;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.VentData;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphPathConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.burster.ai.BursterGOAP;
+import com.alien.common.model.alien.variant.AlienVariant;
+import com.alien.common.registry.init.AlienEntityTypes;
+import com.alien.common.registry.init.AlienSoundEvents;
+import com.alien.common.registry.tag.AlienEntityTypeTags;
+import com.blib.api.common.entity.v1.EntityUtil;
+import com.blib.api.common.entity.v1.PlayerStatConstants;
+import com.blib.api.common.goap.v1.GOAPUser;
+import com.just.ai.goap.Agent;
+import com.just.ai.goap.graph.Graph;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gameevent.DynamicGameEventListener;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.function.BiConsumer;
+
+public class Burster extends Xenomorph implements EggCarrier, GOAPUser<Burster>, VentBuilder {
+
+    private static final float CRITICAL_HEALTH_THRESHOLD = 0.1F;
+
+    private static final float EXPLOSION_RADIUS = 2F;
+
+    private static final int ACID_AMOUNT = 3;
+
+    public static final AttackType CLAW = AttackType.builder("burster_claw")
+        .defaultDurationInTicks(10)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    public static final AttackType BITE = AttackType.builder("burster_bite")
+        .defaultDurationInTicks(8)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    public static final AttackType TAIL = AttackType.builder("burster_tail")
+        .defaultDurationInTicks(12)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    public static AttributeSupplier.Builder createBursterAttributes() {
+        return Alien.createAlienAttributes()
+            .add(Attributes.ARMOR, 4.0F)
+            .add(Attributes.ARMOR_TOUGHNESS, 0f)
+            .add(Attributes.ATTACK_DAMAGE, PlayerStatConstants.BASE_HEALTH * 0.25F)
+            .add(Attributes.FOLLOW_RANGE, 35F)
+            .add(Attributes.KNOCKBACK_RESISTANCE, 0.3f)
+            .add(Attributes.MAX_HEALTH, PlayerStatConstants.BASE_HEALTH * 2F)
+            .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1F);
+    }
+
+    private final BursterAnimationDispatcher animationDispatcher;
+
+    private final EggPickupManager eggPickupManager;
+
+    private final VentData ventData;
+
+    private boolean hasExploded;
+
+    public Burster(EntityType<? extends Burster> entityType, Level level) {
+        super(
+            entityType,
+            level,
+            XenomorphConfig.builder(XenomorphPathConfig.SMALL_DOOR, Burster::getType)
+                .attackConfig(
+                    XenomorphAttackConfig.builder()
+                        .addRegular(CLAW)
+                        .addRegular(BITE)
+                        .addRegular(TAIL)
+                        .build()
+                )
+                .build()
+        );
+        this.animationDispatcher = new BursterAnimationDispatcher(this);
+        this.eggPickupManager = new EggPickupManager(this);
+        this.ventData = new VentData();
+    }
+
+    @Override
+    public Agent.Builder<Burster> blib$applyGOAPAgentProperties(Agent.Builder<Burster> agentBuilder) {
+        return BursterGOAP.applyAgentProperties(agentBuilder);
+    }
+
+    @Override
+    public @Nullable Graph<Burster> blib$getGOAPGraphOrNull() {
+        return getActiveGOAPGraph(BursterGOAP.GRAPH);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        eggPickupManager.tick();
+
+        if (!level().isClientSide && isAlive() && getHealth() <= getMaxHealth() * CRITICAL_HEALTH_THRESHOLD) {
+            explodeAndDiscard();
+        }
+    }
+
+    @Override
+    protected boolean canEntityRideAlien(@NotNull Entity passenger) {
+        return super.canEntityRideAlien(passenger)
+            || passenger.getType().is(AlienEntityTypeTags.OVOMORPHS);
+    }
+
+    @Override
+    protected void positionRider(@NotNull Entity passenger, @NotNull MoveFunction callback) {
+        if (passenger.getType().is(AlienEntityTypeTags.OVOMORPHS)) {
+            var relativePos = EntityUtil.getRelativePosition(this, 0, 0.8, -1);
+            callback.accept(passenger, relativePos.x, relativePos.y, relativePos.z);
+            return;
+        }
+
+        super.positionRider(passenger, callback);
+    }
+
+    @Override
+    public void die(@NotNull DamageSource damageSource) {
+        explode();
+        super.die(damageSource);
+    }
+
+    private void explodeAndDiscard() {
+        explode();
+        triggerOnDeathMobEffects(RemovalReason.KILLED);
+        discard();
+    }
+
+    private void explode() {
+        if (hasExploded || level().isClientSide) {
+            return;
+        }
+
+        hasExploded = true;
+        ExplosiveXenomorphUtil.explodeWithAcid(this, EXPLOSION_RADIUS, ACID_AMOUNT);
+    }
+
+    @Override
+    public void updateDynamicGameEventListener(@NotNull BiConsumer<DynamicGameEventListener<?>, ServerLevel> biConsumer) {
+        super.updateDynamicGameEventListener(biConsumer);
+        eggPickupManager.updateDynamicGameEventListener(biConsumer);
+    }
+
+    @Override
+    public EggPickupManager getEggPickupManager() {
+        return eggPickupManager;
+    }
+
+    @Override
+    public VentData getVentData() {
+        return ventData;
+    }
+
+    @Override
+    public void readAdditionalSaveData(@NotNull CompoundTag compoundTag) {
+        super.readAdditionalSaveData(compoundTag);
+        ventData.load(compoundTag);
+    }
+
+    @Override
+    public void addAdditionalSaveData(@NotNull CompoundTag compoundTag) {
+        super.addAdditionalSaveData(compoundTag);
+        ventData.save(compoundTag);
+    }
+
+    public BursterAnimationDispatcher getAnimationDispatcher() {
+        return animationDispatcher;
+    }
+
+    public static EntityType<? extends Alien> getType(AlienVariant alienVariant) {
+        return switch (alienVariant) {
+            case NORMAL -> AlienEntityTypes.BURSTER.get();
+            case NETHER -> AlienEntityTypes.NETHER_BURSTER.get();
+            case ABERRANT -> AlienEntityTypes.ABERRANT_BURSTER.get();
+            case IRRADIATED -> AlienEntityTypes.IRRADIATED_BURSTER.get();
+        };
+    }
+}

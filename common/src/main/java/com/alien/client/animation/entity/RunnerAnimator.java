@@ -1,12 +1,16 @@
 package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
+import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.RunnerAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
+import com.alien.common.util.AzAlienHeadAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
-import com.blib.api.client.animation.v1.controller.AzAnimationController;
-import com.blib.api.client.animation.v1.controller.AzAnimationControllerContainer;
+import com.blib.api.client.animation.v1.track.AzAnimationTrack;
+import com.blib.api.client.animation.v1.track.AzAnimationTrackContainer;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,32 +20,36 @@ public class RunnerAnimator extends AzEntityAnimator<Runner> {
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
 
+    private int previousAttackId = Integer.MIN_VALUE;
+
+    private final CocoonAnimationStateTracker<Runner> cocoonAnimationStateTracker = new CocoonAnimationStateTracker<>();
+
     public RunnerAnimator() {
         super(AzAnimatorConfig.defaultConfig());
     }
 
     @Override
-    public void registerControllers(AzAnimationControllerContainer<Runner> animationControllerContainer) {
-        animationControllerContainer.add(
-            AzAnimationController.builder(this, AzAlienAnimationUtil.BODY_CONTROLLER_NAME)
+    public void registerTracks(AzAnimationTrackContainer<Runner> animationTrackContainer) {
+        animationTrackContainer.add(
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.BODY)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, AzAlienAnimationUtil.HEAD_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.HEAD)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, AzAlienAnimationUtil.LEFT_ARM_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_ARM)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, AzAlienAnimationUtil.LEFT_LEG_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_LEG)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, AzAlienAnimationUtil.RIGHT_ARM_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_ARM)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, AzAlienAnimationUtil.RIGHT_LEG_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_LEG)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, AzAlienAnimationUtil.TAIL_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.TAIL)
                 .setTransitionLength(5)
                 .build()
         );
@@ -56,19 +64,50 @@ public class RunnerAnimator extends AzEntityAnimator<Runner> {
     public void setCustomAnimations(Runner animatable, float partialTicks) {
         super.setCustomAnimations(animatable, partialTicks);
 
+        if (cocoonAnimationStateTracker.run(animatable)) {
+            return;
+        }
+
+        AzAlienHeadAnimationUtil.applyHeadLookFromBindPose(animatable, context(), partialTicks, "gNeck");
+
         runPassiveAnimations(animatable);
     }
 
     private void runPassiveAnimations(Runner runner) {
         var dispatcher = runner.getAnimationDispatcher();
-        var isMovingOnGround = runner.isMovingHorizontally.get() && runner.onGround();
+
+        if (runner.isLunging.get()) {
+            dispatcher.lunge();
+            return;
+        }
+
+        var attackType = runner.attackType.get();
+        var attackId = runner.attackId.get();
+
+        if (!attackType.isNone()) {
+            if (attackId != previousAttackId) {
+                var speed = calculateAttackSpeed(runner, attackType);
+
+                if (attackType == Runner.BITE)
+                    dispatcher.biteAttack(speed);
+                else if (attackType == Runner.CLAW)
+                    dispatcher.rightClawAttack(speed);
+                else if (attackType == Runner.TAIL_QUAD)
+                    dispatcher.tailAttackQuad(speed);
+
+                previousAttackId = attackId;
+            }
+            return;
+        }
+
+        var isMoving = runner.isMovingHorizontally.get() && runner.onGround();
         var isCrawling = runner.getCrawlingManager().isCrawling();
         Runnable animFunction;
 
         if (runner.isUnderWater()) {
             // TODO: idle swim
             animFunction = dispatcher::swim;
-        } else if (isMovingOnGround) {
+        } else if (isMoving) {
             if (isCrawling) {
                 animFunction = dispatcher::crawl;
             } else if (runner.hasTarget.get()) {
@@ -82,5 +121,28 @@ public class RunnerAnimator extends AzEntityAnimator<Runner> {
         }
 
         animFunction.run();
+    }
+
+    private float calculateAttackSpeed(Runner runner, AttackType attackType) {
+        String animationName;
+
+        if (attackType == Runner.BITE)
+            animationName = RunnerAnimationRefs.BITEATTACK_HEAD_ANIMATION_NAME;
+        else if (attackType == Runner.CLAW)
+            animationName = RunnerAnimationRefs.ATTACKCLAWQUAD_RIGHTARM_ANIMATION_NAME;
+        else if (attackType == Runner.TAIL_QUAD)
+            animationName = RunnerAnimationRefs.TAILATTACKQUAD_TAIL_ANIMATION_NAME;
+        else
+            animationName = null;
+
+        var durationInTicks = runner.attackDurationInTicks.get();
+
+        if (animationName == null || durationInTicks <= 0) {
+            return 1.0f;
+        }
+
+        var animation = getAnimation(runner, animationName);
+
+        return (float) (animation.length() / durationInTicks);
     }
 }

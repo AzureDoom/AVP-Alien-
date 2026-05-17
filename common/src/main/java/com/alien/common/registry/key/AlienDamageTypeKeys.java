@@ -9,7 +9,13 @@ public class AlienDamageTypeKeys {
 
     public static final ResourceKey<DamageType> ACID = create("acid");
 
+    public static final ResourceKey<DamageType> ACID_SPIT = create("acid_spit");
+
     public static final ResourceKey<DamageType> CHESTBURSTING = create("chestbursting");
+
+    public static final ResourceKey<DamageType> RAVAGER_CLAW = create("ravager_claw");
+
+    public static final ResourceKey<DamageType> RAVAGER_SPECIAL = create("ravager_special");
 
     public static final ResourceKey<DamageType> SMOTHERING = create("smothering");
 

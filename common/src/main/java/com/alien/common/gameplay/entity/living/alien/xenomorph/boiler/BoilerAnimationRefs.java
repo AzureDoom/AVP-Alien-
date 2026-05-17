@@ -1,0 +1,25 @@
+package com.alien.common.gameplay.entity.living.alien.xenomorph.boiler;
+
+import com.alien.common.gameplay.entity.living.alien.Alien;
+import com.blib.api.client.animation.v1.track.AzTrackHandle;
+
+public class BoilerAnimationRefs {
+
+    public static final AzTrackHandle<Alien> FULL_BODY = AzTrackHandle.declare("full_body");
+
+    public static final String ATTACK_CLAW_ANIMATION_NAME = "animation.attackclaw";
+
+    public static final String ATTACK_TAIL_ANIMATION_NAME = "animation.attacktail";
+
+    public static final String CRAWL_ANIMATION_NAME = "animation.crawl";
+
+    public static final String IDLE_ANIMATION_NAME = "animation.idle";
+
+    public static final String LUNGE_ANIMATION_NAME = "animation.lunge";
+
+    public static final String RUN_ANIMATION_NAME = "animation.run";
+
+    public static final String SWIM_ANIMATION_NAME = "animation.swim";
+
+    public static final String WALK_ANIMATION_NAME = "animation.walk";
+}

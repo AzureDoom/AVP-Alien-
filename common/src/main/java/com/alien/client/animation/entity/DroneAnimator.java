@@ -1,12 +1,16 @@
 package com.alien.client.animation.entity;
 
 import com.alien.AlienResources;
+import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.DroneAnimationRefs;
 import com.alien.common.util.AzAlienAnimationUtil;
+import com.alien.common.util.AzAlienHeadAnimationUtil;
 import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
 import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
-import com.blib.api.client.animation.v1.controller.AzAnimationController;
-import com.blib.api.client.animation.v1.controller.AzAnimationControllerContainer;
+import com.blib.api.client.animation.v1.track.AzAnimationTrack;
+import com.blib.api.client.animation.v1.track.AzAnimationTrackContainer;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,32 +20,36 @@ public class DroneAnimator extends AzEntityAnimator<Drone> {
 
     private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
 
+    private int previousAttackId = Integer.MIN_VALUE;
+
+    private final CocoonAnimationStateTracker<Drone> cocoonAnimationStateTracker = new CocoonAnimationStateTracker<>();
+
     public DroneAnimator() {
         super(AzAnimatorConfig.defaultConfig());
     }
 
     @Override
-    public void registerControllers(AzAnimationControllerContainer<Drone> animationControllerContainer) {
-        animationControllerContainer.add(
-            AzAnimationController.builder(this, AzAlienAnimationUtil.BODY_CONTROLLER_NAME)
+    public void registerTracks(AzAnimationTrackContainer<Drone> animationTrackContainer) {
+        animationTrackContainer.add(
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.BODY)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, AzAlienAnimationUtil.HEAD_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.HEAD)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, AzAlienAnimationUtil.LEFT_ARM_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_ARM)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, AzAlienAnimationUtil.LEFT_LEG_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_LEG)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, AzAlienAnimationUtil.RIGHT_ARM_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_ARM)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, AzAlienAnimationUtil.RIGHT_LEG_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_LEG)
                 .setTransitionLength(5)
                 .build(),
-            AzAnimationController.builder(this, AzAlienAnimationUtil.TAIL_CONTROLLER_NAME)
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.TAIL)
                 .setTransitionLength(5)
                 .build()
         );
@@ -56,19 +64,50 @@ public class DroneAnimator extends AzEntityAnimator<Drone> {
     public void setCustomAnimations(Drone animatable, float partialTicks) {
         super.setCustomAnimations(animatable, partialTicks);
 
+        if (cocoonAnimationStateTracker.run(animatable)) {
+            return;
+        }
+
+        AzAlienHeadAnimationUtil.applyHeadLookFromBindPose(animatable, context(), partialTicks, "gNeck");
+
         runPassiveAnimations(animatable);
     }
 
     private void runPassiveAnimations(Drone drone) {
         var dispatcher = drone.getAnimationDispatcher();
-        var isMovingOnGround = drone.isMovingHorizontally.get() && drone.onGround();
+
+        if (drone.isLunging.get()) {
+            dispatcher.lunge();
+            return;
+        }
+
+        var attackType = drone.attackType.get();
+        var attackId = drone.attackId.get();
+
+        if (!attackType.isNone()) {
+            if (attackId != previousAttackId) {
+                var speed = calculateAttackSpeed(drone, attackType);
+
+                if (attackType == Drone.BITE)
+                    dispatcher.biteAttack(speed);
+                else if (attackType == Drone.CLAW)
+                    dispatcher.rightClawAttack(speed);
+                else if (attackType == Drone.TAIL)
+                    dispatcher.tailAttack(speed);
+
+                previousAttackId = attackId;
+            }
+            return;
+        }
+
+        var isMoving = drone.isMovingHorizontally.get() && drone.onGround();
         var isCrawling = drone.getCrawlingManager().isCrawling();
         Runnable animFunction;
 
         if (drone.isUnderWater()) {
             // TODO: idle swim
             animFunction = dispatcher::swim;
-        } else if (isMovingOnGround) {
+        } else if (isMoving) {
             if (isCrawling) {
                 animFunction = dispatcher::crawl;
             } else if (drone.hasTarget.get()) {
@@ -82,5 +121,28 @@ public class DroneAnimator extends AzEntityAnimator<Drone> {
         }
 
         animFunction.run();
+    }
+
+    private float calculateAttackSpeed(Drone drone, AttackType attackType) {
+        String animationName;
+
+        if (attackType == Drone.BITE)
+            animationName = DroneAnimationRefs.ATTACKBITE_HEAD_ANIMATION_NAME;
+        else if (attackType == Drone.CLAW)
+            animationName = DroneAnimationRefs.ATTACKCLAW_RIGHTARM_ANIMATION_NAME;
+        else if (attackType == Drone.TAIL)
+            animationName = DroneAnimationRefs.ATTACKTAIL_TAIL_ANIMATION_NAME;
+        else
+            animationName = null;
+
+        var durationInTicks = drone.attackDurationInTicks.get();
+
+        if (animationName == null || durationInTicks <= 0) {
+            return 1.0f;
+        }
+
+        var animation = getAnimation(drone, animationName);
+
+        return (float) (animation.length() / durationInTicks);
     }
 }

@@ -1,6 +1,7 @@
 package com.alien.client;
 
 import com.alien.Alien;
+import com.alien.AlienResources;
 import com.alien.client.particle.AcidParticleProvider;
 import com.alien.client.particle.BlueAcidParticleProvider;
 import com.alien.client.particle.IrradiatedAcidParticleProvider;
@@ -12,12 +13,20 @@ import com.alien.client.render.armor.PlatedAberrantChitinArmorRenderer;
 import com.alien.client.render.armor.PlatedChitinArmorRenderer;
 import com.alien.client.render.armor.PlatedIrradiatedChitinArmorRenderer;
 import com.alien.client.render.armor.PlatedNetherChitinArmorRenderer;
+import com.alien.client.render.block.CrusherHeadBlockEntityRenderer;
+import com.alien.client.render.block.QueenHeadBlockEntityRenderer;
 import com.alien.client.render.entity.AcidRenderer;
+import com.alien.client.render.entity.AcidSpitRenderer;
 import com.alien.client.render.entity.AdolescentRenderer;
 import com.alien.client.render.entity.BoilerRenderer;
+import com.alien.client.render.entity.BursterRenderer;
+import com.alien.client.render.entity.CarrierRenderer;
 import com.alien.client.render.entity.ChestbursterRenderer;
+import com.alien.client.render.entity.ChrysalisRenderer;
 import com.alien.client.render.entity.CrusherRenderer;
 import com.alien.client.render.entity.DroneRenderer;
+import com.alien.client.render.entity.EmpressRenderer;
+import com.alien.client.render.entity.HarbingerRenderer;
 import com.alien.client.render.entity.OvipositorRenderer;
 import com.alien.client.render.entity.OvomorphRenderer;
 import com.alien.client.render.entity.PraetorianRenderer;
@@ -26,6 +35,8 @@ import com.alien.client.render.entity.PredalienChestbursterRenderer;
 import com.alien.client.render.entity.PredalienRenderer;
 import com.alien.client.render.entity.ProwlerRenderer;
 import com.alien.client.render.entity.QueenRenderer;
+import com.alien.client.render.entity.RavagerRenderer;
+import com.alien.client.render.entity.RazorClawRenderer;
 import com.alien.client.render.entity.RunnerRenderer;
 import com.alien.client.render.entity.SpitterRenderer;
 import com.alien.client.render.entity.WarriorRenderer;
@@ -34,6 +45,7 @@ import com.alien.client.render.entity.head.EntityHeadDataCache;
 import com.alien.client.render.entity.parasite.attachment.AlienParasiteHeadAttachmentOffsetData;
 import com.alien.client.render.entity.parasite.attachment.ParasiteHeadAttachmentOffsetDataCache;
 import com.alien.client.render.entity.parasite.facehugger.FacehuggerRenderer;
+import com.alien.common.registry.init.AlienBlockEntityTypes;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienParticleTypes;
 import com.alien.common.registry.init.block.AberrantAlienResinBlocks;
@@ -42,9 +54,13 @@ import com.alien.common.registry.init.block.AlienResinBlocks;
 import com.alien.common.registry.init.block.IrradiatedAlienResinBlocks;
 import com.alien.common.registry.init.block.NetherAlienResinBlocks;
 import com.alien.common.registry.init.item.AlienArmorItems;
+import com.alien.common.registry.init.item.AlienItems;
+import com.alien.compatibility.blib_engine.BLibEngine;
 import com.blib.api.client.mod.v1.BLibClientMod;
+import com.blib.api.common.registry.v1.BLibHolder;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
 
 import java.util.List;
 
@@ -60,7 +76,13 @@ public class AlienClient {
         registerArmorRenderers();
         registerBlockRenderLayers();
         registerEntityRenderers();
+        registerItemRenderers();
+        registerBlockEntityRenderers();
         registerParticleProviderFactories();
+
+        // Engine workspace: add hive-specific inspector sections under the generic faction inspector so picking an AVP
+        // faction in the FactionBrowser reveals biomass/jelly/caste/territory/leadership/vigilance data.
+        BLibEngine.registerInspectorSections();
 
         MOD.events().onClientSetup().register(() -> {
             registerEntityHeadData();
@@ -165,6 +187,7 @@ public class AlienClient {
         MOD.registries().registerBlockRenderLayer(IrradiatedAlienResinBlocks.IRRADIATED_RESIN_WEB, RenderType.cutout());
 
         MOD.registries().registerBlockRenderLayer(AlienBlocks.ROYAL_JELLY_BLOCK, RenderType.translucent());
+        MOD.registries().registerBlockRenderLayer(AlienBlocks.SCOURGE_JELLY_BLOCK, RenderType.translucent());
     }
 
     private static void registerEntityHeadData() {
@@ -205,9 +228,12 @@ public class AlienClient {
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_ADOLESCENT, AdolescentRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_BOILER, BoilerRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_CHESTBURSTER, ChestbursterRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_CARRIER, CarrierRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_CHRYSALIS, ChrysalisRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_CRUSHER, CrusherRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_DRONE, DroneRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_FACEHUGGER, FacehuggerRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_HARBINGER, HarbingerRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_OVOMORPH, OvomorphRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_PRAETORIAN, PraetorianRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_PREDALIEN, PredalienRenderer::new);
@@ -222,31 +248,50 @@ public class AlienClient {
                 PredalienChestbursterRenderer::new
             );
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_PROWLER, ProwlerRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_RAZOR_CLAW, RazorClawRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_RAVAGER, RavagerRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_QUEEN, QueenRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_EMPRESS, EmpressRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_BURSTER, BursterRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_RUNNER, RunnerRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_SPITTER, SpitterRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_WARRIOR, WarriorRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ACID, AcidRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ACID_SPIT, AcidSpitRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ADOLESCENT, AdolescentRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.BOILER, BoilerRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.CHESTBURSTER, ChestbursterRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.CARRIER, CarrierRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.CHRYSALIS, ChrysalisRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.CRUSHER, CrusherRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.DRONE, DroneRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.EMPRESS, EmpressRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.HARBINGER, HarbingerRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.FACEHUGGER, FacehuggerRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_CARRIER, CarrierRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_CHRYSALIS, ChrysalisRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_CRUSHER, CrusherRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_DRONE, DroneRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_PRAETORIAN, PraetorianRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_PREDALIEN, PredalienRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_PROWLER, ProwlerRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_HARBINGER, HarbingerRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_RAZOR_CLAW, RazorClawRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_RAVAGER, RavagerRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_QUEEN, QueenRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_EMPRESS, EmpressRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_BURSTER, BursterRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_RUNNER, RunnerRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.IRRADIATED_WARRIOR, WarriorRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_ADOLESCENT, AdolescentRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_BOILER, BoilerRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_CHESTBURSTER, ChestbursterRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_CARRIER, CarrierRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_CHRYSALIS, ChrysalisRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_CRUSHER, CrusherRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_DRONE, DroneRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_FACEHUGGER, FacehuggerRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_HARBINGER, HarbingerRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_OVOMORPH, OvomorphRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_PRAETORIAN, PraetorianRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_PREDALIEN, PredalienRenderer::new);
@@ -257,7 +302,11 @@ public class AlienClient {
                 PredalienChestbursterRenderer::new
             );
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_PROWLER, ProwlerRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_RAZOR_CLAW, RazorClawRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_RAVAGER, RavagerRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_QUEEN, QueenRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_EMPRESS, EmpressRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_BURSTER, BursterRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_RUNNER, RunnerRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_SPITTER, SpitterRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_WARRIOR, WarriorRenderer::new);
@@ -268,6 +317,8 @@ public class AlienClient {
         MOD.registries().registerEntityRenderer(AlienEntityTypes.PREDALIEN_ADOLESCENT, PredalienAdolescentRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.PREDALIEN_CHESTBURSTER, PredalienChestbursterRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.PROWLER, ProwlerRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.RAZOR_CLAW, RazorClawRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.RAVAGER, RavagerRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.QUEEN, QueenRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ROYAL_ABERRANT_ADOLESCENT, AdolescentRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ROYAL_ABERRANT_CHESTBURSTER, ChestbursterRenderer::new);
@@ -281,6 +332,7 @@ public class AlienClient {
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ROYAL_NETHER_FACEHUGGER, FacehuggerRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ROYAL_NETHER_OVOMORPH, OvomorphRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.ROYAL_OVOMORPH, OvomorphRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.BURSTER, BursterRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.RUNNER, RunnerRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.SPITTER, SpitterRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.WARRIOR, WarriorRenderer::new);
@@ -318,6 +370,49 @@ public class AlienClient {
         ParasiteHeadAttachmentOffsetDataCache.put(EntityType.WOLF, AlienParasiteHeadAttachmentOffsetData.WOLF);
         ParasiteHeadAttachmentOffsetDataCache.put(EntityType.ZOGLIN, AlienParasiteHeadAttachmentOffsetData.HOGLIN);
         ParasiteHeadAttachmentOffsetDataCache.put(EntityType.ZOMBIE_VILLAGER, AlienParasiteHeadAttachmentOffsetData.VILLAGER);
+    }
+
+    private static void registerItemRenderers() {
+        // Queen heads — trophy + shield variants. Trophies have no blocking transforms; the shared
+        // blocking predicate is harmless for them since the renderer short-circuits when there are no
+        // blocking transforms. Shields use the same predicate for actual raise-to-block behavior.
+        registerAsset(AlienItems.QUEEN_HEAD, "queen_head");
+        registerAsset(AlienItems.ABERRANT_QUEEN_HEAD, "aberrant_queen_head");
+        registerAsset(AlienItems.IRRADIATED_QUEEN_HEAD, "irradiated_queen_head");
+        registerAsset(AlienItems.NETHER_QUEEN_HEAD, "nether_queen_head");
+
+        registerAsset(AlienItems.QUEEN_HEAD_SHIELD, "queen_head_shield");
+        registerAsset(AlienItems.ABERRANT_QUEEN_HEAD_SHIELD, "aberrant_queen_head_shield");
+        registerAsset(AlienItems.IRRADIATED_QUEEN_HEAD_SHIELD, "irradiated_queen_head_shield");
+        registerAsset(AlienItems.NETHER_QUEEN_HEAD_SHIELD, "nether_queen_head_shield");
+
+        // Crusher heads — same shape, sourced from the crusher geo + per-tint textures.
+        registerAsset(AlienItems.CRUSHER_HEAD, "crusher_head");
+        registerAsset(AlienItems.ABERRANT_CRUSHER_HEAD, "aberrant_crusher_head");
+        registerAsset(AlienItems.IRRADIATED_CRUSHER_HEAD, "irradiated_crusher_head");
+        registerAsset(AlienItems.NETHER_CRUSHER_HEAD, "nether_crusher_head");
+
+        registerAsset(AlienItems.CRUSHER_HEAD_SHIELD, "crusher_head_shield");
+        registerAsset(AlienItems.ABERRANT_CRUSHER_HEAD_SHIELD, "aberrant_crusher_head_shield");
+        registerAsset(AlienItems.IRRADIATED_CRUSHER_HEAD_SHIELD, "irradiated_crusher_head_shield");
+        registerAsset(AlienItems.NETHER_CRUSHER_HEAD_SHIELD, "nether_crusher_head_shield");
+    }
+
+    private static void registerAsset(BLibHolder<Item> holder, String configPath) {
+        MOD.registries().registerGeoBoneItemRendererFromAsset(holder, AlienResources.location(configPath));
+    }
+
+    private static void registerBlockEntityRenderers() {
+        MOD.registries()
+            .registerBlockEntityRenderer(
+                AlienBlockEntityTypes.QUEEN_HEAD,
+                ctx -> new QueenHeadBlockEntityRenderer()
+            );
+        MOD.registries()
+            .registerBlockEntityRenderer(
+                AlienBlockEntityTypes.CRUSHER_HEAD,
+                ctx -> new CrusherHeadBlockEntityRenderer()
+            );
     }
 
     private static void registerParticleProviderFactories() {

@@ -62,4 +62,9 @@ public class Ovipositor extends Mob {
     public boolean isPushedByFluid() {
         return false;
     }
+
+    @Override
+    public int getAirSupply() {
+        return Integer.MAX_VALUE;
+    }
 }

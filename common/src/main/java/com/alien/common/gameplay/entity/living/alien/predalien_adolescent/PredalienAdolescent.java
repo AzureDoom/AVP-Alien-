@@ -1,18 +1,12 @@
 package com.alien.common.gameplay.entity.living.alien.predalien_adolescent;
 
-import com.alien.common.constant.AttackDamageConstants;
-import com.alien.common.constant.FollowRangeConstants;
-import com.alien.common.constant.HealthConstants;
-import com.alien.common.constant.HealthRegenConstants;
-import com.alien.common.constant.KnockbackResistanceConstants;
-import com.alien.common.constant.MoveSpeedConstants;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.GrowthManager;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.util.AlienPredicates;
-import com.alien.common.util.XenomorphGrowthUtil;
 import com.blib.api.common.entity.v1.BLibEntityPredicates;
+import com.blib.api.common.entity.v1.PlayerStatConstants;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -30,11 +24,12 @@ public class PredalienAdolescent extends Alien {
         return Alien.createAlienAttributes()
             .add(Attributes.ARMOR, 0f)
             .add(Attributes.ARMOR_TOUGHNESS, 0f)
-            .add(Attributes.ATTACK_DAMAGE, AttackDamageConstants.PREDALIEN_ADOLESCENT_ATTACK_DAMAGE)
-            .add(Attributes.FOLLOW_RANGE, FollowRangeConstants.PREDALIEN_ADOLESCENT_FOLLOW_RANGE)
-            .add(Attributes.KNOCKBACK_RESISTANCE, KnockbackResistanceConstants.PREDALIEN_ADOLESCENT_KNOCKBACK_RESISTANCE)
-            .add(Attributes.MAX_HEALTH, HealthConstants.PREDALIEN_ADOLESCENT_HEALTH)
-            .add(Attributes.MOVEMENT_SPEED, MoveSpeedConstants.PREDALIEN_ADOLESCENT_SPEED);
+            .add(Attributes.ATTACK_DAMAGE, PlayerStatConstants.BASE_HEALTH * 0.1F)
+            .add(Attributes.FOLLOW_RANGE, 16F)
+            .add(Attributes.KNOCKBACK_RESISTANCE, 0F)
+            .add(Attributes.MAX_HEALTH, PlayerStatConstants.BASE_HEALTH * 0.5F)
+            .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1.025F)
+            .add(Attributes.SCALE, 0.7F);
     }
 
     private final PredalienAdolescentAnimationDispatcher animationDispatcher;
@@ -45,7 +40,7 @@ public class PredalienAdolescent extends Alien {
         super(entityType, level);
 
         this.animationDispatcher = new PredalienAdolescentAnimationDispatcher(this);
-        this.growthManager = new GrowthManager(this, XenomorphGrowthUtil.GROW_UP_CALLBACK)
+        this.growthManager = new GrowthManager(this)
             .setGrowOverTime(true);
     }
 
@@ -80,7 +75,7 @@ public class PredalienAdolescent extends Alien {
 
     @Override
     protected float getHealthRegenPerSecond() {
-        return HealthRegenConstants.PREDALIEN_ADOLESCENT_HEALTH_REGEN;
+        return 0.5F;
     }
 
     @Override
@@ -93,11 +88,6 @@ public class PredalienAdolescent extends Alien {
     public void addAdditionalSaveData(@NotNull CompoundTag compoundTag) {
         super.addAdditionalSaveData(compoundTag);
         growthManager.save(compoundTag);
-    }
-
-    @Override
-    public Integer getMaxJellyToGrowth() {
-        return 1;
     }
 
     public PredalienAdolescentAnimationDispatcher getAnimationDispatcher() {

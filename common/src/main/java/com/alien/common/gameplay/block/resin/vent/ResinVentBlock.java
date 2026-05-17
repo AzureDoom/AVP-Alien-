@@ -46,10 +46,9 @@ public class ResinVentBlock extends BaseEntityBlock {
         var blockEntity = level.getBlockEntity(blockPos);
 
         if (blockEntity instanceof ResinVentBlockEntity resinVentBlockEntity) {
-            var hive = resinVentBlockEntity.getHive();
-
-            if (hive != null) {
-                hive.getVentManager().removeVent(blockPos);
+            var location = resinVentBlockEntity.getBoundLocation();
+            if (location != null) {
+                location.ventManager().removeVent(blockPos);
             }
         }
     }

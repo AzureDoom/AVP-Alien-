@@ -33,6 +33,19 @@ public class MiscellaneousRecipeProvider {
             .requires(1, AlienBlocks.ROYAL_JELLY_BLOCK)
             .into(9, AlienItems.RAW_ROYAL_JELLY);
 
+        builder.shaped()
+            .withCategory(RecipeCategory.MISC)
+            .define('I', AlienItems.RAW_SCOURGE_JELLY)
+            .pattern("III")
+            .pattern("III")
+            .pattern("III")
+            .into(1, AlienBlocks.SCOURGE_JELLY_BLOCK);
+
+        builder.shapeless()
+            .withCategory(RecipeCategory.MISC)
+            .requires(1, AlienBlocks.SCOURGE_JELLY_BLOCK)
+            .into(9, AlienItems.RAW_SCOURGE_JELLY);
+
         builder.shapeless()
             .withCategory(RecipeCategory.MISC)
             .requires(1, Items.POISONOUS_POTATO)
@@ -43,6 +56,57 @@ public class MiscellaneousRecipeProvider {
             .withCategory(RecipeCategory.MISC)
             .requires(9, AlienItems.ALIEN_MUSIC_DISC_1_FRAGMENT)
             .into(1, AlienItems.ALIEN_MUSIC_DISC_1);
+
+        // Queen head trophy + vanilla shield -> queen head shield. One-way conversion: there's no recipe
+        // back to the wearable head, so crafting commits to the combat utility.
+        builder.shapeless()
+            .withCategory(RecipeCategory.COMBAT)
+            .requires(1, AlienItems.QUEEN_HEAD)
+            .requires(1, Items.SHIELD)
+            .into(1, AlienItems.QUEEN_HEAD_SHIELD);
+
+        builder.shapeless()
+            .withCategory(RecipeCategory.COMBAT)
+            .requires(1, AlienItems.ABERRANT_QUEEN_HEAD)
+            .requires(1, Items.SHIELD)
+            .into(1, AlienItems.ABERRANT_QUEEN_HEAD_SHIELD);
+
+        builder.shapeless()
+            .withCategory(RecipeCategory.COMBAT)
+            .requires(1, AlienItems.IRRADIATED_QUEEN_HEAD)
+            .requires(1, Items.SHIELD)
+            .into(1, AlienItems.IRRADIATED_QUEEN_HEAD_SHIELD);
+
+        builder.shapeless()
+            .withCategory(RecipeCategory.COMBAT)
+            .requires(1, AlienItems.NETHER_QUEEN_HEAD)
+            .requires(1, Items.SHIELD)
+            .into(1, AlienItems.NETHER_QUEEN_HEAD_SHIELD);
+
+        // Crusher head trophy + vanilla shield -> crusher head shield. Mirrors the queen recipe family.
+        builder.shapeless()
+            .withCategory(RecipeCategory.COMBAT)
+            .requires(1, AlienItems.CRUSHER_HEAD)
+            .requires(1, Items.SHIELD)
+            .into(1, AlienItems.CRUSHER_HEAD_SHIELD);
+
+        builder.shapeless()
+            .withCategory(RecipeCategory.COMBAT)
+            .requires(1, AlienItems.ABERRANT_CRUSHER_HEAD)
+            .requires(1, Items.SHIELD)
+            .into(1, AlienItems.ABERRANT_CRUSHER_HEAD_SHIELD);
+
+        builder.shapeless()
+            .withCategory(RecipeCategory.COMBAT)
+            .requires(1, AlienItems.IRRADIATED_CRUSHER_HEAD)
+            .requires(1, Items.SHIELD)
+            .into(1, AlienItems.IRRADIATED_CRUSHER_HEAD_SHIELD);
+
+        builder.shapeless()
+            .withCategory(RecipeCategory.COMBAT)
+            .requires(1, AlienItems.NETHER_CRUSHER_HEAD)
+            .requires(1, Items.SHIELD)
+            .into(1, AlienItems.NETHER_CRUSHER_HEAD_SHIELD);
     }
 
     private static void provideMiscellaneousNetherRecipes(RecipeBuilder builder) {

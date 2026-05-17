@@ -37,6 +37,17 @@ public class EnUsSoundEventProvider {
         addSound(builder, AlienSoundEvents.ENTITY_QUEEN_STEP_THUMP, "Queen steps");
         addSound(builder, AlienSoundEvents.ENTITY_QUEEN_STEP_THUMP_ROCK, "Queen steps");
 
+        addSound(builder, AlienSoundEvents.ENTITY_EMPRESS_ARM_ATTACK, "Empress attacks");
+        addSound(builder, AlienSoundEvents.ENTITY_EMPRESS_BACK_HAND_ATTACK, "Empress back hand attacks");
+        addSound(builder, AlienSoundEvents.ENTITY_EMPRESS_RAM_ATTACK, "Empress ram attacks");
+        addSound(builder, AlienSoundEvents.ENTITY_EMPRESS_SCREAM, "Empress screams");
+        addSound(builder, AlienSoundEvents.ENTITY_EMPRESS_TAIL_ATTACK, "Empress tail attacks");
+        addSound(builder, AlienSoundEvents.ENTITY_EMPRESS_DEATH, "Empress dies");
+        addSound(builder, AlienSoundEvents.ENTITY_EMPRESS_HURT, "Empress hurts");
+        addSound(builder, AlienSoundEvents.ENTITY_EMPRESS_IDLE, "Empress breathes");
+        addSound(builder, AlienSoundEvents.ENTITY_EMPRESS_STEP_THUMP, "Empress steps");
+        addSound(builder, AlienSoundEvents.ENTITY_EMPRESS_STEP_THUMP_ROCK, "Empress steps");
+
         addSound(builder, AlienSoundEvents.ENTITY_XENOMORPH_ATTACK, "Xenomorph attacks");
         addSound(builder, AlienSoundEvents.ENTITY_XENOMORPH_DEATH, "Xenomorph dies");
         addSound(builder, AlienSoundEvents.ENTITY_XENOMORPH_HISS, "Xenomorph hisses");

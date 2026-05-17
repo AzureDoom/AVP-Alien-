@@ -1,10 +1,8 @@
 package com.alien.common.gameplay.entity.living.alien;
 
 import com.alien.common.data.AlienVariantTypes;
-import com.alien.common.gameplay.hive.Hive;
-import com.alien.common.gameplay.level.saveddata.HiveLevelData;
+import com.alien.common.gameplay.hive2.spawning.HiveLocationSpawnGate;
 import com.alien.common.model.alien.variant.AlienVariantType;
-import com.alien.common.registry.tag.AlienEntityTypeTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
@@ -12,8 +10,6 @@ import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.ServerLevelAccessor;
-
-import java.util.Objects;
 
 public class AlienSpawning {
 
@@ -28,7 +24,15 @@ public class AlienSpawning {
         mobSpawnType,
         blockPos,
         randomSource
-    ) -> {
+    ) -> canSpawnAt(entityType, serverLevelAccessor, mobSpawnType, blockPos, randomSource);
+
+    public static boolean canSpawnAt(
+        EntityType<? extends Alien> entityType,
+        ServerLevelAccessor serverLevelAccessor,
+        MobSpawnType mobSpawnType,
+        BlockPos blockPos,
+        RandomSource randomSource
+    ) {
         var belowState = serverLevelAccessor.getBlockState(blockPos.below());
         var alienVariantTypeOption = AlienVariantTypes.getFor(entityType)
             .map(AlienVariantType::resinBlockTag);
@@ -37,7 +41,7 @@ public class AlienSpawning {
 
         return isValidResinPos
             && checkSpawnRules(entityType, serverLevelAccessor, mobSpawnType, blockPos, randomSource);
-    };
+    }
 
     public static boolean checkSpawnRules(
         EntityType<? extends Monster> entityType,
@@ -46,7 +50,7 @@ public class AlienSpawning {
         BlockPos blockPos,
         RandomSource randomSource
     ) {
-        return Monster.checkMonsterSpawnRules(
+        return Monster.checkAnyLightMonsterSpawnRules(
             entityType,
             serverLevelAccessor,
             mobSpawnType,
@@ -56,51 +60,16 @@ public class AlienSpawning {
             canSpawnWithinNearestHive(entityType, serverLevelAccessor, blockPos);
     }
 
+    /**
+     * Hive2 spawn gate: a {@link com.alien.common.gameplay.hive2.location.HiveLocation} must contain this chunk, the
+     * caste-distance rule must permit the entity at this distance from the location's center, and reserves must have
+     * one available.
+     */
     private static boolean canSpawnWithinNearestHive(
         EntityType<? extends Monster> entityType,
         ServerLevelAccessor serverLevelAccessor,
         BlockPos blockPos
     ) {
-        var alienVariantTypeOption = AlienVariantTypes.getFor(entityType);
-
-        return HiveLevelData.getOrCreate(serverLevelAccessor.getLevel())
-            .andThen(
-                hiveLevelData -> hiveLevelData.findNearestHive(
-                    blockPos,
-                    // Find the nearest hive for this alien type's variant type.
-                    hive -> alienVariantTypeOption.isSomeAnd(
-                        alienVariantType -> Objects.equals(hive.getVariant(), alienVariantType.variant())
-                    )
-                )
-            )
-            .isSomeAnd(nearestHive ->
-            // Aliens can not spawn in hives that are dead.
-            nearestHive.isAlive()
-                // AND spawn position must be within range of the hive.
-                && canEntityTypeSpawnWithinHiveLayer(nearestHive, entityType, blockPos)
-                && nearestHive.getReserveManager()
-                    .canSpawn(entityType)
-            );
-    }
-
-    private static boolean canEntityTypeSpawnWithinHiveLayer(
-        Hive nearestHive,
-        EntityType<? extends Monster> entityType,
-        BlockPos blockPos
-    ) {
-        var layer = nearestHive.getSpaceManager()
-            .getHiveLayerOrNull(blockPos);
-
-        if (layer == null) {
-            return false;
-        }
-
-        return switch (layer) {
-            case EDGE, LEASH, BUFFER -> false;
-            case WARRIOR -> entityType.is(AlienEntityTypeTags.SPAWNS_IN_HIVE_WARRIOR_LAYER);
-            case DRONE -> entityType.is(AlienEntityTypeTags.SPAWNS_IN_HIVE_DRONE_LAYER);
-            case PRAETORIAN -> entityType.is(AlienEntityTypeTags.SPAWNS_IN_HIVE_PRAETORIAN_LAYER);
-            case CENTER -> entityType.is(AlienEntityTypeTags.SPAWNS_IN_HIVE_QUEEN_LAYER);
-        };
+        return HiveLocationSpawnGate.findSpawnableLocation(serverLevelAccessor, entityType, blockPos) != null;
     }
 }

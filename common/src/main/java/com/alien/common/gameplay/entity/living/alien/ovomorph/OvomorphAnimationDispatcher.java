@@ -1,28 +1,21 @@
 package com.alien.common.gameplay.entity.living.alien.ovomorph;
 
-import com.alien.common.constant.animation.OvomorphAnimationRefs;
 import com.blib.api.client.animation.v1.command.AzCommand;
 import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
 
 public class OvomorphAnimationDispatcher {
 
-    private static final AzCommand CLOSE_HOLD = AzCommand.create(
-        OvomorphAnimationRefs.BASE_CONTROLLER_NAME,
-        OvomorphAnimationRefs.CLOSE_HOLD_ANIMATION_NAME,
-        AzPlayBehaviors.LOOP
-    );
+    private static final AzCommand<Ovomorph> CLOSE_HOLD = AzCommand.<Ovomorph>idempotent()
+        .play(OvomorphAnimationRefs.BASE, OvomorphAnimationRefs.CLOSE_HOLD_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
 
-    private static final AzCommand OPEN = AzCommand.create(
-        OvomorphAnimationRefs.BASE_CONTROLLER_NAME,
-        OvomorphAnimationRefs.OPEN_ANIMATION_NAME,
-        AzPlayBehaviors.HOLD_ON_LAST_FRAME
-    );
+    private static final AzCommand<Ovomorph> OPEN = AzCommand.<Ovomorph>idempotent()
+        .play(OvomorphAnimationRefs.BASE, OvomorphAnimationRefs.OPEN_ANIMATION_NAME, AzPlayBehaviors.HOLD_ON_LAST_FRAME)
+        .build();
 
-    private static final AzCommand OPEN_HOLD = AzCommand.create(
-        OvomorphAnimationRefs.BASE_CONTROLLER_NAME,
-        OvomorphAnimationRefs.OPEN_HOLD_ANIMATION_NAME,
-        AzPlayBehaviors.LOOP
-    );
+    private static final AzCommand<Ovomorph> OPEN_HOLD = AzCommand.<Ovomorph>idempotent()
+        .play(OvomorphAnimationRefs.BASE, OvomorphAnimationRefs.OPEN_HOLD_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
 
     private final Ovomorph ovomorph;
 
@@ -31,14 +24,14 @@ public class OvomorphAnimationDispatcher {
     }
 
     public void closeHold() {
-        CLOSE_HOLD.sendForEntity(ovomorph);
+        CLOSE_HOLD.dispatchForEntity(ovomorph);
     }
 
     public void open() {
-        OPEN.sendForEntity(ovomorph);
+        OPEN.dispatchForEntity(ovomorph);
     }
 
     public void openHold() {
-        OPEN_HOLD.sendForEntity(ovomorph);
+        OPEN_HOLD.dispatchForEntity(ovomorph);
     }
 }

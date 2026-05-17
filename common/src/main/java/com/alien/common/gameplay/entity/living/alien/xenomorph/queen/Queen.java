@@ -1,29 +1,26 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.queen;
 
-import com.alien.common.constant.ArmorConstants;
-import com.alien.common.constant.ArmorToughnessConstants;
-import com.alien.common.constant.AttackDamageConstants;
-import com.alien.common.constant.FollowRangeConstants;
-import com.alien.common.constant.HealthConstants;
-import com.alien.common.constant.HealthRegenConstants;
-import com.alien.common.constant.KnockbackResistanceConstants;
-import com.alien.common.constant.MoveSpeedConstants;
 import com.alien.common.data.AlienVariantTypes;
-import com.alien.common.gameplay.ai.goal.DigToTargetGoal;
-import com.alien.common.gameplay.ai.goal.QueenLayEggGoal;
 import com.alien.common.gameplay.entity.living.alien.Alien;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphNavigationManager;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphPathConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg_laying.EggLayer;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.ai.QueenGOAP;
 import com.alien.common.gameplay.level.saveddata.QueenSpawnChunkData;
 import com.alien.common.gameplay.level.saveddata.StrainLeakData;
 import com.alien.common.model.alien.variant.AlienVariant;
-import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
-import com.blib.api.common.entity.v1.EntityUtil;
+import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.entity.v1.PlayerUtil;
+import com.blib.api.common.goap.v1.GOAPUser;
+import com.just.ai.goap.Agent;
+import com.just.ai.goap.graph.Graph;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -40,53 +37,85 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-public class Queen extends Xenomorph {
+public class Queen extends Xenomorph implements GOAPUser<Queen>, EggLayer {
+
+    public static final AttackType SWIPE_DOWN = AttackType.builder("queen_swipe_down")
+        .defaultDurationInTicks(18)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    public static final AttackType BACKHAND = AttackType.builder("queen_backhand")
+        .defaultDurationInTicks(15)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    public static final AttackType TAIL_STRIKE = AttackType.builder("queen_tail_strike")
+        .defaultDurationInTicks(20)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    private static final XenomorphConfig CONFIG = XenomorphConfig.builder(XenomorphPathConfig.WIDE_TALL, Queen::getType)
+        .attackConfig(
+            XenomorphAttackConfig.builder()
+                .addRegular(SWIPE_DOWN)
+                .addRegular(BACKHAND)
+                .addRegular(TAIL_STRIKE)
+                .build()
+        )
+        .parallelDigCount(4)
+        .pushedByFluid(false)
+        .canCrawl(false)
+        .build();
 
     public static AttributeSupplier.Builder createQueenAttributes() {
         return Alien.createAlienAttributes()
-            .add(Attributes.ARMOR, ArmorConstants.QUEEN_ARMOR)
-            .add(Attributes.ARMOR_TOUGHNESS, ArmorToughnessConstants.QUEEN_ARMOR_TOUGHNESS)
-            .add(Attributes.ATTACK_DAMAGE, AttackDamageConstants.QUEEN_ATTACK_DAMAGE)
-            .add(Attributes.FOLLOW_RANGE, FollowRangeConstants.QUEEN_FOLLOW_RANGE)
-            .add(Attributes.KNOCKBACK_RESISTANCE, KnockbackResistanceConstants.QUEEN_KNOCKBACK_RESISTANCE)
-            .add(Attributes.MAX_HEALTH, HealthConstants.QUEEN_HEALTH)
-            .add(Attributes.MOVEMENT_SPEED, MoveSpeedConstants.QUEEN_SPEED);
+            .add(Attributes.ARMOR, 16.0F)
+            .add(Attributes.ARMOR_TOUGHNESS, 16.0F)
+            .add(Attributes.ATTACK_DAMAGE, PlayerStatConstants.BASE_HEALTH * 2.5F)
+            .add(Attributes.FOLLOW_RANGE, 35F)
+            .add(Attributes.KNOCKBACK_RESISTANCE, 1f)
+            .add(Attributes.MAX_HEALTH, PlayerStatConstants.BASE_HEALTH * 10F)
+            .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 0.9F);
     }
 
     private final QueenAnimationDispatcher animationDispatcher;
 
     private final OvipositorManager ovipositorManager;
 
+    private final QueenData queenData;
+
     public Queen(EntityType<? extends Queen> entityType, Level level) {
-        super(entityType, level);
+        super(entityType, level, CONFIG);
         this.animationDispatcher = new QueenAnimationDispatcher(this);
         this.ovipositorManager = new OvipositorManager(this);
+        this.queenData = new QueenData();
     }
 
     @Override
-    protected @NotNull XenomorphNavigationManager createNavigationManager() {
-        return new XenomorphNavigationManager(this, moveControl, 1.6, 1.6);
+    public Agent.Builder<Queen> blib$applyGOAPAgentProperties(Agent.Builder<Queen> agentBuilder) {
+        return QueenGOAP.applyAgentProperties(agentBuilder);
     }
 
     @Override
-    public @Nullable EntityType<? extends Alien> getTypeForVariant(AlienVariant alienVariant) {
-        return getType(alienVariant);
+    public @Nullable Graph<Queen> blib$getGOAPGraphOrNull() {
+        return getActiveGOAPGraph(isOnOvipositor() ? QueenGOAP.OVIPOSITOR_GRAPH : QueenGOAP.GRAPH);
     }
 
-    @Override
-    protected @Nullable ResinData createResinData() {
-        return new ResinData(0, 128, 1, 20);
+    private boolean isOnOvipositor() {
+        return ovipositorManager != null && ovipositorManager.hasOvipositor();
     }
 
     @Override
     public void tick() {
         super.tick();
         ovipositorManager.tick();
+        queenData.tick();
     }
 
     @Override
@@ -97,7 +126,7 @@ public class Queen extends Xenomorph {
     @Override
     protected void positionRider(@NotNull Entity passenger, @NotNull MoveFunction callback) {
         if (passenger.getType() == AlienEntityTypes.OVIPOSITOR.get()) {
-            var relativePos = EntityUtil.getRelativePosition(this, 3, 0.01, 5.25);
+            var relativePos = com.blib.api.common.entity.v1.EntityUtil.getRelativePosition(this, 3, 0.01, 5.25);
             callback.accept(passenger, relativePos.x, relativePos.y, relativePos.z);
             return;
         }
@@ -162,17 +191,6 @@ public class Queen extends Xenomorph {
     }
 
     @Override
-    protected void registerGoals() {
-        super.registerGoals();
-        goalSelector.addGoal(5, new QueenLayEggGoal(this));
-    }
-
-    @Override
-    protected void addDigToTargetGoal() {
-        goalSelector.addGoal(5, new DigToTargetGoal(this, 32, 4, () -> !Objects.requireNonNull(ovipositorManager).hasOvipositor()));
-    }
-
-    @Override
     public float maxUpStep() {
         return 2.5F;
     }
@@ -193,66 +211,18 @@ public class Queen extends Xenomorph {
     }
 
     @Override
-    protected float getHealthRegenPerSecond() {
-        return HealthRegenConstants.QUEEN_HEALTH_REGEN;
-    }
-
-    @Override
-    public void runAttackAnimations() {
-        var attackType = random.nextInt(0, 3);
-
-        playSound(
-            AlienSoundEvents.ENTITY_XENOMORPH_ATTACK.get(),
-            getSoundVolume(),
-            (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F
-        );
-
-        switch (attackType) {
-            case 0 -> animationDispatcher.swipeDownAttack();
-            case 1 -> animationDispatcher.backhandAttack();
-            default -> animationDispatcher.tailStrikeAttack();
-        }
-    }
-
-    @Override
     protected void doPush(@NotNull Entity entity) {
         if (
-            // If queen does not have an ovipositor...
             !ovipositorManager.hasOvipositor()
-                // OR the queen does have an ovipositor and the entity to push is NOT an alien...
                 || !entity.getType().is(AlienEntityTypeTags.ALIENS)
         ) {
-            // Then push the entity.
             super.doPush(entity);
         }
     }
 
-    // Queens are too large to be pushed by fluids.
-    @Override
-    public boolean isPushedByFluid() {
-        return false;
-    }
-
-    // Queens are too large to be pushed.
-    @Override
-    public boolean isPushable() {
-        return false;
-    }
-
-    // Queens should never despawn no matter what.
     @Override
     public boolean isPersistenceRequired() {
         return true;
-    }
-
-    @Override
-    public void checkDespawn() {
-        super.checkDespawn();
-    }
-
-    @Override
-    public Integer getMaxJellyToGrowth() {
-        return null;
     }
 
     public QueenAnimationDispatcher getAnimationDispatcher() {
@@ -263,16 +233,47 @@ public class Queen extends Xenomorph {
         return ovipositorManager;
     }
 
+    public QueenData getQueenData() {
+        return queenData;
+    }
+
+    @Override
+    public Entity asEntity() {
+        return this;
+    }
+
+    @Override
+    public boolean isEggLayCooldownReady() {
+        return queenData.isEggLayCooldownReady();
+    }
+
+    @Override
+    public void resetEggLayCooldown() {
+        queenData.resetEggLayCooldown();
+    }
+
+    @Override
+    public boolean hasOvipositor() {
+        return ovipositorManager.hasOvipositor();
+    }
+
+    @Override
+    public Vec3 getEggLayingPosition() {
+        return ovipositorManager.getEggLayingPosition();
+    }
+
     @Override
     public void readAdditionalSaveData(@NotNull CompoundTag compoundTag) {
         super.readAdditionalSaveData(compoundTag);
         ovipositorManager.load(compoundTag);
+        queenData.load(compoundTag);
     }
 
     @Override
     public void addAdditionalSaveData(@NotNull CompoundTag compoundTag) {
         super.addAdditionalSaveData(compoundTag);
         ovipositorManager.save(compoundTag);
+        queenData.save(compoundTag);
     }
 
     public static EntityType<? extends Alien> getType(AlienVariant alienVariant) {

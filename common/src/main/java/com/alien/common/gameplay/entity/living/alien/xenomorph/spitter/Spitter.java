@@ -1,91 +1,99 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.spitter;
 
-import com.alien.common.constant.ArmorConstants;
-import com.alien.common.constant.AttackDamageConstants;
-import com.alien.common.constant.FollowRangeConstants;
-import com.alien.common.constant.HealthConstants;
-import com.alien.common.constant.HealthRegenConstants;
-import com.alien.common.constant.KnockbackResistanceConstants;
-import com.alien.common.constant.MoveSpeedConstants;
 import com.alien.common.gameplay.entity.living.alien.Alien;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphPathConfig;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.spitter.ai.SpitterGOAP;
 import com.alien.common.model.alien.variant.AlienVariant;
-import com.alien.common.model.resin.ResinData;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
-import com.blib.api.common.entity.v1.ai.goal.combat.LungeAtTargetGoal;
+import com.blib.api.common.entity.v1.PlayerStatConstants;
+import com.blib.api.common.goap.v1.GOAPUser;
+import com.just.ai.goap.Agent;
+import com.just.ai.goap.graph.Graph;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class Spitter extends Xenomorph {
+public class Spitter extends Xenomorph implements GOAPUser<Spitter> {
 
-    public static AttributeSupplier.Builder createSpitterAttributes() {
-        return Alien.createAlienAttributes()
-            .add(Attributes.ARMOR, ArmorConstants.SPITTER_ARMOR)
-            .add(Attributes.ARMOR_TOUGHNESS, 0f)
-            .add(Attributes.ATTACK_DAMAGE, AttackDamageConstants.SPITTER_ATTACK_DAMAGE)
-            .add(Attributes.FOLLOW_RANGE, FollowRangeConstants.SPITTER_FOLLOW_RANGE)
-            .add(Attributes.KNOCKBACK_RESISTANCE, KnockbackResistanceConstants.SPITTER_KNOCKBACK_RESISTANCE)
-            .add(Attributes.MAX_HEALTH, HealthConstants.SPITTER_HEALTH)
-            .add(Attributes.MOVEMENT_SPEED, MoveSpeedConstants.SPITTER_SPEED);
-    }
+    public static final AttackType CLAW = AttackType.builder("spitter_claw")
+        .defaultDurationInTicks(10)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    public static final AttackType BITE = AttackType.builder("spitter_bite")
+        .defaultDurationInTicks(8)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    public static final AttackType TAIL = AttackType.builder("spitter_tail")
+        .defaultDurationInTicks(12)
+        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+        .build();
+
+    private static final XenomorphConfig CONFIG = XenomorphConfig.builder(XenomorphPathConfig.MEDIUM_TALL, Spitter::getType)
+        .attackConfig(
+            XenomorphAttackConfig.builder()
+                .addRegular(CLAW)
+                .addRegular(BITE)
+                .addRegular(TAIL)
+                .build()
+        )
+        .build();
 
     private final SpitterAnimationDispatcher animationDispatcher;
 
+    private final SpitterData spitterData;
+
     public Spitter(EntityType<? extends Spitter> entityType, Level level) {
-        super(entityType, level);
+        super(entityType, level, CONFIG);
         this.animationDispatcher = new SpitterAnimationDispatcher(this);
+        this.spitterData = new SpitterData();
+    }
+
+    public static AttributeSupplier.Builder createSpitterAttributes() {
+        return Alien.createAlienAttributes()
+            .add(Attributes.ARMOR, 8.0F)
+            .add(Attributes.ARMOR_TOUGHNESS, 0f)
+            .add(Attributes.ATTACK_DAMAGE, PlayerStatConstants.BASE_HEALTH * 0.5F)
+            .add(Attributes.FOLLOW_RANGE, 35F)
+            .add(Attributes.KNOCKBACK_RESISTANCE, 0.5f)
+            .add(Attributes.MAX_HEALTH, PlayerStatConstants.BASE_HEALTH * 3F)
+            .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1.1F);
     }
 
     @Override
-    public @Nullable EntityType<? extends Alien> getTypeForVariant(AlienVariant alienVariant) {
-        return getType(alienVariant);
+    public Agent.Builder<Spitter> blib$applyGOAPAgentProperties(Agent.Builder<Spitter> agentBuilder) {
+        return SpitterGOAP.applyAgentProperties(agentBuilder);
     }
 
     @Override
-    protected @Nullable ResinData createResinData() {
-        return new ResinData(0, 16, 1, 20);
+    public @Nullable Graph<Spitter> blib$getGOAPGraphOrNull() {
+        return getActiveGOAPGraph(SpitterGOAP.GRAPH);
+    }
+
+    public SpitterData getSpitterData() {
+        return spitterData;
     }
 
     @Override
-    protected void registerGoals() {
-        super.registerGoals();
-        goalSelector.addGoal(3, new LungeAtTargetGoal(this, 0.05F, 20 * 7, 6, 12).setOnLungeCallback(this::runLungeAnimation));
+    public void readAdditionalSaveData(@NotNull CompoundTag compoundTag) {
+        super.readAdditionalSaveData(compoundTag);
+        spitterData.load(compoundTag);
     }
 
     @Override
-    public void runAttackAnimations() {
-        var attackType = random.nextInt(0, 3);
-
-        playSound(
-            AlienSoundEvents.ENTITY_XENOMORPH_ATTACK.get(),
-            getSoundVolume(),
-            (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F
-        );
-
-        switch (attackType) {
-            case 0 -> animationDispatcher.rightClawAttack();
-            case 1 -> animationDispatcher.biteAttack();
-            default -> animationDispatcher.tailAttack();
-        }
-    }
-
-    private void runLungeAnimation() {
-        playSound(AlienSoundEvents.ENTITY_XENOMORPH_LUNGE.get(), getSoundVolume(), (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F);
-        animationDispatcher.lunge();
-    }
-
-    @Override
-    protected float getHealthRegenPerSecond() {
-        return HealthRegenConstants.SPITTER_HEALTH_REGEN;
-    }
-
-    @Override
-    public Integer getMaxJellyToGrowth() {
-        return null;
+    public void addAdditionalSaveData(@NotNull CompoundTag compoundTag) {
+        super.addAdditionalSaveData(compoundTag);
+        spitterData.save(compoundTag);
     }
 
     public SpitterAnimationDispatcher getAnimationDispatcher() {

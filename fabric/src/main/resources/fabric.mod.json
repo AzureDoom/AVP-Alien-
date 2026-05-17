@@ -1,17 +1,17 @@
 {
 	"schemaVersion": 1,
 	"id": "avp_alien",
-	"version": "${version}",
+	"version": "${mod_version}",
 	"name": "${mod_name}",
-	"description": "${description}",
+	"description": "${mod_description}",
 	"accessWidener": "avp_alien.accesswidener",
 	"authors": [],
 	"contact": {
 		"homepage": "https://www.curseforge.com/minecraft/mc-mods/avp",
 		"sources": "https://github.com/AliensVsPredator/AliensVsPredator"
 	},
-	"license": "${license}",
-	"icon": "${icon}",
+	"license": "${mod_license}",
+	"icon": "${mod_icon}",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
@@ -43,6 +43,7 @@
 	"suggests": {
 		"avp_human": "~${avp_human_version}",
 		"avp_predator": "~${avp_predator_version}",
-		"gigeresque": "~${gigeresque_version}"
+		"gigeresque": "~${gigeresque_version}",
+		"blib_engine": "~${blib_engine_version}"
 	}
 }

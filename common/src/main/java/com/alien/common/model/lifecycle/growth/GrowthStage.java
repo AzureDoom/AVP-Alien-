@@ -14,7 +14,9 @@ public record GrowthStage(
     Optional<EntityTypePredicate> hostTypePredicate,
     EntityType<?> from,
     EntityType<?> to,
-    int growthTimeInTicks
+    int growthTimeInTicks,
+    CocooningConfig cocooning,
+    List<GrowthRequirement> requirements
 ) {
 
     public static final Codec<GrowthStage> CODEC = RecordCodecBuilder.create(
@@ -22,16 +24,30 @@ public record GrowthStage(
             EntityTypePredicate.CODEC.optionalFieldOf("hostTypePredicate").forGetter(GrowthStage::hostTypePredicate),
             BuiltInRegistries.ENTITY_TYPE.byNameCodec().fieldOf("from").forGetter(GrowthStage::from),
             BuiltInRegistries.ENTITY_TYPE.byNameCodec().fieldOf("to").forGetter(GrowthStage::to),
-            Codec.INT.fieldOf("growthTimeInTicks").forGetter(GrowthStage::growthTimeInTicks)
+            Codec.INT.optionalFieldOf("growthTimeInTicks", 0).forGetter(GrowthStage::growthTimeInTicks),
+            CocooningConfig.CODEC.optionalFieldOf("cocooning", CocooningConfig.DEFAULT).forGetter(GrowthStage::cocooning),
+            GrowthRequirement.CODEC.listOf().optionalFieldOf("requirements", List.of()).forGetter(GrowthStage::requirements)
         ).apply(instance, GrowthStage::new)
     );
+
+    public boolean hasRequirements() {
+        return !requirements.isEmpty();
+    }
 
     public GrowthStage(
         EntityType<?> from,
         EntityType<?> to,
         int growthTimeInTicks
     ) {
-        this(Optional.empty(), from, to, growthTimeInTicks);
+        this(Optional.empty(), from, to, growthTimeInTicks, CocooningConfig.DEFAULT, List.of());
+    }
+
+    public GrowthStage(
+        EntityType<?> from,
+        EntityType<?> to,
+        List<GrowthRequirement> requirements
+    ) {
+        this(Optional.empty(), from, to, 0, CocooningConfig.DEFAULT, requirements);
     }
 
     public GrowthStage(
@@ -40,7 +56,7 @@ public record GrowthStage(
         EntityType<?> to,
         int growthTimeInTicks
     ) {
-        this(Optional.of(new EntityTypePredicate.Tag(hostTag)), from, to, growthTimeInTicks);
+        this(Optional.of(new EntityTypePredicate.Tag(hostTag)), from, to, growthTimeInTicks, CocooningConfig.DEFAULT, List.of());
     }
 
     public GrowthStage(
@@ -49,7 +65,7 @@ public record GrowthStage(
         EntityType<?> to,
         int growthTimeInTicks
     ) {
-        this(Optional.of(new EntityTypePredicate.List(hostTypes)), from, to, growthTimeInTicks);
+        this(Optional.of(new EntityTypePredicate.List(hostTypes)), from, to, growthTimeInTicks, CocooningConfig.DEFAULT, List.of());
     }
 
     public GrowthStage(
@@ -58,6 +74,6 @@ public record GrowthStage(
         EntityType<?> to,
         int growthTimeInTicks
     ) {
-        this(Optional.of(new EntityTypePredicate.Single(hostType)), from, to, growthTimeInTicks);
+        this(Optional.of(new EntityTypePredicate.Single(hostType)), from, to, growthTimeInTicks, CocooningConfig.DEFAULT, List.of());
     }
 }

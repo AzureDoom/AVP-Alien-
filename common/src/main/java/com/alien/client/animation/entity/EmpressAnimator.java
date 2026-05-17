@@ -1,0 +1,151 @@
+package com.alien.client.animation.entity;
+
+import com.alien.AlienResources;
+import com.alien.client.animation.entity.cocoon.CocoonAnimationStateTracker;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.empress.Empress;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.empress.EmpressAnimationRefs;
+import com.alien.common.util.AzAlienAnimationUtil;
+import com.alien.common.util.AzAlienHeadAnimationUtil;
+import com.blib.api.client.animation.v1.animator.AzAnimatorConfig;
+import com.blib.api.client.animation.v1.animator.AzEntityAnimator;
+import com.blib.api.client.animation.v1.track.AzAnimationTrack;
+import com.blib.api.client.animation.v1.track.AzAnimationTrackContainer;
+import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
+
+public class EmpressAnimator extends AzEntityAnimator<Empress> {
+
+    private static final String NAME = "empress";
+
+    private static final ResourceLocation ANIMATION = AlienResources.entityAnimationLocation(NAME);
+
+    private int previousAttackId = Integer.MIN_VALUE;
+
+    private final CocoonAnimationStateTracker<Empress> cocoonAnimationStateTracker = new CocoonAnimationStateTracker<>();
+
+    public EmpressAnimator() {
+        super(AzAnimatorConfig.defaultConfig());
+    }
+
+    @Override
+    public void registerTracks(AzAnimationTrackContainer<Empress> animationTrackContainer) {
+        animationTrackContainer.add(
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.BODY)
+                .setTransitionLength(5)
+                .build(),
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.HEAD)
+                .setTransitionLength(5)
+                .build(),
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_ARM)
+                .setTransitionLength(5)
+                .build(),
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_LEG)
+                .setTransitionLength(5)
+                .build(),
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_TITTY_ARM)
+                .setTransitionLength(5)
+                .build(),
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_ARM)
+                .setTransitionLength(5)
+                .build(),
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_LEG)
+                .setTransitionLength(5)
+                .build(),
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_TITTY_ARM)
+                .setTransitionLength(5)
+                .build(),
+            AzAnimationTrack.builder(this, AzAlienAnimationUtil.TAIL)
+                .setTransitionLength(5)
+                .build()
+        );
+    }
+
+    @Override
+    public @NotNull ResourceLocation getAnimationLocation(Empress animatable) {
+        return ANIMATION;
+    }
+
+    @Override
+    public void setCustomAnimations(Empress animatable, float partialTicks) {
+        super.setCustomAnimations(animatable, partialTicks);
+
+        if (cocoonAnimationStateTracker.run(animatable)) {
+            return;
+        }
+
+        AzAlienHeadAnimationUtil.applyHeadLookFromBindPose(animatable, context(), partialTicks, "gNeck");
+
+        runPassiveAnimations(animatable);
+
+        var bakedModel = context().boneCache().getBakedModel();
+        var eggSack = bakedModel.getBoneOrNull("root2");
+
+        if (eggSack != null) {
+            eggSack.setHidden(true);
+        }
+    }
+
+    private void runPassiveAnimations(Empress empress) {
+        var dispatcher = empress.getAnimationDispatcher();
+
+        var attackType = empress.attackType.get();
+        var attackId = empress.attackId.get();
+
+        if (!attackType.isNone()) {
+            if (attackId != previousAttackId) {
+                var speed = calculateAttackSpeed(empress, attackType);
+
+                if (attackType == Empress.SWIPE_DOWN)
+                    dispatcher.swipeDownAttack(speed);
+                else if (attackType == Empress.BACKHAND)
+                    dispatcher.backhandAttack(speed);
+                else if (attackType == Empress.TAIL_STRIKE)
+                    dispatcher.tailStrikeAttack(speed);
+
+                previousAttackId = attackId;
+            }
+            return;
+        }
+
+        var isMovingOnGround = empress.isMovingHorizontally.get() && empress.onGround();
+        Runnable animFunction;
+
+        if (empress.getEmpressOvipositorManager().hasOvipositor()) {
+            animFunction = dispatcher::sitOnOvipositor;
+        } else if (empress.isUnderWater()) {
+            animFunction = dispatcher::swim;
+        } else if (isMovingOnGround) {
+            if (empress.hasTarget.get()) {
+                animFunction = dispatcher::run;
+            } else {
+                animFunction = dispatcher::walk;
+            }
+        } else {
+            animFunction = dispatcher::idle;
+        }
+
+        animFunction.run();
+    }
+
+    private float calculateAttackSpeed(Empress empress, AttackType attackType) {
+        String animationName = null;
+
+        if (attackType == Empress.SWIPE_DOWN)
+            animationName = EmpressAnimationRefs.SWIPEDOWN_BODY_ANIMATION_NAME;
+        else if (attackType == Empress.BACKHAND)
+            animationName = EmpressAnimationRefs.BACKHAND_BODY_ANIMATION_NAME;
+        else if (attackType == Empress.TAIL_STRIKE)
+            animationName = EmpressAnimationRefs.TAILSTRIKE_BODY_ANIMATION_NAME;
+
+        var durationInTicks = empress.attackDurationInTicks.get();
+
+        if (animationName == null || durationInTicks <= 0) {
+            return 1.0f;
+        }
+
+        var animation = getAnimation(empress, animationName);
+
+        return (float) (animation.length() / durationInTicks);
+    }
+}
