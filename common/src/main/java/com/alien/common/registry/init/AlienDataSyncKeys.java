@@ -50,6 +50,12 @@ public class AlienDataSyncKeys {
             .build(false)
     );
 
+    public static final BLibHolder<DataSyncKey<Boolean>> ALIEN_IS_MOVING_QUICKLY = create(
+        "alien_is_moving_quickly",
+        builder -> builder.networkSynchronized(StreamCodecs.BOOLEAN)
+            .build(false)
+    );
+
     public static final BLibHolder<DataSyncKey<Integer>> OVOMORPH_DESIRE_TO_HATCH = create(
         "ovomorph_desire_to_hatch",
         builder -> builder.persistent("desireToHatch", Codec.INT)

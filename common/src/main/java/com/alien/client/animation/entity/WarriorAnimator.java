@@ -111,7 +111,7 @@ public class WarriorAnimator extends AzEntityAnimator<Warrior> {
         } else if (isMoving) {
             if (isCrawling) {
                 animFunction = dispatcher::crawl;
-            } else if (warrior.hasTarget.get()) {
+            } else if (warrior.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {
                 animFunction = dispatcher::walk;

@@ -63,7 +63,7 @@ public class BoilerAnimator extends AzEntityAnimator<Boiler> {
         } else if (isMovingOnGround) {
             if (isCrawling) {
                 animFunction = dispatcher::crawl;
-            } else if (boiler.hasTarget.get()) {
+            } else if (boiler.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {
                 animFunction = dispatcher::walk;

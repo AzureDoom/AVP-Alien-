@@ -93,7 +93,7 @@ public class AdolescentAnimator extends AzEntityAnimator<Adolescent> {
             // TODO: idle swim
             animFunction = dispatcher::swim;
         } else if (isMovingOnGround) {
-            if (adolescent.hasTarget.get()) {
+            if (adolescent.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {
                 animFunction = dispatcher::walk;

@@ -116,7 +116,7 @@ public class QueenAnimator extends AzEntityAnimator<Queen> {
         } else if (queen.isUnderWater()) {
             animFunction = dispatcher::swim;
         } else if (isMovingOnGround) {
-            if (queen.hasTarget.get()) {
+            if (queen.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {
                 animFunction = dispatcher::walk;

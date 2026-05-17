@@ -111,7 +111,7 @@ public class SpitterAnimator extends AzEntityAnimator<Spitter> {
         } else if (isMovingOnGround) {
             if (isCrawling) {
                 animFunction = dispatcher::crawl;
-            } else if (spitter.hasTarget.get()) {
+            } else if (spitter.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {
                 animFunction = dispatcher::walk;

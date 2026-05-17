@@ -103,7 +103,7 @@ public class PredalienAnimator extends AzEntityAnimator<Predalien> {
             // TODO: idle swim
             animFunction = dispatcher::swim;
         } else if (isMovingOnGround) {
-            if (predalien.hasTarget.get()) {
+            if (predalien.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {
                 animFunction = dispatcher::walk;

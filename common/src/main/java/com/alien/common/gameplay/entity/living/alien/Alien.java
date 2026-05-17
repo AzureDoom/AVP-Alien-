@@ -83,6 +83,9 @@ public abstract class Alien extends Monster implements DataUser {
 
     private static final String NBT_LEGACY_RAID_MEMBERSHIP = "Hive2RaidMembership";
 
+    // Idle pathing uses 0.5x speed and pursuit uses 1.1x; 0.8x splits the two for animation.
+    private static final double RUN_ANIMATION_SPEED_THRESHOLD_MULTIPLIER = 0.8D;
+
     public final DataAccessor<Boolean> hasTarget;
 
     public final DataAccessor<Boolean> isPoisoned;
@@ -90,6 +93,8 @@ public abstract class Alien extends Monster implements DataUser {
     public final DataAccessor<Float> moltAlpha;
 
     public final DataAccessor<Boolean> isMovingHorizontally;
+
+    public final DataAccessor<Boolean> isMovingQuickly;
 
     protected final HiveManager hiveManager;
 
@@ -103,6 +108,12 @@ public abstract class Alien extends Monster implements DataUser {
 
     private int lastHurtTimeInTicks;
 
+    private boolean hasAnimationMovementSample;
+
+    private double lastAnimationMovementSampleX;
+
+    private double lastAnimationMovementSampleZ;
+
     protected Alien(EntityType<? extends Alien> entityType, Level level) {
         super(entityType, level);
 
@@ -110,6 +121,7 @@ public abstract class Alien extends Monster implements DataUser {
         this.isPoisoned = new DataAccessor<>(this, AlienDataSyncKeys.ALIEN_IS_POISONED.get());
         this.moltAlpha = new DataAccessor<>(this, AlienDataSyncKeys.ALIEN_MOLT_ALPHA.get());
         this.isMovingHorizontally = new DataAccessor<>(this, BLibDataSyncKeys.ENTITY_IS_MOVING_HORIZONTALLY.get());
+        this.isMovingQuickly = new DataAccessor<>(this, AlienDataSyncKeys.ALIEN_IS_MOVING_QUICKLY.get());
 
         this.hiveManager = new HiveManager(this);
         this.movementAnalyzer = new MovementAnalyzer(this);
@@ -305,6 +317,7 @@ public abstract class Alien extends Monster implements DataUser {
 
             hasTarget.set(getTarget() != null);
             isMovingHorizontally.set(movementAnalyzer.isMovingHorizontally());
+            isMovingQuickly.set(updateMovingQuicklyForAnimation());
 
             if (getVehicle() != null && !canRide(getVehicle())) {
                 stopRiding();
@@ -323,6 +336,31 @@ public abstract class Alien extends Monster implements DataUser {
             applyDynamicAttributes();
             becomeIrradiated();
         }
+    }
+
+    private boolean updateMovingQuicklyForAnimation() {
+        var currentX = getX();
+        var currentZ = getZ();
+
+        if (!hasAnimationMovementSample) {
+            hasAnimationMovementSample = true;
+            lastAnimationMovementSampleX = currentX;
+            lastAnimationMovementSampleZ = currentZ;
+            return false;
+        }
+
+        var deltaX = currentX - lastAnimationMovementSampleX;
+        var deltaZ = currentZ - lastAnimationMovementSampleZ;
+
+        lastAnimationMovementSampleX = currentX;
+        lastAnimationMovementSampleZ = currentZ;
+
+        var speedThreshold = Math.max(
+            0.01D,
+            getAttributeValue(Attributes.MOVEMENT_SPEED) * RUN_ANIMATION_SPEED_THRESHOLD_MULTIPLIER
+        );
+
+        return deltaX * deltaX + deltaZ * deltaZ >= speedThreshold * speedThreshold;
     }
 
     /**

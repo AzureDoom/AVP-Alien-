@@ -71,7 +71,7 @@ public class PredalienAdolescentAnimator extends AzEntityAnimator<PredalienAdole
             // TODO: idle swim
             animFunction = dispatcher::swim;
         } else if (isMovingOnGround) {
-            if (predalienAdolescent.hasTarget.get()) {
+            if (predalienAdolescent.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {
                 animFunction = dispatcher::walk;

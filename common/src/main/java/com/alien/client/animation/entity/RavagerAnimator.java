@@ -92,7 +92,7 @@ public class RavagerAnimator extends AzEntityAnimator<Ravager> {
         if (ravager.isUnderWater()) {
             animFunction = dispatcher::swim;
         } else if (isMovingOnGround) {
-            if (ravager.hasTarget.get()) {
+            if (ravager.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {
                 animFunction = dispatcher::walk;

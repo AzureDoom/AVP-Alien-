@@ -102,7 +102,7 @@ public class HarbingerAnimator extends AzEntityAnimator<Harbinger> {
         if (harbinger.isUnderWater()) {
             animFunction = dispatcher::swim;
         } else if (isMovingOnGround) {
-            if (harbinger.hasTarget.get()) {
+            if (harbinger.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {
                 animFunction = dispatcher::walk;
