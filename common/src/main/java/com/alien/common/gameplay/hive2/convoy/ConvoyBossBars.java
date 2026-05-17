@@ -58,12 +58,12 @@ public final class ConvoyBossBars {
 
     private static BarState createState(Convoy convoy) {
         var event = new ServerBossEvent(title(convoy), colorFor(convoy), BossEvent.BossBarOverlay.PROGRESS);
-        event.setProgress(progress(convoy, Math.max(1, convoy.composition().getCount())));
-        return new BarState(Math.max(1, convoy.composition().getCount()), event);
+        event.setProgress(progress(convoy, Math.max(1, memberCount(convoy))));
+        return new BarState(Math.max(1, memberCount(convoy)), event);
     }
 
     private static Component title(Convoy convoy) {
-        return Component.literal("Convoy: " + typeName(convoy) + " (" + convoy.composition().getCount() + ")");
+        return Component.literal("Convoy: " + typeName(convoy) + " (" + memberCount(convoy) + ")");
     }
 
     private static String typeName(Convoy convoy) {
@@ -91,8 +91,12 @@ public final class ConvoyBossBars {
 
     private static float progress(Convoy convoy, int initialCount) {
         var initial = Math.max(1, initialCount);
-        var current = Math.max(0, convoy.composition().getCount());
+        var current = Math.max(0, memberCount(convoy));
         return Math.clamp(current / (float) initial, 0.0F, 1.0F);
+    }
+
+    private static int memberCount(Convoy convoy) {
+        return convoy.composition().getCount() + convoy.materializedMembers().size();
     }
 
     private static void updateTrackingPlayers(
