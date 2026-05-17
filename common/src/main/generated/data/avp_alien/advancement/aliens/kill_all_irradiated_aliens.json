@@ -1,6 +1,20 @@
 {
   "parent": "avp_alien:aliens/kill_a_royal_alien",
   "criteria": {
+    "avp_alien:irradiated_burster": {
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "avp_alien:irradiated_burster"
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:player_killed_entity"
+    },
     "avp_alien:irradiated_carrier": {
       "conditions": {
         "entity": [
@@ -57,6 +71,34 @@
       },
       "trigger": "minecraft:player_killed_entity"
     },
+    "avp_alien:irradiated_empress": {
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "avp_alien:irradiated_empress"
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:player_killed_entity"
+    },
+    "avp_alien:irradiated_harbinger": {
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "avp_alien:irradiated_harbinger"
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:player_killed_entity"
+    },
     "avp_alien:irradiated_praetorian": {
       "conditions": {
         "entity": [
@@ -99,28 +141,14 @@
       },
       "trigger": "minecraft:player_killed_entity"
     },
-    "avp_alien:irradiated_harbinger": {
+    "avp_alien:irradiated_queen": {
       "conditions": {
         "entity": [
           {
             "condition": "minecraft:entity_properties",
             "entity": "this",
             "predicate": {
-              "type": "avp_alien:irradiated_harbinger"
-            }
-          }
-        ]
-      },
-      "trigger": "minecraft:player_killed_entity"
-    },
-    "avp_alien:irradiated_razor_claw": {
-      "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "type": "avp_alien:irradiated_razor_claw"
+              "type": "avp_alien:irradiated_queen"
             }
           }
         ]
@@ -141,42 +169,14 @@
       },
       "trigger": "minecraft:player_killed_entity"
     },
-    "avp_alien:irradiated_queen": {
+    "avp_alien:irradiated_razor_claw": {
       "conditions": {
         "entity": [
           {
             "condition": "minecraft:entity_properties",
             "entity": "this",
             "predicate": {
-              "type": "avp_alien:irradiated_queen"
-            }
-          }
-        ]
-      },
-      "trigger": "minecraft:player_killed_entity"
-    },
-    "avp_alien:irradiated_empress": {
-      "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "type": "avp_alien:irradiated_empress"
-            }
-          }
-        ]
-      },
-      "trigger": "minecraft:player_killed_entity"
-    },
-    "avp_alien:irradiated_burster": {
-      "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "type": "avp_alien:irradiated_burster"
+              "type": "avp_alien:irradiated_razor_claw"
             }
           }
         ]

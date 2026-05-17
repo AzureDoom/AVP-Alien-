@@ -29,6 +29,20 @@
       },
       "trigger": "minecraft:player_killed_entity"
     },
+    "avp_alien:burster": {
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "avp_alien:burster"
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:player_killed_entity"
+    },
     "avp_alien:carrier": {
       "conditions": {
         "entity": [
@@ -93,6 +107,20 @@
             "entity": "this",
             "predicate": {
               "type": "avp_alien:drone"
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:player_killed_entity"
+    },
+    "avp_alien:empress": {
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "avp_alien:empress"
             }
           }
         ]
@@ -211,14 +239,14 @@
       },
       "trigger": "minecraft:player_killed_entity"
     },
-    "avp_alien:razor_claw": {
+    "avp_alien:queen": {
       "conditions": {
         "entity": [
           {
             "condition": "minecraft:entity_properties",
             "entity": "this",
             "predicate": {
-              "type": "avp_alien:razor_claw"
+              "type": "avp_alien:queen"
             }
           }
         ]
@@ -239,28 +267,14 @@
       },
       "trigger": "minecraft:player_killed_entity"
     },
-    "avp_alien:queen": {
+    "avp_alien:razor_claw": {
       "conditions": {
         "entity": [
           {
             "condition": "minecraft:entity_properties",
             "entity": "this",
             "predicate": {
-              "type": "avp_alien:queen"
-            }
-          }
-        ]
-      },
-      "trigger": "minecraft:player_killed_entity"
-    },
-    "avp_alien:empress": {
-      "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "type": "avp_alien:empress"
+              "type": "avp_alien:razor_claw"
             }
           }
         ]
@@ -317,20 +331,6 @@
             "entity": "this",
             "predicate": {
               "type": "avp_alien:royal_ovomorph"
-            }
-          }
-        ]
-      },
-      "trigger": "minecraft:player_killed_entity"
-    },
-    "avp_alien:burster": {
-      "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "type": "avp_alien:burster"
             }
           }
         ]

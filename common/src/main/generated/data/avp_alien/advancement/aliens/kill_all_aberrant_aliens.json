@@ -29,6 +29,20 @@
       },
       "trigger": "minecraft:player_killed_entity"
     },
+    "avp_alien:aberrant_burster": {
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "avp_alien:aberrant_burster"
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:player_killed_entity"
+    },
     "avp_alien:aberrant_carrier": {
       "conditions": {
         "entity": [
@@ -93,6 +107,20 @@
             "entity": "this",
             "predicate": {
               "type": "avp_alien:aberrant_drone"
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:player_killed_entity"
+    },
+    "avp_alien:aberrant_empress": {
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "avp_alien:aberrant_empress"
             }
           }
         ]
@@ -211,14 +239,14 @@
       },
       "trigger": "minecraft:player_killed_entity"
     },
-    "avp_alien:aberrant_razor_claw": {
+    "avp_alien:aberrant_queen": {
       "conditions": {
         "entity": [
           {
             "condition": "minecraft:entity_properties",
             "entity": "this",
             "predicate": {
-              "type": "avp_alien:aberrant_razor_claw"
+              "type": "avp_alien:aberrant_queen"
             }
           }
         ]
@@ -239,42 +267,14 @@
       },
       "trigger": "minecraft:player_killed_entity"
     },
-    "avp_alien:aberrant_queen": {
+    "avp_alien:aberrant_razor_claw": {
       "conditions": {
         "entity": [
           {
             "condition": "minecraft:entity_properties",
             "entity": "this",
             "predicate": {
-              "type": "avp_alien:aberrant_queen"
-            }
-          }
-        ]
-      },
-      "trigger": "minecraft:player_killed_entity"
-    },
-    "avp_alien:aberrant_empress": {
-      "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "type": "avp_alien:aberrant_empress"
-            }
-          }
-        ]
-      },
-      "trigger": "minecraft:player_killed_entity"
-    },
-    "avp_alien:aberrant_burster": {
-      "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "type": "avp_alien:aberrant_burster"
+              "type": "avp_alien:aberrant_razor_claw"
             }
           }
         ]
