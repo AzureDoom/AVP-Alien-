@@ -6,7 +6,7 @@ import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.id.LineageIds;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
-import com.alien.common.registry.HiveRecipeRegistry;
+import com.alien.common.registry.HiveUnitPurchaseRegistry;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tags.TagKey;
@@ -21,10 +21,10 @@ import java.util.Map;
  * <ol>
  * <li>Counts tracked castes (loaded + reserves) and totals the population.</li>
  * <li>If population is below the per-chunk cap, buys a net-new basic unit when resources allow.</li>
- * <li>Once population is full, spends paid recipes on composition upgrades to move toward the policy ratios.</li>
+ * <li>Once population is full, spends paid purchases on composition upgrades to move toward the policy ratios.</li>
  * </ol>
  * Runs every server tick from {@link HiveLocationRegistry#tick}. Per-location body is cheap (a few sums and bounded
- * recipe lookups); no throttling per the project's correctness-over-cadence preference.
+ * purchase lookups); no throttling per the project's correctness-over-cadence preference.
  */
 public final class HiveBalanceTask {
 
@@ -85,7 +85,7 @@ public final class HiveBalanceTask {
     ) {
         var ordered = populationFillOrder(pop, chunks);
         for (var caste : ordered) {
-            if (tryCommitCaste(location, lineage, caste, totalPop, RecipePopulationMode.NET_GAIN)) {
+            if (tryCommitCaste(location, lineage, caste, totalPop, PurchasePopulationMode.NET_GAIN)) {
                 return true;
             }
         }
@@ -146,7 +146,7 @@ public final class HiveBalanceTask {
         candidates.sort((left, right) -> Integer.compare(deficits.get(right), deficits.get(left)));
 
         for (var caste : candidates) {
-            if (tryCommitCaste(location, lineage, caste, totalPop, RecipePopulationMode.NEUTRAL)) {
+            if (tryCommitCaste(location, lineage, caste, totalPop, PurchasePopulationMode.NEUTRAL)) {
                 return true;
             }
         }
@@ -158,7 +158,7 @@ public final class HiveBalanceTask {
         LineageFactionData lineage,
         TagKey<EntityType<?>> caste,
         int totalPop,
-        RecipePopulationMode populationMode
+        PurchasePopulationMode populationMode
     ) {
         var outputType = CasteResolver.entityTypeForCaste(lineage.variant(), caste);
         if (outputType == null) {
@@ -172,31 +172,31 @@ public final class HiveBalanceTask {
             return false;
         }
 
-        var recipe = HiveRecipeRegistry.forOutputEntity(outputType);
-        if (recipe == null) {
+        var purchase = HiveUnitPurchaseRegistry.forOutputEntity(outputType);
+        if (purchase == null) {
             return false;
         }
 
-        var netPopulationChange = netPopulationChange(recipe);
+        var netPopulationChange = netPopulationChange(purchase);
         if (!populationMode.matches(netPopulationChange)) {
             return false;
         }
 
-        if (!conditionsHold(recipe, location, totalPop)) {
+        if (!conditionsHold(purchase, location, totalPop)) {
             return false;
         }
 
-        var biomassCost = biomassCost(recipe, location);
+        var biomassCost = biomassCost(purchase, location);
         if (location.biomass() < biomassCost
-            || location.royalJelly() < recipe.royalJelly()
-            || location.scourgeJelly() < recipe.scourgeJelly()
+            || location.royalJelly() < purchase.royalJelly()
+            || location.scourgeJelly() < purchase.scourgeJelly()
         ) {
             return false;
         }
 
-        // Confirm the concrete input entity reserves cover the recipe.
-        var inputTypes = new ArrayList<EntityType<?>>(recipe.inputEntities().size());
-        for (var input : recipe.inputEntities()) {
+        // Confirm the concrete input entity reserves cover the purchase.
+        var inputTypes = new ArrayList<EntityType<?>>(purchase.inputEntities().size());
+        for (var input : purchase.inputEntities()) {
             var type = input.entity();
             if (location.localReserves().getCount(type) < input.count()) {
                 return false;
@@ -204,30 +204,30 @@ public final class HiveBalanceTask {
             inputTypes.add(type);
         }
 
-        if (!location.localReserves().accepts(recipe.outputEntity())) {
+        if (!location.localReserves().accepts(purchase.outputEntity())) {
             return false;
         }
 
         // All gates pass — commit.
         location.setBiomass(location.biomass() - biomassCost);
-        location.setRoyalJelly(location.royalJelly() - recipe.royalJelly());
-        location.setScourgeJelly(location.scourgeJelly() - recipe.scourgeJelly());
+        location.setRoyalJelly(location.royalJelly() - purchase.royalJelly());
+        location.setScourgeJelly(location.scourgeJelly() - purchase.scourgeJelly());
 
-        for (var i = 0; i < recipe.inputEntities().size(); i++) {
-            var count = recipe.inputEntities().get(i).count();
+        for (var i = 0; i < purchase.inputEntities().size(); i++) {
+            var count = purchase.inputEntities().get(i).count();
             location.localReserves().underlying().add(inputTypes.get(i), -count);
         }
-        location.localReserves().tryAdd(recipe.outputEntity(), 1);
+        location.localReserves().tryAdd(purchase.outputEntity(), 1);
         return true;
     }
 
-    private static int biomassCost(HiveRecipe recipe, HiveLocation location) {
-        var baseCost = Math.max(0, recipe.biomass());
+    private static int biomassCost(HiveUnitPurchase purchase, HiveLocation location) {
+        var baseCost = Math.max(0, purchase.biomass());
         if (baseCost == 0) {
             return 0;
         }
-        var outputCount = CastePopulation.countEntity(location, recipe.outputEntity());
-        var scaledCost = baseCost + outputCount * (baseCost * recipe.populationBiomassCostScale());
+        var outputCount = CastePopulation.countEntity(location, purchase.outputEntity());
+        var scaledCost = baseCost + outputCount * (baseCost * purchase.populationBiomassCostScale());
         return Math.max(baseCost, (int) Math.ceil(scaledCost));
     }
 
@@ -246,9 +246,9 @@ public final class HiveBalanceTask {
         return false;
     }
 
-    private static int netPopulationChange(HiveRecipe recipe) {
+    private static int netPopulationChange(HiveUnitPurchase purchase) {
         var inputs = 0;
-        for (var input : recipe.inputEntities()) {
+        for (var input : purchase.inputEntities()) {
             inputs += input.count();
         }
         return 1 - inputs;
@@ -290,24 +290,24 @@ public final class HiveBalanceTask {
     }
 
     private static boolean conditionsHold(
-        HiveRecipe recipe,
+        HiveUnitPurchase purchase,
         HiveLocation location,
         int totalPop
     ) {
-        for (var condition : recipe.conditions()) {
+        for (var condition : purchase.conditions()) {
             switch (condition) {
-                case HiveRecipeCondition.MinPopulation min -> {
+                case HiveUnitPurchaseCondition.MinPopulation min -> {
                     if (totalPop < min.value()) {
                         return false;
                     }
                 }
-                case HiveRecipeCondition.MinEntityCountInLocation min -> {
+                case HiveUnitPurchaseCondition.MinEntityCountInLocation min -> {
                     var current = CastePopulation.countEntity(location, min.entity());
                     if (current < min.value()) {
                         return false;
                     }
                 }
-                case HiveRecipeCondition.MaxEntityCountInLocation max -> {
+                case HiveUnitPurchaseCondition.MaxEntityCountInLocation max -> {
                     var current = CastePopulation.countEntity(location, max.entity());
                     if (current >= max.value()) {
                         return false;
@@ -318,7 +318,7 @@ public final class HiveBalanceTask {
         return true;
     }
 
-    private enum RecipePopulationMode {
+    private enum PurchasePopulationMode {
 
         NET_GAIN {
 

@@ -160,10 +160,10 @@ public final class HiveLocation {
 
     private int biomass;
 
-    /** Refined resource produced by queens (1/min). Used by hive recipes to upgrade castes. */
+    /** Refined resource produced by queens (1/min). Used by hive unit purchases to upgrade castes. */
     private int royalJelly;
 
-    /** Rare resource produced by queens (1/100min) and harbingers (1/min). Powers high-tier caste recipes. */
+    /** Rare resource produced by queens (1/100min) and harbingers (1/min). Powers high-tier caste purchases. */
     private int scourgeJelly;
 
     /**

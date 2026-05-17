@@ -10,7 +10,7 @@ import java.util.Map;
 
 /**
  * Snapshot of a location's per-caste population: known location members + local reserves, summed by entity-type tag.
- * Used by {@link HiveBalanceTask} to compute deficits and by recipe-condition checks. The known-member index is
+ * Used by {@link HiveBalanceTask} to compute deficits and by purchase-condition checks. The known-member index is
  * persisted on each location so persistent queens, empresses, and harbingers still count after their chunks unload.
  */
 public final class CastePopulation {

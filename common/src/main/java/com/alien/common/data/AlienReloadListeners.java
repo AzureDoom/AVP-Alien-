@@ -15,7 +15,8 @@ public class AlienReloadListeners {
 
     public static final PreparableReloadListener INFECTIONS_RELOAD_LISTENER = new InfectionReloadListener();
 
-    public static final PreparableReloadListener HIVE_RECIPES_RELOAD_LISTENER = new HiveRecipeReloadListener();
+    public static final PreparableReloadListener HIVE_UNIT_PURCHASES_RELOAD_LISTENER =
+        new HiveUnitPurchaseReloadListener();
 
     public static final PreparableReloadListener RAID_WAVE_PROFILE_RELOAD_LISTENER =
         new RaidWaveProfileReloadListener();
@@ -35,7 +36,11 @@ public class AlienReloadListeners {
             PackType.SERVER_DATA
         );
         REGISTRY.register(InfectionReloadListener.DIRECTORY_NAME, INFECTIONS_RELOAD_LISTENER, PackType.SERVER_DATA);
-        REGISTRY.register(HiveRecipeReloadListener.DIRECTORY_NAME, HIVE_RECIPES_RELOAD_LISTENER, PackType.SERVER_DATA);
+        REGISTRY.register(
+            HiveUnitPurchaseReloadListener.DIRECTORY_NAME,
+            HIVE_UNIT_PURCHASES_RELOAD_LISTENER,
+            PackType.SERVER_DATA
+        );
         REGISTRY.register(
             RaidWaveProfileReloadListener.DIRECTORY_NAME,
             RAID_WAVE_PROFILE_RELOAD_LISTENER,

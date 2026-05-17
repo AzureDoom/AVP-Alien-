@@ -1,8 +1,8 @@
 package com.alien.common.data;
 
 import com.alien.Alien;
-import com.alien.common.gameplay.hive2.economy.HiveRecipe;
-import com.alien.common.registry.HiveRecipeRegistry;
+import com.alien.common.gameplay.hive2.economy.HiveUnitPurchase;
+import com.alien.common.registry.HiveUnitPurchaseRegistry;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -15,16 +15,16 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-public class HiveRecipeReloadListener extends SimpleJsonResourceReloadListener {
+public class HiveUnitPurchaseReloadListener extends SimpleJsonResourceReloadListener {
 
-    public static final String DIRECTORY_NAME = "hive_recipes";
+    public static final String DIRECTORY_NAME = "hive_unit_purchases";
 
     private static final Gson GSON = new GsonBuilder()
         .setPrettyPrinting()
         .disableHtmlEscaping()
         .create();
 
-    public HiveRecipeReloadListener() {
+    public HiveUnitPurchaseReloadListener() {
         super(GSON, DIRECTORY_NAME);
     }
 
@@ -34,15 +34,15 @@ public class HiveRecipeReloadListener extends SimpleJsonResourceReloadListener {
         @NotNull ResourceManager resourceManager,
         @NotNull ProfilerFiller profilerFiller
     ) {
-        HiveRecipeRegistry.clear();
+        HiveUnitPurchaseRegistry.clear();
 
         for (var entry : resourceLocationJsonElementMap.entrySet()) {
             var id = entry.getKey();
             var jsonElement = entry.getValue();
 
-            HiveRecipe.CODEC.parse(JsonOps.INSTANCE, jsonElement)
-                .resultOrPartial(err -> Alien.LOGGER.error("Failed to parse HiveRecipe {}: {}", id, err))
-                .ifPresent(HiveRecipeRegistry::register);
+            HiveUnitPurchase.CODEC.parse(JsonOps.INSTANCE, jsonElement)
+                .resultOrPartial(err -> Alien.LOGGER.error("Failed to parse HiveUnitPurchase {}: {}", id, err))
+                .ifPresent(HiveUnitPurchaseRegistry::register);
         }
     }
 }

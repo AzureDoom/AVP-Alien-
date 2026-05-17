@@ -7,29 +7,29 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 
 /**
- * Datapack-encoded gating condition for a {@link HiveRecipe}. Evaluated against the candidate
+ * Datapack-encoded gating condition for a {@link HiveUnitPurchase}. Evaluated against the candidate
  * {@link com.alien.common.gameplay.hive2.location.HiveLocation} at buy time.
  * <p>
  * Sealed; each implementation is registered with a {@code type} discriminator in the dispatch codec.
  */
-public sealed interface HiveRecipeCondition {
+public sealed interface HiveUnitPurchaseCondition {
 
     String typeId();
 
-    Codec<HiveRecipeCondition> CODEC = Codec.STRING
-        .dispatch("type", HiveRecipeCondition::typeId, HiveRecipeCondition::mapCodecByType);
+    Codec<HiveUnitPurchaseCondition> CODEC = Codec.STRING
+        .dispatch("type", HiveUnitPurchaseCondition::typeId, HiveUnitPurchaseCondition::mapCodecByType);
 
-    private static MapCodec<? extends HiveRecipeCondition> mapCodecByType(String typeId) {
+    private static MapCodec<? extends HiveUnitPurchaseCondition> mapCodecByType(String typeId) {
         return switch (typeId) {
             case MinPopulation.TYPE -> MinPopulation.MAP_CODEC;
             case MinEntityCountInLocation.TYPE -> MinEntityCountInLocation.MAP_CODEC;
             case MaxEntityCountInLocation.TYPE -> MaxEntityCountInLocation.MAP_CODEC;
-            default -> throw new IllegalArgumentException("Unknown HiveRecipeCondition type: " + typeId);
+            default -> throw new IllegalArgumentException("Unknown HiveUnitPurchaseCondition type: " + typeId);
         };
     }
 
     /** Total location population (live members + reserves) must be at least {@code value}. */
-    record MinPopulation(int value) implements HiveRecipeCondition {
+    record MinPopulation(int value) implements HiveUnitPurchaseCondition {
 
         public static final String TYPE = "min_population";
 
@@ -49,7 +49,7 @@ public sealed interface HiveRecipeCondition {
     record MinEntityCountInLocation(
         EntityType<?> entity,
         int value
-    ) implements HiveRecipeCondition {
+    ) implements HiveUnitPurchaseCondition {
 
         public static final String TYPE = "min_entity_count_in_location";
 
@@ -70,7 +70,7 @@ public sealed interface HiveRecipeCondition {
     record MaxEntityCountInLocation(
         EntityType<?> entity,
         int value
-    ) implements HiveRecipeCondition {
+    ) implements HiveUnitPurchaseCondition {
 
         public static final String TYPE = "max_entity_count_in_location";
 
