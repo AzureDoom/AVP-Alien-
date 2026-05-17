@@ -29,6 +29,13 @@ public class EnUsAdvancementProvider {
 
         addAdvancement(
             builder,
+            AlienAdvancements.KILL_A_HARBINGER,
+            "Dread Silenced",
+            "Kill a harbinger"
+        );
+
+        addAdvancement(
+            builder,
             AlienAdvancements.KILL_A_ROYAL_ALIEN,
             "Regicide",
             "Kill a royal alien"

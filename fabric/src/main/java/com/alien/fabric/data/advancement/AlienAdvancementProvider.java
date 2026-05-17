@@ -133,6 +133,7 @@ public class AlienAdvancementProvider {
 
         var alienKillerAdvancement = addAlienKillerAdvancement(root, consumer);
         var royalAlienKillerAdvancement = addRoyalAlienKillerAdvancement(alienKillerAdvancement, consumer);
+        var harbingerKillerAdvancement = addHarbingerKillerAdvancement(royalAlienKillerAdvancement, consumer);
         var hiveBusterAdvancement = addHiveBusterAdvancement(royalAlienKillerAdvancement, consumer);
         var xenocideAdvancement = addXenocideAdvancement(royalAlienKillerAdvancement, consumer);
 
@@ -283,6 +284,24 @@ public class AlienAdvancementProvider {
             )
             .requirements(AdvancementRequirements.Strategy.OR)
             .save(consumer, AlienAdvancements.KILL_A_ROYAL_ALIEN.resourceLocation().toString());
+    }
+
+    private static AdvancementHolder addHarbingerKillerAdvancement(AdvancementHolder parent, Consumer<AdvancementHolder> consumer) {
+        return addMobsToKill(Advancement.Builder.advancement(), "kill_a_harbinger", AlienEntityTypeTags.HARBINGERS)
+            .parent(parent)
+            .display(
+                AlienItems.RAW_SCOURGE_JELLY.get(),
+                AlienAdvancements.KILL_A_HARBINGER.titleComponent(),
+                AlienAdvancements.KILL_A_HARBINGER.descriptionComponent(),
+                null,
+                AdvancementType.CHALLENGE,
+                true,
+                true,
+                false
+            )
+            .requirements(AdvancementRequirements.Strategy.OR)
+            .rewards(AdvancementRewards.Builder.experience(100))
+            .save(consumer, AlienAdvancements.KILL_A_HARBINGER.resourceLocation().toString());
     }
 
     private static AdvancementHolder addXenocideAdvancement(AdvancementHolder parent, Consumer<AdvancementHolder> consumer) {

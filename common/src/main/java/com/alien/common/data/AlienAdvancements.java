@@ -7,6 +7,8 @@ public class AlienAdvancements {
 
     public static final BLibAdvancement KILL_A_HIVE = create("kill_a_hive");
 
+    public static final BLibAdvancement KILL_A_HARBINGER = create("kill_a_harbinger");
+
     public static final BLibAdvancement KILL_A_ROYAL_ALIEN = create("kill_a_royal_alien");
 
     public static final BLibAdvancement KILL_ALL_ALIENS = create("kill_all_aliens");

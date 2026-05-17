@@ -13,6 +13,7 @@
   - Removed hive debugging code. The debugging code was outdated with the rewrite and has therefore been removed, including its properties in the alien properties file.
 
 ## ✨ What's New
+- Added an advancement for killing a harbinger.
 - Added blood loss mob effect.
 - Added raw scourge jelly item.
 - Added scourge jelly block.
