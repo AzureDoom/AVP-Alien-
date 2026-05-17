@@ -17,6 +17,8 @@ public class AlienAdvancements {
 
     public static final BLibAdvancement KILL_AN_ALIEN = create("kill_an_alien");
 
+    public static final BLibAdvancement LEAD_RAID_TO_ENEMY_HIVE = create("lead_raid_to_enemy_hive");
+
     public static final BLibAdvancement DEFEAT_A_RAID = create("defeat_a_raid");
 
     public static final BLibAdvancement DUAL_VARIANT_RAIDS = create("dual_variant_raids");

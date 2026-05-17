@@ -136,6 +136,7 @@ public class AlienAdvancementProvider {
         var harbingerKillerAdvancement = addHarbingerKillerAdvancement(royalAlienKillerAdvancement, consumer);
         var raidDefeatAdvancement = addRaidDefeatAdvancement(harbingerKillerAdvancement, consumer);
         var dualVariantRaidsAdvancement = addDualVariantRaidsAdvancement(raidDefeatAdvancement, consumer);
+        var leadRaidToEnemyHiveAdvancement = addLeadRaidToEnemyHiveAdvancement(raidDefeatAdvancement, consumer);
         var hiveBusterAdvancement = addHiveBusterAdvancement(royalAlienKillerAdvancement, consumer);
         var lineageKillerAdvancement = addLineageKillerAdvancement(hiveBusterAdvancement, consumer);
         var xenocideAdvancement = addXenocideAdvancement(royalAlienKillerAdvancement, consumer);
@@ -347,6 +348,30 @@ public class AlienAdvancementProvider {
             )
             .rewards(AdvancementRewards.Builder.experience(100))
             .save(consumer, AlienAdvancements.DUAL_VARIANT_RAIDS.resourceLocation().toString());
+    }
+
+    private static AdvancementHolder addLeadRaidToEnemyHiveAdvancement(
+        AdvancementHolder parent,
+        Consumer<AdvancementHolder> consumer
+    ) {
+        return Advancement.Builder.advancement()
+            .addCriterion(
+                "lead_raid_to_enemy_hive",
+                CriteriaTriggers.IMPOSSIBLE.createCriterion(new ImpossibleTrigger.TriggerInstance())
+            )
+            .parent(parent)
+            .display(
+                AlienResinBlocks.RESIN.get(),
+                AlienAdvancements.LEAD_RAID_TO_ENEMY_HIVE.titleComponent(),
+                AlienAdvancements.LEAD_RAID_TO_ENEMY_HIVE.descriptionComponent(),
+                null,
+                AdvancementType.CHALLENGE,
+                true,
+                true,
+                false
+            )
+            .rewards(AdvancementRewards.Builder.experience(100))
+            .save(consumer, AlienAdvancements.LEAD_RAID_TO_ENEMY_HIVE.resourceLocation().toString());
     }
 
     private static AdvancementHolder addXenocideAdvancement(AdvancementHolder parent, Consumer<AdvancementHolder> consumer) {

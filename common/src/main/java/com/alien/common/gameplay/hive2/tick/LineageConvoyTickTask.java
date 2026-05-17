@@ -23,6 +23,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.level.ChunkPos;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -114,6 +115,7 @@ public final class LineageConvoyTickTask {
                         updateRaidTargetPos(raid, server);
                         refreshMarkedForDeath(raid, server, config);
                         maybeWarnRaidTarget(raid, server, lineage, config);
+                        grantLeadRaidToEnemyHiveAdvancement(raid, server, lineage);
                         if (raid.shouldStartWaveBreak()) {
                             raid.startWaveBreak(currentTick);
                             anyChanged = true;
@@ -190,6 +192,34 @@ public final class LineageConvoyTickTask {
             if (player != null) {
                 AlienAdvancements.DUAL_VARIANT_RAIDS.grant(player);
             }
+        }
+    }
+
+    private static void grantLeadRaidToEnemyHiveAdvancement(
+        Convoy.Raid raid,
+        MinecraftServer server,
+        LineageFactionData raidLineage
+    ) {
+        if (!isRaidTargetValid(raid, server)) {
+            return;
+        }
+
+        var player = server.getPlayerList().getPlayer(raid.targetPlayerId());
+        if (player == null) {
+            return;
+        }
+
+        var location = HiveLocationRegistry.INSTANCE.getByChunk(
+            player.level().dimension(),
+            new ChunkPos(player.blockPosition())
+        );
+        if (location == null || location.lineageFactionId().equals(raidLineage.factionId())) {
+            return;
+        }
+
+        var hiveVariant = location.lineageVariantOrNull();
+        if (hiveVariant != null && hiveVariant != raidLineage.variant()) {
+            AlienAdvancements.LEAD_RAID_TO_ENEMY_HIVE.grant(player);
         }
     }
 

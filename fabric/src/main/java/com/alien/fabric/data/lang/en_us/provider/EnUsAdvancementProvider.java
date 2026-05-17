@@ -29,6 +29,13 @@ public class EnUsAdvancementProvider {
 
         addAdvancement(
             builder,
+            AlienAdvancements.LEAD_RAID_TO_ENEMY_HIVE,
+            "Enemy of My Enemy",
+            "Lead a raid to a hive of a different xenomorph variant"
+        );
+
+        addAdvancement(
+            builder,
             AlienAdvancements.ROOT,
             "AVP: Aliens",
             "In Minecraft, no one can hear you scream"
