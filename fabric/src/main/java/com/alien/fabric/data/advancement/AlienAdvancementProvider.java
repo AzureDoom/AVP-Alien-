@@ -134,6 +134,7 @@ public class AlienAdvancementProvider {
         var alienKillerAdvancement = addAlienKillerAdvancement(root, consumer);
         var royalAlienKillerAdvancement = addRoyalAlienKillerAdvancement(alienKillerAdvancement, consumer);
         var harbingerKillerAdvancement = addHarbingerKillerAdvancement(royalAlienKillerAdvancement, consumer);
+        var raidDefeatAdvancement = addRaidDefeatAdvancement(harbingerKillerAdvancement, consumer);
         var hiveBusterAdvancement = addHiveBusterAdvancement(royalAlienKillerAdvancement, consumer);
         var lineageKillerAdvancement = addLineageKillerAdvancement(hiveBusterAdvancement, consumer);
         var xenocideAdvancement = addXenocideAdvancement(royalAlienKillerAdvancement, consumer);
@@ -303,6 +304,24 @@ public class AlienAdvancementProvider {
             .requirements(AdvancementRequirements.Strategy.OR)
             .rewards(AdvancementRewards.Builder.experience(100))
             .save(consumer, AlienAdvancements.KILL_A_HARBINGER.resourceLocation().toString());
+    }
+
+    private static AdvancementHolder addRaidDefeatAdvancement(AdvancementHolder parent, Consumer<AdvancementHolder> consumer) {
+        return Advancement.Builder.advancement()
+            .addCriterion("defeat_a_raid", CriteriaTriggers.IMPOSSIBLE.createCriterion(new ImpossibleTrigger.TriggerInstance()))
+            .parent(parent)
+            .display(
+                AlienItems.RAW_SCOURGE_JELLY.get(),
+                AlienAdvancements.DEFEAT_A_RAID.titleComponent(),
+                AlienAdvancements.DEFEAT_A_RAID.descriptionComponent(),
+                null,
+                AdvancementType.CHALLENGE,
+                true,
+                true,
+                false
+            )
+            .rewards(AdvancementRewards.Builder.experience(100))
+            .save(consumer, AlienAdvancements.DEFEAT_A_RAID.resourceLocation().toString());
     }
 
     private static AdvancementHolder addXenocideAdvancement(AdvancementHolder parent, Consumer<AdvancementHolder> consumer) {

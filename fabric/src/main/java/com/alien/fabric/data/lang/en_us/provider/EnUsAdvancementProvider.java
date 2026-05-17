@@ -15,6 +15,13 @@ public class EnUsAdvancementProvider {
     private static void provideAlienAdvancementTranslations(FabricLanguageProvider.TranslationBuilder builder) {
         addAdvancement(
             builder,
+            AlienAdvancements.DEFEAT_A_RAID,
+            "Stand Your Ground",
+            "Defeat a xenomorph raid"
+        );
+
+        addAdvancement(
+            builder,
             AlienAdvancements.ROOT,
             "AVP: Aliens",
             "In Minecraft, no one can hear you scream"

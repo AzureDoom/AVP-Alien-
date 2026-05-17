@@ -1,6 +1,7 @@
 package com.alien.common.gameplay.hive2.tick;
 
 import com.alien.Alien;
+import com.alien.common.data.AlienAdvancements;
 import com.alien.common.gameplay.hive2.config.HiveConfig;
 import com.alien.common.gameplay.hive2.convoy.Convoy;
 import com.alien.common.gameplay.hive2.convoy.Convoy.Raid.ReturnHomeReason;
@@ -96,6 +97,7 @@ public final class LineageConvoyTickTask {
 
                 if (convoy instanceof Convoy.Raid raid) {
                     if (raid.composition().getCount() <= 0 && raid.materializedMembers().isEmpty()) {
+                        grantDefeatRaidAdvancement(raid, server);
                         ConvoyBossBars.remove(convoy);
                         activeConvoyIds.remove(convoy.id());
                         iterator.remove();
@@ -178,6 +180,13 @@ public final class LineageConvoyTickTask {
             ),
             null
         );
+    }
+
+    private static void grantDefeatRaidAdvancement(Convoy.Raid raid, MinecraftServer server) {
+        var player = server.getPlayerList().getPlayer(raid.targetPlayerId());
+        if (player != null) {
+            AlienAdvancements.DEFEAT_A_RAID.grant(player);
+        }
     }
 
     private static int markedForDeathDurationTicks(Convoy.Raid raid, HiveConfig config) {

@@ -17,6 +17,8 @@ public class AlienAdvancements {
 
     public static final BLibAdvancement KILL_AN_ALIEN = create("kill_an_alien");
 
+    public static final BLibAdvancement DEFEAT_A_RAID = create("defeat_a_raid");
+
     public static final BLibAdvancement REMOVE_EMBRYO_WITH_CHORUS_FRUIT = create("remove_embryo_with_chorus_fruit");
 
     public static final BLibAdvancement ROOT = create("root");
