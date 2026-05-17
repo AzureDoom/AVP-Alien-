@@ -3,6 +3,7 @@ package com.alien.common.gameplay.hive2.tick;
 import com.alien.Alien;
 import com.alien.common.gameplay.hive2.config.HiveConfig;
 import com.alien.common.gameplay.hive2.convoy.Convoy;
+import com.alien.common.gameplay.hive2.convoy.Convoy.Raid.ReturnHomeReason;
 import com.alien.common.gameplay.hive2.convoy.ConvoyArrival;
 import com.alien.common.gameplay.hive2.convoy.ConvoyBossBars;
 import com.alien.common.gameplay.hive2.convoy.ConvoyId;
@@ -66,15 +67,26 @@ public final class LineageConvoyTickTask {
                 activeConvoyIds.add(convoy.id());
 
                 if (convoy instanceof Convoy.Raid raid) {
-                    if (!raid.returningHome() && shouldReturnHome(raid, server)) {
-                        if (beginRaidReturnHome(raid, server, lineage)) {
+                    if (raid.returningHome()) {
+                        if (shouldResumeRaidHunt(raid, server)) {
+                            resumeRaidHunt(raid, server);
+                            anyChanged = true;
+                        }
+                    } else {
+                        var returnHomeReason = returnHomeReason(raid, server);
+                        if (
+                            returnHomeReason != ReturnHomeReason.NONE
+                                && beginRaidReturnHome(raid, server, lineage, returnHomeReason)
+                        ) {
                             ConvoyBossBars.remove(convoy);
                             activeConvoyIds.remove(convoy.id());
                             iterator.remove();
                             anyChanged = true;
                             continue;
                         }
-                        anyChanged = true;
+                        if (returnHomeReason != ReturnHomeReason.NONE) {
+                            anyChanged = true;
+                        }
                     }
                 }
 
@@ -195,9 +207,37 @@ public final class LineageConvoyTickTask {
         raid.setLastKnownTargetPos(player.blockPosition());
     }
 
-    private static boolean shouldReturnHome(Convoy.Raid raid, MinecraftServer server) {
+    private static ReturnHomeReason returnHomeReason(Convoy.Raid raid, MinecraftServer server) {
         var player = server.getPlayerList().getPlayer(raid.targetPlayerId());
-        return player != null && (!player.isAlive() || player.isCreative() || player.isSpectator());
+        if (player == null) {
+            return ReturnHomeReason.NONE;
+        }
+        if (!player.isAlive()) {
+            return ReturnHomeReason.TARGET_DEFEATED;
+        }
+        if (player.isCreative() || player.isSpectator()) {
+            return ReturnHomeReason.TARGET_UNAVAILABLE;
+        }
+        return ReturnHomeReason.NONE;
+    }
+
+    private static boolean shouldResumeRaidHunt(Convoy.Raid raid, MinecraftServer server) {
+        return raid.returnHomeReason() == ReturnHomeReason.TARGET_UNAVAILABLE && isRaidTargetValid(raid, server);
+    }
+
+    private static boolean isRaidTargetValid(Convoy.Raid raid, MinecraftServer server) {
+        var player = server.getPlayerList().getPlayer(raid.targetPlayerId());
+        return player != null
+            && player.isAlive()
+            && !player.isCreative()
+            && !player.isSpectator()
+            && player.level().dimension().equals(raid.dimension());
+    }
+
+    private static void resumeRaidHunt(Convoy.Raid raid, MinecraftServer server) {
+        raid.resumeHunt();
+        updateRaidTargetPos(raid, server);
+        Alien.LOGGER.info("Hive2: raid {} resumed hunting player {}", raid.id(), raid.targetPlayerId());
     }
 
     private static double materializedMemberLeashDistanceSqr(HiveConfig config) {
@@ -205,39 +245,72 @@ public final class LineageConvoyTickTask {
         return (double) distance * distance;
     }
 
-    private static boolean beginRaidReturnHome(Convoy.Raid raid, MinecraftServer server, LineageFactionData lineage) {
+    private static boolean beginRaidReturnHome(
+        Convoy.Raid raid,
+        MinecraftServer server,
+        LineageFactionData lineage,
+        ReturnHomeReason reason
+    ) {
         var recalled = ConvoyMemberTracker.recallMaterializedMembers(server, raid);
-        var destination = pickReturnLocation(raid, lineage);
-        if (destination == null) {
+        if (reason == ReturnHomeReason.TARGET_UNAVAILABLE && recalled > 0) {
+            raid.rewindActiveWave();
+        }
+
+        if (raid.composition().getCount() <= 0) {
             Alien.LOGGER.info(
-                "Hive2: raid {} completed against player {} but no live return location exists; disbanding {} member(s)",
+                "Hive2: raid {} stopped hunting player {} because {} with no surviving members to return",
                 raid.id(),
                 raid.targetPlayerId(),
+                returnHomeReasonDescription(reason)
+            );
+            return true;
+        }
+
+        var destination = pickReturnLocation(raid, lineage);
+        if (destination == null) {
+            if (reason == ReturnHomeReason.TARGET_UNAVAILABLE) {
+                raid.beginReturnHome(null, null, reason);
+                lineage.markDirty();
+                Alien.LOGGER.info(
+                    "Hive2: raid {} stopped hunting player {} because {} but no live return location exists; "
+                        + "waiting to resume",
+                    raid.id(),
+                    raid.targetPlayerId(),
+                    returnHomeReasonDescription(reason)
+                );
+                return false;
+            }
+            Alien.LOGGER.info(
+                "Hive2: raid {} stopped hunting player {} because {} but no live return location exists; "
+                    + "disbanding {} member(s)",
+                raid.id(),
+                raid.targetPlayerId(),
+                returnHomeReasonDescription(reason),
                 raid.composition().getCount()
             );
             return true;
         }
 
-        if (raid.composition().getCount() <= 0) {
-            Alien.LOGGER.info(
-                "Hive2: raid {} completed against player {} with no surviving members to return",
-                raid.id(),
-                raid.targetPlayerId()
-            );
-            return true;
-        }
-
-        raid.beginReturnHome(destination.id(), destination.centerPos());
+        raid.beginReturnHome(destination.id(), destination.centerPos(), reason);
         lineage.markDirty();
         Alien.LOGGER.info(
-            "Hive2: raid {} completed against player {}; returning {} member(s) to location {} (recalled {})",
+            "Hive2: raid {} stopped hunting player {} because {}; returning {} member(s) to location {} (recalled {})",
             raid.id(),
             raid.targetPlayerId(),
+            returnHomeReasonDescription(reason),
             raid.composition().getCount(),
             destination.id(),
             recalled
         );
         return false;
+    }
+
+    private static String returnHomeReasonDescription(ReturnHomeReason reason) {
+        return switch (reason) {
+            case TARGET_UNAVAILABLE -> "the target became unavailable";
+            case TARGET_DEFEATED -> "the target was defeated";
+            case NONE -> "no return reason was recorded";
+        };
     }
 
     private static HiveLocation pickReturnLocation(Convoy.Raid raid, LineageFactionData lineage) {

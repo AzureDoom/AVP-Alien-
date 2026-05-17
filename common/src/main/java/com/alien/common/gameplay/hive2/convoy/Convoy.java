@@ -376,6 +376,31 @@ public sealed interface Convoy {
 
         public static final long WAVE_BREAK_TICKS = 20L * 10L;
 
+        public enum ReturnHomeReason {
+            NONE("none"),
+            TARGET_UNAVAILABLE("target_unavailable"),
+            TARGET_DEFEATED("target_defeated");
+
+            private final String serializedName;
+
+            ReturnHomeReason(String serializedName) {
+                this.serializedName = serializedName;
+            }
+
+            public String serializedName() {
+                return serializedName;
+            }
+
+            public static ReturnHomeReason fromSerializedName(String serializedName) {
+                for (var reason : values()) {
+                    if (reason.serializedName.equals(serializedName)) {
+                        return reason;
+                    }
+                }
+                return NONE;
+            }
+        }
+
         private final ConvoyId id;
 
         private final ResourceLocation lineageFactionId;
@@ -405,6 +430,8 @@ public sealed interface Convoy {
         private long waveBreakStartedTick;
 
         private boolean returningHome;
+
+        private ReturnHomeReason returnHomeReason;
 
         private @Nullable HiveLocationId returnLocationId;
 
@@ -535,6 +562,52 @@ public sealed interface Convoy {
             long dispatchedTick,
             long expiresAtTick
         ) {
+            this(
+                id,
+                lineageFactionId,
+                dimension,
+                sourceLocationId,
+                targetPlayerId,
+                currentPos,
+                lastKnownTargetPos,
+                composition,
+                materializedMembers,
+                warningIssued,
+                nextWaveIndex,
+                activeWaveIndex,
+                activeWaveInitialCount,
+                waveBreakStartedTick,
+                returningHome,
+                returningHome ? ReturnHomeReason.TARGET_DEFEATED : ReturnHomeReason.NONE,
+                returnLocationId,
+                returnPos,
+                dispatchedTick,
+                expiresAtTick
+            );
+        }
+
+        public Raid(
+            ConvoyId id,
+            ResourceLocation lineageFactionId,
+            ResourceKey<Level> dimension,
+            HiveLocationId sourceLocationId,
+            UUID targetPlayerId,
+            Vec3 currentPos,
+            BlockPos lastKnownTargetPos,
+            EntityReserves composition,
+            Map<UUID, EntityType<?>> materializedMembers,
+            boolean warningIssued,
+            int nextWaveIndex,
+            int activeWaveIndex,
+            int activeWaveInitialCount,
+            long waveBreakStartedTick,
+            boolean returningHome,
+            ReturnHomeReason returnHomeReason,
+            @Nullable HiveLocationId returnLocationId,
+            @Nullable BlockPos returnPos,
+            long dispatchedTick,
+            long expiresAtTick
+        ) {
             this.id = id;
             this.lineageFactionId = lineageFactionId;
             this.dimension = dimension;
@@ -550,10 +623,15 @@ public sealed interface Convoy {
             this.activeWaveInitialCount = Math.max(0, activeWaveInitialCount);
             this.waveBreakStartedTick = waveBreakStartedTick;
             this.returningHome = returningHome;
+            this.returnHomeReason = returningHome ? normalizeReturnHomeReason(returnHomeReason) : ReturnHomeReason.NONE;
             this.returnLocationId = returnLocationId;
             this.returnPos = returnPos;
             this.dispatchedTick = dispatchedTick;
             this.expiresAtTick = expiresAtTick;
+        }
+
+        private static ReturnHomeReason normalizeReturnHomeReason(ReturnHomeReason reason) {
+            return reason == ReturnHomeReason.NONE ? ReturnHomeReason.TARGET_DEFEATED : reason;
         }
 
         @Override
@@ -705,6 +783,10 @@ public sealed interface Convoy {
             return returningHome;
         }
 
+        public ReturnHomeReason returnHomeReason() {
+            return returnHomeReason;
+        }
+
         public @Nullable HiveLocationId returnLocationId() {
             return returnLocationId;
         }
@@ -714,9 +796,34 @@ public sealed interface Convoy {
         }
 
         public void beginReturnHome(HiveLocationId locationId, BlockPos locationPos) {
+            beginReturnHome(locationId, locationPos, ReturnHomeReason.TARGET_DEFEATED);
+        }
+
+        public void beginReturnHome(
+            @Nullable HiveLocationId locationId,
+            @Nullable BlockPos locationPos,
+            ReturnHomeReason reason
+        ) {
             this.returningHome = true;
+            this.returnHomeReason = normalizeReturnHomeReason(reason);
             this.returnLocationId = locationId;
             this.returnPos = locationPos;
+        }
+
+        public void resumeHunt() {
+            this.returningHome = false;
+            this.returnHomeReason = ReturnHomeReason.NONE;
+            this.returnLocationId = null;
+            this.returnPos = null;
+        }
+
+        public void rewindActiveWave() {
+            if (activeWaveIndex >= 0) {
+                this.nextWaveIndex = Math.clamp(activeWaveIndex, 0, WAVE_COUNT - 1);
+            }
+            this.activeWaveIndex = -1;
+            this.activeWaveInitialCount = 0;
+            this.waveBreakStartedTick = -1L;
         }
     }
 }

@@ -79,6 +79,8 @@ public final class ConvoyCodec {
 
     private static final String NBT_RETURNING_HOME = "ReturningHome";
 
+    private static final String NBT_RETURN_HOME_REASON = "ReturnHomeReason";
+
     private static final String NBT_RETURN_LOCATION_ID = "ReturnLocationId";
 
     private static final String NBT_RETURN_POS = "ReturnPos";
@@ -146,6 +148,7 @@ public final class ConvoyCodec {
             tag.putInt(NBT_ACTIVE_WAVE_INITIAL_COUNT, raid.activeWaveInitialCount());
             tag.putLong(NBT_WAVE_BREAK_STARTED_TICK, raid.waveBreakStartedTick());
             tag.putBoolean(NBT_RETURNING_HOME, raid.returningHome());
+            tag.putString(NBT_RETURN_HOME_REASON, raid.returnHomeReason().serializedName());
             if (raid.returnLocationId() != null) {
                 tag.putString(NBT_RETURN_LOCATION_ID, raid.returnLocationId().value().toString());
             }
@@ -218,6 +221,7 @@ public final class ConvoyCodec {
                 tag.getInt(NBT_ACTIVE_WAVE_INITIAL_COUNT),
                 tag.contains(NBT_WAVE_BREAK_STARTED_TICK) ? tag.getLong(NBT_WAVE_BREAK_STARTED_TICK) : -1L,
                 tag.getBoolean(NBT_RETURNING_HOME),
+                decodeReturnHomeReason(tag),
                 tag.contains(NBT_RETURN_LOCATION_ID)
                     ? new HiveLocationId(ResourceLocation.parse(tag.getString(NBT_RETURN_LOCATION_ID)))
                     : null,
@@ -230,6 +234,15 @@ public final class ConvoyCodec {
                 yield null;
             }
         };
+    }
+
+    private static Convoy.Raid.ReturnHomeReason decodeReturnHomeReason(CompoundTag tag) {
+        if (tag.contains(NBT_RETURN_HOME_REASON)) {
+            return Convoy.Raid.ReturnHomeReason.fromSerializedName(tag.getString(NBT_RETURN_HOME_REASON));
+        }
+        return tag.getBoolean(NBT_RETURNING_HOME)
+            ? Convoy.Raid.ReturnHomeReason.TARGET_DEFEATED
+            : Convoy.Raid.ReturnHomeReason.NONE;
     }
 
     private static ListTag encodeVec3(Vec3 vec) {

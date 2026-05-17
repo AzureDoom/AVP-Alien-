@@ -74,8 +74,8 @@ public final class ConvoyTravel {
             return centerOf(migration.destinationPos());
         }
         if (convoy instanceof Convoy.Raid raid) {
-            if (raid.returningHome() && raid.returnPos() != null) {
-                return centerOf(raid.returnPos());
+            if (raid.returningHome()) {
+                return raid.returnPos() == null ? null : centerOf(raid.returnPos());
             }
             // Raid target tracks the player; lastKnownTargetPos is updated each tick by LineageConvoyTickTask.
             return centerOf(raid.lastKnownTargetPos());
