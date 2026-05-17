@@ -51,6 +51,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
@@ -343,6 +344,18 @@ public abstract class Alien extends Monster implements DataUser {
         if (getRandom().nextIntBetweenInclusive(1, 100) >= 90) {
             AlienTransitionUtil.transitionIntoVariant(this, AlienVariant.IRRADIATED);
         }
+    }
+
+    @Override
+    public void thunderHit(@NotNull ServerLevel level, @NotNull LightningBolt lightning) {
+        var aberrantType = getTypeForVariant(AlienVariant.ABERRANT);
+
+        if (aberrantType != null && !Objects.equals(getType(), aberrantType)) {
+            AlienTransitionUtil.transitionIntoVariant(this, AlienVariant.ABERRANT);
+            return;
+        }
+
+        super.thunderHit(level, lightning);
     }
 
     private void healPassively() {
