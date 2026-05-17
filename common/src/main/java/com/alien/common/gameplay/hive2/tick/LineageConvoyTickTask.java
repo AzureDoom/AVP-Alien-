@@ -123,16 +123,6 @@ public final class LineageConvoyTickTask {
                     }
                 }
 
-                ConvoyBossBars.tick(server, convoy, lineage, config);
-
-                if (ConvoyInterception.tryIntercept(server, convoy, lineage, config)) {
-                    ConvoyBossBars.remove(convoy);
-                    activeConvoyIds.remove(convoy.id());
-                    iterator.remove();
-                    anyChanged = true;
-                    continue;
-                }
-
                 ConvoyTravel.tick(convoy, config);
 
                 if (
@@ -146,6 +136,16 @@ public final class LineageConvoyTickTask {
                 }
 
                 if (ConvoyArrival.checkArrival(server, convoy, lineage, config)) {
+                    ConvoyBossBars.remove(convoy);
+                    activeConvoyIds.remove(convoy.id());
+                    iterator.remove();
+                    anyChanged = true;
+                    continue;
+                }
+
+                ConvoyBossBars.tick(server, convoy, lineage, config);
+
+                if (ConvoyInterception.tryIntercept(server, convoy, lineage, config)) {
                     ConvoyBossBars.remove(convoy);
                     activeConvoyIds.remove(convoy.id());
                     iterator.remove();
