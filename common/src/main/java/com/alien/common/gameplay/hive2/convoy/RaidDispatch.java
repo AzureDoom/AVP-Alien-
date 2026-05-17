@@ -2,7 +2,6 @@ package com.alien.common.gameplay.hive2.convoy;
 
 import com.alien.Alien;
 import com.alien.common.gameplay.hive2.config.HiveConfig;
-import com.alien.common.gameplay.hive2.economy.CastePopulation;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.id.HiveLocationId;
 import com.alien.common.gameplay.hive2.id.LineageIds;
@@ -193,7 +192,7 @@ public final class RaidDispatch {
             if (location.claimedChunks().size() < config.raidMinLocationSizeChunks()) {
                 continue;
             }
-            if (CastePopulation.countCaste(location, AlienEntityTypeTags.HARBINGERS) <= 0) {
+            if (location.localReserves().getCountMatching(type -> type.is(AlienEntityTypeTags.HARBINGERS)) <= 0) {
                 continue;
             }
 
@@ -211,10 +210,18 @@ public final class RaidDispatch {
         return best;
     }
 
-    /** Same round-robin draw as {@link ReinforcementDispatcher}, filtered to scourge-jelly recipe outputs. */
+    /** Same round-robin draw as {@link ReinforcementDispatcher}, with one harbinger reserved as the raid lead. */
     private static EntityReserves drainComposition(HiveLocationReserves donorReserves, int count) {
         var composition = new EntityReserves();
         var remaining = count;
+        var harbingerType = drainOneHarbinger(donorReserves);
+        if (harbingerType == null) {
+            return composition;
+        }
+
+        composition.add(harbingerType, 1);
+        remaining--;
+
         var available = new ArrayList<>(
             donorReserves.getAvailableEntityTypes()
                 .stream()
@@ -241,6 +248,15 @@ public final class RaidDispatch {
         return composition;
     }
 
+    private static @Nullable EntityType<?> drainOneHarbinger(HiveLocationReserves reserves) {
+        for (var type : reserves.getAvailableEntityTypes()) {
+            if (type.is(AlienEntityTypeTags.HARBINGERS) && reserves.trySpawn(type)) {
+                return type;
+            }
+        }
+        return null;
+    }
+
     private static int eligibleRaidReserveCount(HiveLocationReserves reserves) {
         var count = 0;
         for (var type : reserves.getAvailableEntityTypes()) {
@@ -254,6 +270,9 @@ public final class RaidDispatch {
     private static boolean isRaidEligible(EntityType<?> type) {
         if (!type.is(AlienEntityTypeTags.XENOMORPHS)) {
             return false;
+        }
+        if (type.is(AlienEntityTypeTags.HARBINGERS)) {
+            return true;
         }
         if (type.is(AlienEntityTypeTags.WARRIORS)) {
             return true;
