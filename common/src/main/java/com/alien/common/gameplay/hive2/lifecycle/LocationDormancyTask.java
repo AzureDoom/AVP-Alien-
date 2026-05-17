@@ -1,7 +1,6 @@
 package com.alien.common.gameplay.hive2.lifecycle;
 
 import com.alien.Alien;
-import com.alien.common.gameplay.hive2.convoy.Convoy;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.id.LineageIds;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
@@ -94,7 +93,7 @@ public final class LocationDormancyTask {
         var locationFaction = Alien.MOD.factions().get(location.id().value());
         var locationMemberCount = locationFaction != null ? locationFaction.membership().getMembers().size() : 0;
         var storedPopulationCount = location.localReserves().getCount();
-        if (locationMemberCount == 0 && storedPopulationCount == 0 && !hasInboundConvoy(lineage, location)) {
+        if (locationMemberCount == 0 && storedPopulationCount == 0) {
             LocationDeathHandler.killNaturalDecay(level, location, lineage);
             return true;
         }
@@ -145,21 +144,6 @@ public final class LocationDormancyTask {
             return true;
         }
 
-        return false;
-    }
-
-    private static boolean hasInboundConvoy(LineageFactionData lineage, HiveLocation location) {
-        for (var convoy : lineage.convoys()) {
-            if (convoy.composition().getCount() <= 0) {
-                continue;
-            }
-            if (convoy instanceof Convoy.Reinforcement reinforcement && reinforcement.destinationLocationId().equals(location.id())) {
-                return true;
-            }
-            if (convoy instanceof Convoy.Migration migration && migration.destinationLocationId().equals(location.id())) {
-                return true;
-            }
-        }
         return false;
     }
 }
