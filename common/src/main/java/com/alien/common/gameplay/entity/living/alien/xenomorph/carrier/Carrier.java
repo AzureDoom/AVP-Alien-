@@ -1,6 +1,7 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.carrier;
 
 import com.alien.common.gameplay.entity.living.alien.Alien;
+import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.Facehugger;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackConfig;
@@ -100,6 +101,10 @@ public class Carrier extends Xenomorph implements GOAPUser<Carrier> {
     public void tick() {
         super.tick();
         carrierData.tick();
+
+        if (!level().isClientSide) {
+            fillReserveFacehuggerPayloadIfPending();
+        }
     }
 
     @Override
@@ -167,6 +172,40 @@ public class Carrier extends Xenomorph implements GOAPUser<Carrier> {
         return (int) getPassengers().stream()
             .filter(p -> p.getType().is(AlienEntityTypeTags.FACEHUGGERS))
             .count();
+    }
+
+    public void queueReserveFacehuggerPayload() {
+        carrierData.setReserveFacehuggerPayloadPending(true);
+    }
+
+    private void fillReserveFacehuggerPayloadIfPending() {
+        if (!carrierData.isReserveFacehuggerPayloadPending()) {
+            return;
+        }
+
+        var facehuggerType = Facehugger.getType(getVariant(), false);
+        if (facehuggerType == null) {
+            carrierData.setReserveFacehuggerPayloadPending(false);
+            return;
+        }
+
+        while (getRidingFacehuggerCount() < CarrierSpine.COUNT) {
+            var facehugger = facehuggerType.create(level());
+            if (facehugger == null) {
+                return;
+            }
+
+            facehugger.moveTo(getX(), getY(), getZ(), getYRot(), getXRot());
+            facehugger.setPersistenceRequired();
+            level().addFreshEntity(facehugger);
+
+            if (!facehugger.startRiding(this, true)) {
+                facehugger.discard();
+                return;
+            }
+        }
+
+        carrierData.setReserveFacehuggerPayloadPending(false);
     }
 
     public CarrierData getCarrierData() {

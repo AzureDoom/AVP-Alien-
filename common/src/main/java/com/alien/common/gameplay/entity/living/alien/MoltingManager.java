@@ -164,6 +164,21 @@ public class MoltingManager implements NBTSerializable {
         return isMolting(data.phases().get(phaseIndex));
     }
 
+    public void skipToFullMaturity() {
+        var data = getData();
+        if (data == null) {
+            targetScaleReachedTicks = Integer.MAX_VALUE;
+            entity.moltAlpha.set(0F);
+            return;
+        }
+
+        phaseIndex = data.phases().size();
+        phaseElapsedTicks = 0;
+        targetScaleReachedTicks = Integer.MAX_VALUE;
+        entity.moltAlpha.set(0F);
+        applyScaleModifier(data);
+    }
+
     private boolean isMolting(MoltPhase phase) {
         return phaseElapsedTicks >= phase.idleTicks();
     }

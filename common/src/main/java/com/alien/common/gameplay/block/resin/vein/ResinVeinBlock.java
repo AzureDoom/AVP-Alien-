@@ -104,6 +104,7 @@ public class ResinVeinBlock extends MultifaceBlock implements VeinSpreadBehavior
         ResinSpreader resinSpreader
     ) {
         if (attemptPlaceResin(levelAccessor, nodePos, chargeCursor.getPos(), randomSource)) {
+            resinSpreader.recordSuccessfulConversion(chargeCursor);
             return chargeCursor.getCharge() - 1;
         } else {
             return randomSource.nextInt(resinSpreader.chargeDecayRate()) == 0

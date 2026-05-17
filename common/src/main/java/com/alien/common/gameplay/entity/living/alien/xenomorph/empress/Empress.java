@@ -90,7 +90,11 @@ public class Empress extends Xenomorph implements GOAPUser<Empress>, EggLayer {
 
     @Override
     public @Nullable Graph<Empress> blib$getGOAPGraphOrNull() {
-        return getActiveGOAPGraph(EmpressGOAP.GRAPH);
+        return getActiveGOAPGraph(isOnOvipositor() ? EmpressGOAP.OVIPOSITOR_GRAPH : EmpressGOAP.GRAPH);
+    }
+
+    private boolean isOnOvipositor() {
+        return empressOvipositorManager != null && empressOvipositorManager.hasOvipositor();
     }
 
     @Override

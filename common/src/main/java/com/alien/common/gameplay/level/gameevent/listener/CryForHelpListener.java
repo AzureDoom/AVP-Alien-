@@ -2,12 +2,16 @@ package com.alien.common.gameplay.level.gameevent.listener;
 
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.block.entity.resin.vent.ResinVentBlockEntity;
+import com.alien.common.gameplay.hive2.location.HiveLocation;
+import com.alien.common.gameplay.hive2.spawning.ReserveSpawnUtil;
 import com.alien.common.registry.tag.AlienBlockTags;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.spatial.v1.block.BlockPosUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -16,9 +20,15 @@ import net.minecraft.world.level.gameevent.PositionSource;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
+/**
+ * Reacts to a xenomorph's "cry for help" game event by summoning a defender at a vent. In hive2 the responding hive is
+ * the {@link HiveLocation} bound to the vent's chunk; defender supply comes from the location's local reserves.
+ */
 public class CryForHelpListener implements GameEventListener {
 
-    private static final int MAXIMUM_SUMMONED_XENOMORPHS_PER_HIVE = 60;
+    private static final int MAXIMUM_SUMMONED_XENOMORPHS_PER_LOCATION = 60;
 
     private final PositionSource positionSource;
 
@@ -52,12 +62,11 @@ public class CryForHelpListener implements GameEventListener {
 
         if (
             sourceEntity == null
-                // If there is no alien variant type for given source entity
-                // OR if there is a cry for help event type mismatch...
+                // If there is no alien variant type for given source entity OR if there is a cry-for-help event
+                // type mismatch...
                 || AlienVariantTypes.getFor(sourceEntity)
                     .isNoneOr(alienVariantType -> !holder.is(alienVariantType.cryForHelpEvent()))
         ) {
-            // Then ignore the event.
             return false;
         }
 
@@ -72,19 +81,29 @@ public class CryForHelpListener implements GameEventListener {
         var blockEntity = serverLevel.getBlockEntity(blockPos);
 
         if (
-            !(blockEntity instanceof ResinVentBlockEntity resinVentBlockEntity)
-                || resinVentBlockEntity.getAlienSpawnCooldown().isActive()
+            !(blockEntity instanceof ResinVentBlockEntity vent)
+                || vent.getAlienSpawnCooldown().isActive()
         ) {
             return false;
         }
 
-        var hive = resinVentBlockEntity.getHive();
-
-        if (hive == null || hive.getLoadedMembers().size() >= MAXIMUM_SUMMONED_XENOMORPHS_PER_HIVE) {
+        var location = vent.getBoundLocation();
+        if (location == null || !location.isAlive()) {
             return false;
         }
 
-        var basePos = resinVentBlockEntity.getBlockPos();
+        // Cap concurrent helpers per location.
+        var loadedXenomorphCount = location.loadedMembersByType()
+            .entrySet()
+            .stream()
+            .filter(entry -> entry.getKey().is(AlienEntityTypeTags.XENOMORPHS))
+            .mapToInt(entry -> entry.getValue().size())
+            .sum();
+        if (loadedXenomorphCount >= MAXIMUM_SUMMONED_XENOMORPHS_PER_LOCATION) {
+            return false;
+        }
+
+        var basePos = vent.getBlockPos();
         var freeSpaces = BlockPosUtil.getNeighborsMatching(serverLevel, basePos, blockState -> blockState.is(AlienBlockTags.RESIN_WEBS));
 
         var spawnPos = freeSpaces.isEmpty()
@@ -95,33 +114,48 @@ public class CryForHelpListener implements GameEventListener {
             return false;
         }
 
-        var reserveManager = hive.getReserveManager();
-        var availableEntityTypes = reserveManager.getAvailableEntityTypes()
+        // Pick a defender type from the location's local reserves.
+        var localReserveTypes = location.localReserves()
+            .getAvailableEntityTypes()
             .stream()
-            .filter(entityType -> entityType.is(AlienEntityTypeTags.ANSWERS_XENOMORPH_CRIES_FOR_HELP))
+            .filter(type -> type.is(AlienEntityTypeTags.ANSWERS_XENOMORPH_CRIES_FOR_HELP))
             .toList();
 
-        var randomSummonType = availableEntityTypes.isEmpty()
-            ? null
-            : availableEntityTypes.get(sourceEntity.getRandom().nextInt(availableEntityTypes.size()));
-
-        if (randomSummonType == null || !reserveManager.canSpawn(randomSummonType)) {
+        if (localReserveTypes.isEmpty()) {
             return false;
         }
 
-        var summonedAlien = randomSummonType.spawn(serverLevel, spawnPos, MobSpawnType.MOB_SUMMONED);
+        return trySpawnFromReserves(serverLevel, location, sourceEntity, spawnPos, localReserveTypes, vent);
+    }
 
-        if (summonedAlien != null) {
-            resinVentBlockEntity.getAlienSpawnCooldown().reset();
-            reserveManager.add(randomSummonType, -1);
-
-            if (sourceEntity instanceof Mob sourceMob && summonedAlien instanceof Mob summonedAlienMob) {
-                summonedAlienMob.setTarget(sourceMob.getTarget());
-            }
-
-            return true;
+    private static boolean trySpawnFromReserves(
+        ServerLevel level,
+        HiveLocation location,
+        Entity sourceEntity,
+        BlockPos spawnPos,
+        List<EntityType<?>> reserveTypes,
+        ResinVentBlockEntity vent
+    ) {
+        var randomType = reserveTypes.get(sourceEntity.getRandom().nextInt(reserveTypes.size()));
+        if (!location.localReserves().canSpawn(randomType)) {
+            return false;
         }
 
-        return false;
+        var summoned = randomType.spawn(level, spawnPos, MobSpawnType.MOB_SUMMONED);
+        if (summoned == null) {
+            return false;
+        }
+
+        ReserveSpawnUtil.markSpawnedFromReserves(summoned);
+        location.localReserves().trySpawn(randomType);
+        vent.getAlienSpawnCooldown().reset();
+        retargetIfPossible(sourceEntity, summoned);
+        return true;
+    }
+
+    private static void retargetIfPossible(Entity sourceEntity, Entity summoned) {
+        if (sourceEntity instanceof Mob sourceMob && summoned instanceof Mob summonedMob) {
+            summonedMob.setTarget(sourceMob.getTarget());
+        }
     }
 }

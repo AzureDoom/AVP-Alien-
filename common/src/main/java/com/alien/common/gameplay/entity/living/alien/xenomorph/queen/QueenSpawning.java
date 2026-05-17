@@ -1,7 +1,7 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.queen;
 
 import com.alien.common.data.AlienVariantTypes;
-import com.alien.common.gameplay.hive.HiveRegistry;
+import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.gameplay.level.saveddata.QueenSpawnChunkData;
 import com.alien.common.gameplay.level.saveddata.StrainLeakData;
 import net.minecraft.core.BlockPos;
@@ -11,10 +11,9 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
-
-import java.util.Objects;
 
 public class QueenSpawning {
 
@@ -73,8 +72,6 @@ public class QueenSpawning {
         BlockPos blockPos,
         RandomSource randomSource
     ) {
-        var alienVariantTypeOption = AlienVariantTypes.getFor(entityType);
-
         return Monster.checkMonsterSpawnRules(
             entityType,
             serverLevelAccessor,
@@ -82,27 +79,20 @@ public class QueenSpawning {
             blockPos,
             randomSource
         )
-            && isNotWithinExistingHiveBuffer(serverLevelAccessor, blockPos, alienVariantTypeOption);
+            && isQueenSpawnSpatiallyAllowed(serverLevelAccessor, blockPos);
     }
 
-    private static boolean isNotWithinExistingHiveBuffer(
-        ServerLevelAccessor serverLevelAccessor,
-        BlockPos blockPos,
-        com.just.core.functional.option.Option<com.alien.common.model.alien.variant.AlienVariantType> alienVariantTypeOption
-    ) {
+    /**
+     * Hive2: a queen can only spawn into chunks that are NOT inside any existing location's claimed territory. The
+     * design says queen-distance is 0–0 (per {@code HIVE_REDESIGN_03_LOCATIONS.md} § 4) — but for natural spawning, the
+     * practical constraint is "fresh ground only." Once a queen settles, the founding service mints a new location at
+     * her chunk; she's then the unique queen of that center chunk, and another queen wandering in won't displace her.
+     */
+    private static boolean isQueenSpawnSpatiallyAllowed(ServerLevelAccessor serverLevelAccessor, BlockPos blockPos) {
         var level = serverLevelAccessor.getLevel();
-        var nearestHive = HiveRegistry.INSTANCE.findNearestHive(
-            blockPos,
-            level.dimension(),
-            hive -> alienVariantTypeOption.isSomeAnd(
-                alienVariantType -> Objects.equals(hive.getVariant(), alienVariantType.variant())
-            )
-        );
-
-        if (nearestHive == null) {
-            return true;
-        }
-
-        return !nearestHive.getSpaceManager().isBlockPosWithinHiveBuffer(blockPos);
+        var occupant = HiveLocationRegistry.INSTANCE.getByChunk(level.dimension(), new ChunkPos(blockPos));
+        // No existing location → fresh ground, queen spawn allowed.
+        // Existing location → block (queens don't natural-spawn into already-claimed territory).
+        return occupant == null;
     }
 }

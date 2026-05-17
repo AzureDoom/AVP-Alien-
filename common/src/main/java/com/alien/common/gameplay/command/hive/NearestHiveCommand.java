@@ -1,6 +1,6 @@
 package com.alien.common.gameplay.command.hive;
 
-import com.alien.common.gameplay.hive.HiveRegistry;
+import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -17,20 +17,20 @@ public class NearestHiveCommand {
                 var player = Objects.requireNonNull(context.getSource().getPlayer());
                 var level = context.getSource().getLevel();
 
-                var hive = HiveRegistry.INSTANCE.findNearestHive(player.blockPosition(), level.dimension());
+                var location = HiveLocationRegistry.INSTANCE.findNearestInDim(level.dimension(), player.blockPosition());
 
-                if (hive != null) {
-                    var pos = hive.centerPosition();
+                if (location != null) {
+                    var pos = location.centerPos();
 
                     context.getSource()
                         .sendSuccess(
                             () -> Component.literal(
-                                "Nearest hive: x " + pos.getX() + " y " + pos.getY() + " z " + pos.getZ()
+                                "Nearest hive location: " + location.id() + " at x " + pos.getX() + " y " + pos.getY() + " z " + pos.getZ()
                             ),
                             false
                         );
                 } else {
-                    context.getSource().sendSuccess(() -> Component.literal("No nearby hive found."), false);
+                    context.getSource().sendSuccess(() -> Component.literal("No nearby hive location found."), false);
                 }
 
                 return 1;

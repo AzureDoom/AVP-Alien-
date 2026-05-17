@@ -1,6 +1,8 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph;
 
 import com.alien.common.gameplay.entity.living.alien.GrowthManager;
+import com.alien.common.gameplay.hive2.faction.FactionMembershipTransfer;
+import com.alien.common.gameplay.hive2.faction.LocationMembership;
 import com.alien.common.model.lifecycle.growth.CocooningConfig;
 import com.blib.api.common.entity.v1.EntityTransitionUtil;
 import com.blib.api.common.nbt.v1.model.NBTSerializable;
@@ -133,6 +135,9 @@ public class CocoonManager implements NBTSerializable {
             return false;
         }
 
+        // Snapshot hive2 faction membership before transitionInto discards the old xenomorph.
+        var factionSnapshot = FactionMembershipTransfer.snapshot(xenomorph);
+
         var transitionResult = EntityTransitionUtil.transitionInto(
             xenomorph,
             targetType,
@@ -142,6 +147,13 @@ public class CocoonManager implements NBTSerializable {
 
         if (transitionResult instanceof EntityTransitionUtil.EntityTransitionResult.Success<?> success) {
             var newEntity = success.newEntity();
+
+            // Carry over hive2 faction membership across the new UUID, plus auto-join the parent location if the
+            // new form is a xenomorph in territory (handles chestburster -> adolescent).
+            FactionMembershipTransfer.apply(factionSnapshot, newEntity);
+            if (xenomorph.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+                LocationMembership.autoJoinAtPosition(newEntity, serverLevel);
+            }
 
             if (newEntity instanceof Xenomorph newXenomorph) {
                 newXenomorph.getCocoonManager().beginDestinationCocooning(destinationTimeInTicks);

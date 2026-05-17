@@ -9,12 +9,30 @@ public class VentData implements NBTSerializable {
 
     private int lastVentCreationTick;
 
+    private boolean hasVentTargetSearchFailure;
+
+    private int lastVentTargetSearchFailureTick;
+
     public int getLastVentCreationTick() {
         return lastVentCreationTick;
     }
 
     public void setLastVentCreationTick(int tick) {
         this.lastVentCreationTick = tick;
+    }
+
+    public boolean canRetryVentTargetSearch(int currentTick, int retryCooldownInTicks) {
+        return !hasVentTargetSearchFailure
+            || currentTick - lastVentTargetSearchFailureTick >= retryCooldownInTicks;
+    }
+
+    public void recordVentTargetSearchFailure(int tick) {
+        this.hasVentTargetSearchFailure = true;
+        this.lastVentTargetSearchFailureTick = tick;
+    }
+
+    public void clearVentTargetSearchFailure() {
+        this.hasVentTargetSearchFailure = false;
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.alien.common.gameplay.command.count;
 
-import com.alien.common.gameplay.hive.HiveRegistry;
+import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -14,6 +14,10 @@ public class CountCommand {
     private static final String ENTITY_ARGUMENT_NAME = "entity";
 
     private static final String HIVE_ARGUMENT_NAME = "hive";
+
+    private static final String LINEAGE_ARGUMENT_NAME = "lineage";
+
+    private static final String LOCATION_ARGUMENT_NAME = "location";
 
     public static LiteralArgumentBuilder<CommandSourceStack> create() {
         return Commands.literal(COMMAND_NAME)
@@ -35,20 +39,37 @@ public class CountCommand {
                     })
             )
             .then(
+                // Backwards compat: `count hive` reports total hive2 locations.
                 Commands.literal(HIVE_ARGUMENT_NAME)
-                    .executes(context -> {
-                        var count = HiveRegistry.INSTANCE.allHives().size();
-
-                        context.getSource().sendSuccess(() -> {
-                            var areOrIs = count == 1 ? "is" : "are";
-                            var pluralHive = count == 1 ? "hive" : "hives";
-                            return Component.literal(
-                                "There " + areOrIs + " " + count + " " + pluralHive + " in the world."
-                            );
-                        }, false);
-
-                        return 1;
-                    })
+                    .executes(CountCommand::countLocations)
+            )
+            .then(
+                Commands.literal(LOCATION_ARGUMENT_NAME)
+                    .executes(CountCommand::countLocations)
+            )
+            .then(
+                Commands.literal(LINEAGE_ARGUMENT_NAME)
+                    .executes(CountCommand::countLineages)
             );
+    }
+
+    private static int countLocations(com.mojang.brigadier.context.CommandContext<CommandSourceStack> context) {
+        var count = HiveLocationRegistry.INSTANCE.locationCount();
+        context.getSource().sendSuccess(() -> {
+            var areOrIs = count == 1 ? "is" : "are";
+            var pluralLocation = count == 1 ? "hive location" : "hive locations";
+            return Component.literal("There " + areOrIs + " " + count + " " + pluralLocation + " in the world.");
+        }, false);
+        return 1;
+    }
+
+    private static int countLineages(com.mojang.brigadier.context.CommandContext<CommandSourceStack> context) {
+        var count = HiveLocationRegistry.INSTANCE.lineageCount();
+        context.getSource().sendSuccess(() -> {
+            var areOrIs = count == 1 ? "is" : "are";
+            var pluralLineage = count == 1 ? "lineage" : "lineages";
+            return Component.literal("There " + areOrIs + " " + count + " " + pluralLineage + " in the world.");
+        }, false);
+        return 1;
     }
 }

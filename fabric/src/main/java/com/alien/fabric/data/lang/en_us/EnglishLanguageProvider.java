@@ -1,6 +1,6 @@
 package com.alien.fabric.data.lang.en_us;
 
-import com.alien.common.gameplay.hive.HiveBossBarManager;
+import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienMobEffects;
 import com.alien.fabric.data.lang.en_us.provider.EnUsAdvancementProvider;
 import com.alien.fabric.data.lang.en_us.provider.EnUsBiomeTagProvider;
@@ -19,6 +19,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
 import net.minecraft.core.HolderLookup;
 
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
 public class EnglishLanguageProvider extends FabricLanguageProvider {
@@ -48,6 +49,7 @@ public class EnglishLanguageProvider extends FabricLanguageProvider {
         builder.add(AlienMobEffects.getBloodLossHolder().value(), "Blood Loss");
         builder.add(AlienMobEffects.getMetamorphosisHolder().value(), "Metamorphosis");
         builder.add(AlienMobEffects.getScourgeHolder().value(), "Scourge");
+        builder.add(AlienMobEffects.getMarkedForDeathHolder().value(), "Marked for Death");
 
         // Potions
         builder.add("item.minecraft.potion.effect.blood_loss", "Potion of Blood Loss");
@@ -78,17 +80,17 @@ public class EnglishLanguageProvider extends FabricLanguageProvider {
         // Advancements
         EnUsAdvancementProvider.CONSUMER.accept(builder);
 
-        // Hive boss bars
-        HiveBossBarManager.ALIEN_VARIANT_TO_TRANSLATABLE_STRING_MAP.forEach((alienVariant, translationKey) -> {
+        // Hive2 boss bars — per-variant title key, format must match HiveLocationBossBar.VARIANT_TITLE_KEYS.
+        for (var alienVariant : AlienVariant.values()) {
             var prefix = switch (alienVariant) {
                 case ABERRANT -> "Aberrant ";
                 case IRRADIATED -> "Irradiated ";
                 case NETHER -> "Nether ";
                 case NORMAL -> "";
             };
-
+            var translationKey = "bossbar.avp.hive." + alienVariant.name().toLowerCase(Locale.US) + ".title";
             builder.add(translationKey, prefix + "Hive");
-        });
+        }
 
         // Configs
         EnUsConfigProvider.CONSUMER.accept(builder);

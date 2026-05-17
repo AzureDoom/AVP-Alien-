@@ -3,13 +3,13 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg.action;
 import com.alien.common.gameplay.entity.living.alien.ovomorph.Ovomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.registry.init.AlienSoundEvents;
+import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.goap.v1.action.impl.NeoMoveToPosAction;
 import com.just.ai.goap.StateKey;
 import com.just.ai.goap.action.Action;
 import com.just.ai.goap.state.Blackboard;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -28,7 +28,21 @@ public class DropOffEggAction {
 
     private static final StateKey<Boolean> KEY_HAS_SEARCHED = StateKey.sensed("egg_drop_has_searched");
 
+    private static final StateKey<List<BlockPos>> KEY_FAILED_SPOTS = StateKey.sensed("egg_drop_failed_spots");
+
+    private static final StateKey<Integer> KEY_NEXT_SEARCH_TICK = StateKey.sensed("egg_drop_next_search_tick");
+
     private static final double DROP_OFF_RANGE_SQUARED = 2.0 * 2.0;
+
+    private static final int SEARCH_RETRY_DELAY_TICKS = 20;
+
+    private static final int MAX_REMEMBERED_FAILED_SPOTS = 32;
+
+    private static final int MAX_PATH_VALIDATION_ATTEMPTS = 24;
+
+    private static final int EGG_GRID_SPACING_BLOCKS = 3;
+
+    private static final double MIN_HORIZONTAL_OVOMORPH_SPACING_BLOCKS = 2.0;
 
     private static final List<BlockPos> EGG_GRID_POS_OFFSETS = generateSpiralOffsets(16);
 
@@ -43,19 +57,28 @@ public class DropOffEggAction {
         var hasSearched = blackboard.getOrDefault(KEY_HAS_SEARCHED, false);
         var targetPos = blackboard.getOrDefault(KEY_TARGET_POS, (Vec3) null);
 
-        if (!hasSearched) {
+        if (!hasSearched || targetPos == null) {
+            var nextSearchTick = blackboard.getOrDefault(KEY_NEXT_SEARCH_TICK, 0);
+
+            if (xenomorph.tickCount < nextSearchTick) {
+                return Action.Signal.CONTINUE;
+            }
+
             blackboard.set(KEY_HAS_SEARCHED, true);
 
+            var failedSpots = getFailedSpots(blackboard);
             var freeSpot = findFreeEggSpot(
                 xenomorph,
                 xenomorph.level(),
                 xenomorph.blockPosition(),
-                pos -> xenomorph.level().getBlockState(pos).entityCanStandOn(xenomorph.level(), pos, xenomorph)
+                pos -> xenomorph.level().getBlockState(pos).entityCanStandOn(xenomorph.level(), pos, xenomorph),
+                failedSpots
             );
+            setFailedSpots(blackboard, failedSpots);
 
             if (freeSpot.isEmpty()) {
-                discardPassengerOvomorphs(xenomorph);
-                return Action.Signal.ABORT;
+                scheduleSearchRetry(blackboard, xenomorph.tickCount);
+                return Action.Signal.CONTINUE;
             }
 
             targetPos = freeSpot.get().getCenter();
@@ -79,8 +102,10 @@ public class DropOffEggAction {
             }
             case WAITING_FOR_BLOCK_BREAK -> Action.Signal.CONTINUE;
             case NO_PATH -> {
-                discardPassengerOvomorphs(xenomorph);
-                yield Action.Signal.ABORT;
+                rememberFailedSpot(blackboard, BlockPos.containing(targetPos));
+                scheduleSearchRetry(blackboard, xenomorph.tickCount);
+                NeoMoveToPosAction.onFinish(context);
+                yield Action.Signal.CONTINUE;
             }
         };
     }
@@ -112,10 +137,6 @@ public class DropOffEggAction {
         return !getPassengerOvomorphs(xenomorph).isEmpty();
     }
 
-    private static void discardPassengerOvomorphs(Xenomorph xenomorph) {
-        getPassengerOvomorphs(xenomorph).forEach(Entity::discard);
-    }
-
     private static List<Ovomorph> getPassengerOvomorphs(Xenomorph xenomorph) {
         return xenomorph.getPassengers()
             .stream()
@@ -128,44 +149,15 @@ public class DropOffEggAction {
         Xenomorph xenomorph,
         Level level,
         BlockPos center,
-        Predicate<BlockPos> isWalkable
-    ) {
-        var centerIsOdd = (center.getX() & 1) != 0 && (center.getZ() & 1) != 0;
-        var failedSpots = new HashSet<BlockPos>();
-
-        var result = tryFindWithParity(xenomorph, level, center, isWalkable, centerIsOdd, failedSpots);
-
-        if (result.isEmpty()) {
-            result = tryFindWithParity(xenomorph, level, center, isWalkable, !centerIsOdd, failedSpots);
-        }
-
-        return result;
-    }
-
-    private static Optional<BlockPos> tryFindWithParity(
-        Xenomorph xenomorph,
-        Level level,
-        BlockPos center,
         Predicate<BlockPos> isWalkable,
-        boolean useOdd,
         Set<BlockPos> failedSpots
     ) {
-        var baseX = (center.getX() & ~1) + (useOdd ? 1 : 0);
-        var baseZ = (center.getZ() & ~1) + (useOdd ? 1 : 0);
-        var gridAlignedCenter = new BlockPos(baseX, center.getY(), baseZ);
+        var gridAlignedCenter = alignToEggGrid(center);
 
         var viable = new ArrayList<BlockPos>();
 
         for (var offset : EGG_GRID_POS_OFFSETS) {
             var pos = gridAlignedCenter.offset(offset);
-
-            if (((pos.getX() & 1) == 0) == useOdd) {
-                continue;
-            }
-
-            if (((pos.getZ() & 1) == 0) == useOdd) {
-                continue;
-            }
 
             var verticalSearchRange = 4;
 
@@ -189,6 +181,7 @@ public class DropOffEggAction {
                     (state.isAir() || state.canBeReplaced())
                         && (aboveState.isAir() || aboveState.canBeReplaced())
                         && level.getEntities(null, new AABB(adjustedPos)).isEmpty()
+                        && hasOvomorphSpacing(level, adjustedPos)
                 ) {
                     viable.add(adjustedPos.immutable());
                 }
@@ -197,7 +190,7 @@ public class DropOffEggAction {
 
         viable.sort(Comparator.comparingDouble(pos -> pos.distSqr(gridAlignedCenter)));
 
-        for (var i = 0; i < Math.min(viable.size(), 5); i++) {
+        for (var i = 0; i < Math.min(viable.size(), MAX_PATH_VALIDATION_ATTEMPTS); i++) {
             var pos = viable.get(i);
             var path = xenomorph.getNavigation().createPath(pos, 0);
 
@@ -211,17 +204,62 @@ public class DropOffEggAction {
         return Optional.empty();
     }
 
+    private static BlockPos alignToEggGrid(BlockPos center) {
+        var baseX = Math.floorDiv(center.getX(), EGG_GRID_SPACING_BLOCKS) * EGG_GRID_SPACING_BLOCKS;
+        var baseZ = Math.floorDiv(center.getZ(), EGG_GRID_SPACING_BLOCKS) * EGG_GRID_SPACING_BLOCKS;
+        return new BlockPos(baseX, center.getY(), baseZ);
+    }
+
+    private static boolean hasOvomorphSpacing(Level level, BlockPos pos) {
+        var center = pos.getCenter();
+        var halfSize = MIN_HORIZONTAL_OVOMORPH_SPACING_BLOCKS;
+        var searchBox = new AABB(
+            center.x - halfSize,
+            pos.getY() - level.dimensionType().height(),
+            center.z - halfSize,
+            center.x + halfSize,
+            pos.getY() + 5,
+            center.z + halfSize
+        );
+
+        return level.getEntitiesOfClass(
+            Ovomorph.class,
+            searchBox,
+            entity -> entity.getType().is(AlienEntityTypeTags.OVOMORPHS) && entity.isRooted.get()
+        ).isEmpty();
+    }
+
+    private static Set<BlockPos> getFailedSpots(Blackboard blackboard) {
+        return new HashSet<>(blackboard.getOrDefault(KEY_FAILED_SPOTS, List.<BlockPos>of()));
+    }
+
+    private static void rememberFailedSpot(Blackboard blackboard, BlockPos blockPos) {
+        var failedSpots = getFailedSpots(blackboard);
+        failedSpots.add(blockPos.immutable());
+        setFailedSpots(blackboard, failedSpots);
+    }
+
+    private static void setFailedSpots(Blackboard blackboard, Set<BlockPos> failedSpots) {
+        blackboard.set(
+            KEY_FAILED_SPOTS,
+            failedSpots.stream()
+                .limit(MAX_REMEMBERED_FAILED_SPOTS)
+                .toList()
+        );
+    }
+
+    private static void scheduleSearchRetry(Blackboard blackboard, int currentTick) {
+        blackboard.set(KEY_HAS_SEARCHED, false);
+        blackboard.set(KEY_NEXT_SEARCH_TICK, currentTick + SEARCH_RETRY_DELAY_TICKS);
+    }
+
     private static List<BlockPos> generateSpiralOffsets(int maxDist) {
-        var step = 2;
+        var step = EGG_GRID_SPACING_BLOCKS;
         var offsets = new ArrayList<BlockPos>();
 
         for (var dist = 0; dist <= maxDist; dist += step) {
             for (var dx = -dist; dx <= dist; dx += step) {
                 var dz = dist - Math.abs(dx);
-
-                if ((dz & 1) != 0) {
-                    continue;
-                }
 
                 offsets.add(new BlockPos(dx, 0, dz));
 

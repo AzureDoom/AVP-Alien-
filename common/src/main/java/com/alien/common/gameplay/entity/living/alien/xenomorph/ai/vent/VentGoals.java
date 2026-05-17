@@ -9,6 +9,7 @@ public class VentGoals {
     public static final Goal CREATE_VENT = Goal.builder("CreateVentGoal")
         .addPrecondition(GOAPSensors.HAS_ATTACK_TARGET.key(), Expressions.Boolean.isFalse())
         .addPrecondition(VentSensors.CAN_CREATE_VENT.key(), Expressions.Boolean.isTrue())
+        .addPrecondition(VentSensors.HAS_VENT_TARGET.key(), Expressions.Boolean.isTrue())
         .addDesiredCondition(VentSensors.CAN_CREATE_VENT.key().asDerived(), Expressions.Boolean.isFalse())
         .build();
 

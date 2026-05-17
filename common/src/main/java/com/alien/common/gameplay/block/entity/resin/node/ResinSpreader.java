@@ -1,5 +1,9 @@
 package com.alien.common.gameplay.block.entity.resin.node;
 
+import com.alien.Alien;
+import com.alien.common.gameplay.hive2.faction.LineageFactionData;
+import com.alien.common.gameplay.hive2.id.HiveLocationId;
+import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.blib.api.common.nbt.v1.model.NBTSerializable;
 import com.mojang.serialization.Dynamic;
 import net.minecraft.core.BlockPos;
@@ -7,6 +11,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,9 +49,15 @@ public class ResinSpreader implements NBTSerializable {
     }
 
     public void addCursors(BlockPos blockPos, int totalCharge) {
+        addCursors(blockPos, totalCharge, null);
+    }
+
+    public void addCursors(BlockPos blockPos, int totalCharge, @Nullable ChargeCursor.SpreadCost spreadCost) {
+        var pendingSpreadCost = spreadCost;
         while (totalCharge > 0) {
             var chargeForCursor = Math.min(totalCharge, MAX_CHARGE);
-            addCursor(new ChargeCursor(blockPos, chargeForCursor));
+            addCursor(new ChargeCursor(blockPos, chargeForCursor, pendingSpreadCost));
+            pendingSpreadCost = null;
             totalCharge -= chargeForCursor;
         }
     }
@@ -83,7 +94,11 @@ public class ResinSpreader implements NBTSerializable {
                     // If there is no cursor at this position yet, then add the cursor under this position and continue.
                     cursorsByPos.put(cursorPos, cursor);
                     retainedCursors.add(cursor);
-                } else if (cursor.charge + cachedCursor.charge <= MAX_CHARGE) {
+                } else if (
+                    cursor.getSpreadCost() == null
+                        && cachedCursor.getSpreadCost() == null
+                        && cursor.charge + cachedCursor.charge <= MAX_CHARGE
+                ) {
                     // The current cursor is overlapping in position with the cached cursor, and their combined charge
                     // is under the maximum. We can safely combine them into a single cursor at the given position.
                     cachedCursor.mergeWith(cursor);
@@ -102,6 +117,24 @@ public class ResinSpreader implements NBTSerializable {
         }
 
         this.cursors = retainedCursors;
+    }
+
+    public void recordSuccessfulConversion(ChargeCursor chargeCursor) {
+        var spreadCost = chargeCursor.consumeSpreadCost();
+        if (spreadCost == null || spreadCost.biomassCost() <= 0) {
+            return;
+        }
+
+        var location = HiveLocationRegistry.INSTANCE.get(new HiveLocationId(spreadCost.locationId()));
+        if (location == null || !location.isAlive()) {
+            return;
+        }
+
+        location.setBiomass(location.biomass() - spreadCost.biomassCost());
+        var faction = Alien.MOD.factions().get(location.lineageFactionId());
+        if (faction != null && faction.data() instanceof LineageFactionData lineage) {
+            lineage.markDirty();
+        }
     }
 
     @Override

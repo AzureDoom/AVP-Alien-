@@ -8,6 +8,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
@@ -23,6 +24,14 @@ public class ChargeCursor {
     private static final Codec<Set<Direction>> DIRECTION_SET = Direction.CODEC.listOf()
         .xmap(list -> Sets.newEnumSet(list, Direction.class), Lists::newArrayList);
 
+    private static final Codec<SpreadCost> SPREAD_COST_CODEC = RecordCodecBuilder.create(
+        instance -> instance.group(
+            ResourceLocation.CODEC.fieldOf("location_id").forGetter(SpreadCost::locationId),
+            Codec.INT.fieldOf("biomass_cost").forGetter(SpreadCost::biomassCost)
+        )
+            .apply(instance, SpreadCost::new)
+    );
+
     public static final Codec<ChargeCursor> CODEC = RecordCodecBuilder.create(
         instance -> instance.group(
             BlockPos.CODEC.fieldOf("pos").forGetter(ChargeCursor::getPos),
@@ -32,7 +41,8 @@ public class ChargeCursor {
                 .fieldOf("update_delay")
                 .orElse(0)
                 .forGetter(chargeCursor -> chargeCursor.updateDelayInTicks),
-            DIRECTION_SET.lenientOptionalFieldOf("facings").forGetter(chargeCursor -> Optional.ofNullable(chargeCursor.getFacingData()))
+            DIRECTION_SET.lenientOptionalFieldOf("facings").forGetter(chargeCursor -> Optional.ofNullable(chargeCursor.getFacingData())),
+            SPREAD_COST_CODEC.optionalFieldOf("spread_cost").forGetter(chargeCursor -> Optional.ofNullable(chargeCursor.getSpreadCost()))
         )
             .apply(instance, ChargeCursor::new)
     );
@@ -48,16 +58,31 @@ public class ChargeCursor {
     @Nullable
     private Set<Direction> facings;
 
-    private ChargeCursor(BlockPos blockPos, int charge, int decayDelay, int updateDelayInTicks, Optional<Set<Direction>> facingsOptional) {
+    @Nullable
+    private SpreadCost spreadCost;
+
+    private ChargeCursor(
+        BlockPos blockPos,
+        int charge,
+        int decayDelay,
+        int updateDelayInTicks,
+        Optional<Set<Direction>> facingsOptional,
+        Optional<SpreadCost> spreadCost
+    ) {
         this.pos = blockPos;
         this.charge = charge;
         this.decayDelay = decayDelay;
         this.updateDelayInTicks = updateDelayInTicks;
         this.facings = facingsOptional.orElse(null);
+        this.spreadCost = spreadCost.orElse(null);
     }
 
     public ChargeCursor(BlockPos blockPos, int i) {
-        this(blockPos, i, 1, 0, Optional.empty());
+        this(blockPos, i, null);
+    }
+
+    public ChargeCursor(BlockPos blockPos, int charge, @Nullable SpreadCost spreadCost) {
+        this(blockPos, charge, 1, 0, Optional.empty(), Optional.ofNullable(spreadCost));
     }
 
     public void update(
@@ -83,6 +108,8 @@ public class ChargeCursor {
         var resinBehavior = ChargeCursorUtil.getSpreadBehavior(blockState);
 
         if (resinBehavior.attemptSpreadVein(nodePos, levelAccessor, pos, blockState, facings)) {
+            resinSpreader.recordSuccessfulConversion(this);
+
             if (resinBehavior.canChangeBlockStateOnSpread()) {
                 blockState = levelAccessor.getBlockState(pos);
                 resinBehavior = ChargeCursorUtil.getSpreadBehavior(blockState);
@@ -144,4 +171,21 @@ public class ChargeCursor {
     public Set<Direction> getFacingData() {
         return facings;
     }
+
+    @Nullable
+    public SpreadCost getSpreadCost() {
+        return spreadCost;
+    }
+
+    @Nullable
+    SpreadCost consumeSpreadCost() {
+        var cost = spreadCost;
+        spreadCost = null;
+        return cost;
+    }
+
+    public record SpreadCost(
+        ResourceLocation locationId,
+        int biomassCost
+    ) {}
 }

@@ -43,6 +43,7 @@
 	"suggests": {
 		"avp_human": "~${avp_human_version}",
 		"avp_predator": "~${avp_predator_version}",
-		"gigeresque": "~${gigeresque_version}"
+		"gigeresque": "~${gigeresque_version}",
+		"blib_engine": "~${blib_engine_version}"
 	}
 }

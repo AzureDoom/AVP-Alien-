@@ -3,6 +3,8 @@ plugins {
 }
 
 dependencies {
+    compileOnly "com.blib.engine:blib_engine-common-1.21.1:${project.blib_engine_version}"
+
     // Compatibility
     compileOnly "com.avp.human:avp_human-common-1.21.1:${project.avp_human_version}"
     compileOnly "com.avp.predator:avp_predator-common-1.21.1:${project.avp_predator_version}"

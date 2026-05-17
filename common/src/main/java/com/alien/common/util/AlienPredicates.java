@@ -12,8 +12,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.ambient.Bat;
-import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,16 +20,9 @@ import java.util.Objects;
 public class AlienPredicates {
 
     public static boolean canTarget(@NotNull Alien alien, @NotNull LivingEntity potentialTarget) {
-        // Target must be valid...
-        return canContinueTargeting(alien, potentialTarget)
-            // AND the target is either an enemy alien...
-            && (isAlienTarget(alien, potentialTarget)
-                // ...OR is hated.
-                || isHated(alien, potentialTarget)
-                // ...OR is standing on resin (any mob or monster).
-                || isStandingOnResin(potentialTarget)
-                // ...OR the target has an enemy variant embryo.
-                || doesTargetHaveEnemyVariantEmbryo(alien.getVariant(), potentialTarget));
+        // Xenomorphs are permissive — anything valid is a target. Pacifist exemptions live in
+        // AlienEntityTypeTags.IGNORED_BY_XENOMORPHS, which isValidTarget consults.
+        return canContinueTargeting(alien, potentialTarget);
     }
 
     public static boolean canContinueTargeting(@NotNull Alien alien, @NotNull LivingEntity potentialTarget) {
@@ -64,10 +55,8 @@ public class AlienPredicates {
     }
 
     public static boolean isValidTarget(AlienVariant selfVariant, @NotNull LivingEntity potentialTarget) {
-        // Bats are annoying for aliens to target.
-        return !(potentialTarget instanceof Bat)
-            // AND creepers are foolish for aliens to target.
-            && !(potentialTarget instanceof Creeper)
+        // Pacifist list (bats, creepers, anything modpacks add) is data-driven via the tag.
+        return !potentialTarget.getType().is(AlienEntityTypeTags.IGNORED_BY_XENOMORPHS)
             // AND the target must be alive in order for it to be killed (duh).
             && potentialTarget.isAlive()
             // AND can't attack what can't be attacked (duh).
