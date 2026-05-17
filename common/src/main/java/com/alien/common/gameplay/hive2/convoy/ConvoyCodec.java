@@ -5,6 +5,7 @@ import com.alien.common.gameplay.hive2.id.HiveLocationId;
 import com.blib.api.common.codec.v1.BLibCodecs;
 import com.blib.api.common.entity.v1.EntityReserves;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -14,7 +15,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * NBT serialization for the sealed {@link Convoy} interface. Uses a discriminator string ({@code "type"}) to dispatch
@@ -60,6 +64,8 @@ public final class ConvoyCodec {
     private static final String NBT_LAST_KNOWN_TARGET_POS = "LastKnownTargetPos";
 
     private static final String NBT_EXPIRES_AT_TICK = "ExpiresAtTick";
+
+    private static final String NBT_MATERIALIZED_MEMBERS = "MaterializedMembers";
 
     private ConvoyCodec() {}
 
@@ -117,6 +123,7 @@ public final class ConvoyCodec {
             tag.putUUID(NBT_TARGET_PLAYER_ID, raid.targetPlayerId());
             tag.putIntArray(NBT_LAST_KNOWN_TARGET_POS, encodeBlockPos(raid.lastKnownTargetPos()));
             tag.putLong(NBT_EXPIRES_AT_TICK, raid.expiresAtTick());
+            tag.put(NBT_MATERIALIZED_MEMBERS, encodeMaterializedMembers(raid.materializedMembers()));
         } else {
             throw new IllegalStateException("Unknown convoy subtype: " + convoy.getClass().getName());
         }
@@ -173,6 +180,7 @@ public final class ConvoyCodec {
                 currentPos,
                 decodeBlockPos(tag.getIntArray(NBT_LAST_KNOWN_TARGET_POS)),
                 composition,
+                decodeMaterializedMembers(tag.getList(NBT_MATERIALIZED_MEMBERS, Tag.TAG_COMPOUND)),
                 dispatchedTick,
                 tag.getLong(NBT_EXPIRES_AT_TICK)
             );
@@ -207,5 +215,29 @@ public final class ConvoyCodec {
             return BlockPos.ZERO;
         }
         return new BlockPos(arr[0], arr[1], arr[2]);
+    }
+
+    private static ListTag encodeMaterializedMembers(Map<UUID, net.minecraft.world.entity.EntityType<?>> members) {
+        var listTag = new ListTag();
+        for (var entry : members.entrySet()) {
+            var tag = new CompoundTag();
+            tag.putUUID("EntityId", entry.getKey());
+            tag.putString("EntityType", BuiltInRegistries.ENTITY_TYPE.getKey(entry.getValue()).toString());
+            listTag.add(tag);
+        }
+        return listTag;
+    }
+
+    private static Map<UUID, net.minecraft.world.entity.EntityType<?>> decodeMaterializedMembers(ListTag listTag) {
+        var members = new HashMap<UUID, net.minecraft.world.entity.EntityType<?>>();
+        for (var i = 0; i < listTag.size(); i++) {
+            var tag = listTag.getCompound(i);
+            if (!tag.hasUUID("EntityId") || !tag.contains("EntityType")) {
+                continue;
+            }
+            var entityType = BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.parse(tag.getString("EntityType")));
+            members.put(tag.getUUID("EntityId"), entityType);
+        }
+        return members;
     }
 }

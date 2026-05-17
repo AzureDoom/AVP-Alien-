@@ -5,9 +5,12 @@ import com.blib.api.common.entity.v1.EntityReserves;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -270,6 +273,8 @@ public sealed interface Convoy {
 
         private final EntityReserves composition;
 
+        private final Map<UUID, EntityType<?>> materializedMembers;
+
         private final long dispatchedTick;
 
         private final long expiresAtTick;
@@ -290,6 +295,34 @@ public sealed interface Convoy {
             long dispatchedTick,
             long expiresAtTick
         ) {
+            this(
+                id,
+                lineageFactionId,
+                dimension,
+                sourceLocationId,
+                targetPlayerId,
+                currentPos,
+                lastKnownTargetPos,
+                composition,
+                new HashMap<>(),
+                dispatchedTick,
+                expiresAtTick
+            );
+        }
+
+        public Raid(
+            ConvoyId id,
+            ResourceLocation lineageFactionId,
+            ResourceKey<Level> dimension,
+            HiveLocationId sourceLocationId,
+            UUID targetPlayerId,
+            Vec3 currentPos,
+            BlockPos lastKnownTargetPos,
+            EntityReserves composition,
+            Map<UUID, EntityType<?>> materializedMembers,
+            long dispatchedTick,
+            long expiresAtTick
+        ) {
             this.id = id;
             this.lineageFactionId = lineageFactionId;
             this.dimension = dimension;
@@ -298,6 +331,7 @@ public sealed interface Convoy {
             this.currentPos = currentPos;
             this.lastKnownTargetPos = lastKnownTargetPos;
             this.composition = composition;
+            this.materializedMembers = new HashMap<>(materializedMembers);
             this.dispatchedTick = dispatchedTick;
             this.expiresAtTick = expiresAtTick;
         }
@@ -330,6 +364,18 @@ public sealed interface Convoy {
         @Override
         public EntityReserves composition() {
             return composition;
+        }
+
+        public Map<UUID, EntityType<?>> materializedMembers() {
+            return materializedMembers;
+        }
+
+        public void trackMaterializedMember(UUID memberId, EntityType<?> entityType) {
+            materializedMembers.put(memberId, entityType);
+        }
+
+        public void untrackMaterializedMember(UUID memberId) {
+            materializedMembers.remove(memberId);
         }
 
         @Override

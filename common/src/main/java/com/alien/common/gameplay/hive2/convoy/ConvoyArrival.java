@@ -5,11 +5,9 @@ import com.alien.common.gameplay.hive2.config.HiveConfig;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
-import com.alien.common.gameplay.hive2.spawning.ReserveSpawnUtil;
 import com.blib.api.common.entity.v1.EntityReserves;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.entity.MobSpawnType;
 
 /**
  * Detects when a convoy has reached its destination and applies the arrival effect.
@@ -41,8 +39,7 @@ public final class ConvoyArrival {
         }
 
         if (convoy instanceof Convoy.Raid raid) {
-            arriveRaid(server, raid);
-            return true;
+            return arriveRaid(server, raid);
         }
 
         Alien.LOGGER.warn("Convoy {} arrived but has no arrival handler for type {}", convoy.id(), convoy.getClass().getName());
@@ -115,11 +112,11 @@ public final class ConvoyArrival {
     }
 
     /**
-     * Raid arrival: the raid has reached the player's last-known position. Spawns the entire composition as real
-     * entities at the convoy's current position so the player has something to fight. Composition is emptied — these
-     * members are now in the world (combat losses are real losses; survivors despawn naturally).
+     * Raid arrival: the raid has reached the player's last-known position. Spawns the remaining abstract composition as
+     * real entities at the convoy's current position. The raid convoy itself remains alive so despawned raiders can return
+     * to its composition.
      */
-    private static void arriveRaid(MinecraftServer server, Convoy.Raid raid) {
+    private static boolean arriveRaid(MinecraftServer server, Convoy.Raid raid) {
         var serverLevel = server.getLevel(raid.dimension());
         if (serverLevel == null) {
             Alien.LOGGER.info(
@@ -128,7 +125,7 @@ public final class ConvoyArrival {
                 raid.dimension().location()
             );
             refundToLocation(HiveLocationRegistry.INSTANCE.get(raid.sourceLocationId()), raid.composition(), raid.id().toString());
-            return;
+            return true;
         }
 
         var spawnPos = new BlockPos(
@@ -137,18 +134,10 @@ public final class ConvoyArrival {
             (int) Math.round(raid.currentPos().z)
         );
 
-        var spawnedCount = 0;
-        for (var entityType : raid.composition().getAvailableEntityTypes()) {
-            var count = raid.composition().getCount(entityType);
-            for (var i = 0; i < count; i++) {
-                var spawned = entityType.spawn(serverLevel, spawnPos, MobSpawnType.MOB_SUMMONED);
-                if (spawned != null) {
-                    ReserveSpawnUtil.markSpawnedFromReserves(spawned);
-                    spawnedCount++;
-                }
-            }
-            // Empty the composition entry — these members are now in the world.
-            raid.composition().add(entityType, -count);
+        var targetPlayer = server.getPlayerList().getPlayer(raid.targetPlayerId());
+        var spawnedCount = ConvoyMaterialization.spawnAll(serverLevel, raid, spawnPos, targetPlayer);
+        if (spawnedCount <= 0) {
+            return false;
         }
 
         Alien.LOGGER.info(
@@ -158,6 +147,7 @@ public final class ConvoyArrival {
             spawnedCount,
             raid.targetPlayerId()
         );
+        return false;
     }
 
     private static void addCompositionToLocation(HiveLocation location, EntityReserves composition) {

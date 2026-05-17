@@ -2,12 +2,9 @@ package com.alien.common.gameplay.hive2.convoy;
 
 import com.alien.Alien;
 import com.alien.common.gameplay.hive2.config.HiveConfig;
-import com.alien.common.gameplay.hive2.spawning.ReserveSpawnUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
 
 /**
  * Materializes abstract convoy members when a player gets close enough to intercept the convoy.
@@ -33,24 +30,7 @@ public final class ConvoyInterception {
             (int) Math.round(convoy.currentPos().z)
         );
 
-        var spawnedCount = 0;
-        for (var entityType : new java.util.ArrayList<>(convoy.composition().getAvailableEntityTypes())) {
-            var count = convoy.composition().getCount(entityType);
-            for (var i = 0; i < count; i++) {
-                var spawned = entityType.spawn(level, spawnPos, MobSpawnType.MOB_SUMMONED);
-                if (spawned == null) {
-                    continue;
-                }
-
-                ReserveSpawnUtil.markSpawnedFromReserves(spawned);
-                if (spawned instanceof Mob mob) {
-                    mob.setPersistenceRequired();
-                    mob.setTarget(player);
-                }
-                convoy.composition().add(entityType, -1);
-                spawnedCount++;
-            }
-        }
+        var spawnedCount = ConvoyMaterialization.spawnAll(level, convoy, spawnPos, player);
 
         if (spawnedCount <= 0) {
             return false;
@@ -63,7 +43,7 @@ public final class ConvoyInterception {
             spawnPos,
             spawnedCount
         );
-        return true;
+        return !(convoy instanceof Convoy.Raid);
     }
 
     private static ServerPlayer firstInterceptingPlayer(java.util.List<ServerPlayer> players, Convoy convoy, HiveConfig config) {

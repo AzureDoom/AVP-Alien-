@@ -4,6 +4,9 @@ import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
+import com.alien.common.gameplay.hive2.convoy.ConvoyId;
+import com.alien.common.gameplay.hive2.convoy.RaidMemberTracker;
+import com.alien.common.gameplay.hive2.convoy.RaidMembership;
 import com.alien.common.gameplay.hive2.faction.HiveMemberLocationResolver;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.faction.LocationMembership;
@@ -71,6 +74,8 @@ public abstract class Alien extends Monster implements DataUser {
 
     private static final String NBT_HOST_TYPE = "hostType";
 
+    private static final String NBT_RAID_MEMBERSHIP = "Hive2RaidMembership";
+
     public final DataAccessor<Boolean> hasTarget;
 
     public final DataAccessor<Boolean> isPoisoned;
@@ -86,6 +91,8 @@ public abstract class Alien extends Monster implements DataUser {
     private final MoltingManager moltingManager;
 
     private Option<EntityType<?>> hostTypeOption;
+
+    private @Nullable RaidMembership raidMembership;
 
     private int lastHurtTimeInTicks;
 
@@ -646,6 +653,9 @@ public abstract class Alien extends Monster implements DataUser {
         // Hive2: hive-owned xenomorphs always return to their owning location's reserves when vanilla despawns them,
         // even if they wandered into an unclaimed chunk. Feral xenomorphs still count as strain leaks.
         if (getType().is(AlienEntityTypeTags.XENOMORPHS)) {
+            if (RaidMemberTracker.returnDespawned(this)) {
+                return;
+            }
             if (returnLocation != null && returnToHiveLocation(returnLocation)) {
                 return;
             }
@@ -714,6 +724,7 @@ public abstract class Alien extends Monster implements DataUser {
             if (killer instanceof ServerPlayer player && level() instanceof ServerLevel serverLevel) {
                 attributeKillToLineages(player.getUUID(), serverLevel.getGameTime());
             }
+            RaidMemberTracker.unregisterKilled(this);
             // Hive2 empress death → civil-war flag consumed by CivilWarHandler.
             if (getType().is(AlienEntityTypeTags.EMPRESSES)) {
                 onEmpressDied();
@@ -788,6 +799,16 @@ public abstract class Alien extends Monster implements DataUser {
 
             entityTypeHolderOptional.ifPresent($ -> this.hostTypeOption = Option.some(BuiltInRegistries.ENTITY_TYPE.get(resourceLocation)));
         }
+        this.raidMembership = null;
+        if (compoundTag.contains(NBT_RAID_MEMBERSHIP)) {
+            var raidTag = compoundTag.getCompound(NBT_RAID_MEMBERSHIP);
+            if (raidTag.contains("LineageFactionId") && raidTag.hasUUID("RaidId")) {
+                this.raidMembership = new RaidMembership(
+                    ResourceLocation.parse(raidTag.getString("LineageFactionId")),
+                    new ConvoyId(raidTag.getUUID("RaidId"))
+                );
+            }
+        }
     }
 
     @Override
@@ -800,6 +821,12 @@ public abstract class Alien extends Monster implements DataUser {
             var resourceLocation = BuiltInRegistries.ENTITY_TYPE.getKey(hostTypeOption.unwrap());
             compoundTag.putString(NBT_HOST_TYPE, resourceLocation.toString());
         });
+        if (raidMembership != null) {
+            var raidTag = new CompoundTag();
+            raidTag.putString("LineageFactionId", raidMembership.lineageFactionId().toString());
+            raidTag.putUUID("RaidId", raidMembership.raidId().value());
+            compoundTag.put(NBT_RAID_MEMBERSHIP, raidTag);
+        }
     }
 
     public MoltingManager getMoltingManager() {
@@ -812,6 +839,18 @@ public abstract class Alien extends Monster implements DataUser {
 
     public HiveManager getHiveManager() {
         return hiveManager;
+    }
+
+    public @Nullable RaidMembership raidMembership() {
+        return raidMembership;
+    }
+
+    public void setRaidMembership(RaidMembership raidMembership) {
+        this.raidMembership = raidMembership;
+    }
+
+    public void clearRaidMembership() {
+        this.raidMembership = null;
     }
 
     public Option<EntityType<?>> getHostType() {
