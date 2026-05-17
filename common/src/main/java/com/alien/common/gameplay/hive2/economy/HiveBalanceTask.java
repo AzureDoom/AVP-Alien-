@@ -229,10 +229,8 @@ public final class HiveBalanceTask {
             if (raid.composition().getCountMatching(type -> type.is(AlienEntityTypeTags.HARBINGERS)) > 0) {
                 return true;
             }
-            for (var entityType : raid.materializedMembers().values()) {
-                if (entityType.is(AlienEntityTypeTags.HARBINGERS)) {
-                    return true;
-                }
+            if (raid.materializedCountMatching(type -> type.is(AlienEntityTypeTags.HARBINGERS)) > 0) {
+                return true;
             }
         }
         return false;

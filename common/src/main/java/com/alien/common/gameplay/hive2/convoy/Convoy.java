@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 /**
  * A traveling group of xenomorphs moving between locations or hunting a player. Sealed so codecs can dispatch on
@@ -276,6 +277,8 @@ public sealed interface Convoy {
 
         private final Map<UUID, EntityType<?>> materializedMembers;
 
+        private final EntityReserves materializedComposition;
+
         private final long dispatchedTick;
 
         private final long expiresAtTick;
@@ -410,6 +413,7 @@ public sealed interface Convoy {
             this.lastKnownTargetPos = lastKnownTargetPos;
             this.composition = composition;
             this.materializedMembers = new HashMap<>(materializedMembers);
+            this.materializedComposition = buildMaterializedComposition(materializedMembers);
             this.warningIssued = warningIssued;
             this.returningHome = returningHome;
             this.returnLocationId = returnLocationId;
@@ -453,11 +457,30 @@ public sealed interface Convoy {
         }
 
         public void trackMaterializedMember(UUID memberId, EntityType<?> entityType) {
-            materializedMembers.put(memberId, entityType);
+            var previous = materializedMembers.put(memberId, entityType);
+            if (previous != null) {
+                materializedComposition.add(previous, -1);
+            }
+            materializedComposition.add(entityType, 1);
         }
 
         public void untrackMaterializedMember(UUID memberId) {
-            materializedMembers.remove(memberId);
+            var previous = materializedMembers.remove(memberId);
+            if (previous != null) {
+                materializedComposition.add(previous, -1);
+            }
+        }
+
+        public int materializedCountMatching(Predicate<EntityType<?>> predicate) {
+            return materializedComposition.getCountMatching(predicate);
+        }
+
+        private static EntityReserves buildMaterializedComposition(Map<UUID, EntityType<?>> members) {
+            var composition = new EntityReserves();
+            for (var entityType : members.values()) {
+                composition.add(entityType, 1);
+            }
+            return composition;
         }
 
         @Override
