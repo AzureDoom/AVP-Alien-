@@ -5,6 +5,7 @@ import com.alien.common.gameplay.hive2.id.HiveLocationId;
 import com.alien.common.gameplay.hive2.id.HiveLocationIds;
 import com.alien.common.gameplay.hive2.id.LineageIds;
 import com.alien.common.gameplay.hive2.id.VariantIds;
+import com.alien.common.gameplay.hive2.lifecycle.HiveLocationMergeHandler;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
@@ -16,14 +17,15 @@ import net.minecraft.world.phys.AABB;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Resolves contested chunks per {@code HIVE_REDESIGN_03_LOCATIONS.md} § 3.
  * <p>
  * Every {@code contestTickWindow} (default 60 seconds), scans every level's contested chunks via
- * {@code TerritoryManager.getAllContestedChunks(level)}. For each contested chunk, counts the number of loaded
- * xenomorphs in that chunk per claimant location's lineage; the side with more wins. The losers' location claims on
- * that chunk are removed.
+ * {@code TerritoryManager.getAllContestedChunks(level)}. Same-lineage location claimants are merged before hostile
+ * contest resolution. For each remaining contested chunk, counts the number of loaded xenomorphs in that chunk per
+ * claimant location's lineage; the side with more wins. The losers' location claims on that chunk are removed.
  * <p>
  * If only one xenomorph is present (or zero), the resolution is deferred — no decisive winner. This avoids flipping an
  * empty contested chunk back and forth.
@@ -59,8 +61,7 @@ public final class ContestResolutionTask {
             return;
         }
 
-        // Count xenomorphs per claimant location within this chunk.
-        var counts = new HashMap<ResourceLocation, Integer>();
+        var validLocationClaimants = new ArrayList<HiveLocation>();
         for (var claimantId : claimants) {
             if (!HiveLocationIds.isHiveLocationId(claimantId)) {
                 if (LineageIds.isLineageId(claimantId) || VariantIds.isVariantId(claimantId)) {
@@ -75,7 +76,17 @@ public final class ContestResolutionTask {
                 continue;
             }
 
-            counts.put(claimantId, countXenomorphsIn(level, chunk, location.lineageFactionId()));
+            validLocationClaimants.add(location);
+        }
+
+        if (mergeSameLineageClaimants(level, validLocationClaimants)) {
+            return;
+        }
+
+        // Count xenomorphs per claimant location within this chunk.
+        var counts = new HashMap<ResourceLocation, Integer>();
+        for (var location : validLocationClaimants) {
+            counts.put(location.id().value(), countXenomorphsIn(level, chunk, location.lineageFactionId()));
         }
 
         if (counts.size() < 2) {
@@ -141,6 +152,24 @@ public final class ContestResolutionTask {
             }
         }
         return xenomorphCount;
+    }
+
+    private static boolean mergeSameLineageClaimants(ServerLevel level, ArrayList<HiveLocation> claimants) {
+        var byLineage = new HashMap<ResourceLocation, List<HiveLocation>>();
+        for (var location : claimants) {
+            byLineage.computeIfAbsent(location.lineageFactionId(), $ -> new ArrayList<>()).add(location);
+        }
+
+        var merged = false;
+        for (var entry : byLineage.entrySet()) {
+            if (entry.getValue().size() < 2) {
+                continue;
+            }
+            if (HiveLocationMergeHandler.mergeSameLineage(level, entry.getKey(), entry.getValue()) != null) {
+                merged = true;
+            }
+        }
+        return merged;
     }
 
     private static void releaseChunkFromLocation(ServerLevel level, ResourceLocation locationFactionId, ChunkPos chunk) {
