@@ -69,7 +69,7 @@ public final class ConvoyBossBars {
         if (convoy instanceof Convoy.Raid raid) {
             return Component.literal("Raid - Wave " + (raid.displayWaveIndex() + 1) + "/" + Convoy.Raid.WAVE_COUNT);
         }
-        return Component.literal("Convoy: " + typeName(convoy) + " (" + memberCount(convoy) + ")");
+        return Component.literal(typeName(convoy) + " (" + memberCount(convoy) + ")");
     }
 
     private static String typeName(Convoy convoy) {
