@@ -1,6 +1,7 @@
 package com.alien.common.gameplay.hive2.economy;
 
 import com.alien.Alien;
+import com.alien.common.gameplay.hive2.convoy.Convoy;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.id.LineageIds;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
@@ -163,7 +164,11 @@ public final class HiveBalanceTask {
         if (outputType == null) {
             return false;
         }
-        if (outputType.is(AlienEntityTypeTags.HARBINGERS) && CastePopulation.countCaste(location, AlienEntityTypeTags.HARBINGERS) >= 1) {
+        if (
+            outputType.is(AlienEntityTypeTags.HARBINGERS)
+                && (CastePopulation.countCaste(location, AlienEntityTypeTags.HARBINGERS) >= 1
+                    || hasHarbingerAwayInRaid(location, lineage))
+        ) {
             return false;
         }
 
@@ -214,6 +219,23 @@ public final class HiveBalanceTask {
         }
         location.localReserves().tryAdd(recipe.outputEntity(), 1);
         return true;
+    }
+
+    private static boolean hasHarbingerAwayInRaid(HiveLocation location, LineageFactionData lineage) {
+        for (var convoy : lineage.convoys()) {
+            if (!(convoy instanceof Convoy.Raid raid) || !raid.sourceLocationId().equals(location.id())) {
+                continue;
+            }
+            if (raid.composition().getCountMatching(type -> type.is(AlienEntityTypeTags.HARBINGERS)) > 0) {
+                return true;
+            }
+            for (var entityType : raid.materializedMembers().values()) {
+                if (entityType.is(AlienEntityTypeTags.HARBINGERS)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private static int netPopulationChange(HiveRecipe recipe) {
