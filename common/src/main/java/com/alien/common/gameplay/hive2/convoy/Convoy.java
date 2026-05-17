@@ -690,7 +690,8 @@ public sealed interface Convoy {
         }
 
         public boolean canSpawnWave(long currentTick) {
-            return waveBreakStartedTick < 0L || currentTick >= waveBreakStartedTick + WAVE_BREAK_TICKS;
+            return materializedMembers().isEmpty()
+                && (waveBreakStartedTick < 0L || currentTick >= waveBreakStartedTick + WAVE_BREAK_TICKS);
         }
 
         public int displayWaveIndex() {
