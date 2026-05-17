@@ -736,7 +736,11 @@ public abstract class Alien extends Monster implements DataUser {
         // etc) count when vanilla counts them.
         if (getType().is(AlienEntityTypeTags.XENOMORPHS)) {
             var killer = getKillCredit();
-            if (killer instanceof ServerPlayer player && level() instanceof ServerLevel serverLevel) {
+            if (
+                !ConvoyMemberTracker.isRaidMember(this)
+                    && killer instanceof ServerPlayer player
+                    && level() instanceof ServerLevel serverLevel
+            ) {
                 attributeKillToLineages(player.getUUID(), serverLevel.getGameTime());
             }
             ConvoyMemberTracker.unregisterKilled(this);

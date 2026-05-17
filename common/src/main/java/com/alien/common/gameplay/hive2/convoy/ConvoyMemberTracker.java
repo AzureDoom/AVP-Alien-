@@ -34,6 +34,11 @@ public final class ConvoyMemberTracker {
         return returnToReserves(alien, "unloaded");
     }
 
+    public static boolean isRaidMember(com.alien.common.gameplay.entity.living.alien.Alien alien) {
+        var membership = alien.convoyMembership();
+        return membership != null && findConvoy(membership) instanceof Convoy.Raid;
+    }
+
     private static boolean returnToReserves(com.alien.common.gameplay.entity.living.alien.Alien alien, String reason) {
         var membership = alien.convoyMembership();
         if (membership == null) {
