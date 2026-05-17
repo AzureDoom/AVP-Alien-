@@ -13,6 +13,7 @@ import com.blib.api.common.faction.v1.FactionMember;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.LongTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -73,6 +74,8 @@ public class LineageFactionData extends FactionData {
 
     private static final String NBT_CONVOYS = "Convoys";
 
+    private static final String NBT_KILL_ATTRIBUTION_BY_PLAYER = "KillAttributionByPlayer";
+
     private static final String NBT_FIRST_ADJACENT_BY_LINEAGE = "FirstAdjacentByLineage";
 
     private static final String NBT_REMOVAL_REASON = "RemovalReason";
@@ -116,8 +119,6 @@ public class LineageFactionData extends FactionData {
      * Player-kill attribution table for Phase 8b raid dispatch. Each entry is the list of game-tick timestamps when
      * that player killed members of this lineage. {@link #recordKillByPlayer} prunes timestamps older than the raid
      * aggro window on each insertion.
-     * <p>
-     * Not persisted — kill aggro is a transient runtime concern; restarting the server resets player aggro.
      */
     private final Map<UUID, List<Long>> killAttributionByPlayer;
 
@@ -414,8 +415,11 @@ public class LineageFactionData extends FactionData {
      */
     public void recordKillByPlayer(UUID playerId, long currentTick, long aggroWindowTicks) {
         var timestamps = killAttributionByPlayer.computeIfAbsent(playerId, $ -> new ArrayList<>());
-        timestamps.removeIf(t -> currentTick - t > aggroWindowTicks);
+        if (timestamps.removeIf(t -> currentTick - t > aggroWindowTicks)) {
+            markDirty();
+        }
         timestamps.add(currentTick);
+        markDirty();
     }
 
     /** Count of recent kills by {@code playerId}, dropping entries older than {@code aggroWindowTicks}. */
@@ -424,8 +428,23 @@ public class LineageFactionData extends FactionData {
         if (timestamps == null) {
             return 0;
         }
-        timestamps.removeIf(t -> currentTick - t > aggroWindowTicks);
-        return timestamps.size();
+        pruneKillTimestamps(playerId, timestamps, currentTick, aggroWindowTicks);
+        var pruned = killAttributionByPlayer.get(playerId);
+        return pruned == null ? 0 : pruned.size();
+    }
+
+    private void pruneKillTimestamps(UUID playerId, List<Long> timestamps, long currentTick, long aggroWindowTicks) {
+        var changed = timestamps.removeIf(t -> currentTick - t > aggroWindowTicks);
+        if (!timestamps.isEmpty()) {
+            if (changed) {
+                markDirty();
+            }
+            return;
+        }
+
+        if (killAttributionByPlayer.remove(playerId) != null) {
+            markDirty();
+        }
     }
 
     public Map<ResourceLocation, Long> firstAdjacentTickByLineage() {
@@ -514,6 +533,31 @@ public class LineageFactionData extends FactionData {
             convoys.addAll(ConvoyCodec.loadAll(tag.getList(NBT_CONVOYS, Tag.TAG_COMPOUND)));
         }
 
+        killAttributionByPlayer.clear();
+        if (tag.contains(NBT_KILL_ATTRIBUTION_BY_PLAYER)) {
+            var listTag = tag.getList(NBT_KILL_ATTRIBUTION_BY_PLAYER, Tag.TAG_COMPOUND);
+            for (var i = 0; i < listTag.size(); i++) {
+                var entry = listTag.getCompound(i);
+                if (!entry.hasUUID("PlayerId")) {
+                    continue;
+                }
+                var timestampsTag = entry.getList("Timestamps", Tag.TAG_LONG);
+                if (timestampsTag.isEmpty()) {
+                    continue;
+                }
+                var timestamps = new ArrayList<Long>();
+                for (var j = 0; j < timestampsTag.size(); j++) {
+                    if (timestampsTag.get(j) instanceof LongTag timestamp) {
+                        timestamps.add(timestamp.getAsLong());
+                    }
+                }
+                if (timestamps.isEmpty()) {
+                    continue;
+                }
+                killAttributionByPlayer.put(entry.getUUID("PlayerId"), timestamps);
+            }
+        }
+
         firstAdjacentTickByLineage.clear();
         if (tag.contains(NBT_FIRST_ADJACENT_BY_LINEAGE)) {
             var listTag = tag.getList(NBT_FIRST_ADJACENT_BY_LINEAGE, Tag.TAG_COMPOUND);
@@ -568,6 +612,24 @@ public class LineageFactionData extends FactionData {
         tag.put(NBT_LOCATIONS, locationsTag);
 
         tag.put(NBT_CONVOYS, ConvoyCodec.saveAll(convoys));
+
+        if (!killAttributionByPlayer.isEmpty()) {
+            var listTag = new ListTag();
+            for (var entry : killAttributionByPlayer.entrySet()) {
+                if (entry.getValue().isEmpty()) {
+                    continue;
+                }
+                var entryTag = new CompoundTag();
+                entryTag.putUUID("PlayerId", entry.getKey());
+                var timestampsTag = new ListTag();
+                for (var timestamp : entry.getValue()) {
+                    timestampsTag.add(LongTag.valueOf(timestamp));
+                }
+                entryTag.put("Timestamps", timestampsTag);
+                listTag.add(entryTag);
+            }
+            tag.put(NBT_KILL_ATTRIBUTION_BY_PLAYER, listTag);
+        }
 
         if (!firstAdjacentTickByLineage.isEmpty()) {
             var listTag = new ListTag();
