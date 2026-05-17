@@ -492,7 +492,7 @@ public final class HiveLocationRegistry {
         if (ticksSinceLastScan >= config.lineageScanIntervalTicks()) {
             ticksSinceLastScan = 0L;
             com.alien.common.gameplay.hive2.growth.PopulationPressureDecayTask.scanAll(server);
-            // Phase 11: full lifecycle dispatch (dormancy, absorption, contests, lineage death) layered on top of
+            // Phase 11: full lifecycle dispatch (dormancy, contests, lineage death) layered on top of
             // variant-mismatch invariants.
             com.alien.common.gameplay.hive2.faction.LineageInvariantTask.scanAllWithLifecycle(server);
         }

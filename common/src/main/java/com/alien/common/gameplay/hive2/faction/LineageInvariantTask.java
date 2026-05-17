@@ -3,7 +3,6 @@ package com.alien.common.gameplay.hive2.faction;
 import com.alien.Alien;
 import com.alien.common.gameplay.hive2.growth.ContestResolutionTask;
 import com.alien.common.gameplay.hive2.id.LineageIds;
-import com.alien.common.gameplay.hive2.lifecycle.LineageAbsorptionTask;
 import com.alien.common.gameplay.hive2.lifecycle.QueenlessMaturationTask;
 import com.blib.api.common.faction.v1.FactionMember;
 import net.minecraft.server.MinecraftServer;
@@ -19,8 +18,7 @@ import java.util.UUID;
  * <ul>
  * <li><b>Variant matching</b>: for each lineage, scan its loaded members across all owned locations. Members whose
  * entity-type variant doesn't match the lineage's variant are evicted from BLib membership. (Phase 9.)</li>
- * <li><b>Lifecycle</b>: drive location dormancy + death, lineage absorption, lineage death (Phase 11). Each is a
- * separate static task.</li>
+ * <li><b>Lifecycle</b>: drive location contests and lineage death (Phase 11).</li>
  * </ul>
  * <p>
  * Per {@code HIVE_REDESIGN_01_FACTIONS.md} § 2 + § 7 and {@code HIVE_REDESIGN_02_FACTION_LIFECYCLES.md} § 3–§ 5.
@@ -34,7 +32,7 @@ public final class LineageInvariantTask {
     }
 
     /**
-     * Slow-cadence scan: variant invariants, maturation, absorption, contests. Called from
+     * Slow-cadence scan: variant invariants, maturation, contests. Called from
      * {@link com.alien.common.gameplay.hive2.location.HiveLocationRegistry#tick} every
      * {@code lineageScanIntervalTicks}. Per-tick death checks (location dormancy, lineage death) run independently
      * every tick from {@code HiveLocationRegistry.tick} directly — they are NOT routed through this method.
@@ -47,10 +45,7 @@ public final class LineageInvariantTask {
         // growth stages over time.
         QueenlessMaturationTask.scanAll(server);
 
-        // 3. Lineage absorption — same-variant cross-lineage merging.
-        LineageAbsorptionTask.scanAll(server);
-
-        // 4. Contested chunk resolution.
+        // 3. Contested chunk resolution.
         ContestResolutionTask.scanAll(server);
     }
 

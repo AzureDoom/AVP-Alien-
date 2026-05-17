@@ -13,7 +13,6 @@ package com.alien.common.gameplay.hive2.config;
  */
 public record HiveConfig(
     // ---------- § 1 Faction lifecycle ----------
-    long lineageAbsorptionAdjacencyTicks,
     long protoHiveStageInterval,
 
     // ---------- § 2 Locations ----------
@@ -129,7 +128,6 @@ public record HiveConfig(
     public static HiveConfig defaults() {
         return new HiveConfig(
             // § 1 Faction lifecycle
-            5L * TICKS_PER_MINUTE, // lineageAbsorptionAdjacencyTicks: 5 min
             5L * TICKS_PER_MINUTE, // protoHiveStageInterval: 5 min between drone→warrior→praetorian→queen advances
 
             // § 2 Locations

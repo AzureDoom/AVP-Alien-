@@ -16,7 +16,7 @@ import java.util.Objects;
 public final class HiveConfigSchema {
 
     private static final List<GroupSpec> GROUP_SPECS = List.of(
-        group("Lineage Seeds", "lineageAbsorptionAdjacencyTicks", "protoHiveStageInterval"),
+        group("Lineage Seeds", "protoHiveStageInterval"),
         group(
             "Location Lifecycle",
             "settlementTicks",

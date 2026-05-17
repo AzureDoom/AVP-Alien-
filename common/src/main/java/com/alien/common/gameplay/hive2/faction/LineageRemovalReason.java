@@ -1,8 +1,6 @@
 package com.alien.common.gameplay.hive2.faction;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
-
 /**
  * The recorded cause of a lineage faction's removal. Sealed so we can add cases later without breaking exhaustive
  * switches.
@@ -13,8 +11,6 @@ public sealed interface LineageRemovalReason {
 
     String NBT_KIND = "Kind";
 
-    String NBT_ABSORBER = "AbsorberLineageId";
-
     String NBT_REASON = "Reason";
 
     String typeKind();
@@ -24,7 +20,7 @@ public sealed interface LineageRemovalReason {
     static LineageRemovalReason load(CompoundTag tag) {
         return switch (tag.getString(NBT_KIND)) {
             case "no_locations_remain" -> new NoLocationsRemain();
-            case "absorbed_by" -> new AbsorbedBy(ResourceLocation.parse(tag.getString(NBT_ABSORBER)));
+            case "absorbed_by" -> new NoLocationsRemain();
             case "civil_war" -> new NoLocationsRemain();
             case "admin_removed" -> new AdminRemoved(tag.getString(NBT_REASON));
             default -> new NoLocationsRemain();
@@ -47,19 +43,6 @@ public sealed interface LineageRemovalReason {
 
         @Override
         public void writeBody(CompoundTag tag) {}
-    }
-
-    record AbsorbedBy(ResourceLocation absorberLineageId) implements LineageRemovalReason {
-
-        @Override
-        public String typeKind() {
-            return "absorbed_by";
-        }
-
-        @Override
-        public void writeBody(CompoundTag tag) {
-            tag.putString(NBT_ABSORBER, absorberLineageId.toString());
-        }
     }
 
     record AdminRemoved(String reason) implements LineageRemovalReason {
