@@ -58,7 +58,7 @@ public class Runner extends Xenomorph implements EggCarrier, GOAPUser<Runner>, V
             .add(Attributes.FOLLOW_RANGE, 35F)
             .add(Attributes.KNOCKBACK_RESISTANCE, 0.3f)
             .add(Attributes.MAX_HEALTH, PlayerStatConstants.BASE_HEALTH * 2F)
-            .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1F);
+            .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1.1F);
     }
 
     private final RunnerAnimationDispatcher animationDispatcher;
