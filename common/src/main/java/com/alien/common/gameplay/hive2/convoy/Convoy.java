@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -281,6 +282,12 @@ public sealed interface Convoy {
 
         private boolean warningIssued;
 
+        private boolean returningHome;
+
+        private @Nullable HiveLocationId returnLocationId;
+
+        private @Nullable BlockPos returnPos;
+
         private Vec3 currentPos;
 
         private BlockPos lastKnownTargetPos;
@@ -336,6 +343,9 @@ public sealed interface Convoy {
                 composition,
                 materializedMembers,
                 false,
+                false,
+                null,
+                null,
                 dispatchedTick,
                 expiresAtTick
             );
@@ -355,6 +365,42 @@ public sealed interface Convoy {
             long dispatchedTick,
             long expiresAtTick
         ) {
+            this(
+                id,
+                lineageFactionId,
+                dimension,
+                sourceLocationId,
+                targetPlayerId,
+                currentPos,
+                lastKnownTargetPos,
+                composition,
+                materializedMembers,
+                warningIssued,
+                false,
+                null,
+                null,
+                dispatchedTick,
+                expiresAtTick
+            );
+        }
+
+        public Raid(
+            ConvoyId id,
+            ResourceLocation lineageFactionId,
+            ResourceKey<Level> dimension,
+            HiveLocationId sourceLocationId,
+            UUID targetPlayerId,
+            Vec3 currentPos,
+            BlockPos lastKnownTargetPos,
+            EntityReserves composition,
+            Map<UUID, EntityType<?>> materializedMembers,
+            boolean warningIssued,
+            boolean returningHome,
+            @Nullable HiveLocationId returnLocationId,
+            @Nullable BlockPos returnPos,
+            long dispatchedTick,
+            long expiresAtTick
+        ) {
             this.id = id;
             this.lineageFactionId = lineageFactionId;
             this.dimension = dimension;
@@ -365,6 +411,9 @@ public sealed interface Convoy {
             this.composition = composition;
             this.materializedMembers = new HashMap<>(materializedMembers);
             this.warningIssued = warningIssued;
+            this.returningHome = returningHome;
+            this.returnLocationId = returnLocationId;
+            this.returnPos = returnPos;
             this.dispatchedTick = dispatchedTick;
             this.expiresAtTick = expiresAtTick;
         }
@@ -442,6 +491,24 @@ public sealed interface Convoy {
 
         public void setWarningIssued(boolean warningIssued) {
             this.warningIssued = warningIssued;
+        }
+
+        public boolean returningHome() {
+            return returningHome;
+        }
+
+        public @Nullable HiveLocationId returnLocationId() {
+            return returnLocationId;
+        }
+
+        public @Nullable BlockPos returnPos() {
+            return returnPos;
+        }
+
+        public void beginReturnHome(HiveLocationId locationId, BlockPos locationPos) {
+            this.returningHome = true;
+            this.returnLocationId = locationId;
+            this.returnPos = locationPos;
         }
     }
 }

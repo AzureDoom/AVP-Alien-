@@ -35,12 +35,12 @@ import java.util.UUID;
  * harbinger.</li>
  * <li>Per-source cooldown so the same source doesn't spam raids.</li>
  * <li>Composition drained from source reserves, limited to xenomorphs whose hive recipe costs scourge jelly.</li>
- * <li>Expires {@code raidExpiryTicks} after dispatch (default 30 minutes).</li>
+ * <li>Persists until the target player dies, then returns to a live lineage location when possible.</li>
  * </ul>
  * <p>
  * Phase 8b ships an "admin-trigger only or auto-trigger via kill threshold" path. The full design's complexities
  * (cross-dimension blocking, target-offline camping behaviors mid-flight) are handled by
- * {@link com.alien.common.gameplay.hive2.tick.LineageConvoyTickTask}'s tick-time updater + expiry logic.
+ * {@link com.alien.common.gameplay.hive2.tick.LineageConvoyTickTask}'s tick-time updater.
  */
 public final class RaidDispatch {
 
@@ -158,7 +158,7 @@ public final class RaidDispatch {
             targetPlayer.blockPosition(),
             composition,
             currentTick,
-            currentTick + config.raidExpiryTicks()
+            Long.MAX_VALUE
         );
 
         lineage.convoys().add(raid);
@@ -166,12 +166,11 @@ public final class RaidDispatch {
         lastDispatchTickByLocation.put(source.id(), currentTick);
 
         Alien.LOGGER.info(
-            "Hive2: raid dispatched: {} → player {} from source {} ({} members, expires at tick {})",
+            "Hive2: raid dispatched: {} → player {} from source {} ({} members, no expiry)",
             raid.id(),
             playerId,
             source.id(),
-            composition.getCount(),
-            raid.expiresAtTick()
+            composition.getCount()
         );
 
         return true;

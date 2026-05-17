@@ -39,6 +39,10 @@ public final class ConvoyArrival {
         }
 
         if (convoy instanceof Convoy.Raid raid) {
+            if (raid.returningHome()) {
+                arriveReturningRaid(server, raid, lineage);
+                return true;
+            }
             return arriveRaid(server, raid);
         }
 
@@ -113,19 +117,18 @@ public final class ConvoyArrival {
 
     /**
      * Raid arrival: the raid has reached the player's last-known position. Spawns the remaining abstract composition as
-     * real entities at the convoy's current position. The raid convoy itself remains alive so despawned raiders can return
-     * to its composition.
+     * real entities at the convoy's current position. The raid convoy itself remains alive so despawned raiders can
+     * return to its composition.
      */
     private static boolean arriveRaid(MinecraftServer server, Convoy.Raid raid) {
         var serverLevel = server.getLevel(raid.dimension());
         if (serverLevel == null) {
             Alien.LOGGER.info(
-                "Raid {} arrived but destination dimension {} is unloaded — refunding composition to source location",
+                "Raid {} reached its target position but destination dimension {} is unloaded — holding raid in flight",
                 raid.id(),
                 raid.dimension().location()
             );
-            refundToLocation(HiveLocationRegistry.INSTANCE.get(raid.sourceLocationId()), raid.composition(), raid.id().toString());
-            return true;
+            return false;
         }
 
         var spawnPos = new BlockPos(
@@ -148,6 +151,32 @@ public final class ConvoyArrival {
             raid.targetPlayerId()
         );
         return false;
+    }
+
+    private static void arriveReturningRaid(MinecraftServer server, Convoy.Raid raid, LineageFactionData lineage) {
+        RaidMemberTracker.recallMaterializedMembers(server, raid);
+
+        var destination = raid.returnLocationId() == null ? null : HiveLocationRegistry.INSTANCE.get(raid.returnLocationId());
+        if (destination == null || !destination.isAlive()) {
+            destination = nearestAliveLocation(lineage, raid);
+        }
+
+        if (destination == null) {
+            Alien.LOGGER.info(
+                "Raid {} completed and returned, but no live lineage location remains — disbanding {} member(s)",
+                raid.id(),
+                raid.composition().getCount()
+            );
+            return;
+        }
+
+        addCompositionToLocation(destination, raid.composition());
+        Alien.LOGGER.info(
+            "Raid {} returned home to location {} with {} member(s)",
+            raid.id(),
+            destination.id(),
+            raid.composition().getCount()
+        );
     }
 
     private static void addCompositionToLocation(HiveLocation location, EntityReserves composition) {

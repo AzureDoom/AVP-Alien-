@@ -3,7 +3,10 @@ package com.alien.common.gameplay.hive2.convoy;
 import com.alien.Alien;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.blib.api.common.faction.v1.FactionMember;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.Entity;
+
+import java.util.ArrayList;
 
 public final class RaidMemberTracker {
 
@@ -61,6 +64,30 @@ public final class RaidMemberTracker {
             markDirty(membership);
         }
         alien.clearRaidMembership();
+    }
+
+    public static int recallMaterializedMembers(MinecraftServer server, Convoy.Raid raid) {
+        var level = server.getLevel(raid.dimension());
+        var hadTrackedMembers = !raid.materializedMembers().isEmpty();
+        var recalled = 0;
+
+        for (var entry : new ArrayList<>(raid.materializedMembers().entrySet())) {
+            var entity = level == null ? null : level.getEntity(entry.getKey());
+            if (entity != null && entity.isAlive() && !entity.isRemoved()) {
+                raid.composition().add(entry.getValue(), 1);
+                if (entity instanceof com.alien.common.gameplay.entity.living.alien.Alien alien) {
+                    alien.clearRaidMembership();
+                }
+                entity.discard();
+                recalled++;
+            }
+            raid.untrackMaterializedMember(entry.getKey());
+        }
+
+        if (hadTrackedMembers) {
+            markDirty(new RaidMembership(raid.lineageFactionId(), raid.id()));
+        }
+        return recalled;
     }
 
     private static Convoy.Raid findRaid(RaidMembership membership) {

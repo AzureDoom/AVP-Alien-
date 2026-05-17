@@ -69,6 +69,12 @@ public final class ConvoyCodec {
 
     private static final String NBT_WARNING_ISSUED = "WarningIssued";
 
+    private static final String NBT_RETURNING_HOME = "ReturningHome";
+
+    private static final String NBT_RETURN_LOCATION_ID = "ReturnLocationId";
+
+    private static final String NBT_RETURN_POS = "ReturnPos";
+
     private ConvoyCodec() {}
 
     public static ListTag saveAll(List<Convoy> convoys) {
@@ -127,6 +133,13 @@ public final class ConvoyCodec {
             tag.putLong(NBT_EXPIRES_AT_TICK, raid.expiresAtTick());
             tag.put(NBT_MATERIALIZED_MEMBERS, encodeMaterializedMembers(raid.materializedMembers()));
             tag.putBoolean(NBT_WARNING_ISSUED, raid.warningIssued());
+            tag.putBoolean(NBT_RETURNING_HOME, raid.returningHome());
+            if (raid.returnLocationId() != null) {
+                tag.putString(NBT_RETURN_LOCATION_ID, raid.returnLocationId().value().toString());
+            }
+            if (raid.returnPos() != null) {
+                tag.putIntArray(NBT_RETURN_POS, encodeBlockPos(raid.returnPos()));
+            }
         } else {
             throw new IllegalStateException("Unknown convoy subtype: " + convoy.getClass().getName());
         }
@@ -185,6 +198,11 @@ public final class ConvoyCodec {
                 composition,
                 decodeMaterializedMembers(tag.getList(NBT_MATERIALIZED_MEMBERS, Tag.TAG_COMPOUND)),
                 tag.getBoolean(NBT_WARNING_ISSUED),
+                tag.getBoolean(NBT_RETURNING_HOME),
+                tag.contains(NBT_RETURN_LOCATION_ID)
+                    ? new HiveLocationId(ResourceLocation.parse(tag.getString(NBT_RETURN_LOCATION_ID)))
+                    : null,
+                tag.contains(NBT_RETURN_POS) ? decodeBlockPos(tag.getIntArray(NBT_RETURN_POS)) : null,
                 dispatchedTick,
                 tag.getLong(NBT_EXPIRES_AT_TICK)
             );
