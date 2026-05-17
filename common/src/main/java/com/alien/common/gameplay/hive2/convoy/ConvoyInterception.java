@@ -30,7 +30,9 @@ public final class ConvoyInterception {
             (int) Math.round(convoy.currentPos().z)
         );
 
-        var spawnedCount = ConvoyMaterialization.spawnAll(level, convoy, spawnPos, player);
+        var spawnedCount = convoy instanceof Convoy.Raid raid
+            ? ConvoyMaterialization.spawnNextRaidWave(level, raid, spawnPos, player)
+            : ConvoyMaterialization.spawnAll(level, convoy, spawnPos, player);
 
         if (spawnedCount <= 0) {
             return false;

@@ -69,6 +69,8 @@ public final class ConvoyCodec {
 
     private static final String NBT_WARNING_ISSUED = "WarningIssued";
 
+    private static final String NBT_NEXT_WAVE_INDEX = "NextWaveIndex";
+
     private static final String NBT_RETURNING_HOME = "ReturningHome";
 
     private static final String NBT_RETURN_LOCATION_ID = "ReturnLocationId";
@@ -133,6 +135,7 @@ public final class ConvoyCodec {
             tag.putIntArray(NBT_LAST_KNOWN_TARGET_POS, encodeBlockPos(raid.lastKnownTargetPos()));
             tag.putLong(NBT_EXPIRES_AT_TICK, raid.expiresAtTick());
             tag.putBoolean(NBT_WARNING_ISSUED, raid.warningIssued());
+            tag.putInt(NBT_NEXT_WAVE_INDEX, raid.nextWaveIndex());
             tag.putBoolean(NBT_RETURNING_HOME, raid.returningHome());
             if (raid.returnLocationId() != null) {
                 tag.putString(NBT_RETURN_LOCATION_ID, raid.returnLocationId().value().toString());
@@ -201,6 +204,7 @@ public final class ConvoyCodec {
                 composition,
                 materializedMembers,
                 tag.getBoolean(NBT_WARNING_ISSUED),
+                tag.getInt(NBT_NEXT_WAVE_INDEX),
                 tag.getBoolean(NBT_RETURNING_HOME),
                 tag.contains(NBT_RETURN_LOCATION_ID)
                     ? new HiveLocationId(ResourceLocation.parse(tag.getString(NBT_RETURN_LOCATION_ID)))

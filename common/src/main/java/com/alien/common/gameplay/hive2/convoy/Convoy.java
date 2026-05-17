@@ -392,6 +392,8 @@ public sealed interface Convoy {
 
         private boolean warningIssued;
 
+        private int nextWaveIndex;
+
         private boolean returningHome;
 
         private @Nullable HiveLocationId returnLocationId;
@@ -453,6 +455,7 @@ public sealed interface Convoy {
                 composition,
                 materializedMembers,
                 false,
+                0,
                 false,
                 null,
                 null,
@@ -486,6 +489,7 @@ public sealed interface Convoy {
                 composition,
                 materializedMembers,
                 warningIssued,
+                0,
                 false,
                 null,
                 null,
@@ -505,6 +509,7 @@ public sealed interface Convoy {
             EntityReserves composition,
             Map<UUID, EntityType<?>> materializedMembers,
             boolean warningIssued,
+            int nextWaveIndex,
             boolean returningHome,
             @Nullable HiveLocationId returnLocationId,
             @Nullable BlockPos returnPos,
@@ -521,6 +526,7 @@ public sealed interface Convoy {
             this.composition = composition;
             this.materializedMembers = new ConvoyMaterializedMembers(materializedMembers);
             this.warningIssued = warningIssued;
+            this.nextWaveIndex = Math.max(0, nextWaveIndex);
             this.returningHome = returningHome;
             this.returnLocationId = returnLocationId;
             this.returnPos = returnPos;
@@ -609,6 +615,14 @@ public sealed interface Convoy {
 
         public void setWarningIssued(boolean warningIssued) {
             this.warningIssued = warningIssued;
+        }
+
+        public int nextWaveIndex() {
+            return nextWaveIndex;
+        }
+
+        public void advanceWave() {
+            nextWaveIndex++;
         }
 
         public boolean returningHome() {

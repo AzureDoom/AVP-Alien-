@@ -118,9 +118,8 @@ public final class ConvoyArrival {
     }
 
     /**
-     * Raid arrival: the raid has reached the player's last-known position. Spawns the remaining abstract composition as
-     * real entities at the convoy's current position. The raid convoy itself remains alive so despawned raiders can
-     * return to its composition.
+     * Raid arrival: the raid has reached the player's last-known position. Spawns one wave at the convoy's current
+     * position. The raid convoy itself remains alive so despawned raiders can return to its composition.
      */
     private static boolean arriveRaid(MinecraftServer server, Convoy.Raid raid) {
         var serverLevel = server.getLevel(raid.dimension());
@@ -139,16 +138,21 @@ public final class ConvoyArrival {
             (int) Math.round(raid.currentPos().z)
         );
 
+        if (!raid.materializedMembers().isEmpty()) {
+            return false;
+        }
+
         var targetPlayer = server.getPlayerList().getPlayer(raid.targetPlayerId());
-        var spawnedCount = ConvoyMaterialization.spawnAll(serverLevel, raid, spawnPos, targetPlayer);
+        var spawnedCount = ConvoyMaterialization.spawnNextRaidWave(serverLevel, raid, spawnPos, targetPlayer);
         if (spawnedCount <= 0) {
             return false;
         }
 
         Alien.LOGGER.info(
-            "Raid {} arrived at {} — spawned {} attackers targeting player {}",
+            "Raid {} arrived at {} — spawned wave {} with {} attackers targeting player {}",
             raid.id(),
             spawnPos,
+            raid.nextWaveIndex(),
             spawnedCount,
             raid.targetPlayerId()
         );
