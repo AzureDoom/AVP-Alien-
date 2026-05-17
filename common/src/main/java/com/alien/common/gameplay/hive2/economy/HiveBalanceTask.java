@@ -186,10 +186,10 @@ public final class HiveBalanceTask {
             return false;
         }
 
-        if (
-            location.biomass() < recipe.biomass()
-                || location.royalJelly() < recipe.royalJelly()
-                || location.scourgeJelly() < recipe.scourgeJelly()
+        var biomassCost = biomassCost(recipe, location);
+        if (location.biomass() < biomassCost
+            || location.royalJelly() < recipe.royalJelly()
+            || location.scourgeJelly() < recipe.scourgeJelly()
         ) {
             return false;
         }
@@ -209,7 +209,7 @@ public final class HiveBalanceTask {
         }
 
         // All gates pass — commit.
-        location.setBiomass(location.biomass() - recipe.biomass());
+        location.setBiomass(location.biomass() - biomassCost);
         location.setRoyalJelly(location.royalJelly() - recipe.royalJelly());
         location.setScourgeJelly(location.scourgeJelly() - recipe.scourgeJelly());
 
@@ -219,6 +219,16 @@ public final class HiveBalanceTask {
         }
         location.localReserves().tryAdd(recipe.outputEntity(), 1);
         return true;
+    }
+
+    private static int biomassCost(HiveRecipe recipe, HiveLocation location) {
+        var baseCost = Math.max(0, recipe.biomass());
+        if (baseCost == 0) {
+            return 0;
+        }
+        var outputCount = CastePopulation.countEntity(location, recipe.outputEntity());
+        var scaledCost = baseCost + outputCount * (baseCost * recipe.populationBiomassCostScale());
+        return Math.max(baseCost, (int) Math.ceil(scaledCost));
     }
 
     private static boolean hasHarbingerAwayInRaid(HiveLocation location, LineageFactionData lineage) {

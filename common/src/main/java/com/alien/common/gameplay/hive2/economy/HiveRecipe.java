@@ -15,22 +15,52 @@ import java.util.List;
 public record HiveRecipe(
     EntityType<?> outputEntity,
     int biomass,
+    double populationBiomassCostScale,
     int royalJelly,
     int scourgeJelly,
     List<InputEntity> inputEntities,
     List<HiveRecipeCondition> conditions
 ) {
 
+    public static final double DEFAULT_POPULATION_BIOMASS_COST_SCALE = 0.05D;
+
     public static final Codec<HiveRecipe> CODEC = RecordCodecBuilder.create(
         instance -> instance.group(
             BuiltInRegistries.ENTITY_TYPE.byNameCodec().fieldOf("output_entity").forGetter(HiveRecipe::outputEntity),
             Codec.INT.optionalFieldOf("biomass", 0).forGetter(HiveRecipe::biomass),
+            Codec.DOUBLE.optionalFieldOf("population_biomass_cost_scale", DEFAULT_POPULATION_BIOMASS_COST_SCALE)
+                .forGetter(HiveRecipe::populationBiomassCostScale),
             Codec.INT.optionalFieldOf("royal_jelly", 0).forGetter(HiveRecipe::royalJelly),
             Codec.INT.optionalFieldOf("scourge_jelly", 0).forGetter(HiveRecipe::scourgeJelly),
             InputEntity.CODEC.listOf().optionalFieldOf("input_entities", List.of()).forGetter(HiveRecipe::inputEntities),
             HiveRecipeCondition.CODEC.listOf().optionalFieldOf("conditions", List.of()).forGetter(HiveRecipe::conditions)
         ).apply(instance, HiveRecipe::new)
     );
+
+    public HiveRecipe {
+        populationBiomassCostScale = Math.max(0.0D, populationBiomassCostScale);
+        inputEntities = List.copyOf(inputEntities);
+        conditions = List.copyOf(conditions);
+    }
+
+    public HiveRecipe(
+        EntityType<?> outputEntity,
+        int biomass,
+        int royalJelly,
+        int scourgeJelly,
+        List<InputEntity> inputEntities,
+        List<HiveRecipeCondition> conditions
+    ) {
+        this(
+            outputEntity,
+            biomass,
+            DEFAULT_POPULATION_BIOMASS_COST_SCALE,
+            royalJelly,
+            scourgeJelly,
+            inputEntities,
+            conditions
+        );
+    }
 
     public record InputEntity(
         EntityType<?> entity,
