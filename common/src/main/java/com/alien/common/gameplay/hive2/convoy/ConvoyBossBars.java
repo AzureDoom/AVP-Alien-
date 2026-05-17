@@ -1,5 +1,6 @@
 package com.alien.common.gameplay.hive2.convoy;
 
+import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.hive2.config.HiveConfig;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.util.AlienPredicates;
@@ -23,10 +24,10 @@ public final class ConvoyBossBars {
     private ConvoyBossBars() {}
 
     public static void tick(MinecraftServer server, Convoy convoy, LineageFactionData lineage, HiveConfig config) {
-        var state = BARS.computeIfAbsent(convoy.id(), id -> createState(convoy));
+        var state = BARS.computeIfAbsent(convoy.id(), id -> createState(convoy, lineage));
         var currentTick = server.overworld().getGameTime();
         state.bossEvent().setName(title(convoy));
-        state.bossEvent().setColor(colorFor(convoy));
+        state.bossEvent().setColor(colorFor(convoy, lineage));
         state.bossEvent().setProgress(progress(convoy, state.initialCount(), currentTick));
         updateTrackingPlayers(server, convoy, lineage, config, state.bossEvent());
     }
@@ -57,15 +58,15 @@ public final class ConvoyBossBars {
         BARS.clear();
     }
 
-    private static BarState createState(Convoy convoy) {
-        var event = new ServerBossEvent(title(convoy), colorFor(convoy), BossEvent.BossBarOverlay.PROGRESS);
+    private static BarState createState(Convoy convoy, LineageFactionData lineage) {
+        var event = new ServerBossEvent(title(convoy), colorFor(convoy, lineage), BossEvent.BossBarOverlay.PROGRESS);
         event.setProgress(1.0F);
         return new BarState(Math.max(1, memberCount(convoy)), event);
     }
 
     private static Component title(Convoy convoy) {
         if (convoy instanceof Convoy.Raid raid) {
-            return Component.literal("Raid - wave " + (raid.displayWaveIndex() + 1) + "/" + Convoy.Raid.WAVE_COUNT);
+            return Component.literal("Raid - Wave " + (raid.displayWaveIndex() + 1) + "/" + Convoy.Raid.WAVE_COUNT);
         }
         return Component.literal("Convoy: " + typeName(convoy) + " (" + memberCount(convoy) + ")");
     }
@@ -83,9 +84,9 @@ public final class ConvoyBossBars {
         return "Unknown";
     }
 
-    private static BossEvent.BossBarColor colorFor(Convoy convoy) {
+    private static BossEvent.BossBarColor colorFor(Convoy convoy, LineageFactionData lineage) {
         if (convoy instanceof Convoy.Raid) {
-            return BossEvent.BossBarColor.RED;
+            return AlienVariantTypes.getFor(lineage.variant()).bossBarColor();
         }
         if (convoy instanceof Convoy.Migration) {
             return BossEvent.BossBarColor.YELLOW;
@@ -154,7 +155,12 @@ public final class ConvoyBossBars {
         toRemove.forEach(bossEvent::removePlayer);
     }
 
-    private static boolean shouldRemove(ServerPlayer player, Convoy convoy, LineageFactionData lineage, double radiusSqr) {
+    private static boolean shouldRemove(
+        ServerPlayer player,
+        Convoy convoy,
+        LineageFactionData lineage,
+        double radiusSqr
+    ) {
         if (!player.level().dimension().equals(convoy.dimension())) {
             return true;
         }

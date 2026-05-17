@@ -54,7 +54,7 @@ public final class HiveLocationBossBar {
         this.location = location;
         this.configSupplier = configSupplier;
         this.bossEvent = (ServerBossEvent) new ServerBossEvent(
-            titleComponent(),
+            titleComponent(currentXenomorphCount()),
             AlienVariantTypes.getFor(variant).bossBarColor(),
             BossEvent.BossBarOverlay.PROGRESS
         ).setDarkenScreen(AlienPropertyAccess.INSTANCE.getOrThrow(AlienProperties.Hive.DARKEN_SCREEN));
@@ -63,8 +63,8 @@ public final class HiveLocationBossBar {
     public void tick(MinecraftServer server, AlienVariant variant, LineageFactionData lineage) {
         decayPeak();
         decayEvacuating();
-        updateProgress(lineage);
-        updateColorAndTitle(variant);
+        var xenomorphCount = updateProgress(lineage);
+        updateColorAndTitle(variant, xenomorphCount);
         updateTrackingPlayers(server, variant);
     }
 
@@ -89,19 +89,23 @@ public final class HiveLocationBossBar {
     }
 
     private int updateProgress(LineageFactionData lineage) {
-        var loadedHere = countMatchingLoadedMembers(XENOMORPH_PREDICATE);
-        var inReserves = location.localReserves().getCountMatching(XENOMORPH_PREDICATE);
+        var total = currentXenomorphCount();
 
         // Reference `lineage` to satisfy the param contract; future lineage-level display rules may use it.
         if (lineage == null) {
-            return 0;
+            return total;
         }
 
-        var total = loadedHere + inReserves;
         var peak = Math.max(location.peakXenomorphCount(), Math.max(1, total));
         location.setPeakXenomorphCount(peak);
         bossEvent.setProgress(total / (float) peak);
         return total;
+    }
+
+    private int currentXenomorphCount() {
+        var loadedHere = countMatchingLoadedMembers(XENOMORPH_PREDICATE);
+        var inReserves = location.localReserves().getCountMatching(XENOMORPH_PREDICATE);
+        return loadedHere + inReserves;
     }
 
     private int countMatchingLoadedMembers(Predicate<EntityType<?>> predicate) {
@@ -114,18 +118,20 @@ public final class HiveLocationBossBar {
         return count;
     }
 
-    private void updateColorAndTitle(AlienVariant variant) {
+    private void updateColorAndTitle(AlienVariant variant, int xenomorphCount) {
         var evacuating = location.evacuatingRemainingTicks() > 0;
         if (evacuating) {
             bossEvent.setColor(BossEvent.BossBarColor.YELLOW);
         } else {
             bossEvent.setColor(AlienVariantTypes.getFor(variant).bossBarColor());
         }
-        bossEvent.setName(titleComponent());
+        bossEvent.setName(titleComponent(xenomorphCount));
     }
 
-    private Component titleComponent() {
-        return Component.literal("Hive (" + locationLineageNumber() + ", " + location.locationNumber() + ")");
+    private Component titleComponent(int xenomorphCount) {
+        return Component.literal(
+            "Hive (" + locationLineageNumber() + ", " + location.locationNumber() + ") - " + xenomorphCount
+        );
     }
 
     private long locationLineageNumber() {
