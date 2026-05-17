@@ -1,4 +1,5 @@
 {
   "biomass": 50,
+  "population_biomass_cost_scale": 0.05,
   "output_entity": "avp_alien:drone"
 }

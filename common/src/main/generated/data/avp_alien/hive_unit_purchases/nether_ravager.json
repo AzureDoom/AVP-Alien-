@@ -13,5 +13,6 @@
     }
   ],
   "output_entity": "avp_alien:nether_ravager",
+  "population_biomass_cost_scale": 0.05,
   "scourge_jelly": 1
 }

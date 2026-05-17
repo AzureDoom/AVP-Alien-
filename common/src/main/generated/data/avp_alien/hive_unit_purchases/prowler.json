@@ -6,5 +6,6 @@
     }
   ],
   "output_entity": "avp_alien:prowler",
+  "population_biomass_cost_scale": 0.05,
   "royal_jelly": 1
 }

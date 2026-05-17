@@ -22,6 +22,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class HiveUnitPurchaseDataProvider implements DataProvider {
 
+    private static final double POPULATION_BIOMASS_COST_SCALE = HiveUnitPurchase.DEFAULT_POPULATION_BIOMASS_COST_SCALE;
+
     private final FabricDataOutput output;
 
     private final Map<ResourceLocation, HiveUnitPurchase> purchasesById = new LinkedHashMap<>();
@@ -82,12 +84,13 @@ public class HiveUnitPurchaseDataProvider implements DataProvider {
     }
 
     private void addVariantPurchases(VariantEntities entities) {
-        add(new HiveUnitPurchase(entities.drone(), 50, 0, 0, List.of(), List.of()));
-        add(new HiveUnitPurchase(entities.runner(), 40, 0, 0, List.of(), List.of()));
+        add(new HiveUnitPurchase(entities.drone(), 50, POPULATION_BIOMASS_COST_SCALE, 0, 0, List.of(), List.of()));
+        add(new HiveUnitPurchase(entities.runner(), 40, POPULATION_BIOMASS_COST_SCALE, 0, 0, List.of(), List.of()));
         add(
             new HiveUnitPurchase(
                 entities.warrior(),
                 0,
+                POPULATION_BIOMASS_COST_SCALE,
                 1,
                 0,
                 List.of(input(entities.drone())),
@@ -98,6 +101,7 @@ public class HiveUnitPurchaseDataProvider implements DataProvider {
             new HiveUnitPurchase(
                 entities.praetorian(),
                 0,
+                POPULATION_BIOMASS_COST_SCALE,
                 1,
                 0,
                 List.of(input(entities.warrior())),
@@ -108,6 +112,7 @@ public class HiveUnitPurchaseDataProvider implements DataProvider {
             new HiveUnitPurchase(
                 entities.prowler(),
                 0,
+                POPULATION_BIOMASS_COST_SCALE,
                 1,
                 0,
                 List.of(input(entities.runner())),
@@ -118,6 +123,7 @@ public class HiveUnitPurchaseDataProvider implements DataProvider {
             new HiveUnitPurchase(
                 entities.crusher(),
                 0,
+                POPULATION_BIOMASS_COST_SCALE,
                 1,
                 0,
                 List.of(input(entities.prowler())),
@@ -128,6 +134,7 @@ public class HiveUnitPurchaseDataProvider implements DataProvider {
             new HiveUnitPurchase(
                 entities.ravager(),
                 0,
+                POPULATION_BIOMASS_COST_SCALE,
                 0,
                 1,
                 List.of(input(entities.warrior())),
@@ -138,6 +145,7 @@ public class HiveUnitPurchaseDataProvider implements DataProvider {
             new HiveUnitPurchase(
                 entities.razorClaw(),
                 0,
+                POPULATION_BIOMASS_COST_SCALE,
                 0,
                 2,
                 List.of(input(entities.runner())),
@@ -148,6 +156,7 @@ public class HiveUnitPurchaseDataProvider implements DataProvider {
             new HiveUnitPurchase(
                 entities.burster(),
                 0,
+                POPULATION_BIOMASS_COST_SCALE,
                 0,
                 1,
                 List.of(input(entities.runner())),
@@ -158,6 +167,7 @@ public class HiveUnitPurchaseDataProvider implements DataProvider {
             new HiveUnitPurchase(
                 entities.carrier(),
                 0,
+                POPULATION_BIOMASS_COST_SCALE,
                 0,
                 1,
                 List.of(input(entities.drone())),
@@ -168,6 +178,7 @@ public class HiveUnitPurchaseDataProvider implements DataProvider {
             new HiveUnitPurchase(
                 entities.chrysalis(),
                 0,
+                POPULATION_BIOMASS_COST_SCALE,
                 0,
                 1,
                 List.of(input(entities.prowler())),
@@ -178,6 +189,7 @@ public class HiveUnitPurchaseDataProvider implements DataProvider {
             new HiveUnitPurchase(
                 entities.harbinger(),
                 200,
+                POPULATION_BIOMASS_COST_SCALE,
                 0,
                 1,
                 List.of(input(entities.praetorian())),

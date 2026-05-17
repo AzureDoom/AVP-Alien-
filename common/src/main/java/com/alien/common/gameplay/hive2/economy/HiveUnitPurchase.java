@@ -28,8 +28,7 @@ public record HiveUnitPurchase(
         instance -> instance.group(
             BuiltInRegistries.ENTITY_TYPE.byNameCodec().fieldOf("output_entity").forGetter(HiveUnitPurchase::outputEntity),
             Codec.INT.optionalFieldOf("biomass", 0).forGetter(HiveUnitPurchase::biomass),
-            Codec.DOUBLE.optionalFieldOf("population_biomass_cost_scale", DEFAULT_POPULATION_BIOMASS_COST_SCALE)
-                .forGetter(HiveUnitPurchase::populationBiomassCostScale),
+            Codec.DOUBLE.fieldOf("population_biomass_cost_scale").forGetter(HiveUnitPurchase::populationBiomassCostScale),
             Codec.INT.optionalFieldOf("royal_jelly", 0).forGetter(HiveUnitPurchase::royalJelly),
             Codec.INT.optionalFieldOf("scourge_jelly", 0).forGetter(HiveUnitPurchase::scourgeJelly),
             InputEntity.CODEC.listOf()
@@ -45,25 +44,6 @@ public record HiveUnitPurchase(
         populationBiomassCostScale = Math.max(0.0D, populationBiomassCostScale);
         inputEntities = List.copyOf(inputEntities);
         conditions = List.copyOf(conditions);
-    }
-
-    public HiveUnitPurchase(
-        EntityType<?> outputEntity,
-        int biomass,
-        int royalJelly,
-        int scourgeJelly,
-        List<InputEntity> inputEntities,
-        List<HiveUnitPurchaseCondition> conditions
-    ) {
-        this(
-            outputEntity,
-            biomass,
-            DEFAULT_POPULATION_BIOMASS_COST_SCALE,
-            royalJelly,
-            scourgeJelly,
-            inputEntities,
-            conditions
-        );
     }
 
     public record InputEntity(
