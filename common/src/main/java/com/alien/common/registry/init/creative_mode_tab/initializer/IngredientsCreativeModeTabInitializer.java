@@ -12,9 +12,9 @@ public class IngredientsCreativeModeTabInitializer {
         // Alien materials
         addBaseXenomorphIngredients(output);
         addNetherXenomorphIngredients(output);
+        addAberrantXenomorphIngredients(output);
 
         if (AVPHuman.MOD.isLoaded()) {
-            addAberrantXenomorphIngredients(output);
             addIrradiatedXenomorphIngredients(output);
         }
 

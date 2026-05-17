@@ -12,7 +12,7 @@ public class MiscellaneousRecipeProvider {
 
     public static void provide(RecipeBuilder builder) {
         provideMiscellaneousNetherRecipes(builder);
-        provideMiscellaneousAberrantRecipes(builder.withCondition(AVPHumanFabric.IS_LOADED));
+        provideMiscellaneousAberrantRecipes(builder);
         provideMiscellaneousIrradiatedRecipes(builder.withCondition(AVPHumanFabric.IS_LOADED));
 
         builder.smelt(AlienItems.RESIN_BALL)

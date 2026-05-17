@@ -2,6 +2,7 @@ package com.alien;
 
 import com.alien.common.data.AlienReloadListeners;
 import com.alien.common.data.fixer.migration.AlienDataMigrations;
+import com.alien.common.gameplay.advancement.AlienAdvancementEvents;
 import com.alien.common.gameplay.entity.dismemberment.AlienLimbDefinitions;
 import com.alien.common.gameplay.entity.dismemberment.AlienLimbDrops;
 import com.alien.common.gameplay.hive2.growth.ResinDecorator;
@@ -130,6 +131,7 @@ public class Alien {
 
         // Listeners/Events
         AlienReloadListeners.initialize();
+        AlienAdvancementEvents.initialize();
 
         MOD.events().postLevelTick().register(Alien::tickHive2Registry);
         MOD.events().postLevelTick().register(Alien::tickQueenSpawnCooldown);

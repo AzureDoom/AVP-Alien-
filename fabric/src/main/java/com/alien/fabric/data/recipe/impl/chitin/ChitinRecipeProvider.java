@@ -4,7 +4,6 @@ import com.alien.common.registry.init.block.AberrantAlienChitinBlocks;
 import com.alien.common.registry.init.block.AlienChitinBlocks;
 import com.alien.common.registry.init.block.NetherAlienChitinBlocks;
 import com.alien.common.registry.init.item.AlienItems;
-import com.alien.fabric.compatibility.avp_human.AVPHumanFabric;
 import com.blib.fabric.data.recipe.builder.RecipeBuilder;
 import com.blib.fabric.data.recipe.util.RecipeUtil;
 
@@ -74,7 +73,7 @@ public class ChitinRecipeProvider {
     private static void createChitinRecipes(RecipeBuilder builder) {
         createChitinRecipesFromSet(builder, BASE_SET);
         createChitinRecipesFromSet(builder, NETHER_SET);
-        createChitinRecipesFromSet(builder.withCondition(AVPHumanFabric.IS_LOADED), ABERRANT_SET);
+        createChitinRecipesFromSet(builder, ABERRANT_SET);
     }
 
     private static void createChitinRecipesFromSet(RecipeBuilder builder, ChitinSet set) {

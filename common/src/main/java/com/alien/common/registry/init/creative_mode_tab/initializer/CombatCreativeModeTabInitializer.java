@@ -11,9 +11,9 @@ public class CombatCreativeModeTabInitializer {
     public static final Consumer<CreativeModeTab.Output> OUTPUT_CONSUMER = output -> {
         addBaseXenomorphArmors(output);
         addNetherXenomorphArmors(output);
+        addAberrantXenomorphArmors(output);
 
         if (AVPHuman.MOD.isLoaded()) {
-            addAberrantXenomorphArmors(output);
             addIrradiatedXenomorphArmors(output);
         }
     };
