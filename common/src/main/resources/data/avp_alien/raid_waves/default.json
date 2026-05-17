@@ -3,16 +3,18 @@
     {
       "size": 5,
       "buffer_ticks": 200,
-      "pools": [
-        {
-          "tag": "avp_alien:warriors",
-          "weight": 3
-        },
-        {
-          "tag": "avp_alien:prowlers",
-          "weight": 2
-        }
-      ]
+      "random": {
+        "pools": [
+          {
+            "tag": "avp_alien:warriors",
+            "weight": 3
+          },
+          {
+            "tag": "avp_alien:prowlers",
+            "weight": 2
+          }
+        ]
+      }
     },
     {
       "size": 8,
@@ -30,84 +32,90 @@
           ]
         }
       ],
-      "pools": [
-        {
-          "tag": "avp_alien:warriors",
-          "weight": 4
-        },
-        {
-          "tag": "avp_alien:prowlers",
-          "weight": 3
-        }
-      ]
+      "random": {
+        "pools": [
+          {
+            "tag": "avp_alien:warriors",
+            "weight": 4
+          },
+          {
+            "tag": "avp_alien:prowlers",
+            "weight": 3
+          }
+        ]
+      }
     },
     {
       "size": 13,
       "buffer_ticks": 200,
-      "pools": [
-        {
-          "tag": "avp_alien:warriors",
-          "weight": 3
-        },
-        {
-          "tag": "avp_alien:prowlers",
-          "weight": 3
-        },
-        {
-          "tag": "avp_alien:chrysalises",
-          "weight": 2,
-          "max_count": 3
-        },
-        {
-          "tag": "avp_alien:razor_claws",
-          "weight": 2,
-          "max_count": 3
-        },
-        {
-          "tag": "avp_alien:bursters",
-          "weight": 2,
-          "max_count": 4
-        }
-      ]
+      "random": {
+        "pools": [
+          {
+            "tag": "avp_alien:warriors",
+            "weight": 3
+          },
+          {
+            "tag": "avp_alien:prowlers",
+            "weight": 3
+          },
+          {
+            "tag": "avp_alien:chrysalises",
+            "weight": 2,
+            "max_count": 3
+          },
+          {
+            "tag": "avp_alien:razor_claws",
+            "weight": 2,
+            "max_count": 3
+          },
+          {
+            "tag": "avp_alien:bursters",
+            "weight": 2,
+            "max_count": 4
+          }
+        ]
+      }
     },
     {
       "size": 21,
       "buffer_ticks": 200,
-      "pools": [
-        {
-          "tag": "avp_alien:warriors",
-          "weight": 3
-        },
-        {
-          "tag": "avp_alien:prowlers",
-          "weight": 3
-        },
-        {
-          "tag": "avp_alien:chrysalises",
-          "weight": 2,
-          "max_count": 4
-        },
-        {
-          "tag": "avp_alien:razor_claws",
-          "weight": 2,
-          "max_count": 4
-        },
-        {
-          "tag": "avp_alien:bursters",
-          "weight": 2,
-          "max_count": 5
-        },
-        {
-          "tag": "avp_alien:ravagers",
-          "weight": 1,
-          "max_count": 3
-        },
-        {
-          "tag": "avp_alien:carriers",
-          "weight": 1,
-          "max_count": 3
-        }
-      ]
+      "random": {
+        "pools": [
+          {
+            "tag": "avp_alien:warriors",
+            "weight": 3
+          },
+          {
+            "tag": "avp_alien:prowlers",
+            "weight": 3
+          },
+          {
+            "tag": "avp_alien:chrysalises",
+            "weight": 2,
+            "max_count": 4
+          },
+          {
+            "tag": "avp_alien:razor_claws",
+            "weight": 2,
+            "max_count": 4
+          },
+          {
+            "tag": "avp_alien:bursters",
+            "weight": 2,
+            "max_count": 5
+          },
+          {
+            "tag": "avp_alien:ravagers",
+            "weight": 1,
+            "max_count": 3
+          },
+          {
+            "tag": "avp_alien:carriers",
+            "weight": 1,
+            "max_count": 3
+          }
+        ]
+      }
     },
     {
       "size": 34,
@@ -122,41 +130,43 @@
           ]
         }
       ],
-      "pools": [
-        {
-          "tag": "avp_alien:warriors",
-          "weight": 3
-        },
-        {
-          "tag": "avp_alien:prowlers",
-          "weight": 3
-        },
-        {
-          "tag": "avp_alien:chrysalises",
-          "weight": 2,
-          "max_count": 6
-        },
-        {
-          "tag": "avp_alien:razor_claws",
-          "weight": 2,
-          "max_count": 6
-        },
-        {
-          "tag": "avp_alien:bursters",
-          "weight": 2,
-          "max_count": 8
-        },
-        {
-          "tag": "avp_alien:ravagers",
-          "weight": 1,
-          "max_count": 4
-        },
-        {
-          "tag": "avp_alien:carriers",
-          "weight": 1,
-          "max_count": 4
-        }
-      ]
+      "random": {
+        "pools": [
+          {
+            "tag": "avp_alien:warriors",
+            "weight": 3
+          },
+          {
+            "tag": "avp_alien:prowlers",
+            "weight": 3
+          },
+          {
+            "tag": "avp_alien:chrysalises",
+            "weight": 2,
+            "max_count": 6
+          },
+          {
+            "tag": "avp_alien:razor_claws",
+            "weight": 2,
+            "max_count": 6
+          },
+          {
+            "tag": "avp_alien:bursters",
+            "weight": 2,
+            "max_count": 8
+          },
+          {
+            "tag": "avp_alien:ravagers",
+            "weight": 1,
+            "max_count": 4
+          },
+          {
+            "tag": "avp_alien:carriers",
+            "weight": 1,
+            "max_count": 4
+          }
+        ]
+      }
     }
   ]
 }

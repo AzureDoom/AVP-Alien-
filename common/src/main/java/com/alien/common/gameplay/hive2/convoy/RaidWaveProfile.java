@@ -152,7 +152,7 @@ public record RaidWaveProfile(List<Wave> waves) {
             }
             if (wave.pools().isEmpty() && wave.guaranteedSize() < wave.size()) {
                 return DataResult.error(
-                    () -> "Raid wave " + waveNumber + " pools cannot be empty unless guarantees fill the wave"
+                    () -> "Raid wave " + waveNumber + " random pools cannot be empty unless guarantees fill the wave"
                 );
             }
         }
@@ -171,7 +171,7 @@ public record RaidWaveProfile(List<Wave> waves) {
                 Codec.INT.fieldOf("size").forGetter(Wave::size),
                 Codec.LONG.optionalFieldOf("buffer_ticks", DEFAULT_BUFFER_TICKS).forGetter(Wave::bufferTicks),
                 Guarantee.CODEC.listOf().optionalFieldOf("guaranteed", List.of()).forGetter(Wave::guaranteed),
-                PoolEntry.CODEC.listOf().fieldOf("pools").forGetter(Wave::pools)
+                RandomSelection.POOLS_CODEC.fieldOf("random").forGetter(Wave::pools)
             ).apply(instance, Wave::new)
         );
 
@@ -200,6 +200,21 @@ public record RaidWaveProfile(List<Wave> waves) {
                 }
             }
             return false;
+        }
+    }
+
+    public record RandomSelection(List<PoolEntry> pools) {
+
+        public static final Codec<RandomSelection> CODEC = RecordCodecBuilder.<RandomSelection>create(
+            instance -> instance.group(
+                PoolEntry.CODEC.listOf().fieldOf("pools").forGetter(RandomSelection::pools)
+            ).apply(instance, RandomSelection::new)
+        );
+
+        static final Codec<List<PoolEntry>> POOLS_CODEC = CODEC.xmap(RandomSelection::pools, RandomSelection::new);
+
+        public RandomSelection {
+            pools = List.copyOf(pools);
         }
     }
 
