@@ -2,15 +2,33 @@
 
 ## ✍️ Developer Notes
 - For help or other questions, concerns, etc. check out our Discord server: https://discord.gg/wp7mvmbkVb
+- This changelog entry is intentionally detailed. `v0.1.5` contains the Scourge xenomorph rollout, the alien growth/molting rewrite, the xenomorph AI rewrite, and a large rewrite of hive gameplay around BLib factions, hive locations, reserves, convoys, and raids.
 
 ## ☢️ Breaking Changes
-- Rewrote the hive system from the ground up to use BLib's faction system:
-  - BLib factions are treated as global entities. As a result, hives are no longer bound by dimensions. A drone that is a member of a hive will still be part of its hive even if it crosses over into the Nether, End, etc.
-  - BLib's faction system offers certain performance improvements for querying information about entities (such as what faction members are loaded in the world).
-  - This rewrite should also fix a bug where a hive can have multiple queens.
-  - BLib factions support subfactions - this opens the path for more advanced hive mechanics down the road (super hives, empresses, intra-hive and inter-hive fighting, etc.).
-  - BLib factions support reputation. This allows for complex relationships between hives and other factions in the future (hives <-> cultists? ;)), but as of right now reputation is unused. However, addon developers are now able to make use of that mechanic if they wanted to!
-  - Removed hive debugging code. The debugging code was outdated with the rewrite and has therefore been removed, including its properties in the alien properties file.
+- Rewrote the hive system around BLib factions.
+  - Hives are now represented as variant, lineage, and location factions instead of the old single hive object.
+  - Hive membership is global rather than tied to one dimension, so hive members remain part of their hive lineage even after dimension travel or entity transitions.
+  - Hive data now persists lineage/location state, reserves, convoy state, raid anger, claimed chunks, jelly resources, and other long-lived hive runtime data.
+  - Old hive debug state and outdated hive debug properties were removed and replaced by the new `hive2` debug/inspection tools.
+- Replaced the old natural xenomorph spawning model.
+  - Vanilla xenomorph spawn registrations and generated NeoForge biome modifiers were removed.
+  - Queens no longer use the old random natural spawn registration path.
+  - Loaded hive locations now spawn from their local reserves through the hive system.
+  - Xenomorphs were removed from The End spawn pool so they no longer reduce enderman spawn rates.
+- Reworked alien growth.
+  - Adult-stage growth now requires the Metamorphosis effect.
+  - Scourge growth paths now require the Scourge effect.
+  - Growth is now tied into molting phases and data-driven form size scale data.
+- Reworked xenomorph AI/pathfinding around the new GOAP stack.
+  - Existing xenomorph castes were ported to the new combat, idle, swimming, resin, vent, egg, lunge, digging, and path interception behaviors.
+  - Attack timing is now server-driven instead of depending on client animation timing.
+- Hive location mechanics now enforce stricter lifecycle rules.
+  - Locations have their own leadership, territory, reserves, biomass, jelly stores, population pressure, and boss bars.
+  - Locations enforce one queen and one harbinger per location.
+  - A hive location cannot make a replacement harbinger while its harbinger is away in a raid.
+  - Civil war and lineage absorption mechanics were removed.
+  - Same-lineage hive locations that contest chunks now merge instead of fighting or absorbing each other.
+- Raid sizing and raid-eligible entities are now controlled by raid wave profile data instead of hardcoded raid entity lists.
 
 ## ✨ What's New
 - Added an advancement for blocking a spitter's spit attack with a xenomorph head shield.
@@ -19,64 +37,253 @@
 - Added an advancement for defeating a xenomorph raid.
 - Added an advancement for killing a harbinger.
 - Added an advancement for destroying a xenomorph lineage.
-- Added blood loss mob effect.
-- Added raw scourge jelly item.
-- Added scourge jelly block.
-- Added scourge mob effect.
-- Added a new set of xenomorphs... the SCOURGE xenomorphs:
-  - Added chrysalis.
-    - Can roll around in a ball to cross distances quickly.
-    - While rolled into a ball, is immune to any projectile attacks except fire and explosives.
-  - Added razor claw.
-    - Applies a temporarily debuff effect called 'Blood Loss' to entities.
-      - When entities are attacked while Blood Loss is active, their maximum health gets reduced by whatever damage they take.
-      - For example, if your health is 20/20 and you get attacked for 2 damage, your health is now 18/18 instead of 18/20.
-  - Added carrier.
-    - Facehuggers can latch onto carriers. While latched on, facehuggers are protected from damage.
-    - If attacking a viable host and carrying a facehugger, throws a facehugger at the host to infect it.
-    - On death, all carried facehuggers launch from its body in random direction.
-  - Added ravager.
+- Added the Scourge xenomorph family, with normal, aberrant, nether, and irradiated variants where applicable.
+  - Added the Chrysalis.
+    - Rolls to close distance.
+    - Can be stunned by crashing into walls while rolling.
+    - Changes hitbox while rolling.
+    - Resists most projectile damage while rolled, except fire and explosives.
+  - Added the Razor Claw.
+    - Applies Blood Loss.
+    - Has a sweeping area attack with knockback.
+  - Added the Carrier.
+    - Facehuggers can ride carriers.
+    - Carriers can throw carried facehuggers at viable hosts.
+    - Carriers can panic-release facehuggers.
+    - Carried facehuggers are launched on carrier death.
+  - Added the Ravager.
     - Basic attacks ignore armor.
-    - Has a one-hit kill attack that, if landed, kills anything smaller than the ravager (including players).
-  - Added harbinger.
-    - Deadliest of the scourge xenomorphs.
-    - Has a passive effect that buffs nearby xenomorphs to have 15% attack speed and 15% movement speed.
-    - Invulnerable to nearly all damage, including caseless and heavy bullets.
-    - Can be damaged with fire.
-      - Fire allows the harbinger to be damaged by heavier firepower (caseless/heavy bullets).
-    - Can be damaged with explosives.
-    - Has a 2nd phase when severely damaged:
-      - Tendrils become damaged enough that the harbinger can fling acid around everywhere.
-      - Moves 10% faster.
-  - All scourge xenomorphs also have respective variant forms (aberrant, nether and irradiated).
+    - Has an area blade attack.
+    - Has a one-hit-kill charge attack against smaller targets, including players.
+    - The special attack can dismember entities when applicable.
+  - Added the Harbinger.
+    - Functions as a high-tier Scourge xenomorph and raid anchor.
+    - Passively applies Frenzy to nearby same-lineage xenomorphs every 30 seconds.
+    - Is resistant to most damage.
+    - Becomes vulnerable through fire and explosives.
+    - Gains a second phase with acid-flinging behavior and higher movement speed.
+  - Added the Burster.
+    - Evolves from runners through the Scourge growth path.
+    - Explodes on death or when critically injured.
+  - Added the Empress.
+    - Includes model, texture, animation, sound, spawn egg, loot table, and hive leadership/emergence support.
+- Added new effects, potions, arrows, items, and blocks.
+  - Added Blood Loss.
+  - Added Metamorphosis.
+  - Added Scourge.
+  - Added Marked for Death, used to show players that a raid is hunting them.
+  - Added Frenzy, which boosts xenomorph attack damage and movement speed by 15%.
+  - Added potions, splash potions, lingering potions, and tipped arrows for Blood Loss, Metamorphosis, and Scourge.
+  - Added Raw Scourge Jelly.
+  - Added Scourge Jelly Block.
+  - Added royal and scourge jelly resource tracking for hive locations.
+  - Added a Food & Drinks creative mode tab.
+- Added xenomorph heads and shields.
+  - Added placeable and wearable queen heads.
+  - Added placeable and wearable crusher heads.
+  - Added queen head shields and crusher head shields for normal, aberrant, nether, and irradiated variants.
+  - Head and shield behavior is now data-driven.
+- Added the new hive2 location system.
+  - Queens can found hive locations after settling.
+  - Locations start with a 3x3 claimed chunk area.
+  - Location claims are kept connected and protect the center chunk.
+  - Locations enforce spacing from other hive locations.
+  - Location growth is gated by population, biomass, claim cooldowns, and claim caps.
+  - Underpopulated claims decay while protected center claims remain stable.
+  - Locations can keep accumulating unloaded progress through incremental sampling.
+  - Newborn hive locations receive bootstrap protection from early evacuation.
+- Added hive economy and reserves.
+  - Hives gain biomass from combat kills, resin placement, loaded xenomorphs, ovomorphs, idle activity, and unloaded location growth.
+  - Hive reserve growth is paid through biomass and jelly resources.
+  - Hive balance purchases are recipe-driven and require queen leadership where appropriate.
+  - Queens produce royal/scourge jelly and harbingers produce scourge jelly.
+  - Reserve royals can produce jelly while unloaded.
+  - Reserve carriers can spawn with facehugger passengers.
+  - Wandering hive members can be returned to reserves.
+- Added datapacked hive recipes.
+  - Hive recipes define entity costs, input entities, output entities, resource costs, and population/count conditions.
+  - Added default recipes for drones, runners, warriors, prowlers, praetorians, crushers, carriers, chrysalises, razor claws, ravagers, bursters, and harbingers across supported variants.
+  - Added a `CasteResolver` for mapping variant/caste data to concrete entity types.
+- Added hive spread, migration, and reinforcement convoys.
+  - Hives can perform abstract spread attempts from existing locations.
+  - Abstract spread creates new locations with founder groups, reserve storage, and resin seed placement.
+  - Founder queen convoys can bootstrap new locations.
+  - Reinforcement convoys can move reserves between same-lineage locations.
+  - Migration convoys can relocate hive resources and members.
+  - Players can intercept convoys.
+  - Convoys have boss bars and use convoy speed multipliers.
+  - Materialized convoy members are recalled to reserves if they unload with a chunk or drift too far from their convoy.
+- Added raid convoys.
+  - Raids are triggered by lineage anger after a player kills enough hive members within the aggro window.
+  - Raid anger is persisted on the lineage.
+  - Raid member kills no longer count toward raid anger, preventing immediate repeat raids after defeating a raid.
+  - Automatic raid dispatch now blocks duplicate raids against the same player.
+  - Raids drain their composition from a source hive location's reserves.
+  - Harbingers are required in raid convoys.
+  - Raid sources must be large enough and must satisfy the active variant raid wave profile.
+  - Raid convoys do not expire on a timer; they continue until the target dies, becomes unavailable, or the raid is defeated.
+  - When the target dies, the raid returns to its original source location or the closest living location in the same lineage.
+  - If the target enters creative or spectator mode, the raid starts returning home.
+  - If the target becomes valid again, the raid can resume hunting.
+  - If no valid return location exists after the raid goal is complete, remaining raid reserves may disband.
+  - Raid entities are not made persistent; the convoy keeps the reserves and recalls materialized members when needed.
+  - Raid spawns use relaxed xenomorph spawn requirements and can materialize off resin when configured.
+  - Raid attackers are spawned on solid ground and distributed near the player from the direction the convoy approached.
+  - Players get a 1 minute warning before raid arrival, including the screech sound cue and the message `A distant screech answers your violence...`.
+  - Intercepted raids do not get the 1 minute arrival grace period.
+  - Raid targets receive Marked for Death without particles.
+  - Marked for Death is constantly refreshed and its duration tracks the raid ETA while the raid is traveling.
+- Added raid waves.
+  - Raids always use five waves.
+  - Default wave sizes are 5, 8, 13, 21, and 34.
+  - Waves are gated so the next wave only begins after the active wave has been cleared.
+  - Each wave has a configurable intermission/buffer time.
+  - During intermissions, the raid boss bar charges up before the next wave.
+  - Raid boss bar titles now use `Raid - Wave X/5`.
+  - Raid boss bar colors match the hive variant color.
+  - The harbinger is guaranteed in the final wave by profile data.
+- Added data-driven raid wave profiles.
+  - Profiles exist per variant, with a default fallback.
+  - Profiles are generated by Fabric datagen.
+  - Each wave defines size, buffer ticks, guaranteed entries, and random pool entries.
+  - Guaranteed entries can require a count from one or more pools, such as at least one Chrysalis or Razor Claw.
+  - Random pools live under a `random` object for readability.
+  - Pool entries can reference either an entity type tag or a direct entity type.
+  - Tags and direct entity types are mutually exclusive per pool entry.
+  - Raid eligibility is derived from the active raid wave profile data.
+  - Prowlers are included in default raid profiles.
+- Added hive inspection, commands, and UI improvements.
+  - Added `hive2` debug commands, including location inspection, lineage inspection, forced raids, convoy inspection, and location removal tools.
+  - Added server-to-client hive inspection payloads and client hive inspection cache support.
+  - Exposed hive configuration in the engine inspector.
+  - Added economy, spread, reserve, convoy, and contested-claim diagnostics to hive inspection.
+  - Hive boss bars now show the location's remaining alien count as ` - {count}`.
+  - Hive boss bars are colored by variant and use improved contrast/muted progress colors in the inspector.
 
 ## ♻️ Changes
-- Updated praetorian model, textures and animations.
-- Updated predalien model, textures and animations.
-- Updated spitter model and textures.
-- Updated warrior model and textures.
-- Updated chitin models and textures.
-- Updated plated chitin models and textures.
-- Only ovomorphs and boilers now respond to vibrations, rather than all aliens.
-- Only boilers now investigate vibrations and become aggressive from repeated disturbances.
+- Updated models, textures, animations, render offsets, or spawn egg textures for many aliens and items.
+  - Predalien, predalien adolescent, and predalien chestburster.
+  - Drone, runner, prowler, warrior, spitter, praetorian, crusher, queen, and boiler.
+  - Chrysalis, razor claw, carrier, ravager, harbinger, burster, and empress.
+  - Chitin, plated chitin, chitin armor, raw scourge jelly, and scourge jelly block.
+  - Queen/crusher heads and shields.
+- Only ovomorphs and boilers now respond to vibrations.
+- Only boilers investigate vibrations and become aggressive from repeated disturbances.
+- Facehugger AI was migrated to GOAP.
+- Facehuggers can now seek carriers as well as hosts.
+- Spitters can now use acid spit projectiles.
+- Xenomorphs now have improved water pathfinding.
+- Xenomorphs can dig while pathfinding when appropriate.
+- Xenomorph target interception was added so aliens can move toward where a target is going rather than only where it was.
+- Block breaking is excluded from non-combat pathfinding.
+- Xenomorph head tracking was added.
+- Cocooning logic was added for xenomorphs, including carrier cocooning animations.
+- Added a dismemberment system.
+  - Drones can be dismembered.
+  - Ravager special attacks can dismember entities.
+  - Explosions can remove xenomorph limbs.
+  - Aliens can lose legs to fall damage.
+  - Added limb definitions for the remaining xenomorphs and several vanilla mobs.
+- Resin and ovipositor behavior was reworked.
+  - Skylight no longer blocks resin spreading.
+  - Queens and other royals can spread resin before creating ovipositors.
+  - Queen ovipositors require resin support and stay near hive centers.
+  - Biomass is charged for resin spread and ovipositor creation.
+  - Biomass is only charged for resin spread after conversion succeeds.
+- Ovomorph behavior was tuned.
+  - Host sensitivity was doubled.
+  - Hatch progress sensitivity was doubled.
+  - Rooted egg spacing and two-block ovomorph spacing are enforced.
+- Nether chitin and nether resin balls can now be used to make Fire Resistance.
+- Aberrant chitin and aberrant resin balls can now be used to make Weakness.
+- Royal jelly's old interactive item use was removed.
+- Hive reserve overflow pools were removed.
+- Hive spread, contest, and registry ticks now snapshot data before mutation to avoid iteration instability.
+- Hive location factions now use path-style names such as `xenos/{variant}/lin{N}/loc{M}`.
+- Hive indexes rebuild after BLib factions load.
+- BLib and other project dependencies were updated.
+- The Gradle setup was simplified with the BLib Gradle plugin and the old `buildSrc` multiloader boilerplate was removed.
 
 ## 🐞 Fixes
+- Fixed Gigeresque acid melting through AVP chitin and resin blocks.
+- Fixed multiple Gigeresque tag references.
 - Fixed ovipositors suffocating.
-- Fixed facehugger lungs expanding/contracting even when not on a host.
-- Fixed gigeresque acid melting through chitin and resin blocks.
-- Fixed boilers being added to hive reserves on after exploding.
-- Fixed aliens having their old forms added to reserves when evolving into a newer form.
-  - This may have resulted in larger-than-expected hives, which increased hive combat difficulty unnecessarily.
-- Fixed aliens being added to reserves whenever other mods call `discard()` on them.
-  - This may fix bugs with certain mods like `Mob Capturing Tool` or similar.
-- Fixed the mod interfering with enderman spawns in The End.
-  - Xenomorphs were added to The End's spawn pool on the off chance that they spread to The End. However because Minecraft uses a weighted spawn system, xenomorphs being introduced decreased the chances of endermen spawning. To fix this issue, we've had to remove natural xenomorph spawns from The End's spawn pool.
+- Fixed ovipositor-mounted royal AI.
+- Fixed facehugger lungs expanding or contracting when not attached to a host.
+- Fixed xenomorph attack timings by moving attack execution server-side.
+- Fixed attack animations not cycling.
+- Fixed acid spit hurting xenomorphs.
+- Fixed crashes when spawning boilers.
+- Fixed larger aliens not being pushable.
+- Fixed alien scale not applying immediately.
+- Fixed Chrysalis hitbox updates while rolling.
+- Fixed Razor Claw default hitbox size.
+- Fixed Ravagers not facing targets while attacking.
+- Fixed incorrect base Ravager height.
+- Fixed attack registry id collisions.
+- Fixed boilers being added to hive reserves after exploding.
+- Fixed aliens adding their previous forms to reserves when evolving.
+- Fixed aliens being added to reserves when another mod calls `discard()` on them.
+- Fixed a `ConcurrentModificationException` in location dormancy.
+- Fixed asymmetric hive chunk-claim partial fills.
+- Fixed center chunk claiming at hive founding.
+- Fixed contested-claim mutation issues by snapshotting contest claimants before resolution.
+- Fixed overlapping abstract spread cores being accepted.
+- Fixed automatic raids being duplicated.
+- Fixed raid xenomorphs spawning in the air.
+- Fixed raids spawning all waves at once.
+- Fixed raid waves advancing before active wave members were dead.
+- Fixed raid boss bar counts/progress by accounting for materialized convoy members.
+- Fixed raid harbinger checks by indexing materialized raid composition.
+- Fixed raid convoy members being lost when chunks unload.
+- Fixed distant convoy members not being recalled into convoy reserves.
+- Fixed creative and spectator targets keeping raids stuck on them.
+- Fixed raids not resuming when an unavailable target became valid again.
+- Fixed repeated raid loops caused by raid member kills feeding raid anger.
+- Fixed same-lineage contested hive locations by merging them into a surviving location.
 
 ## 🛠 Data Pack
-- Added `#avp_alien:carriers` entity type tag.
-- Added `#avp_alien:chrysalises` entity type tag.
-- Added `#avp_alien:harbingers` entity type tag.
-- Added `#avp_alien:ravagers` entity type tag.
-- Added `#avp_alien:razor_claws` entity type tag.
-- Added `#avp_alien:scourge_aliens` entity type tag.
-- Removed `#minecraft:is_end` biome tag from `#avp_alien:has_xenomorphs` biome tag.
+- Added `avp_alien:raid_waves/default`.
+- Added variant raid wave profiles for normal, aberrant, and nether raids.
+- Added `avp_alien:hive_recipes/*` data for hive reserve growth.
+- Added `avp_alien:form_size_scale/*` data for alien scaling and molting.
+- Added damage types:
+  - `avp_alien:acid_spit`
+  - `avp_alien:ravager_claw`
+  - `avp_alien:ravager_special`
+- Added or expanded entity type tags:
+  - `#avp_alien:aberrant_aliens`
+  - `#avp_alien:answers_xenomorph_cries_for_help`
+  - `#avp_alien:bursters`
+  - `#avp_alien:carriers`
+  - `#avp_alien:chrysalises`
+  - `#avp_alien:empresses`
+  - `#avp_alien:harbingers`
+  - `#avp_alien:hive_aliens`
+  - `#avp_alien:ignored_by_xenomorphs`
+  - `#avp_alien:irradiated_aliens`
+  - `#avp_alien:nether_aliens`
+  - `#avp_alien:normal_aliens`
+  - `#avp_alien:queens`
+  - `#avp_alien:ravagers`
+  - `#avp_alien:razor_claws`
+  - `#avp_alien:scourge_aliens`
+  - `#avp_alien:spawns_in_hive_drone_layer`
+  - `#avp_alien:spawns_in_hive_praetorian_layer`
+  - `#avp_alien:spawns_in_hive_queen_layer`
+  - `#avp_alien:spawns_in_hive_warrior_layer`
+  - `#avp_alien:xenomorphs`
+- Added or expanded damage type tags:
+  - `#avp_alien:acid`
+  - `#avp_alien:does_not_hurt_aliens`
+- Removed `#minecraft:is_end` from `#avp_alien:has_xenomorphs`.
+- Removed generated NeoForge biome modifiers for vanilla xenomorph spawning.
+- Added generated recipes, advancements, models, loot tables, and language entries for Scourge content, jelly resources, heads, shields, potions, tipped arrows, spawn eggs, raid waves, hive recipes, and form size scale data.
+
+## 🧩 API / Mod Integration
+- Added a hive policy modifier API.
+- Added hive config networking for inspector-driven config updates.
+- Added hive inspection networking for client-side inspector UI.
+- Added BLib faction data types for variant, lineage, and location hive data.
+- Added support for rebuilding hive location indexes from loaded BLib factions.
+- Added old hive migration support and migration logging for moving legacy hive data into the hive2 model.
