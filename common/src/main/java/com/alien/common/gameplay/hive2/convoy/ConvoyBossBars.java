@@ -86,7 +86,7 @@ public final class ConvoyBossBars {
     }
 
     private static BossEvent.BossBarColor colorFor(Convoy convoy, LineageFactionData lineage) {
-        if (convoy instanceof Convoy.Raid) {
+        if (convoy instanceof Convoy.Raid || convoy instanceof Convoy.Reinforcement) {
             return AlienVariantTypes.getFor(lineage.variant()).bossBarColor();
         }
         if (convoy instanceof Convoy.Migration) {
