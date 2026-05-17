@@ -2,6 +2,7 @@ package com.alien.common.registry.init;
 
 import com.alien.Alien;
 import com.alien.common.gameplay.effect.BloodLossStatusEffect;
+import com.alien.common.gameplay.effect.FrenzyStatusEffect;
 import com.alien.common.gameplay.effect.MarkedForDeathStatusEffect;
 import com.alien.common.gameplay.effect.MetamorphosisStatusEffect;
 import com.alien.common.gameplay.effect.ScourgeStatusEffect;
@@ -19,6 +20,8 @@ public class AlienMobEffects {
 
     private static final BLibHolder<MobEffect> BLOOD_LOSS = create("blood_loss", BloodLossStatusEffect::new);
 
+    private static final BLibHolder<MobEffect> FRENZY = create("frenzy", FrenzyStatusEffect::new);
+
     private static final BLibHolder<MobEffect> METAMORPHOSIS = create("metamorphosis", MetamorphosisStatusEffect::new);
 
     private static final BLibHolder<MobEffect> SCOURGE = create("scourge", ScourgeStatusEffect::new);
@@ -30,6 +33,10 @@ public class AlienMobEffects {
 
     public static Holder<MobEffect> getBloodLossHolder() {
         return BLOOD_LOSS.getBackingHolder();
+    }
+
+    public static Holder<MobEffect> getFrenzyHolder() {
+        return FRENZY.getBackingHolder();
     }
 
     public static Holder<MobEffect> getMetamorphosisHolder() {

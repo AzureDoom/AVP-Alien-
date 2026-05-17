@@ -9,18 +9,28 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphPathConf
 import com.alien.common.gameplay.entity.living.alien.xenomorph.harbinger.ai.HarbingerGOAP;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienEntityTypes;
+import com.alien.common.registry.init.AlienMobEffects;
 import com.alien.common.registry.init.AlienSoundEvents;
+import com.alien.common.util.AlienPredicates;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.goap.v1.GOAPUser;
 import com.just.ai.goap.Agent;
 import com.just.ai.goap.graph.Graph;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 
 public class Harbinger extends Xenomorph implements GOAPUser<Harbinger> {
+
+    private static final int FRENZY_AURA_INTERVAL_TICKS = 20 * 30;
+
+    private static final int FRENZY_DURATION_TICKS = 20 * 30;
+
+    private static final double FRENZY_AURA_RADIUS_BLOCKS = 16.0;
 
     public static final AttackType CLAW = AttackType.builder("harbinger_claw")
         .defaultDurationInTicks(10)
@@ -65,6 +75,48 @@ public class Harbinger extends Xenomorph implements GOAPUser<Harbinger> {
             .add(Attributes.KNOCKBACK_RESISTANCE, 0.7f)
             .add(Attributes.MAX_HEALTH, PlayerStatConstants.BASE_HEALTH * 5F)
             .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1.2F);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        applyFrenzyAura();
+    }
+
+    private void applyFrenzyAura() {
+        if (level().isClientSide || tickCount % FRENZY_AURA_INTERVAL_TICKS != 0) {
+            return;
+        }
+
+        var center = position();
+        var auraBounds = new AABB(
+            center.x - FRENZY_AURA_RADIUS_BLOCKS,
+            center.y - FRENZY_AURA_RADIUS_BLOCKS,
+            center.z - FRENZY_AURA_RADIUS_BLOCKS,
+            center.x + FRENZY_AURA_RADIUS_BLOCKS,
+            center.y + FRENZY_AURA_RADIUS_BLOCKS,
+            center.z + FRENZY_AURA_RADIUS_BLOCKS
+        );
+        var nearbyXenomorphs = level().getEntitiesOfClass(
+            Xenomorph.class,
+            auraBounds,
+            xenomorph -> xenomorph != this
+                && xenomorph.isAlive()
+                && AlienPredicates.areAliensSameHive(this, xenomorph)
+        );
+
+        for (var xenomorph : nearbyXenomorphs) {
+            xenomorph.addEffect(
+                new MobEffectInstance(
+                    AlienMobEffects.getFrenzyHolder(),
+                    FRENZY_DURATION_TICKS,
+                    0,
+                    true,
+                    false,
+                    true
+                )
+            );
+        }
     }
 
     @Override
