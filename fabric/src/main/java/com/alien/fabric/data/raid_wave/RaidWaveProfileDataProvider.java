@@ -80,21 +80,6 @@ public class RaidWaveProfileDataProvider implements DataProvider {
                 )
             )
         );
-        profilesById.put(
-            RaidWaveProfileRegistry.profileIdFor(AlienVariant.IRRADIATED),
-            profile(
-                new VariantRaidEntities(
-                    AlienEntityTypes.IRRADIATED_WARRIOR.get(),
-                    AlienEntityTypes.IRRADIATED_PROWLER.get(),
-                    AlienEntityTypes.IRRADIATED_CHRYSALIS.get(),
-                    AlienEntityTypes.IRRADIATED_RAZOR_CLAW.get(),
-                    AlienEntityTypes.IRRADIATED_BURSTER.get(),
-                    AlienEntityTypes.IRRADIATED_RAVAGER.get(),
-                    AlienEntityTypes.IRRADIATED_CARRIER.get(),
-                    AlienEntityTypes.IRRADIATED_HARBINGER.get()
-                )
-            )
-        );
     }
 
     private static RaidWaveProfile profile(VariantRaidEntities entities) {
@@ -130,9 +115,9 @@ public class RaidWaveProfileDataProvider implements DataProvider {
                     List.of(
                         pool(entities.warrior(), 3),
                         pool(entities.prowler(), 3),
-                        pool(entities.chrysalis(), 2, 3),
-                        pool(entities.razorClaw(), 2, 3),
-                        pool(entities.burster(), 2, 4)
+                        pool(entities.chrysalis(), 2, 2),
+                        pool(entities.razorClaw(), 2, 1),
+                        pool(entities.burster(), 2, 3)
                     )
                 ),
                 wave(
@@ -141,11 +126,11 @@ public class RaidWaveProfileDataProvider implements DataProvider {
                     List.of(
                         pool(entities.warrior(), 3),
                         pool(entities.prowler(), 3),
-                        pool(entities.chrysalis(), 2, 4),
-                        pool(entities.razorClaw(), 2, 4),
+                        pool(entities.chrysalis(), 2, 3),
+                        pool(entities.razorClaw(), 2, 2),
                         pool(entities.burster(), 2, 5),
-                        pool(entities.ravager(), 1, 3),
-                        pool(entities.carrier(), 1, 3)
+                        pool(entities.ravager(), 1, 1),
+                        pool(entities.carrier(), 1, 1)
                     )
                 ),
                 wave(
@@ -156,11 +141,11 @@ public class RaidWaveProfileDataProvider implements DataProvider {
                     List.of(
                         pool(entities.warrior(), 3),
                         pool(entities.prowler(), 3),
-                        pool(entities.chrysalis(), 2, 6),
-                        pool(entities.razorClaw(), 2, 6),
+                        pool(entities.chrysalis(), 2, 4),
+                        pool(entities.razorClaw(), 2, 3),
                         pool(entities.burster(), 2, 8),
-                        pool(entities.ravager(), 1, 4),
-                        pool(entities.carrier(), 1, 4)
+                        pool(entities.ravager(), 1, 2),
+                        pool(entities.carrier(), 1, 2)
                     )
                 )
             )
