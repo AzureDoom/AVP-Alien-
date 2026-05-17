@@ -66,7 +66,7 @@ public final class LineageConvoyTickTask {
                 continue;
             }
 
-            var iterator = lineage.convoys().iterator();
+            var iterator = lineage.convoys().listIterator();
             var anyChanged = false;
 
             while (iterator.hasNext()) {
@@ -94,6 +94,22 @@ public final class LineageConvoyTickTask {
                         if (returnHomeReason != ReturnHomeReason.NONE) {
                             anyChanged = true;
                         }
+                    }
+                }
+
+                if (convoy instanceof Convoy.Reinforcement reinforcement) {
+                    var redirected = turnReinforcementHomeIfDestinationGone(server, reinforcement);
+                    if (redirected == null) {
+                        ConvoyBossBars.remove(convoy);
+                        activeConvoyIds.remove(convoy.id());
+                        iterator.remove();
+                        anyChanged = true;
+                        continue;
+                    }
+                    if (redirected != reinforcement) {
+                        convoy = redirected;
+                        iterator.set(convoy);
+                        anyChanged = true;
                     }
                 }
 
@@ -160,6 +176,51 @@ public final class LineageConvoyTickTask {
 
         ConvoyBossBars.retain(activeConvoyIds);
         grantDualVariantRaidAdvancements(server);
+    }
+
+    private static Convoy.Reinforcement turnReinforcementHomeIfDestinationGone(
+        MinecraftServer server,
+        Convoy.Reinforcement reinforcement
+    ) {
+        var destination = HiveLocationRegistry.INSTANCE.get(reinforcement.destinationLocationId());
+        if (destination != null && destination.isAlive()) {
+            return reinforcement;
+        }
+
+        ConvoyMemberTracker.recallMaterializedMembers(server, reinforcement);
+
+        var source = HiveLocationRegistry.INSTANCE.get(reinforcement.sourceLocationId());
+        if (source == null || !source.isAlive()) {
+            Alien.LOGGER.info(
+                "Hive2: reinforcement {} target location {} is gone, but source location {} is not alive; disbanding {} member(s)",
+                reinforcement.id(),
+                reinforcement.destinationLocationId(),
+                reinforcement.sourceLocationId(),
+                reinforcement.composition().getCount()
+            );
+            return null;
+        }
+
+        Alien.LOGGER.info(
+            "Hive2: reinforcement {} target location {} is gone; returning {} member(s) to source location {}",
+            reinforcement.id(),
+            reinforcement.destinationLocationId(),
+            reinforcement.composition().getCount(),
+            source.id()
+        );
+
+        return new Convoy.Reinforcement(
+            reinforcement.id(),
+            reinforcement.lineageFactionId(),
+            reinforcement.dimension(),
+            reinforcement.sourceLocationId(),
+            source.id(),
+            reinforcement.currentPos(),
+            source.centerPos(),
+            reinforcement.composition(),
+            reinforcement.materializedMembers(),
+            reinforcement.dispatchedTick()
+        );
     }
 
     private static void grantDualVariantRaidAdvancements(MinecraftServer server) {
