@@ -1,7 +1,6 @@
 {
   "waves": [
     {
-      "size": 5,
       "buffer_ticks": 200,
       "random": {
         "pools": [
@@ -14,10 +13,10 @@
             "weight": 2
           }
         ]
-      }
+      },
+      "size": 5
     },
     {
-      "size": 8,
       "buffer_ticks": 200,
       "guaranteed": [
         {
@@ -43,10 +42,10 @@
             "weight": 3
           }
         ]
-      }
+      },
+      "size": 8
     },
     {
-      "size": 13,
       "buffer_ticks": 200,
       "random": {
         "pools": [
@@ -59,25 +58,25 @@
             "weight": 3
           },
           {
+            "max_count": 3,
             "tag": "avp_alien:chrysalises",
-            "weight": 2,
-            "max_count": 3
+            "weight": 2
           },
           {
+            "max_count": 3,
             "tag": "avp_alien:razor_claws",
-            "weight": 2,
-            "max_count": 3
+            "weight": 2
           },
           {
+            "max_count": 4,
             "tag": "avp_alien:bursters",
-            "weight": 2,
-            "max_count": 4
+            "weight": 2
           }
         ]
-      }
+      },
+      "size": 13
     },
     {
-      "size": 21,
       "buffer_ticks": 200,
       "random": {
         "pools": [
@@ -90,35 +89,33 @@
             "weight": 3
           },
           {
+            "max_count": 4,
             "tag": "avp_alien:chrysalises",
-            "weight": 2,
-            "max_count": 4
+            "weight": 2
           },
           {
+            "max_count": 4,
             "tag": "avp_alien:razor_claws",
-            "weight": 2,
-            "max_count": 4
+            "weight": 2
           },
           {
+            "max_count": 5,
             "tag": "avp_alien:bursters",
-            "weight": 2,
-            "max_count": 5
+            "weight": 2
           },
           {
-            "tag": "avp_alien:ravagers",
-            "weight": 1,
-            "max_count": 3
+            "max_count": 3,
+            "tag": "avp_alien:ravagers"
           },
           {
-            "tag": "avp_alien:carriers",
-            "weight": 1,
-            "max_count": 3
+            "max_count": 3,
+            "tag": "avp_alien:carriers"
           }
         ]
-      }
+      },
+      "size": 21
     },
     {
-      "size": 34,
       "buffer_ticks": 200,
       "guaranteed": [
         {
@@ -141,32 +138,31 @@
             "weight": 3
           },
           {
+            "max_count": 6,
             "tag": "avp_alien:chrysalises",
-            "weight": 2,
-            "max_count": 6
+            "weight": 2
           },
           {
+            "max_count": 6,
             "tag": "avp_alien:razor_claws",
-            "weight": 2,
-            "max_count": 6
+            "weight": 2
           },
           {
+            "max_count": 8,
             "tag": "avp_alien:bursters",
-            "weight": 2,
-            "max_count": 8
+            "weight": 2
           },
           {
-            "tag": "avp_alien:ravagers",
-            "weight": 1,
-            "max_count": 4
+            "max_count": 4,
+            "tag": "avp_alien:ravagers"
           },
           {
-            "tag": "avp_alien:carriers",
-            "weight": 1,
-            "max_count": 4
+            "max_count": 4,
+            "tag": "avp_alien:carriers"
           }
         ]
-      }
+      },
+      "size": 34
     }
   ]
 }

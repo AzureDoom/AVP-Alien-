@@ -1,7 +1,6 @@
 {
   "waves": [
     {
-      "size": 5,
       "buffer_ticks": 200,
       "random": {
         "pools": [
@@ -14,10 +13,10 @@
             "weight": 2
           }
         ]
-      }
+      },
+      "size": 5
     },
     {
-      "size": 8,
       "buffer_ticks": 200,
       "guaranteed": [
         {
@@ -43,10 +42,10 @@
             "weight": 3
           }
         ]
-      }
+      },
+      "size": 8
     },
     {
-      "size": 13,
       "buffer_ticks": 200,
       "random": {
         "pools": [
@@ -60,24 +59,24 @@
           },
           {
             "entity": "avp_alien:chrysalis",
-            "weight": 2,
-            "max_count": 3
+            "max_count": 3,
+            "weight": 2
           },
           {
             "entity": "avp_alien:razor_claw",
-            "weight": 2,
-            "max_count": 3
+            "max_count": 3,
+            "weight": 2
           },
           {
             "entity": "avp_alien:burster",
-            "weight": 2,
-            "max_count": 4
+            "max_count": 4,
+            "weight": 2
           }
         ]
-      }
+      },
+      "size": 13
     },
     {
-      "size": 21,
       "buffer_ticks": 200,
       "random": {
         "pools": [
@@ -91,34 +90,32 @@
           },
           {
             "entity": "avp_alien:chrysalis",
-            "weight": 2,
-            "max_count": 4
+            "max_count": 4,
+            "weight": 2
           },
           {
             "entity": "avp_alien:razor_claw",
-            "weight": 2,
-            "max_count": 4
+            "max_count": 4,
+            "weight": 2
           },
           {
             "entity": "avp_alien:burster",
-            "weight": 2,
-            "max_count": 5
+            "max_count": 5,
+            "weight": 2
           },
           {
             "entity": "avp_alien:ravager",
-            "weight": 1,
             "max_count": 3
           },
           {
             "entity": "avp_alien:carrier",
-            "weight": 1,
             "max_count": 3
           }
         ]
-      }
+      },
+      "size": 21
     },
     {
-      "size": 34,
       "buffer_ticks": 200,
       "guaranteed": [
         {
@@ -142,31 +139,30 @@
           },
           {
             "entity": "avp_alien:chrysalis",
-            "weight": 2,
-            "max_count": 6
+            "max_count": 6,
+            "weight": 2
           },
           {
             "entity": "avp_alien:razor_claw",
-            "weight": 2,
-            "max_count": 6
+            "max_count": 6,
+            "weight": 2
           },
           {
             "entity": "avp_alien:burster",
-            "weight": 2,
-            "max_count": 8
+            "max_count": 8,
+            "weight": 2
           },
           {
             "entity": "avp_alien:ravager",
-            "weight": 1,
             "max_count": 4
           },
           {
             "entity": "avp_alien:carrier",
-            "weight": 1,
             "max_count": 4
           }
         ]
-      }
+      },
+      "size": 34
     }
   ]
 }
