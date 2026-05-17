@@ -2,6 +2,8 @@ package com.alien.common.gameplay.hive2.convoy;
 
 import com.alien.Alien;
 import com.alien.common.gameplay.hive2.config.HiveConfig;
+import com.alien.common.gameplay.hive2.faction.LineageFactionData;
+import com.alien.common.registry.RaidWaveProfileRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -13,7 +15,12 @@ public final class ConvoyInterception {
 
     private ConvoyInterception() {}
 
-    public static boolean tryIntercept(MinecraftServer server, Convoy convoy, HiveConfig config) {
+    public static boolean tryIntercept(
+        MinecraftServer server,
+        Convoy convoy,
+        LineageFactionData lineage,
+        HiveConfig config
+    ) {
         var level = server.getLevel(convoy.dimension());
         if (level == null || convoy.composition().getCount() <= 0) {
             return false;
@@ -30,9 +37,30 @@ public final class ConvoyInterception {
             (int) Math.round(convoy.currentPos().z)
         );
 
-        var spawnedCount = convoy instanceof Convoy.Raid raid
-            ? ConvoyMaterialization.spawnNextRaidWave(level, raid, spawnPos, player, server.overworld().getGameTime())
-            : ConvoyMaterialization.spawnAll(level, convoy, spawnPos, player);
+        var spawnedCount = 0;
+        if (convoy instanceof Convoy.Raid raid) {
+            var breakStartedTick = raid.waveBreakStartedTick();
+            var compositionCount = raid.composition().getCount();
+            var nextWaveIndex = raid.nextWaveIndex();
+            spawnedCount = ConvoyMaterialization.spawnNextRaidWave(
+                level,
+                raid,
+                RaidWaveProfileRegistry.forVariant(lineage.variant()),
+                spawnPos,
+                player,
+                server.overworld().getGameTime()
+            );
+            if (
+                spawnedCount > 0
+                    || raid.waveBreakStartedTick() != breakStartedTick
+                    || raid.composition().getCount() != compositionCount
+                    || raid.nextWaveIndex() != nextWaveIndex
+            ) {
+                lineage.markDirty();
+            }
+        } else {
+            spawnedCount = ConvoyMaterialization.spawnAll(level, convoy, spawnPos, player);
+        }
 
         if (spawnedCount <= 0) {
             return false;

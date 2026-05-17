@@ -2,6 +2,7 @@
   "waves": [
     {
       "size": 5,
+      "buffer_ticks": 200,
       "pools": [
         {
           "tag": "avp_alien:warriors",
@@ -15,6 +16,20 @@
     },
     {
       "size": 8,
+      "buffer_ticks": 200,
+      "guaranteed": [
+        {
+          "count": 1,
+          "pools": [
+            {
+              "tag": "avp_alien:chrysalises"
+            },
+            {
+              "tag": "avp_alien:razor_claws"
+            }
+          ]
+        }
+      ],
       "pools": [
         {
           "tag": "avp_alien:warriors",
@@ -23,21 +38,12 @@
         {
           "tag": "avp_alien:prowlers",
           "weight": 3
-        },
-        {
-          "tag": "avp_alien:chrysalises",
-          "weight": 1,
-          "max_count": 1
-        },
-        {
-          "tag": "avp_alien:razor_claws",
-          "weight": 1,
-          "max_count": 1
         }
       ]
     },
     {
       "size": 13,
+      "buffer_ticks": 200,
       "pools": [
         {
           "tag": "avp_alien:warriors",
@@ -66,6 +72,7 @@
     },
     {
       "size": 21,
+      "buffer_ticks": 200,
       "pools": [
         {
           "tag": "avp_alien:warriors",
@@ -104,6 +111,17 @@
     },
     {
       "size": 34,
+      "buffer_ticks": 200,
+      "guaranteed": [
+        {
+          "count": 1,
+          "pools": [
+            {
+              "tag": "avp_alien:harbingers"
+            }
+          ]
+        }
+      ],
       "pools": [
         {
           "tag": "avp_alien:warriors",
@@ -137,11 +155,6 @@
           "tag": "avp_alien:carriers",
           "weight": 1,
           "max_count": 4
-        },
-        {
-          "tag": "avp_alien:harbingers",
-          "weight": 1,
-          "max_count": 1
         }
       ]
     }

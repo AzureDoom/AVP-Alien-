@@ -1,72 +1,52 @@
 package com.alien.common.gameplay.hive2.convoy;
 
-import com.alien.common.registry.tag.AlienEntityTypeTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 
 final class RaidWaveSelection {
 
     private RaidWaveSelection() {}
 
     static @Nullable EntityType<?> chooseType(
-        RaidWaveProfile.Wave wave,
+        List<RaidWaveProfile.PoolEntry> pools,
         Inventory inventory,
-        Predicate<EntityType<?>> eligible,
-        boolean allowHarbingers,
         Map<Integer, Integer> selectedByPool,
         RandomSource random
     ) {
         var matchingPools = new ArrayList<PoolMatch>();
-        for (var i = 0; i < wave.pools().size(); i++) {
-            var pool = wave.pools().get(i);
+        for (var i = 0; i < pools.size(); i++) {
+            var pool = pools.get(i);
             if (selectedByPool.getOrDefault(i, 0) >= pool.maxCount()) {
                 continue;
             }
-            if (hasMatchingType(pool, inventory, eligible, allowHarbingers)) {
+            if (hasMatchingType(pool, inventory)) {
                 matchingPools.add(new PoolMatch(i, pool));
             }
         }
 
         if (!matchingPools.isEmpty()) {
             var match = choosePool(matchingPools, random);
-            var type = chooseMatchingType(match.pool(), inventory, eligible, allowHarbingers, random);
+            var type = chooseMatchingType(match.pool(), inventory, random);
             if (type != null) {
                 selectedByPool.merge(match.index(), 1, Integer::sum);
                 return type;
             }
         }
 
-        return chooseAnyType(inventory, eligible, allowHarbingers, random);
-    }
-
-    static @Nullable EntityType<?> chooseAnyType(
-        Inventory inventory,
-        Predicate<EntityType<?>> eligible,
-        boolean allowHarbingers,
-        RandomSource random
-    ) {
-        var candidates = new ArrayList<EntityType<?>>();
-        for (var type : inventory.availableTypes()) {
-            if (isSelectable(type, inventory, eligible, allowHarbingers)) {
-                candidates.add(type);
-            }
-        }
-        return chooseByCount(candidates, inventory, random);
+        return null;
     }
 
     private static boolean hasMatchingType(
         RaidWaveProfile.PoolEntry pool,
-        Inventory inventory,
-        Predicate<EntityType<?>> eligible,
-        boolean allowHarbingers
+        Inventory inventory
     ) {
         for (var type : inventory.availableTypes()) {
-            if (pool.matches(type) && isSelectable(type, inventory, eligible, allowHarbingers)) {
+            if (pool.matches(type) && inventory.count(type) > 0) {
                 return true;
             }
         }
@@ -76,13 +56,11 @@ final class RaidWaveSelection {
     private static @Nullable EntityType<?> chooseMatchingType(
         RaidWaveProfile.PoolEntry pool,
         Inventory inventory,
-        Predicate<EntityType<?>> eligible,
-        boolean allowHarbingers,
         RandomSource random
     ) {
         var candidates = new ArrayList<EntityType<?>>();
         for (var type : inventory.availableTypes()) {
-            if (pool.matches(type) && isSelectable(type, inventory, eligible, allowHarbingers)) {
+            if (pool.matches(type) && inventory.count(type) > 0) {
                 candidates.add(type);
             }
         }
@@ -127,17 +105,6 @@ final class RaidWaveSelection {
             }
         }
         return candidates.getLast();
-    }
-
-    private static boolean isSelectable(
-        EntityType<?> type,
-        Inventory inventory,
-        Predicate<EntityType<?>> eligible,
-        boolean allowHarbingers
-    ) {
-        return inventory.count(type) > 0
-            && eligible.test(type)
-            && (allowHarbingers || !type.is(AlienEntityTypeTags.HARBINGERS));
     }
 
     interface Inventory {

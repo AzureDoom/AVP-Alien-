@@ -2,11 +2,13 @@ package com.alien.common.registry;
 
 import com.alien.AlienResources;
 import com.alien.common.gameplay.hive2.convoy.RaidWaveProfile;
+import com.alien.common.model.alien.variant.AlienVariant;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public final class RaidWaveProfileRegistry {
@@ -30,10 +32,19 @@ public final class RaidWaveProfileRegistry {
         if (profile != null) {
             return profile;
         }
-        if (!PROFILES.isEmpty()) {
-            return PROFILES.values().iterator().next();
-        }
         return RaidWaveProfile.fallback();
+    }
+
+    public static RaidWaveProfile forVariant(AlienVariant variant) {
+        var profile = PROFILES.get(profileIdFor(variant));
+        if (profile != null) {
+            return profile;
+        }
+        return active();
+    }
+
+    public static ResourceLocation profileIdFor(AlienVariant variant) {
+        return AlienResources.location(variant.name().toLowerCase(Locale.ROOT));
     }
 
     public static @Nullable RaidWaveProfile get(ResourceLocation id) {

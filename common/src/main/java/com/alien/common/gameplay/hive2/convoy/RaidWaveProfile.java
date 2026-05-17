@@ -17,6 +17,8 @@ public record RaidWaveProfile(List<Wave> waves) {
 
     public static final int MIN_WAVE_SIZE = 5;
 
+    public static final long DEFAULT_BUFFER_TICKS = 20L * 10L;
+
     public static final Codec<RaidWaveProfile> CODEC = RecordCodecBuilder.<RaidWaveProfile>create(
         instance -> instance.group(
             Wave.CODEC.listOf().fieldOf("waves").forGetter(RaidWaveProfile::waves)
@@ -32,6 +34,8 @@ public record RaidWaveProfile(List<Wave> waves) {
             List.of(
                 new Wave(
                     5,
+                    DEFAULT_BUFFER_TICKS,
+                    List.of(),
                     List.of(
                         PoolEntry.tagPool(AlienEntityTypeTags.WARRIORS, 3, Integer.MAX_VALUE),
                         PoolEntry.tagPool(AlienEntityTypeTags.PROWLERS, 2, Integer.MAX_VALUE)
@@ -39,15 +43,25 @@ public record RaidWaveProfile(List<Wave> waves) {
                 ),
                 new Wave(
                     8,
+                    DEFAULT_BUFFER_TICKS,
+                    List.of(
+                        new Guarantee(
+                            1,
+                            List.of(
+                                PoolEntry.tagPool(AlienEntityTypeTags.CHRYSALISES, 1, Integer.MAX_VALUE),
+                                PoolEntry.tagPool(AlienEntityTypeTags.RAZOR_CLAWS, 1, Integer.MAX_VALUE)
+                            )
+                        )
+                    ),
                     List.of(
                         PoolEntry.tagPool(AlienEntityTypeTags.WARRIORS, 4, Integer.MAX_VALUE),
-                        PoolEntry.tagPool(AlienEntityTypeTags.PROWLERS, 3, Integer.MAX_VALUE),
-                        PoolEntry.tagPool(AlienEntityTypeTags.CHRYSALISES, 1, 1),
-                        PoolEntry.tagPool(AlienEntityTypeTags.RAZOR_CLAWS, 1, 1)
+                        PoolEntry.tagPool(AlienEntityTypeTags.PROWLERS, 3, Integer.MAX_VALUE)
                     )
                 ),
                 new Wave(
                     13,
+                    DEFAULT_BUFFER_TICKS,
+                    List.of(),
                     List.of(
                         PoolEntry.tagPool(AlienEntityTypeTags.WARRIORS, 3, Integer.MAX_VALUE),
                         PoolEntry.tagPool(AlienEntityTypeTags.PROWLERS, 3, Integer.MAX_VALUE),
@@ -58,6 +72,8 @@ public record RaidWaveProfile(List<Wave> waves) {
                 ),
                 new Wave(
                     21,
+                    DEFAULT_BUFFER_TICKS,
+                    List.of(),
                     List.of(
                         PoolEntry.tagPool(AlienEntityTypeTags.WARRIORS, 3, Integer.MAX_VALUE),
                         PoolEntry.tagPool(AlienEntityTypeTags.PROWLERS, 3, Integer.MAX_VALUE),
@@ -70,6 +86,13 @@ public record RaidWaveProfile(List<Wave> waves) {
                 ),
                 new Wave(
                     34,
+                    DEFAULT_BUFFER_TICKS,
+                    List.of(
+                        new Guarantee(
+                            1,
+                            List.of(PoolEntry.tagPool(AlienEntityTypeTags.HARBINGERS, 1, Integer.MAX_VALUE))
+                        )
+                    ),
                     List.of(
                         PoolEntry.tagPool(AlienEntityTypeTags.WARRIORS, 3, Integer.MAX_VALUE),
                         PoolEntry.tagPool(AlienEntityTypeTags.PROWLERS, 3, Integer.MAX_VALUE),
@@ -77,8 +100,7 @@ public record RaidWaveProfile(List<Wave> waves) {
                         PoolEntry.tagPool(AlienEntityTypeTags.RAZOR_CLAWS, 2, 6),
                         PoolEntry.tagPool(AlienEntityTypeTags.BURSTERS, 2, 8),
                         PoolEntry.tagPool(AlienEntityTypeTags.RAVAGERS, 1, 4),
-                        PoolEntry.tagPool(AlienEntityTypeTags.CARRIERS, 1, 4),
-                        PoolEntry.tagPool(AlienEntityTypeTags.HARBINGERS, 1, 1)
+                        PoolEntry.tagPool(AlienEntityTypeTags.CARRIERS, 1, 4)
                     )
                 )
             )
@@ -97,8 +119,13 @@ public record RaidWaveProfile(List<Wave> waves) {
         return total;
     }
 
-    public int nonHarbingerSize() {
-        return Math.max(0, totalSize() - 1);
+    public boolean isRaidEligible(EntityType<?> entityType) {
+        for (var wave : waves) {
+            if (wave.matches(entityType)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static DataResult<RaidWaveProfile> validate(RaidWaveProfile profile) {
@@ -115,24 +142,97 @@ public record RaidWaveProfile(List<Wave> waves) {
                     () -> "Raid wave " + waveNumber + " must have at least " + MIN_WAVE_SIZE + " members"
                 );
             }
-            if (wave.pools().isEmpty()) {
-                return DataResult.error(() -> "Raid wave " + waveNumber + " must define at least one pool");
+            if (wave.bufferTicks() < 0L) {
+                return DataResult.error(() -> "Raid wave " + waveNumber + " buffer_ticks cannot be negative");
+            }
+            if (wave.guaranteedSize() > wave.size()) {
+                return DataResult.error(
+                    () -> "Raid wave " + waveNumber + " guaranteed counts exceed the configured wave size"
+                );
+            }
+            if (wave.pools().isEmpty() && wave.guaranteedSize() < wave.size()) {
+                return DataResult.error(
+                    () -> "Raid wave " + waveNumber + " pools cannot be empty unless guarantees fill the wave"
+                );
             }
         }
         return DataResult.success(profile);
     }
 
-    public record Wave(int size, List<PoolEntry> pools) {
+    public record Wave(
+        int size,
+        long bufferTicks,
+        List<Guarantee> guaranteed,
+        List<PoolEntry> pools
+    ) {
 
         public static final Codec<Wave> CODEC = RecordCodecBuilder.<Wave>create(
             instance -> instance.group(
                 Codec.INT.fieldOf("size").forGetter(Wave::size),
+                Codec.LONG.optionalFieldOf("buffer_ticks", DEFAULT_BUFFER_TICKS).forGetter(Wave::bufferTicks),
+                Guarantee.CODEC.listOf().optionalFieldOf("guaranteed", List.of()).forGetter(Wave::guaranteed),
                 PoolEntry.CODEC.listOf().fieldOf("pools").forGetter(Wave::pools)
             ).apply(instance, Wave::new)
         );
 
         public Wave {
+            guaranteed = List.copyOf(guaranteed);
             pools = List.copyOf(pools);
+        }
+
+        public int guaranteedSize() {
+            var total = 0;
+            for (var guarantee : guaranteed) {
+                total += guarantee.count();
+            }
+            return total;
+        }
+
+        public boolean matches(EntityType<?> entityType) {
+            for (var guarantee : guaranteed) {
+                if (guarantee.matches(entityType)) {
+                    return true;
+                }
+            }
+            for (var pool : pools) {
+                if (pool.matches(entityType)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    public record Guarantee(int count, List<PoolEntry> pools) {
+
+        public static final Codec<Guarantee> CODEC = RecordCodecBuilder.<Guarantee>create(
+            instance -> instance.group(
+                Codec.INT.fieldOf("count").forGetter(Guarantee::count),
+                PoolEntry.CODEC.listOf().fieldOf("pools").forGetter(Guarantee::pools)
+            ).apply(instance, Guarantee::new)
+        ).flatXmap(Guarantee::validate, Guarantee::validate);
+
+        public Guarantee {
+            pools = List.copyOf(pools);
+        }
+
+        public boolean matches(EntityType<?> entityType) {
+            for (var pool : pools) {
+                if (pool.matches(entityType)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static DataResult<Guarantee> validate(Guarantee guarantee) {
+            if (guarantee.count() <= 0) {
+                return DataResult.error(() -> "Raid wave guaranteed count must be positive");
+            }
+            if (guarantee.pools().isEmpty()) {
+                return DataResult.error(() -> "Raid wave guarantee must define at least one pool");
+            }
+            return DataResult.success(guarantee);
         }
     }
 

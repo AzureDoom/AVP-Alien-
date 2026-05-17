@@ -5,6 +5,7 @@ import com.alien.common.gameplay.hive2.config.HiveConfig;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
+import com.alien.common.registry.RaidWaveProfileRegistry;
 import com.blib.api.common.entity.v1.EntityReserves;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
@@ -43,7 +44,7 @@ public final class ConvoyArrival {
                 arriveReturningRaid(server, raid, lineage);
                 return true;
             }
-            return arriveRaid(server, raid);
+            return arriveRaid(server, raid, lineage);
         }
 
         Alien.LOGGER.warn("Convoy {} arrived but has no arrival handler for type {}", convoy.id(), convoy.getClass().getName());
@@ -121,7 +122,7 @@ public final class ConvoyArrival {
      * Raid arrival: the raid has reached the player's last-known position. Spawns one wave at the convoy's current
      * position. The raid convoy itself remains alive so despawned raiders can return to its composition.
      */
-    private static boolean arriveRaid(MinecraftServer server, Convoy.Raid raid) {
+    private static boolean arriveRaid(MinecraftServer server, Convoy.Raid raid, LineageFactionData lineage) {
         var serverLevel = server.getLevel(raid.dimension());
         if (serverLevel == null) {
             Alien.LOGGER.info(
@@ -143,13 +144,25 @@ public final class ConvoyArrival {
         }
 
         var targetPlayer = server.getPlayerList().getPlayer(raid.targetPlayerId());
+        var breakStartedTick = raid.waveBreakStartedTick();
+        var compositionCount = raid.composition().getCount();
+        var nextWaveIndex = raid.nextWaveIndex();
         var spawnedCount = ConvoyMaterialization.spawnNextRaidWave(
             serverLevel,
             raid,
+            RaidWaveProfileRegistry.forVariant(lineage.variant()),
             spawnPos,
             targetPlayer,
             server.overworld().getGameTime()
         );
+        if (
+            spawnedCount > 0
+                || raid.waveBreakStartedTick() != breakStartedTick
+                || raid.composition().getCount() != compositionCount
+                || raid.nextWaveIndex() != nextWaveIndex
+        ) {
+            lineage.markDirty();
+        }
         if (spawnedCount <= 0) {
             return false;
         }

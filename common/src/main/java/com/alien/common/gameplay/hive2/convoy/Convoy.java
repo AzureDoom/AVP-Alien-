@@ -374,8 +374,6 @@ public sealed interface Convoy {
 
         public static final int WAVE_COUNT = 5;
 
-        public static final long WAVE_BREAK_TICKS = 20L * 10L;
-
         public enum ReturnHomeReason {
             NONE("none"),
             TARGET_UNAVAILABLE("target_unavailable"),
@@ -755,21 +753,28 @@ public sealed interface Convoy {
             this.waveBreakStartedTick = currentTick;
         }
 
-        public boolean isWaveBreakActive(long currentTick) {
-            return waveBreakStartedTick >= 0L && currentTick < waveBreakStartedTick + WAVE_BREAK_TICKS;
+        public boolean isWaveBreakActive(long currentTick, long bufferTicks) {
+            return bufferTicks > 0L
+                && waveBreakStartedTick >= 0L
+                && currentTick < waveBreakStartedTick + bufferTicks;
         }
 
-        public float waveBreakProgress(long currentTick) {
-            if (waveBreakStartedTick < 0L) {
+        public float waveBreakProgress(long currentTick, long bufferTicks) {
+            if (waveBreakStartedTick < 0L || bufferTicks <= 0L) {
                 return 1.0F;
             }
             var elapsed = currentTick - waveBreakStartedTick;
-            return Math.clamp(elapsed / (float) WAVE_BREAK_TICKS, 0.0F, 1.0F);
+            return Math.clamp(elapsed / (float) bufferTicks, 0.0F, 1.0F);
         }
 
-        public boolean canSpawnWave(long currentTick) {
-            return materializedMembers().isEmpty()
-                && (waveBreakStartedTick < 0L || currentTick >= waveBreakStartedTick + WAVE_BREAK_TICKS);
+        public boolean canSpawnWave(long currentTick, long bufferTicks) {
+            if (!materializedMembers().isEmpty()) {
+                return false;
+            }
+            if (bufferTicks <= 0L) {
+                return true;
+            }
+            return waveBreakStartedTick >= 0L && currentTick >= waveBreakStartedTick + bufferTicks;
         }
 
         public int displayWaveIndex() {

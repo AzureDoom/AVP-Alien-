@@ -116,7 +116,7 @@ public final class LineageConvoyTickTask {
 
                 ConvoyBossBars.tick(server, convoy, lineage, config);
 
-                if (ConvoyInterception.tryIntercept(server, convoy, config)) {
+                if (ConvoyInterception.tryIntercept(server, convoy, lineage, config)) {
                     ConvoyBossBars.remove(convoy);
                     activeConvoyIds.remove(convoy.id());
                     iterator.remove();

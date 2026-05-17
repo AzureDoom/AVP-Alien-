@@ -1061,13 +1061,13 @@ public final class Hive2DebugCommands {
         var player = Objects.requireNonNull(ctx.getSource().getPlayer());
         var lineageFactionId = ResourceLocationArgument.getId(ctx, LINEAGE_ID_ARG);
         var faction = Alien.MOD.factions().get(lineageFactionId);
-        var waveProfile = RaidWaveProfileRegistry.active();
 
         if (faction == null || !(faction.data() instanceof LineageFactionData lineage)) {
             ctx.getSource().sendFailure(Component.literal("No lineage with id " + lineageFactionId));
             return 0;
         }
 
+        var waveProfile = RaidWaveProfileRegistry.forVariant(lineage.variant());
         var ok = RaidDispatch.forceRaid(ctx.getSource().getServer(), lineage, lineageFactionId, player);
         ctx.getSource()
             .sendSuccess(
@@ -1077,7 +1077,8 @@ public final class Hive2DebugCommands {
                             + " from largest eligible source — see /list_convoys"
                         : "Raid declined (no eligible source — needs empress + a location with " +
                             HiveLocationRegistry.INSTANCE.config().raidMinLocationSizeChunks() + "+ chunks, " +
-                            waveProfile.nonHarbingerSize() + "+ eligible non-harbingers, and a harbinger)"
+                            "and reserves that satisfy the " + waveProfile.totalSize() + "-member " +
+                            lineage.variant().name() + " raid wave profile)"
                 ),
                 true
             );

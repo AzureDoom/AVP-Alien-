@@ -2,8 +2,6 @@ package com.alien.common.gameplay.hive2.convoy;
 
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.gameplay.hive2.spawning.ReserveSpawnUtil;
-import com.alien.common.registry.RaidWaveProfileRegistry;
-import com.alien.common.registry.tag.AlienEntityTypeTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -37,47 +35,46 @@ final class ConvoyMaterialization {
     private ConvoyMaterialization() {}
 
     static int spawnAll(ServerLevel level, Convoy convoy, BlockPos spawnPos, ServerPlayer targetPlayer) {
-        return spawnEntities(level, convoy, expandComposition(convoy, false), spawnPos, targetPlayer);
+        return spawnEntities(level, convoy, expandComposition(convoy), spawnPos, targetPlayer);
     }
 
     static int spawnNextRaidWave(
         ServerLevel level,
         Convoy.Raid raid,
+        RaidWaveProfile waveProfile,
         BlockPos spawnPos,
         ServerPlayer targetPlayer,
         long currentTick
     ) {
-        if (!raid.canSpawnWave(currentTick)) {
+        if (raid.composition().getCount() <= 0) {
             return 0;
         }
 
-        while (raid.composition().getCount() > 0) {
-            var waveIndex = Math.min(raid.nextWaveIndex(), RAID_LAST_WAVE_INDEX);
-            var wave = selectRaidWave(level, raid);
-            if (wave.isEmpty()) {
-                raid.advanceWave();
-                continue;
-            }
-
-            var spawnedCount = spawnRaidWaveEntities(level, raid, wave, spawnPos, targetPlayer);
-            if (spawnedCount > 0) {
-                raid.beginWave(waveIndex, spawnedCount);
-                return spawnedCount;
-            }
-
-            return 0;
-        }
-
-        return 0;
-    }
-
-    private static List<EntityType<?>> selectRaidWave(ServerLevel level, Convoy.Raid raid) {
-        var waveProfile = RaidWaveProfileRegistry.active();
         var waveIndex = Math.min(raid.nextWaveIndex(), RAID_LAST_WAVE_INDEX);
         var waveConfig = waveProfile.wave(waveIndex);
-        var desiredCount = waveIndex >= RAID_LAST_WAVE_INDEX
-            ? raid.composition().getCount()
-            : Math.min(waveConfig.size(), raid.composition().getCount());
+        if (!raid.canSpawnWave(currentTick, waveConfig.bufferTicks())) {
+            if (raid.waveBreakStartedTick() < 0L && raid.materializedMembers().isEmpty()) {
+                raid.startWaveBreak(currentTick);
+            }
+            return 0;
+        }
+
+        var wave = selectRaidWave(level, raid, waveProfile);
+        if (wave.isEmpty()) {
+            return 0;
+        }
+
+        var spawnedCount = spawnRaidWaveEntities(level, raid, wave, spawnPos, targetPlayer);
+        if (spawnedCount > 0) {
+            raid.beginWave(waveIndex, spawnedCount);
+        }
+        return spawnedCount;
+    }
+
+    private static List<EntityType<?>> selectRaidWave(ServerLevel level, Convoy.Raid raid, RaidWaveProfile waveProfile) {
+        var waveIndex = Math.min(raid.nextWaveIndex(), RAID_LAST_WAVE_INDEX);
+        var waveConfig = waveProfile.wave(waveIndex);
+        var desiredCount = Math.min(waveConfig.size(), raid.composition().getCount());
         var selected = new ArrayList<EntityType<?>>(desiredCount);
         var selectedCounts = new HashMap<EntityType<?>, Integer>();
         var inventory = new RaidWaveSelection.Inventory() {
@@ -92,45 +89,61 @@ final class ConvoyMaterialization {
             }
         };
 
-        if (waveIndex >= RAID_LAST_WAVE_INDEX) {
-            var harbinger = RaidWaveSelection.chooseAnyType(
-                inventory,
-                type -> type.is(AlienEntityTypeTags.HARBINGERS),
-                true,
-                level.random
-            );
-            if (harbinger != null) {
-                selected.add(harbinger);
-                selectedCounts.merge(harbinger, 1, Integer::sum);
+        for (var guarantee : waveConfig.guaranteed()) {
+            if (
+                !selectFromPools(
+                    selected,
+                    selectedCounts,
+                    inventory,
+                    guarantee.pools(),
+                    guarantee.count(),
+                    level
+                )
+            ) {
+                return List.of();
             }
         }
 
-        var selectedByPool = new HashMap<Integer, Integer>();
-        while (selected.size() < desiredCount) {
-            var type = RaidWaveSelection.chooseType(
-                waveConfig,
+        if (
+            !selectFromPools(
+                selected,
+                selectedCounts,
                 inventory,
-                RaidDispatch::isRaidEligible,
-                false,
-                selectedByPool,
-                level.random
-            );
-            if (type == null) {
-                break;
-            }
-            selected.add(type);
-            selectedCounts.merge(type, 1, Integer::sum);
+                waveConfig.pools(),
+                desiredCount - selected.size(),
+                level
+            )
+        ) {
+            return List.of();
         }
 
         return selected;
     }
 
-    private static List<EntityType<?>> expandComposition(Convoy convoy, boolean excludeHarbingers) {
+    private static boolean selectFromPools(
+        List<EntityType<?>> selected,
+        HashMap<EntityType<?>, Integer> selectedCounts,
+        RaidWaveSelection.Inventory inventory,
+        List<RaidWaveProfile.PoolEntry> pools,
+        int count,
+        ServerLevel level
+    ) {
+        var selectedByPool = new HashMap<Integer, Integer>();
+        for (var i = 0; i < count; i++) {
+            var type = RaidWaveSelection.chooseType(pools, inventory, selectedByPool, level.random);
+            if (type == null) {
+                return false;
+            }
+            selected.add(type);
+            selectedCounts.merge(type, 1, Integer::sum);
+        }
+
+        return true;
+    }
+
+    private static List<EntityType<?>> expandComposition(Convoy convoy) {
         var expanded = new ArrayList<EntityType<?>>();
         for (var entityType : new ArrayList<>(convoy.composition().getAvailableEntityTypes())) {
-            if (excludeHarbingers && entityType.is(AlienEntityTypeTags.HARBINGERS)) {
-                continue;
-            }
             var count = convoy.composition().getCount(entityType);
             for (var i = 0; i < count; i++) {
                 expanded.add(entityType);

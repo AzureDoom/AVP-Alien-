@@ -1,0 +1,74 @@
+{
+  "waves": [
+    {
+      "size": 5,
+      "buffer_ticks": 200,
+      "pools": [
+        { "entity": "avp_alien:irradiated_warrior", "weight": 3 },
+        { "entity": "avp_alien:irradiated_prowler", "weight": 2 }
+      ]
+    },
+    {
+      "size": 8,
+      "buffer_ticks": 200,
+      "guaranteed": [
+        {
+          "count": 1,
+          "pools": [
+            { "entity": "avp_alien:irradiated_chrysalis" },
+            { "entity": "avp_alien:irradiated_razor_claw" }
+          ]
+        }
+      ],
+      "pools": [
+        { "entity": "avp_alien:irradiated_warrior", "weight": 4 },
+        { "entity": "avp_alien:irradiated_prowler", "weight": 3 }
+      ]
+    },
+    {
+      "size": 13,
+      "buffer_ticks": 200,
+      "pools": [
+        { "entity": "avp_alien:irradiated_warrior", "weight": 3 },
+        { "entity": "avp_alien:irradiated_prowler", "weight": 3 },
+        { "entity": "avp_alien:irradiated_chrysalis", "weight": 2, "max_count": 3 },
+        { "entity": "avp_alien:irradiated_razor_claw", "weight": 2, "max_count": 3 },
+        { "entity": "avp_alien:irradiated_burster", "weight": 2, "max_count": 4 }
+      ]
+    },
+    {
+      "size": 21,
+      "buffer_ticks": 200,
+      "pools": [
+        { "entity": "avp_alien:irradiated_warrior", "weight": 3 },
+        { "entity": "avp_alien:irradiated_prowler", "weight": 3 },
+        { "entity": "avp_alien:irradiated_chrysalis", "weight": 2, "max_count": 4 },
+        { "entity": "avp_alien:irradiated_razor_claw", "weight": 2, "max_count": 4 },
+        { "entity": "avp_alien:irradiated_burster", "weight": 2, "max_count": 5 },
+        { "entity": "avp_alien:irradiated_ravager", "weight": 1, "max_count": 3 },
+        { "entity": "avp_alien:irradiated_carrier", "weight": 1, "max_count": 3 }
+      ]
+    },
+    {
+      "size": 34,
+      "buffer_ticks": 200,
+      "guaranteed": [
+        {
+          "count": 1,
+          "pools": [
+            { "entity": "avp_alien:irradiated_harbinger" }
+          ]
+        }
+      ],
+      "pools": [
+        { "entity": "avp_alien:irradiated_warrior", "weight": 3 },
+        { "entity": "avp_alien:irradiated_prowler", "weight": 3 },
+        { "entity": "avp_alien:irradiated_chrysalis", "weight": 2, "max_count": 6 },
+        { "entity": "avp_alien:irradiated_razor_claw", "weight": 2, "max_count": 6 },
+        { "entity": "avp_alien:irradiated_burster", "weight": 2, "max_count": 8 },
+        { "entity": "avp_alien:irradiated_ravager", "weight": 1, "max_count": 4 },
+        { "entity": "avp_alien:irradiated_carrier", "weight": 1, "max_count": 4 }
+      ]
+    }
+  ]
+}

@@ -3,6 +3,7 @@ package com.alien.common.gameplay.hive2.convoy;
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.hive2.config.HiveConfig;
 import com.alien.common.gameplay.hive2.faction.LineageFactionData;
+import com.alien.common.registry.RaidWaveProfileRegistry;
 import com.alien.common.util.AlienPredicates;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -28,7 +29,7 @@ public final class ConvoyBossBars {
         var currentTick = server.overworld().getGameTime();
         state.bossEvent().setName(title(convoy));
         state.bossEvent().setColor(colorFor(convoy, lineage));
-        state.bossEvent().setProgress(progress(convoy, state.initialCount(), currentTick));
+        state.bossEvent().setProgress(progress(convoy, lineage, state.initialCount(), currentTick));
         updateTrackingPlayers(server, convoy, lineage, config, state.bossEvent());
     }
 
@@ -94,9 +95,9 @@ public final class ConvoyBossBars {
         return BossEvent.BossBarColor.WHITE;
     }
 
-    private static float progress(Convoy convoy, int initialCount, long currentTick) {
+    private static float progress(Convoy convoy, LineageFactionData lineage, int initialCount, long currentTick) {
         if (convoy instanceof Convoy.Raid raid) {
-            return raidProgress(raid, currentTick);
+            return raidProgress(raid, RaidWaveProfileRegistry.forVariant(lineage.variant()), currentTick);
         }
 
         var initial = Math.max(1, initialCount);
@@ -104,13 +105,14 @@ public final class ConvoyBossBars {
         return Math.clamp(current / (float) initial, 0.0F, 1.0F);
     }
 
-    private static float raidProgress(Convoy.Raid raid, long currentTick) {
+    private static float raidProgress(Convoy.Raid raid, RaidWaveProfile waveProfile, long currentTick) {
         if (
             raid.waveBreakStartedTick() >= 0L
                 && raid.materializedMembers().isEmpty()
                 && raid.composition().getCount() > 0
         ) {
-            return raid.waveBreakProgress(currentTick);
+            var wave = waveProfile.wave(raid.displayWaveIndex());
+            return raid.waveBreakProgress(currentTick, wave.bufferTicks());
         }
         if (raid.activeWaveInitialCount() <= 0) {
             return 1.0F;
