@@ -197,7 +197,7 @@ public final class LineageConvoyTickTask {
 
     private static boolean shouldReturnHome(Convoy.Raid raid, MinecraftServer server) {
         var player = server.getPlayerList().getPlayer(raid.targetPlayerId());
-        return player != null && (!player.isAlive() || player.isCreative());
+        return player != null && (!player.isAlive() || player.isCreative() || player.isSpectator());
     }
 
     private static double materializedMemberLeashDistanceSqr(HiveConfig config) {
