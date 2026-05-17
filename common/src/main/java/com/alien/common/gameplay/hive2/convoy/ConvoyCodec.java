@@ -67,6 +67,8 @@ public final class ConvoyCodec {
 
     private static final String NBT_MATERIALIZED_MEMBERS = "MaterializedMembers";
 
+    private static final String NBT_WARNING_ISSUED = "WarningIssued";
+
     private ConvoyCodec() {}
 
     public static ListTag saveAll(List<Convoy> convoys) {
@@ -124,6 +126,7 @@ public final class ConvoyCodec {
             tag.putIntArray(NBT_LAST_KNOWN_TARGET_POS, encodeBlockPos(raid.lastKnownTargetPos()));
             tag.putLong(NBT_EXPIRES_AT_TICK, raid.expiresAtTick());
             tag.put(NBT_MATERIALIZED_MEMBERS, encodeMaterializedMembers(raid.materializedMembers()));
+            tag.putBoolean(NBT_WARNING_ISSUED, raid.warningIssued());
         } else {
             throw new IllegalStateException("Unknown convoy subtype: " + convoy.getClass().getName());
         }
@@ -181,6 +184,7 @@ public final class ConvoyCodec {
                 decodeBlockPos(tag.getIntArray(NBT_LAST_KNOWN_TARGET_POS)),
                 composition,
                 decodeMaterializedMembers(tag.getList(NBT_MATERIALIZED_MEMBERS, Tag.TAG_COMPOUND)),
+                tag.getBoolean(NBT_WARNING_ISSUED),
                 dispatchedTick,
                 tag.getLong(NBT_EXPIRES_AT_TICK)
             );

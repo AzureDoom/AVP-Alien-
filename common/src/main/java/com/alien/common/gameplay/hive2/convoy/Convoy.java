@@ -279,6 +279,8 @@ public sealed interface Convoy {
 
         private final long expiresAtTick;
 
+        private boolean warningIssued;
+
         private Vec3 currentPos;
 
         private BlockPos lastKnownTargetPos;
@@ -323,6 +325,36 @@ public sealed interface Convoy {
             long dispatchedTick,
             long expiresAtTick
         ) {
+            this(
+                id,
+                lineageFactionId,
+                dimension,
+                sourceLocationId,
+                targetPlayerId,
+                currentPos,
+                lastKnownTargetPos,
+                composition,
+                materializedMembers,
+                false,
+                dispatchedTick,
+                expiresAtTick
+            );
+        }
+
+        public Raid(
+            ConvoyId id,
+            ResourceLocation lineageFactionId,
+            ResourceKey<Level> dimension,
+            HiveLocationId sourceLocationId,
+            UUID targetPlayerId,
+            Vec3 currentPos,
+            BlockPos lastKnownTargetPos,
+            EntityReserves composition,
+            Map<UUID, EntityType<?>> materializedMembers,
+            boolean warningIssued,
+            long dispatchedTick,
+            long expiresAtTick
+        ) {
             this.id = id;
             this.lineageFactionId = lineageFactionId;
             this.dimension = dimension;
@@ -332,6 +364,7 @@ public sealed interface Convoy {
             this.lastKnownTargetPos = lastKnownTargetPos;
             this.composition = composition;
             this.materializedMembers = new HashMap<>(materializedMembers);
+            this.warningIssued = warningIssued;
             this.dispatchedTick = dispatchedTick;
             this.expiresAtTick = expiresAtTick;
         }
@@ -401,6 +434,14 @@ public sealed interface Convoy {
 
         public long expiresAtTick() {
             return expiresAtTick;
+        }
+
+        public boolean warningIssued() {
+            return warningIssued;
+        }
+
+        public void setWarningIssued(boolean warningIssued) {
+            this.warningIssued = warningIssued;
         }
     }
 }

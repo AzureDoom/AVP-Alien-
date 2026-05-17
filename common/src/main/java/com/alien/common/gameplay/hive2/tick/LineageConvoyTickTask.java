@@ -11,6 +11,10 @@ import com.alien.common.gameplay.hive2.faction.LineageFactionData;
 import com.alien.common.gameplay.hive2.id.LineageIds;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
+import com.alien.common.registry.init.AlienSoundEvents;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.server.MinecraftServer;
 
 /**
@@ -24,6 +28,8 @@ import net.minecraft.server.MinecraftServer;
  * See {@code HIVE_REDESIGN_12_PERFORMANCE.md} § 1.
  */
 public final class LineageConvoyTickTask {
+
+    private static final long RAID_WARNING_LEAD_TICKS = 20L * 60L;
 
     private LineageConvoyTickTask() {}
 
@@ -59,6 +65,7 @@ public final class LineageConvoyTickTask {
                         continue;
                     }
                     updateRaidTargetPos(raid, server);
+                    maybeWarnRaidTarget(raid, server, lineage, config);
                 }
 
                 ConvoyBossBars.tick(server, convoy, lineage, config);
@@ -99,6 +106,43 @@ public final class LineageConvoyTickTask {
             return;
         }
         raid.setLastKnownTargetPos(player.blockPosition());
+    }
+
+    private static void maybeWarnRaidTarget(
+        Convoy.Raid raid,
+        MinecraftServer server,
+        LineageFactionData lineage,
+        com.alien.common.gameplay.hive2.config.HiveConfig config
+    ) {
+        if (raid.warningIssued()) {
+            return;
+        }
+
+        var player = server.getPlayerList().getPlayer(raid.targetPlayerId());
+        if (player == null || !player.isAlive()) {
+            return;
+        }
+        if (!player.level().dimension().equals(raid.dimension())) {
+            return;
+        }
+
+        var blocksPerTick = com.alien.common.gameplay.hive2.convoy.ConvoySpeedTable.blocksPerTick(raid, config);
+        if (blocksPerTick <= 0.0) {
+            return;
+        }
+
+        var ticksToArrival = (long) Math.ceil(ConvoyTravel.distanceToTarget(raid) / blocksPerTick);
+        if (ticksToArrival > RAID_WARNING_LEAD_TICKS) {
+            return;
+        }
+
+        player.playNotifySound(AlienSoundEvents.ENTITY_QUEEN_SCREAM.get(), SoundSource.MASTER, 1.0F, 1.0F);
+        player.sendSystemMessage(
+            Component.literal("A distant screech answers your violence...")
+                .withStyle(ChatFormatting.DARK_RED, ChatFormatting.ITALIC)
+        );
+        raid.setWarningIssued(true);
+        lineage.markDirty();
     }
 
     /**
