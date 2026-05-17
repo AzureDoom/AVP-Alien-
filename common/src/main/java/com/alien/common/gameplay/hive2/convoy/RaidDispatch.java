@@ -9,11 +9,13 @@ import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.gameplay.hive2.location.HiveLocationReserves;
 import com.alien.common.registry.HiveRecipeRegistry;
+import com.alien.common.registry.RaidWaveProfileRegistry;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.entity.v1.EntityReserves;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -34,7 +36,7 @@ import java.util.UUID;
  * <li>Source = the largest qualifying location ({@code claimedChunks ≥ raidMinLocationSizeChunks}) with a
  * harbinger.</li>
  * <li>Per-source cooldown so the same source doesn't spam raids.</li>
- * <li>Composition drained from source reserves, limited to xenomorphs whose hive recipe costs scourge jelly.</li>
+ * <li>Composition drained from source reserves using the active datapack raid wave profile.</li>
  * <li>Persists until the target player dies, then returns to a live lineage location when possible.</li>
  * </ul>
  * <p>
@@ -119,7 +121,17 @@ public final class RaidDispatch {
                 continue;
             }
 
-            tryDispatchAgainstPlayer(server, lineage, lineageFactionId, playerId, targetPlayer, currentTick, config, true, true);
+            tryDispatchAgainstPlayer(
+                server,
+                lineage,
+                lineageFactionId,
+                playerId,
+                targetPlayer,
+                currentTick,
+                config,
+                true,
+                true
+            );
         }
     }
 
@@ -138,23 +150,15 @@ public final class RaidDispatch {
             return false;
         }
 
-        var source = pickLargestEligibleSource(lineage, currentTick, config);
+        var waveProfile = RaidWaveProfileRegistry.active();
+        var source = pickLargestEligibleSource(lineage, currentTick, config, waveProfile);
         if (source == null) {
             return false;
         }
 
-        var raidSize = (int) Math.round(
-            config.baseRaidSize() + config.raidSizePerClaimedChunk() * source.claimedChunks().size()
-        );
-        var available = eligibleRaidReserveCount(source.localReserves());
-        raidSize = Math.min(raidSize, available);
-
-        if (raidSize <= 0) {
-            return false;
-        }
-
-        var composition = drainComposition(source.localReserves(), raidSize);
-        if (composition.getCount() == 0) {
+        var composition = drainComposition(source.localReserves(), waveProfile, server.overworld().random);
+        if (composition.getCount() < waveProfile.totalSize()) {
+            refundComposition(source.localReserves(), composition);
             return false;
         }
 
@@ -211,7 +215,8 @@ public final class RaidDispatch {
     private static @Nullable HiveLocation pickLargestEligibleSource(
         LineageFactionData lineage,
         long currentTick,
-        HiveConfig config
+        HiveConfig config,
+        RaidWaveProfile waveProfile
     ) {
         HiveLocation best = null;
         var bestSize = 0;
@@ -224,6 +229,9 @@ public final class RaidDispatch {
                 continue;
             }
             if (location.localReserves().getCountMatching(type -> type.is(AlienEntityTypeTags.HARBINGERS)) <= 0) {
+                continue;
+            }
+            if (!hasRaidCapacity(location.localReserves(), waveProfile)) {
                 continue;
             }
 
@@ -241,42 +249,78 @@ public final class RaidDispatch {
         return best;
     }
 
-    /** Same round-robin draw as {@link ReinforcementDispatcher}, with one harbinger reserved as the raid lead. */
-    private static EntityReserves drainComposition(HiveLocationReserves donorReserves, int count) {
+    private static boolean hasRaidCapacity(HiveLocationReserves reserves, RaidWaveProfile waveProfile) {
+        return reserves.getCountMatching(type -> type.is(AlienEntityTypeTags.HARBINGERS)) > 0
+            && eligibleNonHarbingerReserveCount(reserves) >= waveProfile.nonHarbingerSize();
+    }
+
+    private static EntityReserves drainComposition(
+        HiveLocationReserves donorReserves,
+        RaidWaveProfile waveProfile,
+        RandomSource random
+    ) {
         var composition = new EntityReserves();
-        var remaining = count;
         var harbingerType = drainOneHarbinger(donorReserves);
         if (harbingerType == null) {
             return composition;
         }
 
         composition.add(harbingerType, 1);
-        remaining--;
 
-        var available = new ArrayList<>(
-            donorReserves.getAvailableEntityTypes()
-                .stream()
-                .filter(RaidDispatch::isRaidEligible)
-                .toList()
-        );
-
-        while (remaining > 0 && !available.isEmpty()) {
-            var iterator = available.iterator();
-            while (iterator.hasNext() && remaining > 0) {
-                var type = iterator.next();
-                if (donorReserves.trySpawn(type)) {
-                    composition.add(type, 1);
-                    remaining--;
-                    if (donorReserves.getCount(type) <= 0) {
-                        iterator.remove();
-                    }
-                } else {
-                    iterator.remove();
-                }
-            }
+        for (var i = 0; i < waveProfile.waves().size(); i++) {
+            var waveSize = waveProfile.wave(i).size();
+            var nonHarbingerSlots = i == Convoy.Raid.WAVE_COUNT - 1 ? waveSize - 1 : waveSize;
+            drainWave(donorReserves, composition, waveProfile.wave(i), nonHarbingerSlots, random);
         }
 
         return composition;
+    }
+
+    private static void drainWave(
+        HiveLocationReserves donorReserves,
+        EntityReserves composition,
+        RaidWaveProfile.Wave wave,
+        int count,
+        RandomSource random
+    ) {
+        var selectedByPool = new HashMap<Integer, Integer>();
+        var inventory = new RaidWaveSelection.Inventory() {
+            @Override
+            public Iterable<EntityType<?>> availableTypes() {
+                return donorReserves.getAvailableEntityTypes();
+            }
+
+            @Override
+            public int count(EntityType<?> type) {
+                return donorReserves.getCount(type);
+            }
+        };
+
+        for (var i = 0; i < count; i++) {
+            var selectedType = RaidWaveSelection.chooseType(
+                wave,
+                inventory,
+                RaidDispatch::isRaidEligible,
+                false,
+                selectedByPool,
+                random
+            );
+            if (selectedType == null || !donorReserves.trySpawn(selectedType)) {
+                return;
+            }
+            composition.add(selectedType, 1);
+        }
+    }
+
+    private static void refundComposition(HiveLocationReserves reserves, EntityReserves composition) {
+        for (var type : new ArrayList<>(composition.getAvailableEntityTypes())) {
+            var count = composition.getCount(type);
+            if (count <= 0) {
+                continue;
+            }
+            reserves.addReturningMember(type, count);
+            composition.add(type, -count);
+        }
     }
 
     private static @Nullable EntityType<?> drainOneHarbinger(HiveLocationReserves reserves) {
@@ -288,17 +332,17 @@ public final class RaidDispatch {
         return null;
     }
 
-    private static int eligibleRaidReserveCount(HiveLocationReserves reserves) {
+    private static int eligibleNonHarbingerReserveCount(HiveLocationReserves reserves) {
         var count = 0;
         for (var type : reserves.getAvailableEntityTypes()) {
-            if (isRaidEligible(type)) {
+            if (isRaidEligible(type) && !type.is(AlienEntityTypeTags.HARBINGERS)) {
                 count += reserves.getCount(type);
             }
         }
         return count;
     }
 
-    private static boolean isRaidEligible(EntityType<?> type) {
+    static boolean isRaidEligible(EntityType<?> type) {
         if (!type.is(AlienEntityTypeTags.XENOMORPHS)) {
             return false;
         }
@@ -306,6 +350,9 @@ public final class RaidDispatch {
             return true;
         }
         if (type.is(AlienEntityTypeTags.WARRIORS)) {
+            return true;
+        }
+        if (type.is(AlienEntityTypeTags.PROWLERS)) {
             return true;
         }
         var recipe = HiveRecipeRegistry.forOutputEntity(type);

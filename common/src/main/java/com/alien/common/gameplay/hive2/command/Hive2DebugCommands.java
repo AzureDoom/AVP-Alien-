@@ -24,6 +24,7 @@ import com.alien.common.gameplay.hive2.lifecycle.QueenSettlementDetector;
 import com.alien.common.gameplay.hive2.location.HiveLocation;
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.model.alien.variant.AlienVariant;
+import com.alien.common.registry.RaidWaveProfileRegistry;
 import com.alien.common.registry.init.AlienFactionDataTypes;
 import com.blib.api.common.faction.v1.FactionMember;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -1060,6 +1061,7 @@ public final class Hive2DebugCommands {
         var player = Objects.requireNonNull(ctx.getSource().getPlayer());
         var lineageFactionId = ResourceLocationArgument.getId(ctx, LINEAGE_ID_ARG);
         var faction = Alien.MOD.factions().get(lineageFactionId);
+        var waveProfile = RaidWaveProfileRegistry.active();
 
         if (faction == null || !(faction.data() instanceof LineageFactionData lineage)) {
             ctx.getSource().sendFailure(Component.literal("No lineage with id " + lineageFactionId));
@@ -1074,7 +1076,8 @@ public final class Hive2DebugCommands {
                         ? "Raid dispatched against " + player.getGameProfile().getName()
                             + " from largest eligible source — see /list_convoys"
                         : "Raid declined (no eligible source — needs empress + a location with " +
-                            HiveLocationRegistry.INSTANCE.config().raidMinLocationSizeChunks() + "+ chunks)"
+                            HiveLocationRegistry.INSTANCE.config().raidMinLocationSizeChunks() + "+ chunks, " +
+                            waveProfile.nonHarbingerSize() + "+ eligible non-harbingers, and a harbinger)"
                 ),
                 true
             );

@@ -1,0 +1,150 @@
+package com.alien.common.gameplay.hive2.convoy;
+
+import com.alien.common.registry.tag.AlienEntityTypeTags;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.EntityType;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.function.Predicate;
+
+final class RaidWaveSelection {
+
+    private RaidWaveSelection() {}
+
+    static @Nullable EntityType<?> chooseType(
+        RaidWaveProfile.Wave wave,
+        Inventory inventory,
+        Predicate<EntityType<?>> eligible,
+        boolean allowHarbingers,
+        Map<Integer, Integer> selectedByPool,
+        RandomSource random
+    ) {
+        var matchingPools = new ArrayList<PoolMatch>();
+        for (var i = 0; i < wave.pools().size(); i++) {
+            var pool = wave.pools().get(i);
+            if (selectedByPool.getOrDefault(i, 0) >= pool.maxCount()) {
+                continue;
+            }
+            if (hasMatchingType(pool, inventory, eligible, allowHarbingers)) {
+                matchingPools.add(new PoolMatch(i, pool));
+            }
+        }
+
+        if (!matchingPools.isEmpty()) {
+            var match = choosePool(matchingPools, random);
+            var type = chooseMatchingType(match.pool(), inventory, eligible, allowHarbingers, random);
+            if (type != null) {
+                selectedByPool.merge(match.index(), 1, Integer::sum);
+                return type;
+            }
+        }
+
+        return chooseAnyType(inventory, eligible, allowHarbingers, random);
+    }
+
+    static @Nullable EntityType<?> chooseAnyType(
+        Inventory inventory,
+        Predicate<EntityType<?>> eligible,
+        boolean allowHarbingers,
+        RandomSource random
+    ) {
+        var candidates = new ArrayList<EntityType<?>>();
+        for (var type : inventory.availableTypes()) {
+            if (isSelectable(type, inventory, eligible, allowHarbingers)) {
+                candidates.add(type);
+            }
+        }
+        return chooseByCount(candidates, inventory, random);
+    }
+
+    private static boolean hasMatchingType(
+        RaidWaveProfile.PoolEntry pool,
+        Inventory inventory,
+        Predicate<EntityType<?>> eligible,
+        boolean allowHarbingers
+    ) {
+        for (var type : inventory.availableTypes()) {
+            if (pool.matches(type) && isSelectable(type, inventory, eligible, allowHarbingers)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static @Nullable EntityType<?> chooseMatchingType(
+        RaidWaveProfile.PoolEntry pool,
+        Inventory inventory,
+        Predicate<EntityType<?>> eligible,
+        boolean allowHarbingers,
+        RandomSource random
+    ) {
+        var candidates = new ArrayList<EntityType<?>>();
+        for (var type : inventory.availableTypes()) {
+            if (pool.matches(type) && isSelectable(type, inventory, eligible, allowHarbingers)) {
+                candidates.add(type);
+            }
+        }
+        return chooseByCount(candidates, inventory, random);
+    }
+
+    private static @Nullable PoolMatch choosePool(ArrayList<PoolMatch> matches, RandomSource random) {
+        var totalWeight = 0;
+        for (var match : matches) {
+            totalWeight += match.pool().weight();
+        }
+
+        var target = random.nextInt(Math.max(1, totalWeight));
+        for (var match : matches) {
+            target -= match.pool().weight();
+            if (target < 0) {
+                return match;
+            }
+        }
+        return matches.getLast();
+    }
+
+    private static @Nullable EntityType<?> chooseByCount(
+        ArrayList<EntityType<?>> candidates,
+        Inventory inventory,
+        RandomSource random
+    ) {
+        if (candidates.isEmpty()) {
+            return null;
+        }
+
+        var totalCount = 0;
+        for (var type : candidates) {
+            totalCount += inventory.count(type);
+        }
+
+        var target = random.nextInt(Math.max(1, totalCount));
+        for (var type : candidates) {
+            target -= inventory.count(type);
+            if (target < 0) {
+                return type;
+            }
+        }
+        return candidates.getLast();
+    }
+
+    private static boolean isSelectable(
+        EntityType<?> type,
+        Inventory inventory,
+        Predicate<EntityType<?>> eligible,
+        boolean allowHarbingers
+    ) {
+        return inventory.count(type) > 0
+            && eligible.test(type)
+            && (allowHarbingers || !type.is(AlienEntityTypeTags.HARBINGERS));
+    }
+
+    interface Inventory {
+        Iterable<EntityType<?>> availableTypes();
+
+        int count(EntityType<?> type);
+    }
+
+    private record PoolMatch(int index, RaidWaveProfile.PoolEntry pool) {}
+}

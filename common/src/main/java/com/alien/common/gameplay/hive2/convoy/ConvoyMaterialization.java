@@ -2,6 +2,7 @@ package com.alien.common.gameplay.hive2.convoy;
 
 import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
 import com.alien.common.gameplay.hive2.spawning.ReserveSpawnUtil;
+import com.alien.common.registry.RaidWaveProfileRegistry;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -14,6 +15,7 @@ import net.minecraft.world.entity.MobSpawnType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,7 +53,7 @@ final class ConvoyMaterialization {
 
         while (raid.composition().getCount() > 0) {
             var waveIndex = Math.min(raid.nextWaveIndex(), RAID_LAST_WAVE_INDEX);
-            var wave = selectRaidWave(raid);
+            var wave = selectRaidWave(level, raid);
             if (wave.isEmpty()) {
                 raid.advanceWave();
                 continue;
@@ -69,20 +71,58 @@ final class ConvoyMaterialization {
         return 0;
     }
 
-    private static List<EntityType<?>> selectRaidWave(Convoy.Raid raid) {
+    private static List<EntityType<?>> selectRaidWave(ServerLevel level, Convoy.Raid raid) {
+        var waveProfile = RaidWaveProfileRegistry.active();
         var waveIndex = Math.min(raid.nextWaveIndex(), RAID_LAST_WAVE_INDEX);
+        var waveConfig = waveProfile.wave(waveIndex);
+        var desiredCount = waveIndex >= RAID_LAST_WAVE_INDEX
+            ? raid.composition().getCount()
+            : Math.min(waveConfig.size(), raid.composition().getCount());
+        var selected = new ArrayList<EntityType<?>>(desiredCount);
+        var selectedCounts = new HashMap<EntityType<?>, Integer>();
+        var inventory = new RaidWaveSelection.Inventory() {
+            @Override
+            public Iterable<EntityType<?>> availableTypes() {
+                return raid.composition().getAvailableEntityTypes();
+            }
+
+            @Override
+            public int count(EntityType<?> type) {
+                return Math.max(0, raid.composition().getCount(type) - selectedCounts.getOrDefault(type, 0));
+            }
+        };
+
         if (waveIndex >= RAID_LAST_WAVE_INDEX) {
-            return expandComposition(raid, false);
+            var harbinger = RaidWaveSelection.chooseAnyType(
+                inventory,
+                type -> type.is(AlienEntityTypeTags.HARBINGERS),
+                true,
+                level.random
+            );
+            if (harbinger != null) {
+                selected.add(harbinger);
+                selectedCounts.merge(harbinger, 1, Integer::sum);
+            }
         }
 
-        var nonHarbingers = expandComposition(raid, true);
-        if (nonHarbingers.isEmpty()) {
-            return List.of();
+        var selectedByPool = new HashMap<Integer, Integer>();
+        while (selected.size() < desiredCount) {
+            var type = RaidWaveSelection.chooseType(
+                waveConfig,
+                inventory,
+                RaidDispatch::isRaidEligible,
+                false,
+                selectedByPool,
+                level.random
+            );
+            if (type == null) {
+                break;
+            }
+            selected.add(type);
+            selectedCounts.merge(type, 1, Integer::sum);
         }
 
-        var nonHarbingerWavesRemaining = RAID_LAST_WAVE_INDEX - waveIndex;
-        var waveSize = Math.max(1, (int) Math.ceil(nonHarbingers.size() / (double) nonHarbingerWavesRemaining));
-        return new ArrayList<>(nonHarbingers.subList(0, Math.min(waveSize, nonHarbingers.size())));
+        return selected;
     }
 
     private static List<EntityType<?>> expandComposition(Convoy convoy, boolean excludeHarbingers) {
