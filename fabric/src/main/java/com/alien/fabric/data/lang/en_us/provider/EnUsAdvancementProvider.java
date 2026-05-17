@@ -15,6 +15,13 @@ public class EnUsAdvancementProvider {
     private static void provideAlienAdvancementTranslations(FabricLanguageProvider.TranslationBuilder builder) {
         addAdvancement(
             builder,
+            AlienAdvancements.BLOCK_SPITTER_SPIT_WITH_HEAD_SHIELD,
+            "Spit Shield",
+            "Block a spitter's spit attack with a xenomorph head shield"
+        );
+
+        addAdvancement(
+            builder,
             AlienAdvancements.DEFEAT_A_RAID,
             "Stand Your Ground",
             "Defeat a xenomorph raid"

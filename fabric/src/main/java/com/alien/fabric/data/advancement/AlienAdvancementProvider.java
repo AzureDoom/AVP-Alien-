@@ -163,8 +163,35 @@ public class AlienAdvancementProvider {
             .save(consumer, AlienAdvancements.SHEAR_AN_OVOMORPH.resourceLocation().toString());
 
         var addChitinArmorAdvancement = addChitinArmorAdvancements(alienKillerAdvancement, consumer);
+        var blockSpitterSpitWithHeadShieldAdvancement = addBlockSpitterSpitWithHeadShieldAdvancement(
+            alienKillerAdvancement,
+            consumer
+        );
 
         var addPlatedChitinArmorAdvancement = addPlatedChitinArmorAdvancement(royalAlienKillerAdvancement, consumer);
+    }
+
+    private static AdvancementHolder addBlockSpitterSpitWithHeadShieldAdvancement(
+        AdvancementHolder parent,
+        Consumer<AdvancementHolder> consumer
+    ) {
+        return Advancement.Builder.advancement()
+            .addCriterion(
+                "block_spitter_spit_with_head_shield",
+                CriteriaTriggers.IMPOSSIBLE.createCriterion(new ImpossibleTrigger.TriggerInstance())
+            )
+            .parent(parent)
+            .display(
+                AlienItems.QUEEN_HEAD_SHIELD.get(),
+                AlienAdvancements.BLOCK_SPITTER_SPIT_WITH_HEAD_SHIELD.titleComponent(),
+                AlienAdvancements.BLOCK_SPITTER_SPIT_WITH_HEAD_SHIELD.descriptionComponent(),
+                null,
+                AdvancementType.TASK,
+                true,
+                true,
+                false
+            )
+            .save(consumer, AlienAdvancements.BLOCK_SPITTER_SPIT_WITH_HEAD_SHIELD.resourceLocation().toString());
     }
 
     private static AdvancementHolder addChitinArmorAdvancements(AdvancementHolder parent, Consumer<AdvancementHolder> consumer) {

@@ -5,6 +5,8 @@ import com.blib.api.common.advancement.v1.BLibAdvancement;
 
 public class AlienAdvancements {
 
+    public static final BLibAdvancement BLOCK_SPITTER_SPIT_WITH_HEAD_SHIELD = create("block_spitter_spit_with_head_shield");
+
     public static final BLibAdvancement KILL_A_HIVE = create("kill_a_hive");
 
     public static final BLibAdvancement KILL_A_HARBINGER = create("kill_a_harbinger");

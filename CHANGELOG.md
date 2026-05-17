@@ -13,6 +13,7 @@
   - Removed hive debugging code. The debugging code was outdated with the rewrite and has therefore been removed, including its properties in the alien properties file.
 
 ## ✨ What's New
+- Added an advancement for blocking a spitter's spit attack with a xenomorph head shield.
 - Added an advancement for leading a raid to a hive of a different xenomorph variant.
 - Added an advancement for being hunted by raids from two different xenomorph variants at the same time.
 - Added an advancement for defeating a xenomorph raid.
