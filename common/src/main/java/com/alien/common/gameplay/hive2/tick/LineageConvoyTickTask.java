@@ -71,6 +71,10 @@ public final class LineageConvoyTickTask {
                         anyChanged = true;
                     }
 
+                    if (RaidMemberTracker.returnMissingMaterializedMembers(server, raid) > 0) {
+                        anyChanged = true;
+                    }
+
                     if (raid.composition().getCount() <= 0 && raid.materializedMembers().isEmpty()) {
                         ConvoyBossBars.remove(convoy);
                         activeConvoyIds.remove(convoy.id());

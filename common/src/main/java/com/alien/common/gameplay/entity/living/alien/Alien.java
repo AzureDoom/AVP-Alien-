@@ -284,6 +284,11 @@ public abstract class Alien extends Monster implements DataUser {
 
     @Override
     public void tick() {
+        if (!level().isClientSide && RaidMemberTracker.discardStaleLoadedMember(this)) {
+            discard();
+            return;
+        }
+
         super.tick();
         hiveManager.tick();
         moltingManager.tick();
@@ -633,6 +638,14 @@ public abstract class Alien extends Monster implements DataUser {
         var bossBarAngry = bossBar != null && bossBar.isAngry();
         var isLeader = location.leadership().isLeader(this);
         return bossBarAngry || isLeader;
+    }
+
+    @Override
+    public boolean shouldBeSaved() {
+        if (raidMembership != null) {
+            return false;
+        }
+        return super.shouldBeSaved();
     }
 
     @Override

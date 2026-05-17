@@ -27,6 +27,14 @@ public final class RaidMemberTracker {
     }
 
     public static boolean returnDespawned(com.alien.common.gameplay.entity.living.alien.Alien alien) {
+        return returnToReserves(alien, "despawned");
+    }
+
+    public static boolean returnUnloaded(com.alien.common.gameplay.entity.living.alien.Alien alien) {
+        return returnToReserves(alien, "unloaded");
+    }
+
+    private static boolean returnToReserves(com.alien.common.gameplay.entity.living.alien.Alien alien, String reason) {
         var membership = alien.raidMembership();
         if (membership == null) {
             return false;
@@ -38,15 +46,22 @@ public final class RaidMemberTracker {
             return false;
         }
 
-        raid.composition().add(alien.getType(), 1);
+        var trackedType = raid.materializedMembers().get(alien.getUUID());
+        if (trackedType == null) {
+            alien.clearRaidMembership();
+            return false;
+        }
+
+        raid.composition().add(trackedType, 1);
         raid.untrackMaterializedMember(alien.getUUID());
         markDirty(membership);
         alien.clearRaidMembership();
 
         Alien.LOGGER.info(
-            "Hive2: raid member {} despawned — returned {} to raid {} reserves",
+            "Hive2: raid member {} {} - returned {} to raid {} reserves",
             alien.getUUID(),
-            alien.getType(),
+            reason,
+            trackedType,
             raid.id()
         );
         return true;
@@ -66,6 +81,53 @@ public final class RaidMemberTracker {
         alien.clearRaidMembership();
     }
 
+    public static boolean discardStaleLoadedMember(com.alien.common.gameplay.entity.living.alien.Alien alien) {
+        var membership = alien.raidMembership();
+        if (membership == null) {
+            return false;
+        }
+
+        var raid = findRaid(membership);
+        if (raid != null && raid.materializedMembers().containsKey(alien.getUUID())) {
+            return false;
+        }
+
+        alien.clearRaidMembership();
+        Alien.LOGGER.info(
+            "Hive2: discarding stale loaded raid member {} for raid {}",
+            alien.getUUID(),
+            membership.raidId()
+        );
+        return true;
+    }
+
+    public static int returnMissingMaterializedMembers(MinecraftServer server, Convoy.Raid raid) {
+        var level = server.getLevel(raid.dimension());
+        if (level == null || raid.materializedMembers().isEmpty()) {
+            return 0;
+        }
+
+        var returned = 0;
+        for (var entry : new ArrayList<>(raid.materializedMembers().entrySet())) {
+            if (level.getEntity(entry.getKey()) != null) {
+                continue;
+            }
+            raid.composition().add(entry.getValue(), 1);
+            raid.untrackMaterializedMember(entry.getKey());
+            returned++;
+        }
+
+        if (returned > 0) {
+            markDirty(new RaidMembership(raid.lineageFactionId(), raid.id()));
+            Alien.LOGGER.info(
+                "Hive2: returned {} missing materialized member(s) to raid {} reserves",
+                returned,
+                raid.id()
+            );
+        }
+        return returned;
+    }
+
     public static int recallMaterializedMembers(MinecraftServer server, Convoy.Raid raid) {
         var level = server.getLevel(raid.dimension());
         var hadTrackedMembers = !raid.materializedMembers().isEmpty();
@@ -74,13 +136,13 @@ public final class RaidMemberTracker {
         for (var entry : new ArrayList<>(raid.materializedMembers().entrySet())) {
             var entity = level == null ? null : level.getEntity(entry.getKey());
             if (entity != null && entity.isAlive() && !entity.isRemoved()) {
-                raid.composition().add(entry.getValue(), 1);
                 if (entity instanceof com.alien.common.gameplay.entity.living.alien.Alien alien) {
                     alien.clearRaidMembership();
                 }
                 entity.discard();
-                recalled++;
             }
+            raid.composition().add(entry.getValue(), 1);
+            recalled++;
             raid.untrackMaterializedMember(entry.getKey());
         }
 
