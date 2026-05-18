@@ -8,7 +8,9 @@ import com.blib.api.common.goap.v1.action.ActionMasks;
 import com.blib.api.common.goap.v1.action.BLibAction;
 import com.blib.api.common.goap.v1.action.impl.MoveToPosAction;
 import com.blib.api.common.goap.v1.action.impl.NeoMoveToPosAction;
+import com.blib.api.common.pathfinding.v1.navigator.PathNavigator;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
+import com.blib.api.common.pathfinding.v1.node.PathBreakRequirement;
 import com.just.ai.goap.StateKey;
 import com.just.ai.goap.action.Action;
 import com.just.ai.goap.condition.expression.Expressions;
@@ -16,6 +18,10 @@ import com.just.ai.goap.state.Blackboard;
 import com.just.core.functional.option.Option;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class CombatActions {
 
@@ -129,10 +135,6 @@ public class CombatActions {
         return predictedPos;
     }
 
-    private static int getEntityHeight(Xenomorph xenomorph) {
-        return (int) Math.ceil(xenomorph.getBbHeight());
-    }
-
     private static final double BLOCK_BREAK_REACH_DISTANCE_SQUARED = 2.5 * 2.5;
 
     private static Action.Signal handleBlockBreak(Action.Context<? extends Xenomorph> context) {
@@ -143,17 +145,19 @@ public class CombatActions {
         }
 
         var navigator = navigatorUser.getPathNavigator();
-        var blockPos = navigator.getBlockToBreak();
+        confirmClearedBreakRequirements(xenomorph, navigator);
 
-        if (blockPos == null) {
-            return Action.Signal.ABORT;
+        var requirements = navigator.getRemainingBreakRequirements();
+
+        if (requirements.isEmpty()) {
+            return Action.Signal.CONTINUE;
         }
 
-        var entityPos = xenomorph.blockPosition();
-        var distanceSquared = entityPos.distSqr(blockPos);
+        var currentRequirement = requirements.get(0);
+        var distanceSquared = distanceSquaredToRequirement(xenomorph, currentRequirement);
 
         if (distanceSquared > BLOCK_BREAK_REACH_DISTANCE_SQUARED) {
-            // Can't reach the block — stop and let the path recompute from our current position.
+            // Can't reach the required column — stop and let the path recompute from our current position.
             navigator.stop();
             return Action.Signal.CONTINUE;
         }
@@ -162,35 +166,69 @@ public class CombatActions {
             xenomorph.runDigAnimation();
         }
 
-        xenomorph.getLookControl().setLookAt(blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5);
+        xenomorph.getLookControl().setLookAt(
+            currentRequirement.x() + 0.5,
+            currentRequirement.y() + currentRequirement.height() * 0.5,
+            currentRequirement.z() + 0.5
+        );
 
         if (xenomorph.tickCount % 4 == 0) {
-            var allCleared = breakBlocksInVolume(xenomorph, blockPos);
-
-            if (allCleared) {
-                navigator.confirmBlockBroken();
-            }
+            breakRequirements(xenomorph, requirements);
+            confirmClearedBreakRequirements(xenomorph, navigator);
         }
 
         return Action.Signal.CONTINUE;
     }
 
-    private static boolean breakBlocksInVolume(Xenomorph xenomorph, BlockPos feetPos) {
-        var entityHeight = getEntityHeight(xenomorph);
-        var parallelDigCount = xenomorph.getXenomorphData().getParallelDigCount();
-        var allCleared = true;
-        var brokenThisCycle = 0;
+    private static void confirmClearedBreakRequirements(Xenomorph xenomorph, PathNavigator navigator) {
+        var requirement = navigator.getCurrentBreakRequirement();
 
-        for (int dy = 0; dy < entityHeight; dy++) {
-            var checkPos = feetPos.above(dy);
+        while (requirement != null && isRequirementClear(xenomorph, requirement)) {
+            navigator.confirmBlockBroken();
+            requirement = navigator.getCurrentBreakRequirement();
+        }
+    }
+
+    private static void breakRequirements(Xenomorph xenomorph, List<PathBreakRequirement> requirements) {
+        var parallelDigCount = xenomorph.getXenomorphData().getParallelDigCount();
+        var damagedThisCycle = new HashSet<BlockPos>();
+        var brokenThisCycle = 0;
+        var brokeAny = true;
+
+        while (brokenThisCycle < parallelDigCount && brokeAny) {
+            brokeAny = false;
+
+            for (var requirement : requirements) {
+                if (brokenThisCycle >= parallelDigCount) {
+                    break;
+                }
+
+                if (distanceSquaredToRequirement(xenomorph, requirement) > BLOCK_BREAK_REACH_DISTANCE_SQUARED) {
+                    continue;
+                }
+
+                if (breakFirstSolidBlockInRequirement(xenomorph, requirement, damagedThisCycle)) {
+                    brokenThisCycle++;
+                    brokeAny = true;
+                }
+            }
+        }
+    }
+
+    private static boolean breakFirstSolidBlockInRequirement(
+        Xenomorph xenomorph,
+        PathBreakRequirement requirement,
+        Set<BlockPos> damagedThisCycle
+    ) {
+        for (int dy = 0; dy < requirement.height(); dy++) {
+            var checkPos = new BlockPos(requirement.x(), requirement.y() + dy, requirement.z());
             var state = xenomorph.level().getBlockState(checkPos);
 
             if (!state.isSolid()) {
                 continue;
             }
 
-            if (brokenThisCycle >= parallelDigCount) {
-                allCleared = false;
+            if (!damagedThisCycle.add(checkPos)) {
                 continue;
             }
 
@@ -206,16 +244,45 @@ public class CombatActions {
                     soundType.getPitch() * 0.5F
                 );
 
-            var result = BlockBreakProgressManager.damage(xenomorph.level(), checkPos, BLOCK_BREAKING_SPEED);
+            BlockBreakProgressManager.damage(xenomorph.level(), checkPos, BLOCK_BREAKING_SPEED);
 
-            if (result != BlockBreakProgressManager.Result.DESTROYED) {
-                allCleared = false;
-            }
-
-            brokenThisCycle++;
+            return true;
         }
 
-        return allCleared;
+        return false;
+    }
+
+    private static boolean isRequirementClear(Xenomorph xenomorph, PathBreakRequirement requirement) {
+        for (int dy = 0; dy < requirement.height(); dy++) {
+            var checkPos = new BlockPos(requirement.x(), requirement.y() + dy, requirement.z());
+
+            if (xenomorph.level().getBlockState(checkPos).isSolid()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static double distanceSquaredToRequirement(Xenomorph xenomorph, PathBreakRequirement requirement) {
+        var box = xenomorph.getBoundingBox();
+        var dx = axisDistance(box.minX, box.maxX, requirement.x(), requirement.x() + 1.0);
+        var dy = axisDistance(box.minY, box.maxY, requirement.y(), requirement.y() + requirement.height());
+        var dz = axisDistance(box.minZ, box.maxZ, requirement.z(), requirement.z() + 1.0);
+
+        return dx * dx + dy * dy + dz * dz;
+    }
+
+    private static double axisDistance(double minA, double maxA, double minB, double maxB) {
+        if (maxA < minB) {
+            return minB - maxA;
+        }
+
+        if (maxB < minA) {
+            return minA - maxB;
+        }
+
+        return 0.0;
     }
 
     private static Action.Signal performWithVanillaNav(
