@@ -9,8 +9,6 @@ import com.blib.api.common.goap.v1.action.ActionMasks;
 import com.blib.api.common.goap.v1.action.BLibAction;
 import com.blib.api.common.goap.v1.action.impl.NeoMoveToPosAction;
 import com.blib.api.common.goap.v1.action.impl.NeoWanderAction;
-import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
-import com.blib.api.common.pathfinding.v1.terrain.TerrainType;
 import com.just.ai.goap.StateKey;
 import com.just.ai.goap.action.Action;
 import com.just.ai.goap.condition.expression.Expressions;
@@ -19,8 +17,6 @@ import net.minecraft.world.entity.ai.util.LandRandomPos;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.EnumSet;
 
 public class IdleActions {
 
@@ -40,11 +36,6 @@ public class IdleActions {
         .addPrecondition(IdleSensors.IS_BORED.key(), Expressions.Boolean.isTrue())
         .addEffect(IdleSensors.IS_BORED.key().asDerived(), false)
         .withPerformCallback(context -> {
-            if (context.getActor() instanceof PathNavigatorUser navigatorUser) {
-                navigatorUser.getPathNavigator()
-                    .setExcludedTerrains(EnumSet.of(TerrainType.BREAKABLE, TerrainType.WATER));
-            }
-
             if (isHiveBoundIdleWanderer(context.getActor())) {
                 return performHiveBoundWander(context);
             }
@@ -58,10 +49,6 @@ public class IdleActions {
             );
         })
         .withFinishCallback(context -> {
-            if (context.getActor() instanceof PathNavigatorUser navigatorUser) {
-                navigatorUser.getPathNavigator().setExcludedTerrains(null);
-            }
-
             if (isHiveBoundIdleWanderer(context.getActor())) {
                 NeoMoveToPosAction.onFinish(context);
                 context.getBlackboard(Blackboard.Scope.ACTION).clear();
@@ -96,8 +83,12 @@ public class IdleActions {
                 blackboard.set(KEY_HIVE_WANDER_TARGET, null);
                 yield Action.Signal.CONTINUE;
             }
-            case MOVING, WAITING_FOR_BLOCK_BREAK -> Action.Signal.CONTINUE;
+            case MOVING -> Action.Signal.CONTINUE;
             case NO_PATH -> {
+                blackboard.set(KEY_HIVE_WANDER_TARGET, null);
+                yield Action.Signal.ABORT;
+            }
+            default -> {
                 blackboard.set(KEY_HIVE_WANDER_TARGET, null);
                 yield Action.Signal.ABORT;
             }

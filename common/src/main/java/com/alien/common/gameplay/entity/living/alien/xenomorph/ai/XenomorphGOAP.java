@@ -25,7 +25,6 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.vent.VentActio
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.vent.VentGoals;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.vent.VentSensors;
 import com.blib.api.common.goap.v1.GOAPSensors;
-import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
 import com.just.ai.goap.Agent;
 import com.just.ai.goap.graph.Graph;
 import com.just.ai.goap.plan.ReplanPolicies;
@@ -49,11 +48,6 @@ public class XenomorphGOAP {
                 ReplanPolicies.ifNoActivePlans(),
                 ReplanPolicies.custom(context -> {
                     var actor = context.agent().getActor();
-
-                    if (actor instanceof PathNavigatorUser user && user.getPathNavigator().isWaitingForBlockBreak()) {
-                        return false;
-                    }
-
                     return actor.tickCount % 20 == 0;
                 }),
                 ReplanPolicies.custom(context -> {
@@ -82,10 +76,6 @@ public class XenomorphGOAP {
                     var actor = context.agent().getActor();
 
                     if (actor.isExecutingTriggeredAttack()) {
-                        return false;
-                    }
-
-                    if (actor instanceof PathNavigatorUser user && user.getPathNavigator().isWaitingForBlockBreak()) {
                         return false;
                     }
 

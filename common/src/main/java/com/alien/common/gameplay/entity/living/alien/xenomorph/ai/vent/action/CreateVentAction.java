@@ -84,8 +84,11 @@ public class CreateVentAction {
                 yield Action.Signal.CONTINUE;
             }
             case MOVING -> Action.Signal.CONTINUE;
-            case WAITING_FOR_BLOCK_BREAK -> Action.Signal.CONTINUE;
             case NO_PATH -> {
+                recordVentTargetSearchFailure(xenomorph);
+                yield Action.Signal.ABORT;
+            }
+            default -> {
                 recordVentTargetSearchFailure(xenomorph);
                 yield Action.Signal.ABORT;
             }

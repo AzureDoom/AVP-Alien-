@@ -100,8 +100,13 @@ public class DropOffEggAction {
 
                 yield Action.Signal.CONTINUE;
             }
-            case WAITING_FOR_BLOCK_BREAK -> Action.Signal.CONTINUE;
             case NO_PATH -> {
+                rememberFailedSpot(blackboard, BlockPos.containing(targetPos));
+                scheduleSearchRetry(blackboard, xenomorph.tickCount);
+                NeoMoveToPosAction.onFinish(context);
+                yield Action.Signal.CONTINUE;
+            }
+            default -> {
                 rememberFailedSpot(blackboard, BlockPos.containing(targetPos));
                 scheduleSearchRetry(blackboard, xenomorph.tickCount);
                 NeoMoveToPosAction.onFinish(context);

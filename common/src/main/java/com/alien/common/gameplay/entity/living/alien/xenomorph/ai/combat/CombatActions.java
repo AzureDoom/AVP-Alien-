@@ -2,27 +2,17 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat;
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.action.MeleeAttackAction;
-import com.blib.api.common.block.v1.BlockBreakProgressManager;
 import com.blib.api.common.goap.v1.GOAPSensors;
 import com.blib.api.common.goap.v1.action.ActionMasks;
 import com.blib.api.common.goap.v1.action.BLibAction;
 import com.blib.api.common.goap.v1.action.impl.MoveToPosAction;
 import com.blib.api.common.goap.v1.action.impl.NeoMoveToPosAction;
-import com.blib.api.common.pathfinding.v1.navigator.PathNavigator;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
-import com.blib.api.common.pathfinding.v1.node.PathBreakOrder;
-import com.blib.api.common.pathfinding.v1.node.PathBreakRequirement;
 import com.just.ai.goap.StateKey;
 import com.just.ai.goap.action.Action;
 import com.just.ai.goap.condition.expression.Expressions;
 import com.just.ai.goap.state.Blackboard;
 import com.just.core.functional.option.Option;
-import net.minecraft.core.BlockPos;
-import net.minecraft.sounds.SoundSource;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 public class CombatActions {
 
@@ -79,8 +69,6 @@ public class CombatActions {
         }
     }
 
-    private static final float BLOCK_BREAKING_SPEED = 50F;
-
     private static final double MAX_PREDICTION_DISTANCE_SQUARED = 32.0 * 32.0;
 
     private static Action.Signal performWithBLibNav(
@@ -89,17 +77,13 @@ public class CombatActions {
     ) {
         var xenomorph = context.getActor();
 
-        if (xenomorph instanceof PathNavigatorUser navigatorUser) {
-            navigatorUser.getPathNavigator().setExcludedTerrains(null);
-        }
-
         var interceptPos = computeInterceptPoint(xenomorph, attackTarget);
         var result = NeoMoveToPosAction.perform(context, interceptPos, 1.1);
 
         return switch (result) {
             case FINISHED, MOVING -> Action.Signal.CONTINUE;
-            case WAITING_FOR_BLOCK_BREAK -> handleBlockBreak(context);
             case NO_PATH -> Action.Signal.ABORT;
+            default -> Action.Signal.ABORT;
         };
     }
 
@@ -134,177 +118,6 @@ public class CombatActions {
         }
 
         return predictedPos;
-    }
-
-    private static final double BLOCK_BREAK_REACH_DISTANCE_SQUARED = 2.5 * 2.5;
-
-    private static Action.Signal handleBlockBreak(Action.Context<? extends Xenomorph> context) {
-        var xenomorph = context.getActor();
-
-        if (!(xenomorph instanceof PathNavigatorUser navigatorUser)) {
-            return Action.Signal.ABORT;
-        }
-
-        var navigator = navigatorUser.getPathNavigator();
-        confirmClearedBreakRequirements(xenomorph, navigator);
-
-        var requirements = navigator.getRemainingBreakRequirements();
-
-        if (requirements.isEmpty()) {
-            return Action.Signal.CONTINUE;
-        }
-
-        var currentRequirement = requirements.get(0);
-        var distanceSquared = distanceSquaredToRequirement(xenomorph, currentRequirement);
-
-        if (distanceSquared > BLOCK_BREAK_REACH_DISTANCE_SQUARED) {
-            // Can't reach the required column — stop and let the path recompute from our current position.
-            navigator.stop();
-            return Action.Signal.CONTINUE;
-        }
-
-        if (!xenomorph.isAttacking()) {
-            xenomorph.runDigAnimation();
-        }
-
-        xenomorph.getLookControl().setLookAt(
-            currentRequirement.x() + 0.5,
-            currentRequirement.y() + currentRequirement.height() * 0.5,
-            currentRequirement.z() + 0.5
-        );
-
-        if (xenomorph.tickCount % 4 == 0) {
-            breakRequirements(xenomorph, requirements);
-            confirmClearedBreakRequirements(xenomorph, navigator);
-        }
-
-        return Action.Signal.CONTINUE;
-    }
-
-    private static void confirmClearedBreakRequirements(Xenomorph xenomorph, PathNavigator navigator) {
-        var requirement = navigator.getCurrentBreakRequirement();
-
-        while (requirement != null && isRequirementClear(xenomorph, requirement)) {
-            navigator.confirmBlockBroken();
-            requirement = navigator.getCurrentBreakRequirement();
-        }
-    }
-
-    private static void breakRequirements(Xenomorph xenomorph, List<PathBreakRequirement> requirements) {
-        var parallelDigCount = xenomorph.getXenomorphData().getParallelDigCount();
-        var damagedThisCycle = new HashSet<BlockPos>();
-        var brokenThisCycle = 0;
-        var brokeAny = true;
-
-        while (brokenThisCycle < parallelDigCount && brokeAny) {
-            brokeAny = false;
-
-            for (var requirement : requirements) {
-                if (brokenThisCycle >= parallelDigCount) {
-                    break;
-                }
-
-                if (distanceSquaredToRequirement(xenomorph, requirement) > BLOCK_BREAK_REACH_DISTANCE_SQUARED) {
-                    continue;
-                }
-
-                if (breakFirstSolidBlockInRequirement(xenomorph, requirement, damagedThisCycle)) {
-                    brokenThisCycle++;
-                    brokeAny = true;
-                }
-            }
-        }
-    }
-
-    private static boolean breakFirstSolidBlockInRequirement(
-        Xenomorph xenomorph,
-        PathBreakRequirement requirement,
-        Set<BlockPos> damagedThisCycle
-    ) {
-        if (requirement.order() == PathBreakOrder.TOP_DOWN) {
-            for (int dy = requirement.height() - 1; dy >= 0; dy--) {
-                if (breakSolidBlockAtRequirementOffset(xenomorph, requirement, damagedThisCycle, dy)) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        for (int dy = 0; dy < requirement.height(); dy++) {
-            if (breakSolidBlockAtRequirementOffset(xenomorph, requirement, damagedThisCycle, dy)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private static boolean breakSolidBlockAtRequirementOffset(
-        Xenomorph xenomorph,
-        PathBreakRequirement requirement,
-        Set<BlockPos> damagedThisCycle,
-        int dy
-    ) {
-        var checkPos = new BlockPos(requirement.x(), requirement.y() + dy, requirement.z());
-        var state = xenomorph.level().getBlockState(checkPos);
-
-        if (!state.isSolid()) {
-            return false;
-        }
-
-        if (!damagedThisCycle.add(checkPos)) {
-            return false;
-        }
-
-        var soundType = state.getSoundType();
-
-        xenomorph.level()
-            .playSound(
-                null,
-                checkPos,
-                soundType.getHitSound(),
-                SoundSource.BLOCKS,
-                (soundType.getVolume() + 1.0F) / 8.0F,
-                soundType.getPitch() * 0.5F
-            );
-
-        BlockBreakProgressManager.damage(xenomorph.level(), checkPos, BLOCK_BREAKING_SPEED);
-
-        return true;
-    }
-
-    private static boolean isRequirementClear(Xenomorph xenomorph, PathBreakRequirement requirement) {
-        for (int dy = 0; dy < requirement.height(); dy++) {
-            var checkPos = new BlockPos(requirement.x(), requirement.y() + dy, requirement.z());
-
-            if (xenomorph.level().getBlockState(checkPos).isSolid()) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private static double distanceSquaredToRequirement(Xenomorph xenomorph, PathBreakRequirement requirement) {
-        var box = xenomorph.getBoundingBox();
-        var dx = axisDistance(box.minX, box.maxX, requirement.x(), requirement.x() + 1.0);
-        var dy = axisDistance(box.minY, box.maxY, requirement.y(), requirement.y() + requirement.height());
-        var dz = axisDistance(box.minZ, box.maxZ, requirement.z(), requirement.z() + 1.0);
-
-        return dx * dx + dy * dy + dz * dz;
-    }
-
-    private static double axisDistance(double minA, double maxA, double minB, double maxB) {
-        if (maxA < minB) {
-            return minB - maxA;
-        }
-
-        if (maxB < minA) {
-            return minA - maxB;
-        }
-
-        return 0.0;
     }
 
     private static Action.Signal performWithVanillaNav(
