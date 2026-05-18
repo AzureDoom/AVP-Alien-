@@ -10,6 +10,7 @@ import com.blib.api.common.goap.v1.action.impl.MoveToPosAction;
 import com.blib.api.common.goap.v1.action.impl.NeoMoveToPosAction;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigator;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
+import com.blib.api.common.pathfinding.v1.node.PathBreakOrder;
 import com.blib.api.common.pathfinding.v1.node.PathBreakRequirement;
 import com.just.ai.goap.StateKey;
 import com.just.ai.goap.action.Action;
@@ -220,36 +221,57 @@ public class CombatActions {
         PathBreakRequirement requirement,
         Set<BlockPos> damagedThisCycle
     ) {
+        if (requirement.order() == PathBreakOrder.TOP_DOWN) {
+            for (int dy = requirement.height() - 1; dy >= 0; dy--) {
+                if (breakSolidBlockAtRequirementOffset(xenomorph, requirement, damagedThisCycle, dy)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         for (int dy = 0; dy < requirement.height(); dy++) {
-            var checkPos = new BlockPos(requirement.x(), requirement.y() + dy, requirement.z());
-            var state = xenomorph.level().getBlockState(checkPos);
-
-            if (!state.isSolid()) {
-                continue;
+            if (breakSolidBlockAtRequirementOffset(xenomorph, requirement, damagedThisCycle, dy)) {
+                return true;
             }
-
-            if (!damagedThisCycle.add(checkPos)) {
-                continue;
-            }
-
-            var soundType = state.getSoundType();
-
-            xenomorph.level()
-                .playSound(
-                    null,
-                    checkPos,
-                    soundType.getHitSound(),
-                    SoundSource.BLOCKS,
-                    (soundType.getVolume() + 1.0F) / 8.0F,
-                    soundType.getPitch() * 0.5F
-                );
-
-            BlockBreakProgressManager.damage(xenomorph.level(), checkPos, BLOCK_BREAKING_SPEED);
-
-            return true;
         }
 
         return false;
+    }
+
+    private static boolean breakSolidBlockAtRequirementOffset(
+        Xenomorph xenomorph,
+        PathBreakRequirement requirement,
+        Set<BlockPos> damagedThisCycle,
+        int dy
+    ) {
+        var checkPos = new BlockPos(requirement.x(), requirement.y() + dy, requirement.z());
+        var state = xenomorph.level().getBlockState(checkPos);
+
+        if (!state.isSolid()) {
+            return false;
+        }
+
+        if (!damagedThisCycle.add(checkPos)) {
+            return false;
+        }
+
+        var soundType = state.getSoundType();
+
+        xenomorph.level()
+            .playSound(
+                null,
+                checkPos,
+                soundType.getHitSound(),
+                SoundSource.BLOCKS,
+                (soundType.getVolume() + 1.0F) / 8.0F,
+                soundType.getPitch() * 0.5F
+            );
+
+        BlockBreakProgressManager.damage(xenomorph.level(), checkPos, BLOCK_BREAKING_SPEED);
+
+        return true;
     }
 
     private static boolean isRequirementClear(Xenomorph xenomorph, PathBreakRequirement requirement) {
