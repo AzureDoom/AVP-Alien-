@@ -309,12 +309,15 @@ public abstract class Alien extends Monster implements DataUser {
         }
 
         super.tick();
+
+        if (!level().isClientSide) {
+            movementAnalyzer.tick();
+        }
+
         hiveManager.tick();
         moltingManager.tick();
 
         if (!level().isClientSide) {
-            movementAnalyzer.tick();
-
             hasTarget.set(getTarget() != null);
             isMovingHorizontally.set(movementAnalyzer.isMovingHorizontally());
             isMovingQuickly.set(updateMovingQuicklyForAnimation());

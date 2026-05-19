@@ -195,6 +195,14 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         return getHiveIntruderTargetOrNull() != null ? hiveIntruderPathNavigator : pathNavigator;
     }
 
+    public final boolean hasActiveBLibPath() {
+        return isPathActive(pathNavigator) || isPathActive(hiveIntruderPathNavigator);
+    }
+
+    private static boolean isPathActive(PathNavigator navigator) {
+        return navigator.isPathPending() || navigator.isNavigating();
+    }
+
     @Override
     public @Nullable EntityType<? extends Alien> getTypeForVariant(AlienVariant alienVariant) {
         return config.variantResolver().apply(alienVariant);
