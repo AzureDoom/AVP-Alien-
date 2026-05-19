@@ -484,7 +484,7 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
             hiveIntruderTargetExpiresAtTick = 0;
             hiveIntruderPathNavigator.stop();
 
-            if (expiredTarget == getTarget()) {
+            if (expiredTarget == getTarget() && !AlienPredicates.canContinueTargeting(this, expiredTarget)) {
                 setTarget(null);
             }
         }
@@ -503,7 +503,12 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         var nearbyXenomorphs = entitySenseCache.getByTag(AlienEntityTypeTags.XENOMORPHS);
 
         for (var entity : nearbyXenomorphs) {
-            if (entity instanceof Xenomorph xenomorph && xenomorph != this && xenomorph.getTarget() == null) {
+            if (
+                entity instanceof Xenomorph xenomorph
+                    && xenomorph != this
+                    && xenomorph.getTarget() == null
+                    && AlienPredicates.canAcquireTarget(xenomorph, attacker)
+            ) {
                 xenomorph.setTarget(attacker);
             }
         }

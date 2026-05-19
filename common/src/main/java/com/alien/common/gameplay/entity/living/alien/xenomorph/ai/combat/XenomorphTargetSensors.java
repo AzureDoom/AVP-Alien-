@@ -16,11 +16,23 @@ public final class XenomorphTargetSensors {
         GOAPSensors.NEARBY_ATTACKABLE_TARGETS_KEY,
         xenomorph -> {
             var targets = new ArrayList<LivingEntity>();
+            var currentTarget = xenomorph.getTarget();
 
             for (var livingEntity : xenomorph.getEntitySenseCache().getByClass(LivingEntity.class)) {
-                if (AlienPredicates.canTarget(xenomorph, livingEntity)) {
+                if (
+                    canKeepCurrentTarget(xenomorph, currentTarget, livingEntity)
+                        || AlienPredicates.canAcquireTarget(xenomorph, livingEntity)
+                ) {
                     targets.add(livingEntity);
                 }
+            }
+
+            if (
+                currentTarget != null
+                    && !targets.contains(currentTarget)
+                    && AlienPredicates.canContinueTargeting(xenomorph, currentTarget)
+            ) {
+                targets.add(currentTarget);
             }
 
             var hiveIntruderTarget = xenomorph.getHiveIntruderTargetOrNull();
@@ -28,7 +40,7 @@ public final class XenomorphTargetSensors {
             if (
                 hiveIntruderTarget != null
                     && !targets.contains(hiveIntruderTarget)
-                    && AlienPredicates.canTarget(xenomorph, hiveIntruderTarget)
+                    && (hiveIntruderTarget == currentTarget || AlienPredicates.canAcquireTarget(xenomorph, hiveIntruderTarget))
             ) {
                 targets.add(hiveIntruderTarget);
             }
@@ -36,6 +48,14 @@ public final class XenomorphTargetSensors {
             return targets;
         }
     );
+
+    private static boolean canKeepCurrentTarget(
+        Xenomorph xenomorph,
+        LivingEntity currentTarget,
+        LivingEntity potentialTarget
+    ) {
+        return potentialTarget == currentTarget && AlienPredicates.canContinueTargeting(xenomorph, potentialTarget);
+    }
 
     private XenomorphTargetSensors() {
         throw new UnsupportedOperationException();

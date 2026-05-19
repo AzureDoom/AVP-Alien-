@@ -71,7 +71,7 @@ public final class HiveTerritoryAggroTask {
         var nearestDistanceSqr = Double.MAX_VALUE;
 
         for (var player : playersInTerritory) {
-            if (!AlienPredicates.canTarget(xenomorph, player)) {
+            if (!AlienPredicates.canAcquireTarget(xenomorph, player)) {
                 continue;
             }
 

@@ -25,6 +25,10 @@ public class AlienPredicates {
         return canContinueTargeting(alien, potentialTarget);
     }
 
+    public static boolean canAcquireTarget(@NotNull Alien alien, @NotNull LivingEntity potentialTarget) {
+        return canTarget(alien, potentialTarget) && alien.getSensing().hasLineOfSight(potentialTarget);
+    }
+
     public static boolean canContinueTargeting(@NotNull Alien alien, @NotNull LivingEntity potentialTarget) {
         // Target must still be valid...
         return isValidTarget(alien.getVariant(), potentialTarget)
