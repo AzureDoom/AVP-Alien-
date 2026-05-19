@@ -270,7 +270,20 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
 
     private void addIgnoredByXenomorphs() {
         getOrCreateTagBuilder(AlienEntityTypeTags.IGNORED_BY_XENOMORPHS)
-            .add(EntityType.BAT, EntityType.CREEPER);
+            .add(
+                EntityType.ALLAY,
+                EntityType.AXOLOTL,
+                EntityType.BAT,
+                EntityType.COD,
+                EntityType.CREEPER,
+                EntityType.GLOW_SQUID,
+                EntityType.PUFFERFISH,
+                EntityType.SALMON,
+                EntityType.SQUID,
+                EntityType.TADPOLE,
+                EntityType.TROPICAL_FISH,
+                EntityType.VEX
+            );
     }
 
     private void addIrradiatedAliens() {
