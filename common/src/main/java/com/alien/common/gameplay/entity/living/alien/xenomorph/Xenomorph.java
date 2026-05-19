@@ -16,6 +16,7 @@ import com.blib.api.common.entity.v1.EntitySenseCache;
 import com.blib.api.common.entity.v1.EntitySenseCacheUser;
 import com.blib.api.common.goap.v1.GOAPUser;
 import com.blib.api.common.pathfinding.v1.cache.TerrainCacheRegistry;
+import com.blib.api.common.pathfinding.v1.evaluator.PathCrawlConfig;
 import com.blib.api.common.pathfinding.v1.evaluator.TerrainEvaluatorConfig;
 import com.blib.api.common.pathfinding.v1.feature.PathfindingProfile;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigator;
@@ -150,10 +151,14 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
     }
 
     private PathNavigator createPathNavigator(Level level, XenomorphPathConfig pathConfig, SearchConfig searchConfig) {
+        var crawlConfig = config.canCrawl()
+            ? PathCrawlConfig.enabled(pathConfig.crawlHeight())
+            : PathCrawlConfig.DISABLED;
         var evaluatorConfig = TerrainEvaluatorConfig.builder()
             .addTerrain(TerrainType.GROUND, 1.0f)
             .withTerrainClassifier(TerrainClassifiers.GROUND_ONLY)
             .withEntitySize(pathConfig.entityWidth(), pathConfig.entityHeight())
+            .withCrawlConfig(crawlConfig)
             .withMaxFallDistance(14)
             .withCanOpenDoors(pathConfig.canOpenDoors())
             .build();

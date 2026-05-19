@@ -3,8 +3,13 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph;
 public record XenomorphPathConfig(
     int entityWidth,
     int entityHeight,
-    boolean canOpenDoors
+    boolean canOpenDoors,
+    int crawlHeight
 ) {
+
+    public XenomorphPathConfig(int entityWidth, int entityHeight, boolean canOpenDoors) {
+        this(entityWidth, entityHeight, canOpenDoors, 1);
+    }
 
     public static final XenomorphPathConfig SMALL_DOOR = new XenomorphPathConfig(1, 1, true);
 
