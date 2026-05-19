@@ -156,7 +156,8 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
             : PathCrawlConfig.DISABLED;
         var evaluatorConfig = TerrainEvaluatorConfig.builder()
             .addTerrain(TerrainType.GROUND, 1.0f)
-            .withTerrainClassifier(TerrainClassifiers.GROUND_ONLY)
+            .addTerrain(TerrainType.WATER, 1.5f)
+            .withTerrainClassifier(TerrainClassifiers.GROUND_AND_WATER)
             .withEntitySize(pathConfig.entityWidth(), pathConfig.entityHeight())
             .withCrawlConfig(crawlConfig)
             .withMaxFallDistance(14)
