@@ -17,6 +17,7 @@ import com.blib.api.common.entity.v1.EntitySenseCacheUser;
 import com.blib.api.common.goap.v1.GOAPUser;
 import com.blib.api.common.pathfinding.v1.cache.TerrainCacheRegistry;
 import com.blib.api.common.pathfinding.v1.evaluator.PathCrawlConfig;
+import com.blib.api.common.pathfinding.v1.evaluator.PathWaterConfig;
 import com.blib.api.common.pathfinding.v1.evaluator.TerrainEvaluatorConfig;
 import com.blib.api.common.pathfinding.v1.feature.PathfindingProfile;
 import com.blib.api.common.pathfinding.v1.navigator.PathNavigator;
@@ -60,6 +61,8 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
     private static final int HIVE_INTRUDER_MAX_PATH_LENGTH = 512;
 
     private static final int HIVE_INTRUDER_TARGET_MEMORY_TICKS = 3 * 20;
+
+    private static final float UNDERWATER_HEIGHT_SCALE = 0.4f;
 
     public final DataAccessor<Integer> attackDurationInTicks;
 
@@ -154,12 +157,14 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         var crawlConfig = config.canCrawl()
             ? PathCrawlConfig.enabled(pathConfig.crawlHeight())
             : PathCrawlConfig.DISABLED;
+        var waterConfig = PathWaterConfig.enabled((int) Math.ceil(pathConfig.entityHeight() * UNDERWATER_HEIGHT_SCALE));
         var evaluatorConfig = TerrainEvaluatorConfig.builder()
             .addTerrain(TerrainType.GROUND, 1.0f)
             .addTerrain(TerrainType.WATER, 1.5f)
             .withTerrainClassifier(TerrainClassifiers.GROUND_AND_WATER)
             .withEntitySize(pathConfig.entityWidth(), pathConfig.entityHeight())
             .withCrawlConfig(crawlConfig)
+            .withWaterConfig(waterConfig)
             .withMaxFallDistance(14)
             .withCanOpenDoors(pathConfig.canOpenDoors())
             .build();
@@ -392,7 +397,7 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
     public @NotNull EntityDimensions getDefaultDimensions(@NotNull Pose pose) {
         var defaultDimensions = getType().getDimensions();
         var shouldBeSmall = crawlingManager.isCrawling() || isUnderWater();
-        return defaultDimensions.scale(1, shouldBeSmall ? 0.4f : 1);
+        return defaultDimensions.scale(1, shouldBeSmall ? UNDERWATER_HEIGHT_SCALE : 1);
     }
 
     @Override
