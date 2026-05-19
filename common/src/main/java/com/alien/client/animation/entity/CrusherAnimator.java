@@ -105,7 +105,7 @@ public class CrusherAnimator extends AzEntityAnimator<Crusher> {
             // TODO: idle swim
             animFunction = dispatcher::swim;
         } else if (isMovingOnGround) {
-            if (crusher.hasTarget.get()) {
+            if (crusher.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {
                 animFunction = dispatcher::walk;

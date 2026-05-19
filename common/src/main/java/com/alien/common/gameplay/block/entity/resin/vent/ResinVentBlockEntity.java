@@ -1,9 +1,9 @@
 package com.alien.common.gameplay.block.entity.resin.vent;
 
 import com.alien.common.data.AlienVariantTypes;
-import com.alien.common.gameplay.hive2.id.HiveLocationId;
-import com.alien.common.gameplay.hive2.location.HiveLocation;
-import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
+import com.alien.common.gameplay.hive.id.HiveLocationId;
+import com.alien.common.gameplay.hive.location.HiveLocation;
+import com.alien.common.gameplay.hive.location.HiveLocationRegistry;
 import com.alien.common.gameplay.level.gameevent.listener.CryForHelpListener;
 import com.alien.common.registry.init.AlienBlockEntityTypes;
 import com.blib.api.common.time.v1.Cooldown;
@@ -20,10 +20,10 @@ import org.jetbrains.annotations.Nullable;
 import java.time.Duration;
 
 /**
- * Vent block entity. In hive2 this binds to a {@link HiveLocation} (not a faction) — the location's chunk-claim set is
+ * Vent block entity. In hive this binds to a {@link HiveLocation} (not a faction) — the location's chunk-claim set is
  * the source of truth for "which hive owns this vent." Each tick we re-resolve which location currently owns this
  * vent's chunk. If that location's variant matches the vent's variant, the vent registers itself with the location's
- * {@link com.alien.common.gameplay.hive2.vent.HiveVentManager} so AI queries can find it.
+ * {@link com.alien.common.gameplay.hive.vent.HiveVentManager} so AI queries can find it.
  */
 public class ResinVentBlockEntity extends BlockEntity implements GameEventListener.Provider<CryForHelpListener> {
 
@@ -80,7 +80,7 @@ public class ResinVentBlockEntity extends BlockEntity implements GameEventListen
         var lineageFaction = com.alien.Alien.MOD.factions().get(owningLocation.lineageFactionId());
         if (
             lineageFaction == null
-                || !(lineageFaction.data() instanceof com.alien.common.gameplay.hive2.faction.LineageFactionData lineage)
+                || !(lineageFaction.data() instanceof com.alien.common.gameplay.hive.faction.LineageFactionData lineage)
                 || lineage.variant() != ventVariant
         ) {
             // Variant mismatch — disown.

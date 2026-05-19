@@ -2,7 +2,7 @@ package com.alien.fabric.data.raid_wave;
 
 import com.alien.AlienResources;
 import com.alien.common.data.RaidWaveProfileReloadListener;
-import com.alien.common.gameplay.hive2.convoy.RaidWaveProfile;
+import com.alien.common.gameplay.hive.convoy.RaidWaveProfile;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.RaidWaveProfileRegistry;
 import com.alien.common.registry.init.AlienEntityTypes;

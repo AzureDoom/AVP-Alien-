@@ -4,11 +4,11 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.XenomorphGOAP;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.CombatActions;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.CombatGoals;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.CombatSensors;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.XenomorphTargetSensors;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.lunge.LungeConfig;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.spitter.Spitter;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.spitter.ai.spit.SpitActions;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.spitter.ai.spit.SpitSensors;
-import com.alien.common.util.AlienPredicates;
 import com.blib.api.common.goap.v1.GOAPSensors;
 import com.just.ai.goap.Agent;
 import com.just.ai.goap.graph.Graph;
@@ -20,7 +20,6 @@ public class SpitterGOAP {
     public static final Graph<Spitter> GRAPH = Graph.<Spitter>builder()
         .apply(XenomorphGOAP::addSensorsPackage)
         .apply(SpitterGOAP::addCombatPackage)
-        .apply(XenomorphGOAP::addDigPackage)
         .apply(XenomorphGOAP::addIdlePackage)
         .apply(b -> XenomorphGOAP.addLungePackage(b, LUNGE_CONFIG))
         .apply(SpitterGOAP::addSpitPackage)
@@ -36,9 +35,7 @@ public class SpitterGOAP {
         graphBuilder.addAction(SpitterCombatActions.MOVE_TO_TARGET);
         graphBuilder.addAction(CombatActions.MELEE_ATTACK);
 
-        graphBuilder.addSensor(
-            GOAPSensors.nearbyAttackableTargetsFactory(AlienPredicates::canTarget)
-        );
+        graphBuilder.addSensor(XenomorphTargetSensors.NEARBY_ATTACKABLE_TARGETS);
         graphBuilder.addSensor(GOAPSensors.NEAREST_ATTACKABLE_TARGETS);
         graphBuilder.addSensor(GOAPSensors.NEAREST_ATTACKABLE_TARGET);
         graphBuilder.addSensor(GOAPSensors.HAS_ATTACK_TARGET);

@@ -88,7 +88,7 @@ public class RazorClawAnimator extends AzEntityAnimator<RazorClaw> {
         if (razorClaw.isUnderWater()) {
             animFunction = dispatcher::swim;
         } else if (isMovingOnGround) {
-            if (razorClaw.hasTarget.get()) {
+            if (razorClaw.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {
                 animFunction = dispatcher::walk;

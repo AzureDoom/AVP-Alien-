@@ -3,7 +3,6 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.chrysalis.ai;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.CombatActions;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.CombatSensors;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.dig.DigSensors;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.chrysalis.ai.roll.RollSensors;
 import com.blib.api.common.goap.v1.GOAPSensors;
 import com.blib.api.common.goap.v1.action.ActionMasks;
@@ -17,7 +16,6 @@ public class ChrysalisCombatActions {
         .addMasks(ActionMasks.MOVE)
         .addPrecondition(GOAPSensors.HAS_ATTACK_TARGET.key(), Expressions.Boolean.isTrue())
         .addPrecondition(CombatSensors.IS_TARGET_IN_MELEE_RANGE.key(), Expressions.Boolean.isFalse())
-        .addPrecondition(DigSensors.IS_PATH_TO_TARGET_BLOCKED.key(), Expressions.Boolean.isFalse())
         .addRuntimePrecondition(RollSensors.IS_TARGET_IN_ROLL_RANGE_KEY, Expressions.Boolean.isFalse())
         .addEffect(CombatSensors.IS_TARGET_IN_MELEE_RANGE.key().asDerived(), true)
         .withPerformCallback(CombatActions::performMoveToTarget)

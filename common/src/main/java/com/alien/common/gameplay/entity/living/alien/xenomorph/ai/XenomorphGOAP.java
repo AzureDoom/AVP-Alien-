@@ -4,8 +4,7 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.CombatActions;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.CombatGoals;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.CombatSensors;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.dig.DigActions;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.dig.DigSensors;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.XenomorphTargetSensors;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg.EggActions;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg.EggGoals;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg.EggSensors;
@@ -25,9 +24,7 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.resin.ResinSen
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.vent.VentActions;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.vent.VentGoals;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.vent.VentSensors;
-import com.alien.common.util.AlienPredicates;
 import com.blib.api.common.goap.v1.GOAPSensors;
-import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
 import com.just.ai.goap.Agent;
 import com.just.ai.goap.graph.Graph;
 import com.just.ai.goap.plan.ReplanPolicies;
@@ -38,15 +35,6 @@ public class XenomorphGOAP {
         return graphBuilder
             .apply(XenomorphGOAP::addSensorsPackage)
             .apply(XenomorphGOAP::addCombatPackage)
-            .apply(XenomorphGOAP::addDigPackage)
-            .apply(XenomorphGOAP::addIdlePackage);
-    }
-
-    public static <T extends Xenomorph> Graph.Builder<T> applyBaseGraphWithoutDig(Graph.Builder<T> graphBuilder) {
-        return graphBuilder
-            .apply(XenomorphGOAP::addSensorsPackage)
-            .apply(XenomorphGOAP::addCombatPackage)
-            .apply(XenomorphGOAP::addDigSensorsPackage)
             .apply(XenomorphGOAP::addIdlePackage);
     }
 
@@ -60,11 +48,6 @@ public class XenomorphGOAP {
                 ReplanPolicies.ifNoActivePlans(),
                 ReplanPolicies.custom(context -> {
                     var actor = context.agent().getActor();
-
-                    if (actor instanceof PathNavigatorUser user && user.getPathNavigator().isWaitingForBlockBreak()) {
-                        return false;
-                    }
-
                     return actor.tickCount % 20 == 0;
                 }),
                 ReplanPolicies.custom(context -> {
@@ -93,10 +76,6 @@ public class XenomorphGOAP {
                     var actor = context.agent().getActor();
 
                     if (actor.isExecutingTriggeredAttack()) {
-                        return false;
-                    }
-
-                    if (actor instanceof PathNavigatorUser user && user.getPathNavigator().isWaitingForBlockBreak()) {
                         return false;
                     }
 
@@ -143,27 +122,11 @@ public class XenomorphGOAP {
 
         graphBuilder.addAction(CombatActions.MELEE_ATTACK);
 
-        graphBuilder.addSensor(
-            GOAPSensors.nearbyAttackableTargetsFactory(AlienPredicates::canTarget)
-        );
+        graphBuilder.addSensor(XenomorphTargetSensors.NEARBY_ATTACKABLE_TARGETS);
         graphBuilder.addSensor(GOAPSensors.NEAREST_ATTACKABLE_TARGETS);
         graphBuilder.addSensor(GOAPSensors.NEAREST_ATTACKABLE_TARGET);
         graphBuilder.addSensor(GOAPSensors.HAS_ATTACK_TARGET);
         graphBuilder.addSensor(CombatSensors.IS_TARGET_IN_MELEE_RANGE);
-
-        return graphBuilder;
-    }
-
-    public static <T extends Xenomorph> Graph.Builder<T> addDigPackage(Graph.Builder<T> graphBuilder) {
-        graphBuilder.addAction(DigActions.DIG_TO_TARGET);
-
-        addDigSensorsPackage(graphBuilder);
-
-        return graphBuilder;
-    }
-
-    public static <T extends Xenomorph> Graph.Builder<T> addDigSensorsPackage(Graph.Builder<T> graphBuilder) {
-        graphBuilder.addSensor(DigSensors.IS_PATH_TO_TARGET_BLOCKED);
 
         return graphBuilder;
     }

@@ -5,6 +5,7 @@ import com.blib.api.common.dismemberment.v1.Dismemberable;
 import com.blib.api.common.dismemberment.v1.LimbCategories;
 import com.blib.api.common.dismemberment.v1.LimbDefinitionRegistry;
 import com.blib.api.common.nbt.v1.model.NBTSerializable;
+import com.blib.api.common.pathfinding.v1.navigator.PathNavigatorUser;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.PathfinderMob;
@@ -59,8 +60,9 @@ public class CrawlingManager implements NBTSerializable {
         }
 
         var path = navigation.getPath();
-
-        var isTight = isTightSpace(blockPosition);
+        var pathRequestsCrawl = entity instanceof PathNavigatorUser navigatorUser
+            && navigatorUser.getPathNavigator().shouldCrawl();
+        var isTight = pathRequestsCrawl || isTightSpace(blockPosition);
 
         if (path != null && path.getNextNodeIndex() < path.getNodeCount()) {
             var previousNode = path.getPreviousNode();

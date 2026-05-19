@@ -15,7 +15,6 @@ public class CarrierGOAP {
     public static final Graph<Carrier> GRAPH = Graph.<Carrier>builder()
         .apply(XenomorphGOAP::addSensorsPackage)
         .apply(CarrierGOAP::addCombatPackage)
-        .apply(XenomorphGOAP::addDigPackage)
         .apply(XenomorphGOAP::addIdlePackage)
         .apply(CarrierGOAP::addPanicReleasePackage)
         .apply(CarrierGOAP::addThrowPackage)

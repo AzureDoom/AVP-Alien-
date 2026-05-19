@@ -66,7 +66,7 @@ public class Burster extends Xenomorph implements EggCarrier, GOAPUser<Burster>,
             .add(Attributes.FOLLOW_RANGE, 35F)
             .add(Attributes.KNOCKBACK_RESISTANCE, 0.3f)
             .add(Attributes.MAX_HEALTH, PlayerStatConstants.BASE_HEALTH * 2F)
-            .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1F);
+            .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1.2F);
     }
 
     private final BursterAnimationDispatcher animationDispatcher;

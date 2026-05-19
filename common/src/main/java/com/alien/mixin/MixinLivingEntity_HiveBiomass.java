@@ -1,6 +1,6 @@
 package com.alien.mixin;
 
-import com.alien.common.gameplay.hive2.economy.HiveBiomassEvents;
+import com.alien.common.gameplay.hive.economy.HiveBiomassEvents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;

@@ -1,9 +1,12 @@
 package com.alien.common.gameplay.item;
 
+import com.alien.common.data.AlienAdvancements;
 import com.alien.common.registry.key.AlienDamageTypeKeys;
+import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.shield.v1.BLibShieldConfig;
 import com.blib.api.common.shield.v1.BLibShieldItem;
 import com.blib.api.common.shield.v1.BlockResult;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
@@ -40,6 +43,7 @@ public class CrusherHeadShieldItem extends Item implements BLibShieldItem {
     public BlockResult onBlocked(LivingEntity user, ItemStack stack, DamageSource source, float damage) {
         // Xenomorph shields resist acid spit for free with no damage applied.
         if (source.is(AlienDamageTypeKeys.ACID_SPIT)) {
+            grantSpitBlockAdvancement(user, source);
             return BlockResult.fullBlock();
         }
 
@@ -59,5 +63,16 @@ public class CrusherHeadShieldItem extends Item implements BLibShieldItem {
         }
 
         return BlockResult.fullBlock();
+    }
+
+    private static void grantSpitBlockAdvancement(LivingEntity user, DamageSource source) {
+        if (!(user instanceof ServerPlayer player)) {
+            return;
+        }
+
+        var attacker = source.getEntity();
+        if (attacker != null && attacker.getType().is(AlienEntityTypeTags.SPITTERS)) {
+            AlienAdvancements.BLOCK_SPITTER_SPIT_WITH_HEAD_SHIELD.grant(player);
+        }
     }
 }

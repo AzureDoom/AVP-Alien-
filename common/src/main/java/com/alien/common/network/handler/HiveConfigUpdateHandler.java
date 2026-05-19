@@ -1,7 +1,7 @@
 package com.alien.common.network.handler;
 
-import com.alien.common.gameplay.hive2.config.HiveConfigSchema;
-import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
+import com.alien.common.gameplay.hive.config.HiveConfigSchema;
+import com.alien.common.gameplay.hive.location.HiveLocationRegistry;
 import com.alien.common.network.payload.C2SUpdateHiveConfigPayload;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;

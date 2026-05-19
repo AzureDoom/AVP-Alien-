@@ -2,6 +2,7 @@ package com.alien.common.gameplay.entity.living.alien;
 
 import com.alien.AlienResources;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
+import com.alien.common.gameplay.hive.faction.HiveMemberLocationResolver;
 import com.alien.common.model.lifecycle.growth.FormSizeScale;
 import com.alien.common.model.lifecycle.growth.MoltPhase;
 import com.alien.common.registry.FormSizeScaleRegistry;
@@ -192,16 +193,44 @@ public class MoltingManager implements NBTSerializable {
     }
 
     private boolean canStartMolting() {
-        return !isVulnerableAndOnFire() && !wasRecentlyHurt() && entity.getTarget() == null && !hasNearbyAttackTarget();
+        return !isVulnerableAndOnFire()
+            && !isAggroed()
+            && !wasRecentlyHurt()
+            && !isHiveLocationTrackingPlayers()
+            && !isMoving()
+            && !hasActiveBLibPath()
+            && !hasNearbyAttackTarget();
     }
 
     private boolean isVulnerableAndOnFire() {
         return entity.isOnFire() && !entity.fireImmune();
     }
 
+    private boolean isAggroed() {
+        return entity.getTarget() != null;
+    }
+
     private boolean wasRecentlyHurt() {
         var lastHurtTime = entity.getLastHurtTimeInTicks();
         return lastHurtTime > 0 && entity.tickCount - lastHurtTime < RECENTLY_HURT_WINDOW_IN_TICKS;
+    }
+
+    private boolean isHiveLocationTrackingPlayers() {
+        var location = HiveMemberLocationResolver.reserveReturnLocation(entity);
+        if (location == null || !location.isAlive()) {
+            return false;
+        }
+
+        var bossBar = location.bossBar();
+        return bossBar != null && bossBar.isAngry();
+    }
+
+    private boolean isMoving() {
+        return entity.getMovementAnalyzer().isMoving();
+    }
+
+    private boolean hasActiveBLibPath() {
+        return entity instanceof Xenomorph xenomorph && xenomorph.hasActiveBLibPath();
     }
 
     private boolean hasNearbyAttackTarget() {
@@ -212,7 +241,7 @@ public class MoltingManager implements NBTSerializable {
         return xenomorph.getEntitySenseCache()
             .getByClass(LivingEntity.class)
             .stream()
-            .anyMatch(potentialTarget -> AlienPredicates.canTarget(xenomorph, potentialTarget));
+            .anyMatch(potentialTarget -> AlienPredicates.canAcquireTarget(xenomorph, potentialTarget));
     }
 
     private float computeMoltAlpha(MoltPhase phase) {

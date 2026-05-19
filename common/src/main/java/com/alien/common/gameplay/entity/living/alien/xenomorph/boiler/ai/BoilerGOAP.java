@@ -8,7 +8,7 @@ import com.just.ai.goap.graph.Graph;
 public class BoilerGOAP {
 
     public static final Graph<Boiler> GRAPH = Graph.<Boiler>builder()
-        .apply(XenomorphGOAP::applyBaseGraphWithoutDig)
+        .apply(XenomorphGOAP::applyBaseGraph)
         .apply(BoilerGOAP::addVibrationPackage)
         .build();
 

@@ -98,7 +98,7 @@ public class CarrierAnimator extends AzEntityAnimator<Carrier> {
         if (carrier.isUnderWater()) {
             animFunction = dispatcher::swim;
         } else if (isMovingOnGround) {
-            if (carrier.hasTarget.get()) {
+            if (carrier.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {
                 animFunction = dispatcher::walk;

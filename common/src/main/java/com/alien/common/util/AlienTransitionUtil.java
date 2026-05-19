@@ -1,8 +1,8 @@
 package com.alien.common.util;
 
 import com.alien.common.gameplay.entity.living.alien.Alien;
-import com.alien.common.gameplay.hive2.faction.FactionMembershipTransfer;
-import com.alien.common.gameplay.hive2.faction.LocationMembership;
+import com.alien.common.gameplay.hive.faction.FactionMembershipTransfer;
+import com.alien.common.gameplay.hive.faction.LocationMembership;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.blib.api.common.entity.v1.EntityTransitionUtil;
 import net.minecraft.server.level.ServerLevel;
@@ -31,7 +31,7 @@ public class AlienTransitionUtil {
             return AlienTransitionResult.NoTypeForVariant.INSTANCE;
         }
 
-        // Snapshot hive2 faction membership before transitionInto discards the old entity (UUID is in the default
+        // Snapshot hive faction membership before transitionInto discards the old entity (UUID is in the default
         // blacklist). The Phase 9 invariant task will evict variant mismatches afterward if they don't fit the
         // lineage's variant — but for self-variant transitions this preserves location-tier membership correctly.
         var factionSnapshot = FactionMembershipTransfer.snapshot(alien);

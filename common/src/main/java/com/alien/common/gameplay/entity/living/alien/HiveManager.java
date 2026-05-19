@@ -2,15 +2,15 @@ package com.alien.common.gameplay.entity.living.alien;
 
 import com.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
-import com.alien.common.gameplay.hive2.faction.HiveMemberLocationResolver;
-import com.alien.common.gameplay.hive2.faction.LineageFactionData;
-import com.alien.common.gameplay.hive2.faction.VariantFactionRegistry;
-import com.alien.common.gameplay.hive2.id.LineageIds;
-import com.alien.common.gameplay.hive2.lifecycle.HiveLocationFoundingService;
-import com.alien.common.gameplay.hive2.lifecycle.QueenSettlementDetector;
-import com.alien.common.gameplay.hive2.lifecycle.SpreadZoneCheck;
-import com.alien.common.gameplay.hive2.lifecycle.SpreadZoneResult;
-import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
+import com.alien.common.gameplay.hive.faction.HiveMemberLocationResolver;
+import com.alien.common.gameplay.hive.faction.LineageFactionData;
+import com.alien.common.gameplay.hive.faction.VariantFactionRegistry;
+import com.alien.common.gameplay.hive.id.LineageIds;
+import com.alien.common.gameplay.hive.lifecycle.HiveLocationFoundingService;
+import com.alien.common.gameplay.hive.lifecycle.QueenSettlementDetector;
+import com.alien.common.gameplay.hive.lifecycle.SpreadZoneCheck;
+import com.alien.common.gameplay.hive.lifecycle.SpreadZoneResult;
+import com.alien.common.gameplay.hive.location.HiveLocationRegistry;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.faction.v1.FactionMember;
 import com.blib.api.common.nbt.v1.model.NBTSerializable;
@@ -20,7 +20,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ChunkPos;
 
 /**
- * Per-alien hive2 manager. Drives:
+ * Per-alien hive manager. Drives:
  * <ul>
  * <li>Variant-faction membership idempotency (event-driven via {@code Alien.finalizeSpawn} + the BLib
  * {@code onEntityLoad} listener — this class only exposes the entry point).</li>
@@ -126,7 +126,7 @@ public class HiveManager implements NBTSerializable {
     }
 
     /**
-     * Ensures every alien gets a fresh shed-grace window the first time it ticks under hive2 — protects newly added
+     * Ensures every alien gets a fresh shed-grace window the first time it ticks under hive — protects newly added
      * lineage members from being shed immediately if their {@link #lastInsideLineageChunkTick} is still the sentinel
      * value 0. After the first observation the timestamp is updated normally based on chunk presence.
      */

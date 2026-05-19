@@ -1,6 +1,6 @@
 package com.alien.common.gameplay.command.count;
 
-import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
+import com.alien.common.gameplay.hive.location.HiveLocationRegistry;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -39,7 +39,7 @@ public class CountCommand {
                     })
             )
             .then(
-                // Backwards compat: `count hive` reports total hive2 locations.
+                // Backwards compat: `count hive` reports total hive locations.
                 Commands.literal(HIVE_ARGUMENT_NAME)
                     .executes(CountCommand::countLocations)
             )

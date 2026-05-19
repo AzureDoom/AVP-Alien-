@@ -1,7 +1,7 @@
 package com.alien.common.data;
 
 import com.alien.Alien;
-import com.alien.common.gameplay.hive2.convoy.RaidWaveProfile;
+import com.alien.common.gameplay.hive.convoy.RaidWaveProfile;
 import com.alien.common.registry.RaidWaveProfileRegistry;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

@@ -115,7 +115,7 @@ public class ChrysalisAnimator extends AzEntityAnimator<Chrysalis> {
         if (chrysalis.isUnderWater()) {
             animFunction = dispatcher::swim;
         } else if (isMovingOnGround) {
-            if (chrysalis.hasTarget.get()) {
+            if (chrysalis.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {
                 animFunction = dispatcher::walk;

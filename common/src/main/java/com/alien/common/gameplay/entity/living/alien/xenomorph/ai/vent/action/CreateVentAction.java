@@ -84,8 +84,11 @@ public class CreateVentAction {
                 yield Action.Signal.CONTINUE;
             }
             case MOVING -> Action.Signal.CONTINUE;
-            case WAITING_FOR_BLOCK_BREAK -> Action.Signal.CONTINUE;
             case NO_PATH -> {
+                recordVentTargetSearchFailure(xenomorph);
+                yield Action.Signal.ABORT;
+            }
+            default -> {
                 recordVentTargetSearchFailure(xenomorph);
                 yield Action.Signal.ABORT;
             }
@@ -115,9 +118,9 @@ public class CreateVentAction {
 
             var hitPos = blockHitResult.getBlockPos();
 
-            // Reject if a vent already exists in the hive2 location that owns this chunk. (If no location owns it,
+            // Reject if a vent already exists in the hive location that owns this chunk. (If no location owns it,
             // there's nothing to dedupe against — let the build proceed.)
-            var owningLocation = com.alien.common.gameplay.hive2.location.HiveLocationRegistry.INSTANCE.getByChunk(
+            var owningLocation = com.alien.common.gameplay.hive.location.HiveLocationRegistry.INSTANCE.getByChunk(
                 xenomorph.level().dimension(),
                 new net.minecraft.world.level.ChunkPos(hitPos)
             );

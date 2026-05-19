@@ -116,7 +116,7 @@ public class EmpressAnimator extends AzEntityAnimator<Empress> {
         } else if (empress.isUnderWater()) {
             animFunction = dispatcher::swim;
         } else if (isMovingOnGround) {
-            if (empress.hasTarget.get()) {
+            if (empress.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {
                 animFunction = dispatcher::walk;

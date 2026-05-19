@@ -91,7 +91,7 @@ public class BursterAnimator extends AzEntityAnimator<Burster> {
         } else if (isMoving) {
             if (isCrawling) {
                 animFunction = dispatcher::crawl;
-            } else if (burster.hasTarget.get()) {
+            } else if (burster.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {
                 animFunction = dispatcher::walk;

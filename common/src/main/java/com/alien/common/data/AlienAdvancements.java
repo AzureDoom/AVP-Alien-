@@ -5,13 +5,35 @@ import com.blib.api.common.advancement.v1.BLibAdvancement;
 
 public class AlienAdvancements {
 
+    public static final BLibAdvancement BLOCK_SPITTER_SPIT_WITH_HEAD_SHIELD = create("block_spitter_spit_with_head_shield");
+
+    public static final BLibAdvancement KILL_A_HARBINGER = create("kill_a_harbinger");
+
     public static final BLibAdvancement KILL_A_HIVE = create("kill_a_hive");
+
+    public static final BLibAdvancement KILL_A_LINEAGE = create("kill_a_lineage");
 
     public static final BLibAdvancement KILL_A_ROYAL_ALIEN = create("kill_a_royal_alien");
 
     public static final BLibAdvancement KILL_ALL_ALIENS = create("kill_all_aliens");
 
+    public static final BLibAdvancement KILL_ALL_ABERRANT_ALIENS = create("kill_all_aberrant_aliens");
+
+    public static final BLibAdvancement KILL_ALL_IRRADIATED_ALIENS = create("kill_all_irradiated_aliens");
+
+    public static final BLibAdvancement KILL_ALL_NETHER_ALIENS = create("kill_all_nether_aliens");
+
+    public static final BLibAdvancement KILL_ALL_NORMAL_ALIENS = create("kill_all_normal_aliens");
+
     public static final BLibAdvancement KILL_AN_ALIEN = create("kill_an_alien");
+
+    public static final BLibAdvancement KILL_AN_EMPRESS = create("kill_an_empress");
+
+    public static final BLibAdvancement LEAD_RAID_TO_ENEMY_HIVE = create("lead_raid_to_enemy_hive");
+
+    public static final BLibAdvancement DEFEAT_A_RAID = create("defeat_a_raid");
+
+    public static final BLibAdvancement DUAL_VARIANT_RAIDS = create("dual_variant_raids");
 
     public static final BLibAdvancement REMOVE_EMBRYO_WITH_CHORUS_FRUIT = create("remove_embryo_with_chorus_fruit");
 

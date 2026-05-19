@@ -62,7 +62,7 @@ public class Prowler extends Xenomorph implements GOAPUser<Prowler> {
             .add(Attributes.FOLLOW_RANGE, 35F)
             .add(Attributes.KNOCKBACK_RESISTANCE, 0.5f)
             .add(Attributes.MAX_HEALTH, PlayerStatConstants.BASE_HEALTH * 3F)
-            .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1.1F);
+            .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 1.2F);
     }
 
     @Override

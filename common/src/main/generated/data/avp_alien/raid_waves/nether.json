@@ -59,17 +59,17 @@
           },
           {
             "entity": "avp_alien:nether_chrysalis",
-            "max_count": 3,
+            "max_count": 2,
             "weight": 2
           },
           {
             "entity": "avp_alien:nether_razor_claw",
-            "max_count": 3,
+            "max_count": 1,
             "weight": 2
           },
           {
             "entity": "avp_alien:nether_burster",
-            "max_count": 4,
+            "max_count": 3,
             "weight": 2
           }
         ]
@@ -90,12 +90,12 @@
           },
           {
             "entity": "avp_alien:nether_chrysalis",
-            "max_count": 4,
+            "max_count": 3,
             "weight": 2
           },
           {
             "entity": "avp_alien:nether_razor_claw",
-            "max_count": 4,
+            "max_count": 2,
             "weight": 2
           },
           {
@@ -105,11 +105,11 @@
           },
           {
             "entity": "avp_alien:nether_ravager",
-            "max_count": 3
+            "max_count": 1
           },
           {
             "entity": "avp_alien:nether_carrier",
-            "max_count": 3
+            "max_count": 1
           }
         ]
       },
@@ -139,12 +139,12 @@
           },
           {
             "entity": "avp_alien:nether_chrysalis",
-            "max_count": 6,
+            "max_count": 4,
             "weight": 2
           },
           {
             "entity": "avp_alien:nether_razor_claw",
-            "max_count": 6,
+            "max_count": 3,
             "weight": 2
           },
           {
@@ -154,11 +154,11 @@
           },
           {
             "entity": "avp_alien:nether_ravager",
-            "max_count": 4
+            "max_count": 2
           },
           {
             "entity": "avp_alien:nether_carrier",
-            "max_count": 4
+            "max_count": 2
           }
         ]
       },

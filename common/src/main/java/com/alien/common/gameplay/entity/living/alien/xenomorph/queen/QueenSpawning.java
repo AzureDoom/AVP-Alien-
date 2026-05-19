@@ -1,7 +1,7 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.queen;
 
 import com.alien.common.data.AlienVariantTypes;
-import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
+import com.alien.common.gameplay.hive.location.HiveLocationRegistry;
 import com.alien.common.gameplay.level.saveddata.QueenSpawnChunkData;
 import com.alien.common.gameplay.level.saveddata.StrainLeakData;
 import net.minecraft.core.BlockPos;
@@ -83,7 +83,7 @@ public class QueenSpawning {
     }
 
     /**
-     * Hive2: a queen can only spawn into chunks that are NOT inside any existing location's claimed territory. The
+     * Hive: a queen can only spawn into chunks that are NOT inside any existing location's claimed territory. The
      * design says queen-distance is 0–0 (per {@code HIVE_REDESIGN_03_LOCATIONS.md} § 4) — but for natural spawning, the
      * practical constraint is "fresh ground only." Once a queen settles, the founding service mints a new location at
      * her chunk; she's then the unique queen of that center chunk, and another queen wandering in won't displace her.

@@ -19,9 +19,9 @@ public class BlocksCreativeModeTabInitializer {
         // Alien blocks
         addBaseXenomorphBlocks(output);
         addNetherXenomorphBlocks(output);
+        addAberrantXenomorphBlocks(output);
 
         if (AVPHuman.MOD.isLoaded()) {
-            addAberrantXenomorphBlocks(output);
             addIrradiatedXenomorphBlocks(output);
         }
 

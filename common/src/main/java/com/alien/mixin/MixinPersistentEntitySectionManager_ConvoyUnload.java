@@ -1,7 +1,7 @@
 package com.alien.mixin;
 
 import com.alien.common.gameplay.entity.living.alien.Alien;
-import com.alien.common.gameplay.hive2.convoy.ConvoyMemberTracker;
+import com.alien.common.gameplay.hive.convoy.ConvoyMemberTracker;
 import net.minecraft.world.level.entity.EntityAccess;
 import net.minecraft.world.level.entity.EntitySection;
 import net.minecraft.world.level.entity.EntitySectionStorage;

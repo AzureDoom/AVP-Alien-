@@ -4,15 +4,15 @@ import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
-import com.alien.common.gameplay.hive2.convoy.ConvoyId;
-import com.alien.common.gameplay.hive2.convoy.ConvoyMemberTracker;
-import com.alien.common.gameplay.hive2.convoy.ConvoyMembership;
-import com.alien.common.gameplay.hive2.faction.HiveMemberLocationResolver;
-import com.alien.common.gameplay.hive2.faction.LineageFactionData;
-import com.alien.common.gameplay.hive2.faction.LocationMembership;
-import com.alien.common.gameplay.hive2.location.HiveLocation;
-import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
-import com.alien.common.gameplay.hive2.spawning.ReserveSpawnUtil;
+import com.alien.common.gameplay.hive.convoy.ConvoyId;
+import com.alien.common.gameplay.hive.convoy.ConvoyMemberTracker;
+import com.alien.common.gameplay.hive.convoy.ConvoyMembership;
+import com.alien.common.gameplay.hive.faction.HiveMemberLocationResolver;
+import com.alien.common.gameplay.hive.faction.LineageFactionData;
+import com.alien.common.gameplay.hive.faction.LocationMembership;
+import com.alien.common.gameplay.hive.location.HiveLocation;
+import com.alien.common.gameplay.hive.location.HiveLocationRegistry;
+import com.alien.common.gameplay.hive.spawning.ReserveSpawnUtil;
 import com.alien.common.gameplay.level.saveddata.StrainLeakData;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienDataSyncKeys;
@@ -51,6 +51,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
@@ -74,9 +75,16 @@ public abstract class Alien extends Monster implements DataUser {
 
     private static final String NBT_HOST_TYPE = "hostType";
 
-    private static final String NBT_CONVOY_MEMBERSHIP = "Hive2ConvoyMembership";
+    private static final String NBT_CONVOY_MEMBERSHIP = "HiveConvoyMembership";
 
-    private static final String NBT_RAID_MEMBERSHIP = "Hive2RaidMembership";
+    private static final String NBT_RAID_MEMBERSHIP = "HiveRaidMembership";
+
+    private static final String NBT_LEGACY_CONVOY_MEMBERSHIP = "Hive2ConvoyMembership";
+
+    private static final String NBT_LEGACY_RAID_MEMBERSHIP = "Hive2RaidMembership";
+
+    // Idle pathing uses 0.5x speed and pursuit uses 1.1x; 0.8x splits the two for animation.
+    private static final double RUN_ANIMATION_SPEED_THRESHOLD_MULTIPLIER = 0.8D;
 
     public final DataAccessor<Boolean> hasTarget;
 
@@ -85,6 +93,8 @@ public abstract class Alien extends Monster implements DataUser {
     public final DataAccessor<Float> moltAlpha;
 
     public final DataAccessor<Boolean> isMovingHorizontally;
+
+    public final DataAccessor<Boolean> isMovingQuickly;
 
     protected final HiveManager hiveManager;
 
@@ -98,6 +108,12 @@ public abstract class Alien extends Monster implements DataUser {
 
     private int lastHurtTimeInTicks;
 
+    private boolean hasAnimationMovementSample;
+
+    private double lastAnimationMovementSampleX;
+
+    private double lastAnimationMovementSampleZ;
+
     protected Alien(EntityType<? extends Alien> entityType, Level level) {
         super(entityType, level);
 
@@ -105,6 +121,7 @@ public abstract class Alien extends Monster implements DataUser {
         this.isPoisoned = new DataAccessor<>(this, AlienDataSyncKeys.ALIEN_IS_POISONED.get());
         this.moltAlpha = new DataAccessor<>(this, AlienDataSyncKeys.ALIEN_MOLT_ALPHA.get());
         this.isMovingHorizontally = new DataAccessor<>(this, BLibDataSyncKeys.ENTITY_IS_MOVING_HORIZONTALLY.get());
+        this.isMovingQuickly = new DataAccessor<>(this, AlienDataSyncKeys.ALIEN_IS_MOVING_QUICKLY.get());
 
         this.hiveManager = new HiveManager(this);
         this.movementAnalyzer = new MovementAnalyzer(this);
@@ -162,7 +179,7 @@ public abstract class Alien extends Monster implements DataUser {
     @Override
     public void setTarget(@Nullable LivingEntity livingEntity) {
         super.setTarget(livingEntity);
-        // Hive2: the per-location boss bar auto-adds in-range players via HiveLocationBossBar.updateTrackingPlayers
+        // Hive: the per-location boss bar auto-adds in-range players via HiveLocationBossBar.updateTrackingPlayers
         // every 20 ticks; no manual track-on-target hook needed.
     }
 
@@ -243,11 +260,11 @@ public abstract class Alien extends Monster implements DataUser {
         @NotNull MobSpawnType spawnType,
         @Nullable SpawnGroupData spawnGroupData
     ) {
-        // Hive2: variant-faction join is event-driven. finalizeSpawn fires once per fresh-spawned alien
+        // Hive: variant-faction join is event-driven. finalizeSpawn fires once per fresh-spawned alien
         // (natural, spawn egg, command). Idempotent — see HiveManager.ensureVariantFactionMembership.
         hiveManager.ensureVariantFactionMembership();
 
-        // Hive2: if this alien spawned inside a location that has it in its reserves, decrement the reserves and
+        // Hive: if this alien spawned inside a location that has it in its reserves, decrement the reserves and
         // copy genes from the location's leader (preserves the legacy "spawned alien inherits leader's genes"
         // behavior).
         var locationAtPos = HiveLocationRegistry.INSTANCE.getByChunk(
@@ -271,7 +288,7 @@ public abstract class Alien extends Monster implements DataUser {
                 }
             }
 
-            // Hive2: any xenomorph spawning into a claimed chunk auto-joins both the owning lineage and the location
+            // Hive: any xenomorph spawning into a claimed chunk auto-joins both the owning lineage and the location
             // faction. Covers natural spawns, spawn eggs, /summon, and MOB_SUMMONED reinforcements/raid units that
             // funnel through finalizeSpawn. (Note: EntityTransitionUtil.transitionInto does NOT call finalizeSpawn —
             // transitions carry membership over explicitly via FactionMembershipTransfer.) The Phase 9 invariant task
@@ -292,14 +309,18 @@ public abstract class Alien extends Monster implements DataUser {
         }
 
         super.tick();
+
+        if (!level().isClientSide) {
+            movementAnalyzer.tick();
+        }
+
         hiveManager.tick();
         moltingManager.tick();
 
         if (!level().isClientSide) {
-            movementAnalyzer.tick();
-
             hasTarget.set(getTarget() != null);
             isMovingHorizontally.set(movementAnalyzer.isMovingHorizontally());
+            isMovingQuickly.set(updateMovingQuicklyForAnimation());
 
             if (getVehicle() != null && !canRide(getVehicle())) {
                 stopRiding();
@@ -318,6 +339,31 @@ public abstract class Alien extends Monster implements DataUser {
             applyDynamicAttributes();
             becomeIrradiated();
         }
+    }
+
+    private boolean updateMovingQuicklyForAnimation() {
+        var currentX = getX();
+        var currentZ = getZ();
+
+        if (!hasAnimationMovementSample) {
+            hasAnimationMovementSample = true;
+            lastAnimationMovementSampleX = currentX;
+            lastAnimationMovementSampleZ = currentZ;
+            return false;
+        }
+
+        var deltaX = currentX - lastAnimationMovementSampleX;
+        var deltaZ = currentZ - lastAnimationMovementSampleZ;
+
+        lastAnimationMovementSampleX = currentX;
+        lastAnimationMovementSampleZ = currentZ;
+
+        var speedThreshold = Math.max(
+            0.01D,
+            getAttributeValue(Attributes.MOVEMENT_SPEED) * RUN_ANIMATION_SPEED_THRESHOLD_MULTIPLIER
+        );
+
+        return deltaX * deltaX + deltaZ * deltaZ >= speedThreshold * speedThreshold;
     }
 
     /**
@@ -343,6 +389,18 @@ public abstract class Alien extends Monster implements DataUser {
         if (getRandom().nextIntBetweenInclusive(1, 100) >= 90) {
             AlienTransitionUtil.transitionIntoVariant(this, AlienVariant.IRRADIATED);
         }
+    }
+
+    @Override
+    public void thunderHit(@NotNull ServerLevel level, @NotNull LightningBolt lightning) {
+        var aberrantType = getTypeForVariant(AlienVariant.ABERRANT);
+
+        if (aberrantType != null && !Objects.equals(getType(), aberrantType)) {
+            AlienTransitionUtil.transitionIntoVariant(this, AlienVariant.ABERRANT);
+            return;
+        }
+
+        super.thunderHit(level, lightning);
     }
 
     private void healPassively() {
@@ -375,7 +433,7 @@ public abstract class Alien extends Monster implements DataUser {
                 // AND the entity killed was not an alien (hive wars shouldn't result in endless growth)...
                 && !entity.getType().is(AlienEntityTypeTags.ALIENS)
         ) {
-            // Hive2: add a bonus drone or runner (depending on host type) to the reserves of the location whose
+            // Hive: add a bonus drone or runner (depending on host type) to the reserves of the location whose
             // chunk this alien is standing in. No-op when the alien is outside any claimed chunk — feral aliens
             // don't generate reserves.
             var location = HiveLocationRegistry.INSTANCE.getByChunk(level.dimension(), chunkPosition());
@@ -630,7 +688,7 @@ public abstract class Alien extends Monster implements DataUser {
         if (super.isPersistenceRequired()) {
             return true;
         }
-        // Hive2: an alien is persistent if it's standing in a hive2 location and either (a) the location's boss bar
+        // Hive: an alien is persistent if it's standing in a hive location and either (a) the location's boss bar
         // is angry (an active fight), or (b) it's the location's current leader.
         var location = HiveLocationRegistry.INSTANCE.getByChunk(level().dimension(), chunkPosition());
         if (location == null) {
@@ -665,7 +723,7 @@ public abstract class Alien extends Monster implements DataUser {
     }
 
     private void onDespawned(@Nullable HiveLocation returnLocation) {
-        // Hive2: hive-owned xenomorphs always return to their owning location's reserves when vanilla despawns them,
+        // Hive: hive-owned xenomorphs always return to their owning location's reserves when vanilla despawns them,
         // even if they wandered into an unclaimed chunk. Feral xenomorphs still count as strain leaks.
         if (getType().is(AlienEntityTypeTags.XENOMORPHS)) {
             if (ConvoyMemberTracker.returnDespawned(this)) {
@@ -725,13 +783,13 @@ public abstract class Alien extends Monster implements DataUser {
     @Override
     public void remove(@NotNull RemovalReason removalReason) {
         super.remove(removalReason);
-        // Hive2: BLib's faction system handles removal cleanup automatically when the entity is killed or
+        // Hive: BLib's faction system handles removal cleanup automatically when the entity is killed or
         // discarded — no manual hive.removeHiveMember call needed.
     }
 
     @Override
     public void die(@NotNull DamageSource damageSource) {
-        // Hive2 raid attribution: if a player gets the kill credit, record it against every lineage this alien
+        // Hive raid attribution: if a player gets the kill credit, record it against every lineage this alien
         // belongs to. Defers to vanilla's getKillCredit so indirect kills (TNT, fall damage from broken block,
         // etc) count when vanilla counts them.
         if (getType().is(AlienEntityTypeTags.XENOMORPHS)) {
@@ -744,7 +802,7 @@ public abstract class Alien extends Monster implements DataUser {
                 attributeKillToLineages(player.getUUID(), serverLevel.getGameTime());
             }
             ConvoyMemberTracker.unregisterKilled(this);
-            // Hive2 empress death clears the lineage's empress slot so the next emergence ritual can fire.
+            // Hive empress death clears the lineage's empress slot so the next emergence ritual can fire.
             if (getType().is(AlienEntityTypeTags.EMPRESSES)) {
                 onEmpressDied();
             }
@@ -755,7 +813,7 @@ public abstract class Alien extends Monster implements DataUser {
 
     private void onEmpressDied() {
         for (var factionId : com.alien.Alien.MOD.factions().getFactionIds(getUUID())) {
-            if (!com.alien.common.gameplay.hive2.id.LineageIds.isLineageId(factionId)) {
+            if (!com.alien.common.gameplay.hive.id.LineageIds.isLineageId(factionId)) {
                 continue;
             }
             var faction = com.alien.Alien.MOD.factions().get(factionId);
@@ -766,7 +824,7 @@ public abstract class Alien extends Monster implements DataUser {
                 lineage.setEmpressId(null);
             }
             com.alien.Alien.LOGGER.info(
-                "Hive2: empress {} died — lineage {} has {} location(s); empress slot cleared",
+                "Hive: empress {} died — lineage {} has {} location(s); empress slot cleared",
                 getUUID(),
                 factionId,
                 lineage.locationsById().size()
@@ -775,9 +833,9 @@ public abstract class Alien extends Monster implements DataUser {
     }
 
     private void attributeKillToLineages(java.util.UUID playerId, long currentTick) {
-        var aggroWindow = com.alien.common.gameplay.hive2.location.HiveLocationRegistry.INSTANCE.config().raidAggroWindowTicks();
+        var aggroWindow = com.alien.common.gameplay.hive.location.HiveLocationRegistry.INSTANCE.config().raidAggroWindowTicks();
         for (var factionId : com.alien.Alien.MOD.factions().getFactionIds(getUUID())) {
-            if (!com.alien.common.gameplay.hive2.id.LineageIds.isLineageId(factionId)) {
+            if (!com.alien.common.gameplay.hive.id.LineageIds.isLineageId(factionId)) {
                 continue;
             }
             var faction = com.alien.Alien.MOD.factions().get(factionId);
@@ -839,6 +897,14 @@ public abstract class Alien extends Monster implements DataUser {
         }
         if (compoundTag.contains(NBT_RAID_MEMBERSHIP)) {
             var raidTag = compoundTag.getCompound(NBT_RAID_MEMBERSHIP);
+            return loadConvoyMembershipTag(raidTag);
+        }
+        if (compoundTag.contains(NBT_LEGACY_CONVOY_MEMBERSHIP)) {
+            var convoyTag = compoundTag.getCompound(NBT_LEGACY_CONVOY_MEMBERSHIP);
+            return loadConvoyMembershipTag(convoyTag);
+        }
+        if (compoundTag.contains(NBT_LEGACY_RAID_MEMBERSHIP)) {
+            var raidTag = compoundTag.getCompound(NBT_LEGACY_RAID_MEMBERSHIP);
             return loadConvoyMembershipTag(raidTag);
         }
         return null;

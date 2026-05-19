@@ -12,9 +12,9 @@ public class SpawnEggsCreativeModeTabInitializer {
     public static final Consumer<CreativeModeTab.Output> OUTPUT_CONSUMER = output -> {
         addBaseXenomorphSpawnEggs(output);
         addNetherXenomorphSpawnEggs(output);
+        addAberrantXenomorphSpawnEggs(output);
 
         if (AVPHuman.MOD.isLoaded()) {
-            addAberrantXenomorphSpawnEggs(output);
             addIrradiatedXenomorphSpawnEggs(output);
         }
     };

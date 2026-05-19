@@ -110,7 +110,7 @@ public class RunnerAnimator extends AzEntityAnimator<Runner> {
         } else if (isMoving) {
             if (isCrawling) {
                 animFunction = dispatcher::crawl;
-            } else if (runner.hasTarget.get()) {
+            } else if (runner.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {
                 animFunction = dispatcher::walk;

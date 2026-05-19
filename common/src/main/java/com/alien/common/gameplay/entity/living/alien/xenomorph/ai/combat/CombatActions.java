@@ -2,8 +2,6 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat;
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.combat.action.MeleeAttackAction;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.dig.DigSensors;
-import com.blib.api.common.block.v1.BlockBreakProgressManager;
 import com.blib.api.common.goap.v1.GOAPSensors;
 import com.blib.api.common.goap.v1.action.ActionMasks;
 import com.blib.api.common.goap.v1.action.BLibAction;
@@ -15,8 +13,6 @@ import com.just.ai.goap.action.Action;
 import com.just.ai.goap.condition.expression.Expressions;
 import com.just.ai.goap.state.Blackboard;
 import com.just.core.functional.option.Option;
-import net.minecraft.core.BlockPos;
-import net.minecraft.sounds.SoundSource;
 
 public class CombatActions {
 
@@ -32,7 +28,6 @@ public class CombatActions {
         .addMasks(ActionMasks.MOVE)
         .addPrecondition(GOAPSensors.HAS_ATTACK_TARGET.key(), Expressions.Boolean.isTrue())
         .addPrecondition(CombatSensors.IS_TARGET_IN_MELEE_RANGE.key(), Expressions.Boolean.isFalse())
-        .addPrecondition(DigSensors.IS_PATH_TO_TARGET_BLOCKED.key(), Expressions.Boolean.isFalse())
         .addEffect(CombatSensors.IS_TARGET_IN_MELEE_RANGE.key().asDerived(), true)
         .withPerformCallback(CombatActions::performMoveToTarget)
         .withFinishCallback(CombatActions::finishMoveToTarget)
@@ -74,8 +69,6 @@ public class CombatActions {
         }
     }
 
-    private static final float BLOCK_BREAKING_SPEED = 50F;
-
     private static final double MAX_PREDICTION_DISTANCE_SQUARED = 32.0 * 32.0;
 
     private static Action.Signal performWithBLibNav(
@@ -84,20 +77,13 @@ public class CombatActions {
     ) {
         var xenomorph = context.getActor();
 
-        if (xenomorph instanceof PathNavigatorUser navigatorUser) {
-            navigatorUser.getPathNavigator().setExcludedTerrains(null);
-        }
-
         var interceptPos = computeInterceptPoint(xenomorph, attackTarget);
         var result = NeoMoveToPosAction.perform(context, interceptPos, 1.1);
 
         return switch (result) {
             case FINISHED, MOVING -> Action.Signal.CONTINUE;
-            case WAITING_FOR_BLOCK_BREAK -> handleBlockBreak(context);
-            case NO_PATH -> {
-                context.getActor().getXenomorphData().setLastPathFailureTick(context.getActor().tickCount);
-                yield Action.Signal.ABORT;
-            }
+            case NO_PATH -> Action.Signal.ABORT;
+            default -> Action.Signal.ABORT;
         };
     }
 
@@ -134,95 +120,6 @@ public class CombatActions {
         return predictedPos;
     }
 
-    private static int getEntityHeight(Xenomorph xenomorph) {
-        return (int) Math.ceil(xenomorph.getBbHeight());
-    }
-
-    private static final double BLOCK_BREAK_REACH_DISTANCE_SQUARED = 2.5 * 2.5;
-
-    private static Action.Signal handleBlockBreak(Action.Context<? extends Xenomorph> context) {
-        var xenomorph = context.getActor();
-
-        if (!(xenomorph instanceof PathNavigatorUser navigatorUser)) {
-            return Action.Signal.ABORT;
-        }
-
-        var navigator = navigatorUser.getPathNavigator();
-        var blockPos = navigator.getBlockToBreak();
-
-        if (blockPos == null) {
-            return Action.Signal.ABORT;
-        }
-
-        var entityPos = xenomorph.blockPosition();
-        var distanceSquared = entityPos.distSqr(blockPos);
-
-        if (distanceSquared > BLOCK_BREAK_REACH_DISTANCE_SQUARED) {
-            // Can't reach the block — stop and let the path recompute from our current position.
-            navigator.stop();
-            return Action.Signal.CONTINUE;
-        }
-
-        if (!xenomorph.isAttacking()) {
-            xenomorph.runDigAnimation();
-        }
-
-        xenomorph.getLookControl().setLookAt(blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5);
-
-        if (xenomorph.tickCount % 4 == 0) {
-            var allCleared = breakBlocksInVolume(xenomorph, blockPos);
-
-            if (allCleared) {
-                navigator.confirmBlockBroken();
-            }
-        }
-
-        return Action.Signal.CONTINUE;
-    }
-
-    private static boolean breakBlocksInVolume(Xenomorph xenomorph, BlockPos feetPos) {
-        var entityHeight = getEntityHeight(xenomorph);
-        var parallelDigCount = xenomorph.getXenomorphData().getParallelDigCount();
-        var allCleared = true;
-        var brokenThisCycle = 0;
-
-        for (int dy = 0; dy < entityHeight; dy++) {
-            var checkPos = feetPos.above(dy);
-            var state = xenomorph.level().getBlockState(checkPos);
-
-            if (!state.isSolid()) {
-                continue;
-            }
-
-            if (brokenThisCycle >= parallelDigCount) {
-                allCleared = false;
-                continue;
-            }
-
-            var soundType = state.getSoundType();
-
-            xenomorph.level()
-                .playSound(
-                    null,
-                    checkPos,
-                    soundType.getHitSound(),
-                    SoundSource.BLOCKS,
-                    (soundType.getVolume() + 1.0F) / 8.0F,
-                    soundType.getPitch() * 0.5F
-                );
-
-            var result = BlockBreakProgressManager.damage(xenomorph.level(), checkPos, BLOCK_BREAKING_SPEED);
-
-            if (result != BlockBreakProgressManager.Result.DESTROYED) {
-                allCleared = false;
-            }
-
-            brokenThisCycle++;
-        }
-
-        return allCleared;
-    }
-
     private static Action.Signal performWithVanillaNav(
         Action.Context<? extends Xenomorph> context,
         net.minecraft.world.entity.LivingEntity attackTarget
@@ -238,16 +135,12 @@ public class CombatActions {
             blackboard.set(KEY_LAST_DISTANCE_TO_TARGET, currentDistance);
             blackboard.set(KEY_LAST_PROGRESS_TICK, xenomorph.tickCount);
         } else if (xenomorph.tickCount - lastProgressTick >= STUCK_THRESHOLD_IN_TICKS) {
-            xenomorph.getXenomorphData().setLastPathFailureTick(xenomorph.tickCount);
             return Action.Signal.ABORT;
         }
 
         return switch (MoveToPosAction.perform(context, attackTarget.position(), 1.1)) {
             case FINISHED, MOVING -> Action.Signal.CONTINUE;
-            case NO_PATH -> {
-                xenomorph.getXenomorphData().setLastPathFailureTick(xenomorph.tickCount);
-                yield Action.Signal.ABORT;
-            }
+            case NO_PATH -> Action.Signal.ABORT;
         };
     }
 

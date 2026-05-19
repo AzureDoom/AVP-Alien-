@@ -88,7 +88,7 @@ public class ResinRecipeProvider {
     private static void createResinRecipes(RecipeBuilder builder) {
         createResinRecipesFromSet(builder, BASE_SET);
         createResinRecipesFromSet(builder, NETHER_SET);
-        createResinRecipesFromSet(builder.withCondition(AVPHumanFabric.IS_LOADED), ABERRANT_SET);
+        createResinRecipesFromSet(builder, ABERRANT_SET);
         createResinRecipesFromSet(builder.withCondition(AVPHumanFabric.IS_LOADED), IRRADIATED_SET);
     }
 

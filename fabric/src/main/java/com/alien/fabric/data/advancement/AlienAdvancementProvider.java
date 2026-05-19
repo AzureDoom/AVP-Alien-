@@ -8,6 +8,7 @@ import com.alien.common.registry.init.block.AlienResinBlocks;
 import com.alien.common.registry.init.item.AlienArmorItems;
 import com.alien.common.registry.init.item.AlienItems;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
+import com.blib.api.common.advancement.v1.BLibAdvancement;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementRequirements;
@@ -25,6 +26,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
 
 import java.util.List;
@@ -37,81 +39,112 @@ public class AlienAdvancementProvider {
     // No, a tag will not work (because tags only work with OR conditions, not AND).
     // No, a filter on the entity types using a tag won't work (because tags aren't loaded yet when this provider runs).
     // Yes, I was very annoyed with Mojang while writing this list out.
-    private static final List<EntityType<?>> ALIENS_TO_KILL = List.of(
-        // Normal Aliens
+    private static final List<EntityType<?>> NORMAL_ALIENS_TO_KILL = List.of(
         AlienEntityTypes.ADOLESCENT.get(),
         AlienEntityTypes.BOILER.get(),
+        AlienEntityTypes.CARRIER.get(),
         AlienEntityTypes.CHESTBURSTER.get(),
+        AlienEntityTypes.CHRYSALIS.get(),
         AlienEntityTypes.CRUSHER.get(),
-        AlienEntityTypes.FACEHUGGER.get(),
         AlienEntityTypes.DRONE.get(),
+        AlienEntityTypes.FACEHUGGER.get(),
+        AlienEntityTypes.HARBINGER.get(),
         AlienEntityTypes.OVOMORPH.get(),
         AlienEntityTypes.PRAETORIAN.get(),
         AlienEntityTypes.PREDALIEN.get(),
         AlienEntityTypes.PREDALIEN_ADOLESCENT.get(),
         AlienEntityTypes.PREDALIEN_CHESTBURSTER.get(),
         AlienEntityTypes.PROWLER.get(),
+        AlienEntityTypes.RAZOR_CLAW.get(),
+        AlienEntityTypes.RAVAGER.get(),
         AlienEntityTypes.QUEEN.get(),
         AlienEntityTypes.EMPRESS.get(),
+        AlienEntityTypes.ROYAL_ADOLESCENT.get(),
+        AlienEntityTypes.ROYAL_CHESTBURSTER.get(),
+        AlienEntityTypes.ROYAL_FACEHUGGER.get(),
+        AlienEntityTypes.ROYAL_OVOMORPH.get(),
+        AlienEntityTypes.BURSTER.get(),
         AlienEntityTypes.RUNNER.get(),
         AlienEntityTypes.SPITTER.get(),
-        AlienEntityTypes.WARRIOR.get(),
+        AlienEntityTypes.WARRIOR.get()
+    );
 
-        // Aberrant Aliens
+    private static final List<EntityType<?>> ABERRANT_ALIENS_TO_KILL = List.of(
         AlienEntityTypes.ABERRANT_ADOLESCENT.get(),
         AlienEntityTypes.ABERRANT_BOILER.get(),
+        AlienEntityTypes.ABERRANT_CARRIER.get(),
         AlienEntityTypes.ABERRANT_CHESTBURSTER.get(),
+        AlienEntityTypes.ABERRANT_CHRYSALIS.get(),
         AlienEntityTypes.ABERRANT_CRUSHER.get(),
-        AlienEntityTypes.ABERRANT_FACEHUGGER.get(),
         AlienEntityTypes.ABERRANT_DRONE.get(),
+        AlienEntityTypes.ABERRANT_FACEHUGGER.get(),
+        AlienEntityTypes.ABERRANT_HARBINGER.get(),
         AlienEntityTypes.ABERRANT_OVOMORPH.get(),
         AlienEntityTypes.ABERRANT_PRAETORIAN.get(),
         AlienEntityTypes.ABERRANT_PREDALIEN.get(),
         AlienEntityTypes.ABERRANT_PREDALIEN_ADOLESCENT.get(),
         AlienEntityTypes.ABERRANT_PREDALIEN_CHESTBURSTER.get(),
         AlienEntityTypes.ABERRANT_PROWLER.get(),
+        AlienEntityTypes.ABERRANT_RAZOR_CLAW.get(),
+        AlienEntityTypes.ABERRANT_RAVAGER.get(),
         AlienEntityTypes.ABERRANT_QUEEN.get(),
         AlienEntityTypes.ABERRANT_EMPRESS.get(),
+        AlienEntityTypes.ABERRANT_BURSTER.get(),
         AlienEntityTypes.ABERRANT_RUNNER.get(),
         AlienEntityTypes.ABERRANT_SPITTER.get(),
         AlienEntityTypes.ABERRANT_WARRIOR.get(),
+        AlienEntityTypes.ROYAL_ABERRANT_ADOLESCENT.get(),
+        AlienEntityTypes.ROYAL_ABERRANT_CHESTBURSTER.get(),
+        AlienEntityTypes.ROYAL_ABERRANT_FACEHUGGER.get(),
+        AlienEntityTypes.ROYAL_ABERRANT_OVOMORPH.get()
+    );
 
-        // Nether Aliens
+    private static final List<EntityType<?>> NETHER_ALIENS_TO_KILL = List.of(
         AlienEntityTypes.NETHER_ADOLESCENT.get(),
         AlienEntityTypes.NETHER_BOILER.get(),
+        AlienEntityTypes.NETHER_CARRIER.get(),
         AlienEntityTypes.NETHER_CHESTBURSTER.get(),
+        AlienEntityTypes.NETHER_CHRYSALIS.get(),
         AlienEntityTypes.NETHER_CRUSHER.get(),
-        AlienEntityTypes.NETHER_FACEHUGGER.get(),
         AlienEntityTypes.NETHER_DRONE.get(),
+        AlienEntityTypes.NETHER_FACEHUGGER.get(),
+        AlienEntityTypes.NETHER_HARBINGER.get(),
         AlienEntityTypes.NETHER_OVOMORPH.get(),
         AlienEntityTypes.NETHER_PRAETORIAN.get(),
         AlienEntityTypes.NETHER_PREDALIEN.get(),
         AlienEntityTypes.NETHER_PREDALIEN_ADOLESCENT.get(),
         AlienEntityTypes.NETHER_PREDALIEN_CHESTBURSTER.get(),
         AlienEntityTypes.NETHER_PROWLER.get(),
+        AlienEntityTypes.NETHER_RAZOR_CLAW.get(),
+        AlienEntityTypes.NETHER_RAVAGER.get(),
         AlienEntityTypes.NETHER_QUEEN.get(),
         AlienEntityTypes.NETHER_EMPRESS.get(),
+        AlienEntityTypes.NETHER_BURSTER.get(),
         AlienEntityTypes.NETHER_RUNNER.get(),
         AlienEntityTypes.NETHER_SPITTER.get(),
         AlienEntityTypes.NETHER_WARRIOR.get(),
-
-        // Royal Normal Aliens
-        AlienEntityTypes.ROYAL_ADOLESCENT.get(),
-        AlienEntityTypes.ROYAL_CHESTBURSTER.get(),
-        AlienEntityTypes.ROYAL_FACEHUGGER.get(),
-        AlienEntityTypes.ROYAL_OVOMORPH.get(),
-
-        // Royal Aberrant Aliens
-        AlienEntityTypes.ROYAL_ABERRANT_ADOLESCENT.get(),
-        AlienEntityTypes.ROYAL_ABERRANT_CHESTBURSTER.get(),
-        AlienEntityTypes.ROYAL_ABERRANT_FACEHUGGER.get(),
-        AlienEntityTypes.ROYAL_ABERRANT_OVOMORPH.get(),
-
-        // Royal nether Aliens
         AlienEntityTypes.ROYAL_NETHER_ADOLESCENT.get(),
         AlienEntityTypes.ROYAL_NETHER_CHESTBURSTER.get(),
         AlienEntityTypes.ROYAL_NETHER_FACEHUGGER.get(),
         AlienEntityTypes.ROYAL_NETHER_OVOMORPH.get()
+    );
+
+    private static final List<EntityType<?>> IRRADIATED_ALIENS_TO_KILL = List.of(
+        AlienEntityTypes.IRRADIATED_CARRIER.get(),
+        AlienEntityTypes.IRRADIATED_CHRYSALIS.get(),
+        AlienEntityTypes.IRRADIATED_CRUSHER.get(),
+        AlienEntityTypes.IRRADIATED_DRONE.get(),
+        AlienEntityTypes.IRRADIATED_PRAETORIAN.get(),
+        AlienEntityTypes.IRRADIATED_PREDALIEN.get(),
+        AlienEntityTypes.IRRADIATED_PROWLER.get(),
+        AlienEntityTypes.IRRADIATED_HARBINGER.get(),
+        AlienEntityTypes.IRRADIATED_RAZOR_CLAW.get(),
+        AlienEntityTypes.IRRADIATED_RAVAGER.get(),
+        AlienEntityTypes.IRRADIATED_QUEEN.get(),
+        AlienEntityTypes.IRRADIATED_EMPRESS.get(),
+        AlienEntityTypes.IRRADIATED_BURSTER.get(),
+        AlienEntityTypes.IRRADIATED_RUNNER.get(),
+        AlienEntityTypes.IRRADIATED_WARRIOR.get()
     );
 
     public static void generateAdvancements(HolderLookup.Provider registryLookup, Consumer<AdvancementHolder> consumer) {
@@ -133,7 +166,41 @@ public class AlienAdvancementProvider {
 
         var alienKillerAdvancement = addAlienKillerAdvancement(root, consumer);
         var royalAlienKillerAdvancement = addRoyalAlienKillerAdvancement(alienKillerAdvancement, consumer);
+        var empressKillerAdvancement = addEmpressKillerAdvancement(royalAlienKillerAdvancement, consumer);
+        var harbingerKillerAdvancement = addHarbingerKillerAdvancement(royalAlienKillerAdvancement, consumer);
+        var raidDefeatAdvancement = addRaidDefeatAdvancement(harbingerKillerAdvancement, consumer);
+        var dualVariantRaidsAdvancement = addDualVariantRaidsAdvancement(raidDefeatAdvancement, consumer);
+        var leadRaidToEnemyHiveAdvancement = addLeadRaidToEnemyHiveAdvancement(raidDefeatAdvancement, consumer);
         var hiveBusterAdvancement = addHiveBusterAdvancement(royalAlienKillerAdvancement, consumer);
+        var lineageKillerAdvancement = addLineageKillerAdvancement(hiveBusterAdvancement, consumer);
+        var normalXenocideAdvancement = addVariantXenocideAdvancement(
+            royalAlienKillerAdvancement,
+            consumer,
+            AlienAdvancements.KILL_ALL_NORMAL_ALIENS,
+            AlienItems.CHITIN.get(),
+            NORMAL_ALIENS_TO_KILL
+        );
+        var aberrantXenocideAdvancement = addVariantXenocideAdvancement(
+            royalAlienKillerAdvancement,
+            consumer,
+            AlienAdvancements.KILL_ALL_ABERRANT_ALIENS,
+            AlienItems.ABERRANT_CHITIN.get(),
+            ABERRANT_ALIENS_TO_KILL
+        );
+        var netherXenocideAdvancement = addVariantXenocideAdvancement(
+            royalAlienKillerAdvancement,
+            consumer,
+            AlienAdvancements.KILL_ALL_NETHER_ALIENS,
+            AlienItems.NETHER_CHITIN.get(),
+            NETHER_ALIENS_TO_KILL
+        );
+        var irradiatedXenocideAdvancement = addVariantXenocideAdvancement(
+            royalAlienKillerAdvancement,
+            consumer,
+            AlienAdvancements.KILL_ALL_IRRADIATED_ALIENS,
+            AlienItems.IRRADIATED_CHITIN.get(),
+            IRRADIATED_ALIENS_TO_KILL
+        );
         var xenocideAdvancement = addXenocideAdvancement(royalAlienKillerAdvancement, consumer);
 
         var shearAnOvomorphAdvancement = Advancement.Builder.advancement()
@@ -158,8 +225,35 @@ public class AlienAdvancementProvider {
             .save(consumer, AlienAdvancements.SHEAR_AN_OVOMORPH.resourceLocation().toString());
 
         var addChitinArmorAdvancement = addChitinArmorAdvancements(alienKillerAdvancement, consumer);
+        var blockSpitterSpitWithHeadShieldAdvancement = addBlockSpitterSpitWithHeadShieldAdvancement(
+            alienKillerAdvancement,
+            consumer
+        );
 
         var addPlatedChitinArmorAdvancement = addPlatedChitinArmorAdvancement(royalAlienKillerAdvancement, consumer);
+    }
+
+    private static AdvancementHolder addBlockSpitterSpitWithHeadShieldAdvancement(
+        AdvancementHolder parent,
+        Consumer<AdvancementHolder> consumer
+    ) {
+        return Advancement.Builder.advancement()
+            .addCriterion(
+                "block_spitter_spit_with_head_shield",
+                CriteriaTriggers.IMPOSSIBLE.createCriterion(new ImpossibleTrigger.TriggerInstance())
+            )
+            .parent(parent)
+            .display(
+                AlienItems.QUEEN_HEAD_SHIELD.get(),
+                AlienAdvancements.BLOCK_SPITTER_SPIT_WITH_HEAD_SHIELD.titleComponent(),
+                AlienAdvancements.BLOCK_SPITTER_SPIT_WITH_HEAD_SHIELD.descriptionComponent(),
+                null,
+                AdvancementType.TASK,
+                true,
+                true,
+                false
+            )
+            .save(consumer, AlienAdvancements.BLOCK_SPITTER_SPIT_WITH_HEAD_SHIELD.resourceLocation().toString());
     }
 
     private static AdvancementHolder addChitinArmorAdvancements(AdvancementHolder parent, Consumer<AdvancementHolder> consumer) {
@@ -285,8 +379,135 @@ public class AlienAdvancementProvider {
             .save(consumer, AlienAdvancements.KILL_A_ROYAL_ALIEN.resourceLocation().toString());
     }
 
+    private static AdvancementHolder addEmpressKillerAdvancement(AdvancementHolder parent, Consumer<AdvancementHolder> consumer) {
+        return addMobsToKill(Advancement.Builder.advancement(), "kill_an_empress", AlienEntityTypeTags.EMPRESSES)
+            .parent(parent)
+            .display(
+                AlienItems.RAW_ROYAL_JELLY.get(),
+                AlienAdvancements.KILL_AN_EMPRESS.titleComponent(),
+                AlienAdvancements.KILL_AN_EMPRESS.descriptionComponent(),
+                null,
+                AdvancementType.CHALLENGE,
+                true,
+                true,
+                false
+            )
+            .requirements(AdvancementRequirements.Strategy.OR)
+            .rewards(AdvancementRewards.Builder.experience(100))
+            .save(consumer, AlienAdvancements.KILL_AN_EMPRESS.resourceLocation().toString());
+    }
+
+    private static AdvancementHolder addHarbingerKillerAdvancement(AdvancementHolder parent, Consumer<AdvancementHolder> consumer) {
+        return addMobsToKill(Advancement.Builder.advancement(), "kill_a_harbinger", AlienEntityTypeTags.HARBINGERS)
+            .parent(parent)
+            .display(
+                AlienItems.RAW_SCOURGE_JELLY.get(),
+                AlienAdvancements.KILL_A_HARBINGER.titleComponent(),
+                AlienAdvancements.KILL_A_HARBINGER.descriptionComponent(),
+                null,
+                AdvancementType.CHALLENGE,
+                true,
+                true,
+                false
+            )
+            .requirements(AdvancementRequirements.Strategy.OR)
+            .rewards(AdvancementRewards.Builder.experience(100))
+            .save(consumer, AlienAdvancements.KILL_A_HARBINGER.resourceLocation().toString());
+    }
+
+    private static AdvancementHolder addRaidDefeatAdvancement(AdvancementHolder parent, Consumer<AdvancementHolder> consumer) {
+        return Advancement.Builder.advancement()
+            .addCriterion("defeat_a_raid", CriteriaTriggers.IMPOSSIBLE.createCriterion(new ImpossibleTrigger.TriggerInstance()))
+            .parent(parent)
+            .display(
+                AlienItems.RAW_SCOURGE_JELLY.get(),
+                AlienAdvancements.DEFEAT_A_RAID.titleComponent(),
+                AlienAdvancements.DEFEAT_A_RAID.descriptionComponent(),
+                null,
+                AdvancementType.CHALLENGE,
+                true,
+                true,
+                false
+            )
+            .rewards(AdvancementRewards.Builder.experience(100))
+            .save(consumer, AlienAdvancements.DEFEAT_A_RAID.resourceLocation().toString());
+    }
+
+    private static AdvancementHolder addDualVariantRaidsAdvancement(
+        AdvancementHolder parent,
+        Consumer<AdvancementHolder> consumer
+    ) {
+        return Advancement.Builder.advancement()
+            .addCriterion(
+                "dual_variant_raids",
+                CriteriaTriggers.IMPOSSIBLE.createCriterion(new ImpossibleTrigger.TriggerInstance())
+            )
+            .parent(parent)
+            .display(
+                AlienItems.RAW_SCOURGE_JELLY.get(),
+                AlienAdvancements.DUAL_VARIANT_RAIDS.titleComponent(),
+                AlienAdvancements.DUAL_VARIANT_RAIDS.descriptionComponent(),
+                null,
+                AdvancementType.CHALLENGE,
+                true,
+                true,
+                false
+            )
+            .rewards(AdvancementRewards.Builder.experience(100))
+            .save(consumer, AlienAdvancements.DUAL_VARIANT_RAIDS.resourceLocation().toString());
+    }
+
+    private static AdvancementHolder addLeadRaidToEnemyHiveAdvancement(
+        AdvancementHolder parent,
+        Consumer<AdvancementHolder> consumer
+    ) {
+        return Advancement.Builder.advancement()
+            .addCriterion(
+                "lead_raid_to_enemy_hive",
+                CriteriaTriggers.IMPOSSIBLE.createCriterion(new ImpossibleTrigger.TriggerInstance())
+            )
+            .parent(parent)
+            .display(
+                AlienResinBlocks.RESIN.get(),
+                AlienAdvancements.LEAD_RAID_TO_ENEMY_HIVE.titleComponent(),
+                AlienAdvancements.LEAD_RAID_TO_ENEMY_HIVE.descriptionComponent(),
+                null,
+                AdvancementType.CHALLENGE,
+                true,
+                true,
+                false
+            )
+            .rewards(AdvancementRewards.Builder.experience(100))
+            .save(consumer, AlienAdvancements.LEAD_RAID_TO_ENEMY_HIVE.resourceLocation().toString());
+    }
+
+    private static AdvancementHolder addVariantXenocideAdvancement(
+        AdvancementHolder parent,
+        Consumer<AdvancementHolder> consumer,
+        BLibAdvancement advancement,
+        ItemLike icon,
+        List<EntityType<?>> aliensToKill
+    ) {
+        return addMobsToKill(Advancement.Builder.advancement(), aliensToKill)
+            .parent(parent)
+            .display(
+                icon,
+                advancement.titleComponent(),
+                advancement.descriptionComponent(),
+                null,
+                AdvancementType.CHALLENGE,
+                true,
+                true,
+                false
+            )
+            .requirements(AdvancementRequirements.Strategy.AND)
+            .rewards(AdvancementRewards.Builder.experience(100))
+            .save(consumer, advancement.resourceLocation().toString());
+    }
+
     private static AdvancementHolder addXenocideAdvancement(AdvancementHolder parent, Consumer<AdvancementHolder> consumer) {
-        return addMobsToKill(Advancement.Builder.advancement(), ALIENS_TO_KILL)
+        return Advancement.Builder.advancement()
+            .addCriterion("kill_all_aliens", CriteriaTriggers.IMPOSSIBLE.createCriterion(new ImpossibleTrigger.TriggerInstance()))
             .parent(parent)
             .display(
                 AlienBlocks.ROYAL_JELLY_BLOCK.get(),
@@ -319,6 +540,24 @@ public class AlienAdvancementProvider {
             )
             .rewards(AdvancementRewards.Builder.experience(100))
             .save(consumer, AlienAdvancements.KILL_A_HIVE.resourceLocation().toString());
+    }
+
+    private static AdvancementHolder addLineageKillerAdvancement(AdvancementHolder parent, Consumer<AdvancementHolder> consumer) {
+        return Advancement.Builder.advancement()
+            .addCriterion("kill_a_lineage", CriteriaTriggers.IMPOSSIBLE.createCriterion(new ImpossibleTrigger.TriggerInstance()))
+            .parent(parent)
+            .display(
+                AlienBlocks.ROYAL_JELLY_BLOCK.get(),
+                AlienAdvancements.KILL_A_LINEAGE.titleComponent(),
+                AlienAdvancements.KILL_A_LINEAGE.descriptionComponent(),
+                null,
+                AdvancementType.CHALLENGE,
+                true,
+                true,
+                false
+            )
+            .rewards(AdvancementRewards.Builder.experience(100))
+            .save(consumer, AlienAdvancements.KILL_A_LINEAGE.resourceLocation().toString());
     }
 
     private static AdvancementHolder addRemoveEmbryoWithChorusFruitAdvancement(

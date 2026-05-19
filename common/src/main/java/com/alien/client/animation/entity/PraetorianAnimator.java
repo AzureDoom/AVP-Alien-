@@ -103,7 +103,7 @@ public class PraetorianAnimator extends AzEntityAnimator<Praetorian> {
             // TODO: idle swim
             animFunction = dispatcher::swim;
         } else if (isMovingOnGround) {
-            if (praetorian.hasTarget.get()) {
+            if (praetorian.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {
                 animFunction = dispatcher::walk;

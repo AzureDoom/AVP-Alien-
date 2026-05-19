@@ -3,7 +3,7 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.ai.vent;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.VentBuilder;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.vent.action.CreateVentAction;
-import com.alien.common.gameplay.hive2.location.HiveLocationRegistry;
+import com.alien.common.gameplay.hive.location.HiveLocationRegistry;
 import com.just.ai.goap.StateKey;
 import com.just.ai.goap.sensor.Sensor;
 import com.just.ai.goap.sensor.Sensors;
@@ -32,7 +32,7 @@ public class VentSensors {
                 return false;
             }
 
-            // Hive2: only build vents while standing inside some location's territory and that location isn't angry.
+            // Hive: only build vents while standing inside some location's territory and that location isn't angry.
             var owningLocation = HiveLocationRegistry.INSTANCE.getByChunk(
                 xenomorph.level().dimension(),
                 new ChunkPos(xenomorph.blockPosition())

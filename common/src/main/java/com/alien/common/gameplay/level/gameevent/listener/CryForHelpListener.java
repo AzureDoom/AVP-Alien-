@@ -2,8 +2,8 @@ package com.alien.common.gameplay.level.gameevent.listener;
 
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.block.entity.resin.vent.ResinVentBlockEntity;
-import com.alien.common.gameplay.hive2.location.HiveLocation;
-import com.alien.common.gameplay.hive2.spawning.ReserveSpawnUtil;
+import com.alien.common.gameplay.hive.location.HiveLocation;
+import com.alien.common.gameplay.hive.spawning.ReserveSpawnUtil;
 import com.alien.common.registry.tag.AlienBlockTags;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.spatial.v1.block.BlockPosUtil;
@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 /**
- * Reacts to a xenomorph's "cry for help" game event by summoning a defender at a vent. In hive2 the responding hive is
+ * Reacts to a xenomorph's "cry for help" game event by summoning a defender at a vent. In hive the responding hive is
  * the {@link HiveLocation} bound to the vent's chunk; defender supply comes from the location's local reserves.
  */
 public class CryForHelpListener implements GameEventListener {

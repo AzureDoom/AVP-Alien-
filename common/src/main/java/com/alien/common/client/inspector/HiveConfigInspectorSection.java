@@ -1,9 +1,9 @@
 package com.alien.common.client.inspector;
 
 import com.alien.Alien;
-import com.alien.common.gameplay.hive2.config.HiveConfigSchema;
-import com.alien.common.gameplay.hive2.config.HiveConfigSchema.Field;
-import com.alien.common.gameplay.hive2.inspection.HiveInspectionSnapshot;
+import com.alien.common.gameplay.hive.config.HiveConfigSchema;
+import com.alien.common.gameplay.hive.config.HiveConfigSchema.Field;
+import com.alien.common.gameplay.hive.inspection.HiveInspectionSnapshot;
 import com.alien.common.network.payload.C2SRequestHiveInspectionPayload;
 import com.alien.common.network.payload.C2SUpdateHiveConfigPayload;
 import com.alien.common.registry.init.AlienFactionDataTypes;
