@@ -148,29 +148,45 @@ public class AlienAdvancementProvider {
     );
 
     private static final List<VariantXenocide> VARIANT_XENOCIDES = List.of(
-        new VariantXenocide(AlienAdvancements.KILL_ALL_NORMAL_ALIENS, AlienItems.CHITIN.get(), NORMAL_ALIENS_TO_KILL),
+        new VariantXenocide(
+            AlienAdvancements.KILL_ALL_NORMAL_ALIENS,
+            AlienItems.CHITIN.get(),
+            NORMAL_ALIENS_TO_KILL,
+            false
+        ),
         new VariantXenocide(
             AlienAdvancements.KILL_ALL_ABERRANT_ALIENS,
             AlienItems.ABERRANT_CHITIN.get(),
-            ABERRANT_ALIENS_TO_KILL
+            ABERRANT_ALIENS_TO_KILL,
+            false
         ),
         new VariantXenocide(
             AlienAdvancements.KILL_ALL_NETHER_ALIENS,
             AlienItems.NETHER_CHITIN.get(),
-            NETHER_ALIENS_TO_KILL
+            NETHER_ALIENS_TO_KILL,
+            false
         ),
         new VariantXenocide(
             AlienAdvancements.KILL_ALL_IRRADIATED_ALIENS,
             AlienItems.IRRADIATED_CHITIN.get(),
-            IRRADIATED_ALIENS_TO_KILL
+            IRRADIATED_ALIENS_TO_KILL,
+            true
         )
     );
 
     public static void generateAdvancements(HolderLookup.Provider registryLookup, Consumer<AdvancementHolder> consumer) {
+        generateAdvancements(registryLookup, consumer, consumer);
+    }
+
+    public static void generateAdvancements(
+        HolderLookup.Provider registryLookup,
+        Consumer<AdvancementHolder> consumer,
+        Consumer<AdvancementHolder> avpHumanConsumer
+    ) {
         var root = addRootAdvancement(consumer);
 
         addLifecycleAdvancements(root, consumer);
-        addCombatAdvancements(root, consumer);
+        addCombatAdvancements(root, consumer, avpHumanConsumer);
     }
 
     private static AdvancementHolder addRootAdvancement(Consumer<AdvancementHolder> consumer) {
@@ -193,24 +209,29 @@ public class AlienAdvancementProvider {
         addRemoveEmbryoWithChorusFruitAdvancement(root, consumer);
     }
 
-    private static void addCombatAdvancements(AdvancementHolder root, Consumer<AdvancementHolder> consumer) {
+    private static void addCombatAdvancements(
+        AdvancementHolder root,
+        Consumer<AdvancementHolder> consumer,
+        Consumer<AdvancementHolder> avpHumanConsumer
+    ) {
         var alienKillerAdvancement = addAlienKillerAdvancement(root, consumer);
         addShearAnOvomorphAdvancement(alienKillerAdvancement, consumer);
         addChitinArmorAdvancements(alienKillerAdvancement, consumer);
         addBlockSpitterSpitWithHeadShieldAdvancement(alienKillerAdvancement, consumer);
 
         var royalAlienKillerAdvancement = addRoyalAlienKillerAdvancement(alienKillerAdvancement, consumer);
-        addRoyalCombatAdvancements(royalAlienKillerAdvancement, consumer);
+        addRoyalCombatAdvancements(royalAlienKillerAdvancement, consumer, avpHumanConsumer);
     }
 
     private static void addRoyalCombatAdvancements(
         AdvancementHolder royalAlienKillerAdvancement,
-        Consumer<AdvancementHolder> consumer
+        Consumer<AdvancementHolder> consumer,
+        Consumer<AdvancementHolder> avpHumanConsumer
     ) {
         addEmpressKillerAdvancement(royalAlienKillerAdvancement, consumer);
         var harbingerKillerAdvancement = addHarbingerKillerAdvancement(royalAlienKillerAdvancement, consumer);
         addRaidAdvancements(harbingerKillerAdvancement, consumer);
-        addHiveDestructionAdvancements(royalAlienKillerAdvancement, consumer);
+        addHiveDestructionAdvancements(royalAlienKillerAdvancement, consumer, avpHumanConsumer);
         addPlatedChitinArmorAdvancement(royalAlienKillerAdvancement, consumer);
     }
 
@@ -222,18 +243,25 @@ public class AlienAdvancementProvider {
 
     private static void addHiveDestructionAdvancements(
         AdvancementHolder royalAlienKillerAdvancement,
-        Consumer<AdvancementHolder> consumer
+        Consumer<AdvancementHolder> consumer,
+        Consumer<AdvancementHolder> avpHumanConsumer
     ) {
         var hiveBusterAdvancement = addHiveBusterAdvancement(royalAlienKillerAdvancement, consumer);
         var lineageKillerAdvancement = addLineageKillerAdvancement(hiveBusterAdvancement, consumer);
-        addXenocideAdvancements(lineageKillerAdvancement, consumer);
+        addXenocideAdvancements(lineageKillerAdvancement, consumer, avpHumanConsumer);
     }
 
-    private static void addXenocideAdvancements(AdvancementHolder lineageKillerAdvancement, Consumer<AdvancementHolder> consumer) {
+    private static void addXenocideAdvancements(
+        AdvancementHolder lineageKillerAdvancement,
+        Consumer<AdvancementHolder> consumer,
+        Consumer<AdvancementHolder> avpHumanConsumer
+    ) {
         for (var xenocide : VARIANT_XENOCIDES) {
+            var xenocideConsumer = xenocide.requiresAvpHuman() ? avpHumanConsumer : consumer;
+
             addVariantXenocideAdvancement(
                 lineageKillerAdvancement,
-                consumer,
+                xenocideConsumer,
                 xenocide.advancement(),
                 xenocide.icon(),
                 xenocide.aliensToKill()
@@ -644,6 +672,7 @@ public class AlienAdvancementProvider {
     private record VariantXenocide(
         BLibAdvancement advancement,
         ItemLike icon,
-        List<EntityType<?>> aliensToKill
+        List<EntityType<?>> aliensToKill,
+        boolean requiresAvpHuman
     ) {}
 }
