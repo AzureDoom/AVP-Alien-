@@ -61,7 +61,7 @@ public class CrawlingManager implements NBTSerializable {
 
         var path = navigation.getPath();
         var pathRequestsCrawl = entity instanceof PathNavigatorUser navigatorUser
-            && navigatorUser.getPathNavigator().shouldCrawl();
+            && navigatorUser.getPathNavigator().getPostureView().shouldCrawl();
         var isTight = pathRequestsCrawl || isTightSpace(blockPosition);
 
         if (path != null && path.getNextNodeIndex() < path.getNodeCount()) {

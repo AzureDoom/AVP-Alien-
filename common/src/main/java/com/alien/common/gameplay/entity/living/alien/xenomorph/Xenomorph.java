@@ -9,6 +9,7 @@ import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.model.resin.ResinProducer;
 import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienSoundEvents;
+import com.alien.common.registry.tag.AlienBlockTags;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.util.AlienPredicates;
 import com.blib.api.common.data_sync.v1.DataAccessor;
@@ -16,6 +17,7 @@ import com.blib.api.common.entity.v1.EntitySenseCache;
 import com.blib.api.common.entity.v1.EntitySenseCacheUser;
 import com.blib.api.common.goap.v1.GOAPUser;
 import com.blib.api.common.pathfinding.v1.cache.TerrainCacheRegistry;
+import com.blib.api.common.pathfinding.v1.evaluator.PathBlockBreakingConfig;
 import com.blib.api.common.pathfinding.v1.evaluator.PathCrawlConfig;
 import com.blib.api.common.pathfinding.v1.evaluator.PathWaterConfig;
 import com.blib.api.common.pathfinding.v1.evaluator.TerrainEvaluatorConfig;
@@ -43,8 +45,10 @@ import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.Minecart;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.DynamicGameEventListener;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
@@ -63,6 +67,20 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
     private static final int HIVE_INTRUDER_TARGET_MEMORY_TICKS = 3 * 20;
 
     private static final float UNDERWATER_HEIGHT_SCALE = 0.4f;
+
+    private static final float PATH_BLOCK_BREAK_MAX_HARDNESS = 6.0f;
+
+    private static final float PATH_BLOCK_BREAK_DAMAGE_PER_TICK = 50.0f;
+
+    private static final PathBlockBreakingConfig PATH_BLOCK_BREAKING_CONFIG = new PathBlockBreakingConfig(
+        true,
+        2,
+        PATH_BLOCK_BREAK_MAX_HARDNESS,
+        4.0f,
+        8.0f,
+        PATH_BLOCK_BREAK_DAMAGE_PER_TICK,
+        Xenomorph::canPathBreakBlock
+    );
 
     public final DataAccessor<Integer> attackDurationInTicks;
 
@@ -165,6 +183,7 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
             .withEntitySize(pathConfig.entityWidth(), pathConfig.entityHeight())
             .withCrawlConfig(crawlConfig)
             .withWaterConfig(waterConfig)
+            .withBlockBreakingConfig(PATH_BLOCK_BREAKING_CONFIG)
             .withMaxFallDistance(14)
             .withCanOpenDoors(pathConfig.canOpenDoors())
             .build();
@@ -177,6 +196,19 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         var classificationCache = TerrainCacheRegistry.getOrCreate(level, evaluatorConfig.getTerrainClassifier());
 
         return new PathNavigator(level, navigatorConfig, classificationCache);
+    }
+
+    private static boolean canPathBreakBlock(LevelReader level, BlockPos pos, BlockState state) {
+        if (
+            !(level instanceof Level world)
+                || !world.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)
+        ) {
+            return false;
+        }
+
+        return !state.hasBlockEntity()
+            && state.getDestroySpeed(level, pos) >= 0.0f
+            && !state.is(AlienBlockTags.XENOMORPH_IMMUNE);
     }
 
     private SearchConfig createHiveIntruderSearchConfig() {
@@ -200,7 +232,8 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
     }
 
     private static boolean isPathActive(PathNavigator navigator) {
-        return navigator.isPathPending() || navigator.isNavigating();
+        var state = navigator.getState();
+        return state.isPathPending() || state.isNavigating();
     }
 
     @Override
