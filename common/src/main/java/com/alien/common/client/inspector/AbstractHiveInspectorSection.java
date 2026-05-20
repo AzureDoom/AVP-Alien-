@@ -6,7 +6,7 @@ import com.blib.engine.api.client.v1.inspector.CollapsibleInspectorSections;
 import com.blib.engine.api.client.v1.inspector.InspectorSection;
 import com.blib.engine.api.client.v1.selection.FactionInspectionView;
 import com.blib.engine.api.client.v1.selection.FactionSelection;
-import com.blib.engine.ui.EngineFont;
+import com.blib.engine.api.client.v1.ui.EngineFont;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.nbt.CompoundTag;

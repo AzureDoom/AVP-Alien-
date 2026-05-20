@@ -1,9 +1,9 @@
 package com.alien.common.client.inspector;
 
-import com.blib.engine.ui.layout.UiRect;
-import com.blib.engine.ui.layout.UiText;
-import com.blib.engine.ui.layout.VerticalLayout;
-import com.blib.engine.ui.panel.details.InspectorStyle;
+import com.blib.engine.api.client.v1.ui.layout.UiRect;
+import com.blib.engine.api.client.v1.ui.layout.UiText;
+import com.blib.engine.api.client.v1.ui.layout.VerticalLayout;
+import com.blib.engine.api.client.v1.inspector.InspectorStyle;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 
@@ -45,7 +45,7 @@ public final class HiveInspectorRender {
     /** Section header bar — dark band with bold label, mirrors {@code DetailsPanel.drawSectionHeader}. */
     public static int drawSectionHeader(GuiGraphics graphics, Font font, int x, int y, int width, String label) {
         var rect = UiRect.of(x, y, width, InspectorStyle.SECTION_HEADER_HEIGHT);
-        graphics.fill(rect.x(), rect.y(), rect.right(), rect.bottom(), InspectorStyle.SECTION_HEADER_BG_COLOR);
+        graphics.fill(rect.x(), rect.y(), rect.right(), rect.bottom(), InspectorStyle.SECTION_HEADER_BG_COLOR());
         UiText.drawClipped(
             graphics,
             font,
@@ -53,14 +53,14 @@ public final class HiveInspectorRender {
             rect.x() + InspectorStyle.CONTENT_PADDING,
             UiText.centeredY(font, rect),
             Math.max(0, rect.width() - 2 * InspectorStyle.CONTENT_PADDING),
-            InspectorStyle.HEADER_TEXT_COLOR
+            InspectorStyle.HEADER_TEXT_COLOR()
         );
         return rect.bottom();
     }
 
     /** Label + value row on one line. Returns next-row y. */
     public static int drawRow(GuiGraphics graphics, Font font, int x, int y, int width, String label, String value) {
-        return drawLabelValueRow(graphics, font, x, y, width, 0, label, value, InspectorStyle.LABEL_COLOR, InspectorStyle.VALUE_COLOR);
+        return drawLabelValueRow(graphics, font, x, y, width, 0, label, value, InspectorStyle.LABEL_COLOR(), InspectorStyle.VALUE_COLOR());
     }
 
     /** Label + value row for values that should prefer ellipsis over horizontal overflow. */
@@ -79,8 +79,8 @@ public final class HiveInspectorRender {
             0,
             label,
             value,
-            InspectorStyle.LABEL_COLOR,
-            InspectorStyle.VALUE_COLOR
+            InspectorStyle.LABEL_COLOR(),
+            InspectorStyle.VALUE_COLOR()
         );
     }
 
@@ -95,8 +95,8 @@ public final class HiveInspectorRender {
             SUBROW_INDENT,
             label,
             value,
-            InspectorStyle.LABEL_COLOR,
-            InspectorStyle.VALUE_COLOR
+            InspectorStyle.LABEL_COLOR(),
+            InspectorStyle.VALUE_COLOR()
         );
     }
 
@@ -124,8 +124,8 @@ public final class HiveInspectorRender {
         var countRect = UiRect.of(countX, row.y(), columns.countWidth(), row.height());
 
         var idWidth = Math.max(0, countX - ROW_LABEL_GAP - row.x());
-        UiText.drawClipped(graphics, font, entityId, row.x(), textY, idWidth, InspectorStyle.LABEL_COLOR);
-        UiText.drawRight(graphics, font, count, countRect, InspectorStyle.VALUE_COLOR);
+        UiText.drawClipped(graphics, font, entityId, row.x(), textY, idWidth, InspectorStyle.LABEL_COLOR());
+        UiText.drawRight(graphics, font, count, countRect, InspectorStyle.VALUE_COLOR());
         return row.bottom();
     }
 
@@ -180,7 +180,7 @@ public final class HiveInspectorRender {
             x + InspectorStyle.CONTENT_PADDING,
             y,
             Math.max(0, InspectorStyle.LABEL_COLUMN_WIDTH * 3),
-            InspectorStyle.LABEL_COLOR
+            InspectorStyle.LABEL_COLOR()
         );
         return y + InspectorStyle.LINE_HEIGHT;
     }
@@ -188,7 +188,7 @@ public final class HiveInspectorRender {
     /** Solo muted text with an explicit available width. */
     public static int drawNote(GuiGraphics graphics, Font font, int x, int y, int width, String text) {
         var row = contentRow(x, y, width, 0);
-        UiText.drawClipped(graphics, font, text, row.x(), UiText.centeredY(font, row), row.width(), InspectorStyle.LABEL_COLOR);
+        UiText.drawClipped(graphics, font, text, row.x(), UiText.centeredY(font, row), row.width(), InspectorStyle.LABEL_COLOR());
         return row.bottom();
     }
 
@@ -200,13 +200,13 @@ public final class HiveInspectorRender {
         var row = contentRow(x, y, width, 0);
         var labelWidth = labelColumnWidth(row.width());
         var textY = UiText.centeredY(font, row);
-        UiText.drawClipped(graphics, font, label, row.x(), textY, labelWidth, InspectorStyle.LABEL_COLOR);
+        UiText.drawClipped(graphics, font, label, row.x(), textY, labelWidth, InspectorStyle.LABEL_COLOR());
 
         var barX = row.x() + Math.min(labelWidth, row.width()) + ROW_LABEL_GAP;
         var barW = Math.max(0, row.right() - barX);
         var valueText = current + " / " + cap;
         if (barW < 42) {
-            UiText.drawClipped(graphics, font, valueText, barX, textY, barW, InspectorStyle.VALUE_COLOR);
+            UiText.drawClipped(graphics, font, valueText, barX, textY, barW, InspectorStyle.VALUE_COLOR());
             return row.bottom();
         }
 
@@ -221,9 +221,9 @@ public final class HiveInspectorRender {
 
         var textW = font.width(valueText);
         if (textW <= barW) {
-            UiText.drawClipped(graphics, font, valueText, barX + (barW - textW) / 2, textY, textW, InspectorStyle.VALUE_COLOR);
+            UiText.drawClipped(graphics, font, valueText, barX + (barW - textW) / 2, textY, textW, InspectorStyle.VALUE_COLOR());
         } else {
-            UiText.drawClipped(graphics, font, valueText, barX + 2, textY, Math.max(0, barW - 4), InspectorStyle.VALUE_COLOR);
+            UiText.drawClipped(graphics, font, valueText, barX + 2, textY, Math.max(0, barW - 4), InspectorStyle.VALUE_COLOR());
         }
 
         return row.bottom();
@@ -262,8 +262,8 @@ public final class HiveInspectorRender {
             value,
             labelColumnWidth(inset.width()),
             ROW_LABEL_GAP,
-            InspectorStyle.HEADER_TEXT_COLOR,
-            InspectorStyle.VALUE_COLOR
+            InspectorStyle.HEADER_TEXT_COLOR(),
+            InspectorStyle.VALUE_COLOR()
         );
         return row.bottom();
     }
@@ -322,8 +322,8 @@ public final class HiveInspectorRender {
             metric.value(),
             labelWidth,
             2,
-            InspectorStyle.LABEL_COLOR,
-            InspectorStyle.VALUE_COLOR
+            InspectorStyle.LABEL_COLOR(),
+            InspectorStyle.VALUE_COLOR()
         );
     }
 

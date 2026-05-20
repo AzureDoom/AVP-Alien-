@@ -1,8 +1,8 @@
 package com.alien.common.gameplay.advancement;
 
 import com.alien.Alien;
-import com.alien.compatibility.avp_human.AVPHuman;
 import com.alien.common.data.AlienAdvancements;
+import com.alien.compatibility.avp_human.AVPHuman;
 import com.blib.api.common.advancement.v1.BLibAdvancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.server.level.ServerPlayer;

@@ -11,11 +11,11 @@ import com.blib.engine.api.client.v1.inspector.CollapsibleInspectorSections;
 import com.blib.engine.api.client.v1.inspector.InspectorSection;
 import com.blib.engine.api.client.v1.selection.FactionInspectionView;
 import com.blib.engine.api.client.v1.selection.FactionSelection;
-import com.blib.engine.ui.EngineFont;
-import com.blib.engine.ui.layout.UiText;
-import com.blib.engine.ui.panel.details.InspectorStyle;
-import com.blib.engine.ui.widget.Checkbox;
-import com.blib.engine.ui.widget.TextInput;
+import com.blib.engine.api.client.v1.ui.EngineFont;
+import com.blib.engine.api.client.v1.ui.layout.UiText;
+import com.blib.engine.api.client.v1.inspector.InspectorStyle;
+import com.blib.engine.api.client.v1.ui.widget.Checkbox;
+import com.blib.engine.api.client.v1.ui.widget.TextInput;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -171,7 +171,7 @@ public final class HiveConfigInspectorSection implements InspectorSection<Factio
         var labelColumnWidth = labelColumnWidth(width);
         var labelX = x + InspectorStyle.CONTENT_PADDING;
         var labelY = y + (rowHeight - font.lineHeight + 2) / 2;
-        UiText.drawClipped(graphics, font, field.label(), labelX, labelY, labelColumnWidth - 4, InspectorStyle.LABEL_COLOR);
+        UiText.drawClipped(graphics, font, field.label(), labelX, labelY, labelColumnWidth - 4, InspectorStyle.LABEL_COLOR());
 
         var controlX = x + InspectorStyle.CONTENT_PADDING + labelColumnWidth;
         var controlWidth = Math.max(0, width - labelColumnWidth - 2 * InspectorStyle.CONTENT_PADDING);
@@ -189,7 +189,7 @@ public final class HiveConfigInspectorSection implements InspectorSection<Factio
                 controlX + Checkbox.SIZE + 5,
                 labelY,
                 Math.max(0, controlWidth - Checkbox.SIZE - 5),
-                InspectorStyle.VALUE_COLOR
+                InspectorStyle.VALUE_COLOR()
             );
             return y + rowHeight + InspectorStyle.ROW_GAP;
         }

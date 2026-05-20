@@ -2,7 +2,7 @@ package com.alien.common.client.inspector;
 
 import com.alien.common.gameplay.hive.inspection.HiveInspectionSnapshot;
 import com.alien.common.registry.init.AlienFactionDataTypes;
-import com.blib.engine.ui.panel.details.InspectorStyle;
+import com.blib.engine.api.client.v1.inspector.InspectorStyle;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.nbt.CompoundTag;
