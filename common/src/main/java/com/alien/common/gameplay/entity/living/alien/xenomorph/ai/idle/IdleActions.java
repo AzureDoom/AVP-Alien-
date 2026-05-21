@@ -45,14 +45,7 @@ public class IdleActions {
 
     private static Action.Signal performWander(Action.Context<? extends Xenomorph> context) {
         var actor = context.getActor();
-        HiveLocation location = null;
-
-        if (isHiveBoundIdleWanderer(actor)) {
-            location = HiveLocationRegistry.INSTANCE.getByChunk(actor.level().dimension(), actor.chunkPosition());
-            if (location == null || !location.isAlive()) {
-                return Action.Signal.ABORT;
-            }
-        }
+        var location = resolveHiveBoundWanderLocation(actor);
 
         var blackboard = context.getBlackboard(Blackboard.Scope.ACTION);
         var target = blackboard.getOrDefault(KEY_WANDER_TARGET, (Vec3) null);
@@ -106,6 +99,15 @@ public class IdleActions {
         return actor.getType().is(AlienEntityTypeTags.QUEENS)
             || actor.getType().is(AlienEntityTypeTags.EMPRESSES)
             || actor.getType().is(AlienEntityTypeTags.HARBINGERS);
+    }
+
+    private static @Nullable HiveLocation resolveHiveBoundWanderLocation(Xenomorph actor) {
+        if (!isHiveBoundIdleWanderer(actor)) {
+            return null;
+        }
+
+        var location = HiveLocationRegistry.INSTANCE.getByChunk(actor.level().dimension(), actor.chunkPosition());
+        return location != null && location.isAlive() ? location : null;
     }
 
     private static boolean isInsideLocation(HiveLocation location, Vec3 pos) {
