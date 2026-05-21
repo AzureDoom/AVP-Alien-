@@ -79,6 +79,16 @@ public class WarriorAnimationDispatcher {
         CRAWL_ALL.dispatchForEntity(warrior);
     }
 
+    public void crawl(float speed) {
+        AzAlienAnimationUtil.composeWithSpeed(
+            AzAlienAnimationUtil.XENO_LIMBS,
+            "crawl",
+            AzPlayBehaviors.LOOP,
+            AzDispatchMode.PLAY_IF_NOT_PLAYING,
+            speed
+        ).dispatchForEntity(warrior);
+    }
+
     public void crawlHold() {
         CRAWL_ALL_HOLD.dispatchForEntity(warrior);
     }

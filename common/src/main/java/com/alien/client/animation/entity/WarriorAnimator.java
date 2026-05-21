@@ -110,7 +110,7 @@ public class WarriorAnimator extends AzEntityAnimator<Warrior> {
             animFunction = dispatcher::swim;
         } else if (isMoving) {
             if (isCrawling) {
-                animFunction = dispatcher::crawl;
+                animFunction = () -> dispatcher.crawl(AzAlienAnimationUtil.crawlAnimationSpeed(warrior));
             } else if (warrior.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {

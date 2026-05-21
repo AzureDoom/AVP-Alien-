@@ -79,6 +79,16 @@ public class DroneAnimationDispatcher {
         CRAWL_ALL.dispatchForEntity(drone);
     }
 
+    public void crawl(float speed) {
+        AzAlienAnimationUtil.composeWithSpeed(
+            AzAlienAnimationUtil.XENO_LIMBS,
+            "crawl",
+            AzPlayBehaviors.LOOP,
+            AzDispatchMode.PLAY_IF_NOT_PLAYING,
+            speed
+        ).dispatchForEntity(drone);
+    }
+
     public void crawlHold() {
         CRAWL_ALL_HOLD.dispatchForEntity(drone);
     }

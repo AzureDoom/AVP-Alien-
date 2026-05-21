@@ -109,7 +109,7 @@ public class RunnerAnimator extends AzEntityAnimator<Runner> {
             animFunction = dispatcher::swim;
         } else if (isMoving) {
             if (isCrawling) {
-                animFunction = dispatcher::crawl;
+                animFunction = () -> dispatcher.crawl(AzAlienAnimationUtil.crawlAnimationSpeed(runner));
             } else if (runner.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {

@@ -109,7 +109,7 @@ public class DroneAnimator extends AzEntityAnimator<Drone> {
             animFunction = dispatcher::swim;
         } else if (isMoving) {
             if (isCrawling) {
-                animFunction = dispatcher::crawl;
+                animFunction = () -> dispatcher.crawl(AzAlienAnimationUtil.crawlAnimationSpeed(drone));
             } else if (drone.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {
