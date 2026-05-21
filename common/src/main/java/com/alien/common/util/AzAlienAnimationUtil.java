@@ -8,6 +8,7 @@ import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehavior;
 import com.blib.api.client.animation.v1.command.policy.AzDispatchMode;
 import com.blib.api.client.animation.v1.command.policy.OnPropertiesChanged;
 import com.blib.api.client.animation.v1.track.AzTrackHandle;
+import com.blib.api.common.entity.v1.PlayerStatConstants;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 
@@ -16,6 +17,11 @@ import java.util.List;
 public class AzAlienAnimationUtil {
 
     private static final float MAX_CRAWL_ANIMATION_SPEED = 2.0F;
+
+    // Xeno movement attributes use BLib's scaled player walk speed, while position deltas remain in vanilla units.
+    private static final float ATTRIBUTE_TO_POSITION_DELTA_SCALE = 0.1F / PlayerStatConstants.BASE_WALK_SPEED;
+
+    private static final float MOVEMENT_EPSILON = 1.0E-4F;
 
     public static final AzTrackHandle<Alien> BODY = AzTrackHandle.declare("body");
 
@@ -70,15 +76,30 @@ public class AzAlienAnimationUtil {
     );
 
     public static float crawlAnimationSpeed(Alien alien) {
-        var deltaX = alien.getX() - alien.xOld;
-        var deltaZ = alien.getZ() - alien.zOld;
-        var movementSpeed = (float) Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
-        var referenceSpeed = Math.max(0.01F, (float) alien.getAttributeValue(Attributes.MOVEMENT_SPEED));
+        var crawlSpeedMultiplier = CrawlingManager.getCrawlSpeedMultiplier(alien);
+        var movementSpeed = actualHorizontalMovementSpeed(alien);
+
+        if (movementSpeed <= MOVEMENT_EPSILON) {
+            return crawlSpeedMultiplier;
+        }
+
+        var currentSpeedAttribute = (float) alien.getAttributeValue(Attributes.MOVEMENT_SPEED);
+        var uncrawledSpeedAttribute = currentSpeedAttribute / crawlSpeedMultiplier;
+        var referenceSpeed = Math.max(0.01F, uncrawledSpeedAttribute * ATTRIBUTE_TO_POSITION_DELTA_SCALE);
         return Mth.clamp(
-            (movementSpeed / referenceSpeed) * CrawlingManager.getCrawlSpeedMultiplier(alien),
-            0.0F,
+            movementSpeed / referenceSpeed,
+            crawlSpeedMultiplier,
             MAX_CRAWL_ANIMATION_SPEED
         );
+    }
+
+    private static float actualHorizontalMovementSpeed(Alien alien) {
+        var deltaX = alien.getX() - alien.xOld;
+        var deltaZ = alien.getZ() - alien.zOld;
+        var positionSpeed = deltaX * deltaX + deltaZ * deltaZ;
+        var movement = alien.getDeltaMovement();
+        var velocitySpeed = movement.x * movement.x + movement.z * movement.z;
+        return Mth.sqrt((float) Math.max(positionSpeed, velocitySpeed));
     }
 
     public static <T extends Alien> AzCommand<T> composeWithSpeed(
