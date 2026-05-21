@@ -1,4 +1,4 @@
-package com.alien.common.client.inspector;
+package com.alien.compatibility.blib_engine.client.inspector;
 
 import com.alien.Alien;
 import com.alien.common.network.payload.C2SRequestHiveInspectionPayload;

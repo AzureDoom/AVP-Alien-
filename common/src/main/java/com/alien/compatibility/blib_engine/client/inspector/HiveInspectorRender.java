@@ -1,4 +1,4 @@
-package com.alien.common.client.inspector;
+package com.alien.compatibility.blib_engine.client.inspector;
 
 import com.blib.engine.api.client.v1.ui.layout.UiRect;
 import com.blib.engine.api.client.v1.ui.layout.UiText;

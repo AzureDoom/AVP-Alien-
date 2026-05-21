@@ -1,9 +1,5 @@
-package com.alien.client.inspector;
+package com.alien.compatibility.blib_engine.client.inspector;
 
-import com.alien.common.client.inspector.HiveConfigInspectorSection;
-import com.alien.common.client.inspector.LineageFactionInspectorSection;
-import com.alien.common.client.inspector.LocationFactionInspectorSection;
-import com.alien.common.client.inspector.VariantFactionInspectorSection;
 import com.blib.engine.api.client.v1.inspector.InspectorSectionRegistry;
 
 /**

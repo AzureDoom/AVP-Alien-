@@ -1,4 +1,4 @@
-package com.alien.common.client.inspector;
+package com.alien.compatibility.blib_engine.client.inspector;
 
 import com.alien.common.gameplay.hive.inspection.HiveInspectionSnapshot;
 import com.alien.common.registry.init.AlienFactionDataTypes;
@@ -8,7 +8,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 
-import static com.alien.common.client.inspector.HiveInspectorRender.metric;
+import static com.alien.compatibility.blib_engine.client.inspector.HiveInspectorRender.metric;
 
 /**
  * Inspector section for AVP {@code avp_alien:location} factions — one panel block per selected hive location showing
