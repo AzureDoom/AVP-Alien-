@@ -25,12 +25,14 @@ public final class RavagerChargeAttack {
     private static final float DAMAGE_POINT_PERCENT = 0.5F;
 
     public static final AttackType WINDUP = AttackType.builder("ravager_charge_windup")
+        .requiresAllLegs()
         .defaultDurationInTicks(WINDUP_DURATION_IN_TICKS)
         .damageThresholdPercent(0F)
         .damageApplicator(DamageApplicator.NOOP)
         .build();
 
     public static final AttackType ATTACK = AttackType.builder("ravager_charge")
+        .requiresAllLegs()
         .defaultDurationInTicks(ACTIVE_DURATION_IN_TICKS)
         .damageThresholdPercent(0F)
         .cooldownInTicks(COOLDOWN_IN_TICKS)

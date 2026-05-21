@@ -267,7 +267,7 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
             return;
         }
 
-        var attack = attackConfig.selectRegular(random, cooldownTracker);
+        var attack = attackConfig.selectRegular(random, cooldownTracker, this);
 
         if (attack == null) {
             return;
@@ -289,12 +289,16 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         return activeAttack != null && attackConfig != null && attackConfig.triggered().contains(activeAttack);
     }
 
+    public boolean canUseAttack(AttackType attack) {
+        return !attack.isNone() && attack.canUse(this);
+    }
+
     protected void resetAttackType() {
         attackType.set(AttackType.NONE);
     }
 
     public void startAttack(AttackType attack, @Nullable LivingEntity target) {
-        if (attack.isNone()) {
+        if (!canUseAttack(attack)) {
             return;
         }
 
@@ -391,6 +395,10 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
 
         if (!level().isClientSide && isLunging.get() && onGround()) {
             isLunging.set(false);
+        }
+
+        if (!level().isClientSide && activeAttack != null && !canUseAttack(activeAttack)) {
+            completeActiveAttack();
         }
 
         if (!level().isClientSide && activeAttack != null && activeExecutor != null) {
