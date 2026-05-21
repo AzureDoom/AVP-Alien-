@@ -1,8 +1,8 @@
-package com.alien.fabric.data.form_size_scale;
+package com.alien.fabric.data.molting_profile;
 
 import com.alien.AlienResources;
-import com.alien.common.data.FormSizeScaleReloadListener;
-import com.alien.common.model.lifecycle.growth.FormSizeScale;
+import com.alien.common.data.MoltingProfileReloadListener;
+import com.alien.common.model.lifecycle.growth.MoltingProfile;
 import com.mojang.serialization.JsonOps;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.minecraft.data.CachedOutput;
@@ -14,38 +14,38 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-public abstract class FormSizeScaleDataProvider implements DataProvider {
+public abstract class MoltingProfileDataProvider implements DataProvider {
 
     private final FabricDataOutput output;
 
-    private final Map<String, FormSizeScale> dataByName;
+    private final Map<String, MoltingProfile> dataByName;
 
-    protected FormSizeScaleDataProvider(FabricDataOutput output) {
+    protected MoltingProfileDataProvider(FabricDataOutput output) {
         this.output = output;
         this.dataByName = new HashMap<>();
     }
 
     protected abstract void generate();
 
-    public void add(String name, FormSizeScale formSizeScale) {
-        dataByName.put(name, formSizeScale);
+    public void add(String name, MoltingProfile moltingProfile) {
+        dataByName.put(name, moltingProfile);
     }
 
     @Override
     public final @NotNull CompletableFuture<?> run(CachedOutput cached) {
         generate();
 
-        var pathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, FormSizeScaleReloadListener.DIRECTORY_NAME);
+        var pathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, MoltingProfileReloadListener.DIRECTORY_NAME);
 
         var futures = dataByName.entrySet()
             .stream()
             .map(entry -> {
                 var name = entry.getKey();
-                var formSizeScale = entry.getValue();
+                var moltingProfile = entry.getValue();
                 var id = AlienResources.location(name);
 
                 var filePath = pathProvider.json(id);
-                var jsonElement = FormSizeScale.CODEC.encodeStart(JsonOps.INSTANCE, formSizeScale)
+                var jsonElement = MoltingProfile.CODEC.encodeStart(JsonOps.INSTANCE, moltingProfile)
                     .getOrThrow();
 
                 return DataProvider.saveStable(cached, jsonElement, filePath);
@@ -56,6 +56,6 @@ public abstract class FormSizeScaleDataProvider implements DataProvider {
 
     @Override
     public final @NotNull String getName() {
-        return "Form Size Scale";
+        return "Molting Profiles";
     }
 }

@@ -7,20 +7,20 @@ import net.minecraft.world.entity.EntityType;
 
 import java.util.List;
 
-public record FormSizeScale(
+public record MoltingProfile(
     EntityType<?> entityType,
     float startScale,
     float endScale,
     List<MoltPhase> phases
 ) {
 
-    public static final Codec<FormSizeScale> CODEC = RecordCodecBuilder.create(
+    public static final Codec<MoltingProfile> CODEC = RecordCodecBuilder.create(
         instance -> instance.group(
-            BuiltInRegistries.ENTITY_TYPE.byNameCodec().fieldOf("entityType").forGetter(FormSizeScale::entityType),
-            Codec.FLOAT.fieldOf("startScale").forGetter(FormSizeScale::startScale),
-            Codec.FLOAT.fieldOf("endScale").forGetter(FormSizeScale::endScale),
-            MoltPhase.CODEC.listOf().fieldOf("phases").forGetter(FormSizeScale::phases)
-        ).apply(instance, FormSizeScale::new)
+            BuiltInRegistries.ENTITY_TYPE.byNameCodec().fieldOf("entityType").forGetter(MoltingProfile::entityType),
+            Codec.FLOAT.fieldOf("startScale").forGetter(MoltingProfile::startScale),
+            Codec.FLOAT.fieldOf("endScale").forGetter(MoltingProfile::endScale),
+            MoltPhase.CODEC.listOf().fieldOf("phases").forGetter(MoltingProfile::phases)
+        ).apply(instance, MoltingProfile::new)
     );
 
     public int totalMaturationTicks() {

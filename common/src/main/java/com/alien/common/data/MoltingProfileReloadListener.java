@@ -1,8 +1,8 @@
 package com.alien.common.data;
 
 import com.alien.Alien;
-import com.alien.common.model.lifecycle.growth.FormSizeScale;
-import com.alien.common.registry.FormSizeScaleRegistry;
+import com.alien.common.model.lifecycle.growth.MoltingProfile;
+import com.alien.common.registry.MoltingProfileRegistry;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -15,16 +15,16 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-public class FormSizeScaleReloadListener extends SimpleJsonResourceReloadListener {
+public class MoltingProfileReloadListener extends SimpleJsonResourceReloadListener {
 
-    public static final String DIRECTORY_NAME = "form_size_scale";
+    public static final String DIRECTORY_NAME = "molting_profiles";
 
     private static final Gson GSON = new GsonBuilder()
         .setPrettyPrinting()
         .disableHtmlEscaping()
         .create();
 
-    public FormSizeScaleReloadListener() {
+    public MoltingProfileReloadListener() {
         super(GSON, DIRECTORY_NAME);
     }
 
@@ -34,15 +34,15 @@ public class FormSizeScaleReloadListener extends SimpleJsonResourceReloadListene
         @NotNull ResourceManager resourceManager,
         @NotNull ProfilerFiller profilerFiller
     ) {
-        FormSizeScaleRegistry.clear();
+        MoltingProfileRegistry.clear();
 
         for (var entry : resourceLocationJsonElementMap.entrySet()) {
             var id = entry.getKey();
             var jsonElement = entry.getValue();
 
-            FormSizeScale.CODEC.parse(JsonOps.INSTANCE, jsonElement)
-                .resultOrPartial(err -> Alien.LOGGER.error("Failed to parse FormSizeScale {}: {}", id, err))
-                .ifPresent(FormSizeScaleRegistry::register);
+            MoltingProfile.CODEC.parse(JsonOps.INSTANCE, jsonElement)
+                .resultOrPartial(err -> Alien.LOGGER.error("Failed to parse MoltingProfile {}: {}", id, err))
+                .ifPresent(MoltingProfileRegistry::register);
         }
     }
 }

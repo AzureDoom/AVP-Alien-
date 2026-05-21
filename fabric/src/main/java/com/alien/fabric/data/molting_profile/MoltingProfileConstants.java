@@ -1,10 +1,10 @@
-package com.alien.fabric.data.form_size_scale;
+package com.alien.fabric.data.molting_profile;
 
 import com.alien.common.model.lifecycle.growth.MoltPhase;
 
 import java.util.List;
 
-public class FormSizeScaleConstants {
+public class MoltingProfileConstants {
 
     // Chestbursters grow from 100% to 125% scale over 3 minutes in 3 phases.
     public static final float CHESTBURSTER_START_SCALE = 1.0F;

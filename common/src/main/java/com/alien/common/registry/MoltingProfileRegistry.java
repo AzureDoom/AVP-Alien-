@@ -1,17 +1,17 @@
 package com.alien.common.registry;
 
-import com.alien.common.model.lifecycle.growth.FormSizeScale;
+import com.alien.common.model.lifecycle.growth.MoltingProfile;
 import net.minecraft.world.entity.EntityType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class FormSizeScaleRegistry {
+public class MoltingProfileRegistry {
 
-    private static final Map<EntityType<?>, FormSizeScale> REGISTRY = new HashMap<>();
+    private static final Map<EntityType<?>, MoltingProfile> REGISTRY = new HashMap<>();
 
-    public static @Nullable FormSizeScale get(EntityType<?> entityType) {
+    public static @Nullable MoltingProfile get(EntityType<?> entityType) {
         return REGISTRY.get(entityType);
     }
 
@@ -23,7 +23,7 @@ public class FormSizeScaleRegistry {
         REGISTRY.clear();
     }
 
-    public static void register(FormSizeScale formSizeScale) {
-        REGISTRY.put(formSizeScale.entityType(), formSizeScale);
+    public static void register(MoltingProfile moltingProfile) {
+        REGISTRY.put(moltingProfile.entityType(), moltingProfile);
     }
 }
