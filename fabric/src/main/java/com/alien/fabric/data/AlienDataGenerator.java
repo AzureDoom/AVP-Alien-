@@ -4,6 +4,8 @@ import com.alien.compatibility.avp_human.AVPHuman;
 import com.alien.fabric.data.advancement.AdvancementProvider;
 import com.alien.fabric.data.damage_type.DamageTypeBootstrapper;
 import com.alien.fabric.data.damage_type.DamageTypeProvider;
+import com.alien.fabric.data.dismemberment.AlienLimbDefinitionDataProvider;
+import com.alien.fabric.data.dismemberment.AlienLimbVisualsDataProvider;
 import com.alien.fabric.data.form_size_scale.FormSizeScaleSubProvider;
 import com.alien.fabric.data.gene_bonus_data.GeneBonusDataSubProvider;
 import com.alien.fabric.data.growth_stages.GrowthStageSubProvider;
@@ -75,6 +77,8 @@ public class AlienDataGenerator implements DataGeneratorEntrypoint {
         pack.addProvider(RaidWaveProfileDataProvider::new);
         pack.addProvider(ReinforcementProfileDataProvider::new);
         pack.addProvider(InfectionSubProvider::new);
+        pack.addProvider(AlienLimbDefinitionDataProvider::new);
+        pack.addProvider(AlienLimbVisualsDataProvider::new);
     }
 
     @Override

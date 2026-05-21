@@ -3,6 +3,7 @@ package com.alien.common.gameplay.entity.dismemberment;
 import com.alien.AlienResources;
 import com.blib.api.common.dismemberment.v1.LimbCategories;
 import com.blib.api.common.dismemberment.v1.LimbDefinition;
+import com.blib.api.common.dismemberment.v1.SpawnFunctionRegistry;
 import com.blib.api.common.registry.v1.BLibHolder;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.Vec3;
@@ -32,6 +33,29 @@ public final class XenomorphLimbs {
             rightLeg(holder, idPrefix);
             tail(holder, idPrefix);
         }
+    }
+
+    public static void registerSpawnOffsets(String idPrefix) {
+        SpawnFunctionRegistry.register(
+            AlienResources.location(idPrefix + "_head"),
+            entity -> new Vec3(0.0, entity.getEyeHeight(), 0.0)
+        );
+        SpawnFunctionRegistry.register(
+            AlienResources.location(idPrefix + "_left_arm"),
+            entity -> new Vec3(0.0, entity.getBbHeight() * 0.75, 0.0)
+        );
+        SpawnFunctionRegistry.register(
+            AlienResources.location(idPrefix + "_right_arm"),
+            entity -> new Vec3(0.0, entity.getBbHeight() * 0.75, 0.0)
+        );
+        SpawnFunctionRegistry.register(
+            AlienResources.location(idPrefix + "_left_leg"),
+            entity -> new Vec3(0.0, entity.getBbHeight() * 0.3, 0.0)
+        );
+        SpawnFunctionRegistry.register(
+            AlienResources.location(idPrefix + "_right_leg"),
+            entity -> new Vec3(0.0, entity.getBbHeight() * 0.3, 0.0)
+        );
     }
 
     private static LimbDefinition head(BLibHolder<? extends EntityType<?>> entityType, String prefix) {

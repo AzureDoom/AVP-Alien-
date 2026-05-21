@@ -15,13 +15,7 @@ public final class AlienLimbDefinitions {
     }
 
     private static void registerXenomorphs() {
-        XenomorphLimbs.register(
-            "drone",
-            AlienEntityTypes.DRONE,
-            AlienEntityTypes.ABERRANT_DRONE,
-            AlienEntityTypes.NETHER_DRONE,
-            AlienEntityTypes.IRRADIATED_DRONE
-        );
+        XenomorphLimbs.registerSpawnOffsets("drone");
         XenomorphLimbs.register(
             "warrior",
             AlienEntityTypes.WARRIOR,
