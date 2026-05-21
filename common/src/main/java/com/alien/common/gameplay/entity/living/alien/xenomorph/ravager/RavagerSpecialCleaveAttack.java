@@ -12,7 +12,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
-public final class RavagerChargeAttack {
+public final class RavagerSpecialCleaveAttack {
 
     private static final int WINDUP_DURATION_IN_TICKS = 20;
 
@@ -24,14 +24,14 @@ public final class RavagerChargeAttack {
 
     private static final float DAMAGE_POINT_PERCENT = 0.5F;
 
-    public static final AttackType WINDUP = AttackType.builder("ravager_charge_windup")
+    public static final AttackType WINDUP = AttackType.builder("ravager_special_cleave_windup")
         .requiresAllLegs()
         .defaultDurationInTicks(WINDUP_DURATION_IN_TICKS)
         .damageThresholdPercent(0F)
         .damageApplicator(DamageApplicator.NOOP)
         .build();
 
-    public static final AttackType ATTACK = AttackType.builder("ravager_charge")
+    public static final AttackType ATTACK = AttackType.builder("ravager_special_cleave")
         .requiresAllLegs()
         .defaultDurationInTicks(ACTIVE_DURATION_IN_TICKS)
         .damageThresholdPercent(0F)
@@ -41,7 +41,7 @@ public final class RavagerChargeAttack {
         .executorFactory(Executor::new)
         .build();
 
-    private RavagerChargeAttack() {
+    private RavagerSpecialCleaveAttack() {
         throw new UnsupportedOperationException();
     }
 

@@ -86,7 +86,7 @@ public class Ravager extends Xenomorph implements GOAPUser<Ravager> {
     private static final XenomorphConfig CONFIG = XenomorphConfig.builder(XenomorphPathConfig.LARGE, Ravager::getType)
         .attackConfig(
             XenomorphAttackConfig.builder()
-                .addTriggered(RavagerChargeAttack.ATTACK)
+                .addTriggered(RavagerSpecialCleaveAttack.ATTACK)
                 .build()
         )
         .parallelDigCount(2)

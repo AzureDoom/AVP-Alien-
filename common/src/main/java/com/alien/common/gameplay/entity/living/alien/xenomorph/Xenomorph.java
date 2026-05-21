@@ -364,7 +364,7 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
 
     /**
      * Transition the visible/synced attack-type without spinning up a new executor. Used by executors that want to swap
-     * animations mid-flight (e.g. windup → active charge).
+     * animations mid-flight (e.g. windup → active cleave).
      */
     public void transitionAttack(AttackType newAttackType, int newDurationInTicks) {
         attackType.set(newAttackType);
