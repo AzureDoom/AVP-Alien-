@@ -39,21 +39,21 @@ public class BlockLootTableProvider extends FabricBlockLootTableProvider {
 
     private void generateOtherDrops() {
         dropOther(AberrantAlienResinBlocks.ABERRANT_RESIN_NODE, AberrantAlienResinBlocks.ABERRANT_RESIN);
-        dropOther(AberrantAlienResinBlocks.ABERRANT_RESIN_VEIN, AlienItems.ABERRANT_RESIN_BALL);
+        dropWhenSilkTouch(AberrantAlienResinBlocks.ABERRANT_RESIN_VEIN);
         dropOther(AberrantAlienResinBlocks.ABERRANT_RESIN_VENT, AberrantAlienResinBlocks.ABERRANT_RESIN);
-        dropOther(AberrantAlienResinBlocks.ABERRANT_RESIN_WEB, AlienItems.ABERRANT_RESIN_BALL);
+        dropWhenSilkTouch(AberrantAlienResinBlocks.ABERRANT_RESIN_WEB);
         dropOther(IrradiatedAlienResinBlocks.IRRADIATED_RESIN_NODE, IrradiatedAlienResinBlocks.IRRADIATED_RESIN);
-        dropOther(IrradiatedAlienResinBlocks.IRRADIATED_RESIN_VEIN, AlienItems.IRRADIATED_RESIN_BALL);
+        dropWhenSilkTouch(IrradiatedAlienResinBlocks.IRRADIATED_RESIN_VEIN);
         dropOther(IrradiatedAlienResinBlocks.IRRADIATED_RESIN_VENT, IrradiatedAlienResinBlocks.IRRADIATED_RESIN);
-        dropOther(IrradiatedAlienResinBlocks.IRRADIATED_RESIN_WEB, AlienItems.IRRADIATED_RESIN_BALL);
+        dropWhenSilkTouch(IrradiatedAlienResinBlocks.IRRADIATED_RESIN_WEB);
         dropOther(NetherAlienResinBlocks.NETHER_RESIN_NODE, NetherAlienResinBlocks.NETHER_RESIN);
-        dropOther(NetherAlienResinBlocks.NETHER_RESIN_VEIN, AlienItems.NETHER_RESIN_BALL);
+        dropWhenSilkTouch(NetherAlienResinBlocks.NETHER_RESIN_VEIN);
         dropOther(NetherAlienResinBlocks.NETHER_RESIN_VENT, NetherAlienResinBlocks.NETHER_RESIN);
-        dropOther(NetherAlienResinBlocks.NETHER_RESIN_WEB, AlienItems.NETHER_RESIN_BALL);
+        dropWhenSilkTouch(NetherAlienResinBlocks.NETHER_RESIN_WEB);
         dropOther(AlienResinBlocks.RESIN_NODE, AlienResinBlocks.RESIN);
-        dropOther(AlienResinBlocks.RESIN_VEIN, AlienItems.RESIN_BALL);
+        dropWhenSilkTouch(AlienResinBlocks.RESIN_VEIN);
         dropOther(AlienResinBlocks.RESIN_VENT, AlienResinBlocks.RESIN);
-        dropOther(AlienResinBlocks.RESIN_WEB, AlienItems.RESIN_BALL);
+        dropWhenSilkTouch(AlienResinBlocks.RESIN_WEB);
 
         // Queen head blocks (floor + wall) drop the matching head item. Both block forms map to the same
         // item — `StandingAndWallBlockItem` placement re-derives floor-vs-wall from the placement context.
@@ -194,6 +194,12 @@ public class BlockLootTableProvider extends FabricBlockLootTableProvider {
     public void dropOther(Supplier<? extends Block> blockSupplier, Supplier<? extends ItemLike> itemLikeSupplier) {
         var block = blockSupplier.get();
         dropOther(block, itemLikeSupplier.get());
+        TOUCHED_ENTRIES.add(block);
+    }
+
+    public void dropWhenSilkTouch(Supplier<? extends Block> blockSupplier) {
+        var block = blockSupplier.get();
+        dropWhenSilkTouch(block);
         TOUCHED_ENTRIES.add(block);
     }
 
