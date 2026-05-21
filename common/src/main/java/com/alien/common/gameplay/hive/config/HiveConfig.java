@@ -131,7 +131,7 @@ public record HiveConfig(
             5L * TICKS_PER_MINUTE, // protoHiveStageInterval: 5 min between drone→warrior→praetorian→queen advances
 
             // § 2 Locations
-            60L * TICKS_PER_SECOND, // settlementTicks: 60s
+            10L * TICKS_PER_SECOND, // settlementTicks: 10s
             7L * 24L * TICKS_PER_HOUR, // locationMaxNoContactTicks: 7 game-days of loaded-no-contact time
             30L * TICKS_PER_MINUTE, // locationBootstrapGraceTicks: protect newborn locations for 30 min
             96, // bossBarDisplayRadiusBlocks
