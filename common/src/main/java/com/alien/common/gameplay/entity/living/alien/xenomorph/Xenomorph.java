@@ -1,5 +1,6 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph;
 
+import com.alien.AlienResources;
 import com.alien.common.gameplay.entity.CrawlingManager;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.GrowthManager;
@@ -13,6 +14,8 @@ import com.alien.common.registry.tag.AlienBlockTags;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.alien.common.util.AlienPredicates;
 import com.blib.api.common.data_sync.v1.DataAccessor;
+import com.blib.api.common.dismemberment.v1.Dismemberable;
+import com.blib.api.common.dismemberment.v1.LimbDefinitionRegistry;
 import com.blib.api.common.entity.v1.EntitySenseCache;
 import com.blib.api.common.entity.v1.EntitySenseCacheUser;
 import com.blib.api.common.goap.v1.GOAPUser;
@@ -31,6 +34,7 @@ import com.blib.api.common.pathfinding.v1.terrain.TerrainType;
 import com.just.ai.goap.graph.Graph;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.FluidTags;
@@ -42,6 +46,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.Minecart;
@@ -71,6 +76,10 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
     private static final float PATH_BLOCK_BREAK_MAX_HARDNESS = 6.0f;
 
     private static final float PATH_BLOCK_BREAK_DAMAGE_PER_TICK = 50.0f;
+
+    private static final ResourceLocation LOST_LIMB_MAX_HEALTH_MODIFIER = AlienResources.location("lost_limb_max_health");
+
+    private static final double MAX_HEALTH_REDUCTION_PER_LOST_LIMB = 0.1D;
 
     private static final PathBlockBreakingConfig PATH_BLOCK_BREAKING_CONFIG = new PathBlockBreakingConfig(
         true,
@@ -362,6 +371,10 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
     public void tick() {
         super.tick();
 
+        if (!level().isClientSide) {
+            applyLostLimbMaxHealthPenalty();
+        }
+
         crawlingManager.tick();
         cocoonManager.maintainLockedState();
 
@@ -399,6 +412,56 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
                 tryAlertNearbyXenomorphs();
             }
         }
+    }
+
+    private void applyLostLimbMaxHealthPenalty() {
+        var attributeInstance = getAttribute(Attributes.MAX_HEALTH);
+
+        if (attributeInstance == null) {
+            return;
+        }
+
+        attributeInstance.removeModifier(LOST_LIMB_MAX_HEALTH_MODIFIER);
+
+        var detachedLimbs = countDetachedLimbs();
+
+        if (detachedLimbs <= 0) {
+            return;
+        }
+
+        attributeInstance.addTransientModifier(
+            new AttributeModifier(
+                LOST_LIMB_MAX_HEALTH_MODIFIER,
+                -detachedLimbs * MAX_HEALTH_REDUCTION_PER_LOST_LIMB,
+                AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
+            )
+        );
+
+        if (getHealth() > getMaxHealth()) {
+            setHealth(getMaxHealth());
+        }
+    }
+
+    private int countDetachedLimbs() {
+        if (!(this instanceof Dismemberable dismemberable)) {
+            return 0;
+        }
+
+        var manager = dismemberable.getDismembermentManager();
+
+        if (manager == null || !manager.hasAnyDetached()) {
+            return 0;
+        }
+
+        var count = 0;
+
+        for (var definition : LimbDefinitionRegistry.getDefinitions(getType())) {
+            if (manager.isDetached(definition)) {
+                count++;
+            }
+        }
+
+        return count;
     }
 
     private void updateDimensionsBasedOnWaterState() {
