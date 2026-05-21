@@ -171,7 +171,7 @@ public class ResinManager implements GameEventListener.Provider<ResinSpreadListe
         if (alien.getTarget() != null) {
             return false;
         }
-        if (alien.isUnderWater()) {
+        if (alien.isInWater() || alien.isUnderWater()) {
             return false;
         }
         // AND alien must have not been hurt for more than 10 seconds...
