@@ -1,4 +1,5 @@
 {
+  "model": "avp_alien:geo/entity/chrysalis.geo.json",
   "bone": "gHead",
   "transforms": {
     "idle": {

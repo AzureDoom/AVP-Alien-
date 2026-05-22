@@ -1,5 +1,4 @@
 {
-  "parent": "avp_alien:templates/xenomorph_head_trophy",
-  "model": "avp_alien:geo/entity/predalien.geo.json",
+  "parent": "avp_alien:templates/predalien_head_trophy",
   "texture": "avp_alien:textures/entity/nether_predalien.png"
 }

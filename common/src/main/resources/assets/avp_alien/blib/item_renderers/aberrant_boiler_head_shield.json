@@ -1,5 +1,4 @@
 {
-  "parent": "avp_alien:templates/xenomorph_head_shield",
-  "model": "avp_alien:geo/entity/boiler.geo.json",
+  "parent": "avp_alien:templates/boiler_head_shield",
   "texture": "avp_alien:textures/entity/aberrant_boiler.png"
 }

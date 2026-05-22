@@ -1,5 +1,4 @@
 {
-  "parent": "avp_alien:templates/xenomorph_head_trophy",
-  "model": "avp_alien:geo/entity/empress.geo.json",
+  "parent": "avp_alien:templates/empress_head_trophy",
   "texture": "avp_alien:textures/entity/aberrant_empress.png"
 }

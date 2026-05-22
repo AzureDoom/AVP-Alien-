@@ -1,4 +1,5 @@
 {
+  "model": "avp_alien:geo/entity/predalien.geo.json",
   "bone": "gHead",
   "transforms": {
     "idle": {

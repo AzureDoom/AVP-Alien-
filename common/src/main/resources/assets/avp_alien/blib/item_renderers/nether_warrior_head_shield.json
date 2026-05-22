@@ -1,5 +1,4 @@
 {
-  "parent": "avp_alien:templates/xenomorph_head_shield",
-  "model": "avp_alien:geo/entity/warrior.geo.json",
+  "parent": "avp_alien:templates/warrior_head_shield",
   "texture": "avp_alien:textures/entity/nether_warrior.png"
 }

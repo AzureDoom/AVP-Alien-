@@ -1,5 +1,4 @@
 {
-  "parent": "avp_alien:templates/xenomorph_head_trophy",
-  "model": "avp_alien:geo/entity/drone.geo.json",
+  "parent": "avp_alien:templates/drone_head_trophy",
   "texture": "avp_alien:textures/entity/irradiated_drone.png"
 }

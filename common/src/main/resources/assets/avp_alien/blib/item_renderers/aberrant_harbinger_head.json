@@ -1,5 +1,4 @@
 {
-  "parent": "avp_alien:templates/xenomorph_head_trophy",
-  "model": "avp_alien:geo/entity/harbinger.geo.json",
+  "parent": "avp_alien:templates/harbinger_head_trophy",
   "texture": "avp_alien:textures/entity/aberrant_harbinger.png"
 }
