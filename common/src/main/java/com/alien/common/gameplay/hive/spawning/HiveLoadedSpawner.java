@@ -40,6 +40,9 @@ public final class HiveLoadedSpawner {
             if (!location.isAlive()) {
                 continue;
             }
+            if (location.isInCombatRespite()) {
+                continue;
+            }
 
             var level = server.getLevel(location.dimension());
             if (level == null) {

@@ -346,6 +346,8 @@ public final class HiveDebugCommands {
                             ? "(uninitialized)"
                             : "angry=" + bossBar.isAngry() + " evacuating=" + bossBar.isEvacuating())
                         + ", evacuatingTicksLeft=" + location.evacuatingRemainingTicks()
+                        + ", combatRespiteTicksLeft=" + location.combatRespiteRemainingTicks()
+                        + ", combatKillsSinceLastRespite=" + location.combatKillsSinceLastRespite()
                 ),
                 false
             );
