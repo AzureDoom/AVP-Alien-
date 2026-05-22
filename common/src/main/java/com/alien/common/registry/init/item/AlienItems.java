@@ -6,6 +6,8 @@ import com.alien.common.gameplay.item.CrusherHeadShieldItem;
 import com.alien.common.gameplay.item.PoisonJellyItem;
 import com.alien.common.gameplay.item.QueenHeadItem;
 import com.alien.common.gameplay.item.QueenHeadShieldItem;
+import com.alien.common.gameplay.item.XenomorphHeadItem;
+import com.alien.common.gameplay.item.XenomorphHeadShieldItem;
 import com.alien.common.registry.init.block.AlienBlocks;
 import com.alien.common.registry.key.AlienJukeboxSongKeys;
 import com.blib.api.common.registry.v1.BLibHolder;
@@ -204,6 +206,24 @@ public class AlienItems {
         return create(name, new Item.Properties());
     }
 
+    static BLibHolder<Item> createXenomorphHead(String name, boolean fireResistant) {
+        return create(name, () -> new XenomorphHeadItem(xenomorphHeadProperties(fireResistant)));
+    }
+
+    static BLibHolder<Item> createXenomorphHeadShield(String name, boolean fireResistant) {
+        return create(name, () -> new XenomorphHeadShieldItem(xenomorphHeadShieldProperties(fireResistant)));
+    }
+
+    private static Item.Properties xenomorphHeadProperties(boolean fireResistant) {
+        var properties = new Item.Properties().stacksTo(1);
+        return fireResistant ? properties.fireResistant() : properties;
+    }
+
+    private static Item.Properties xenomorphHeadShieldProperties(boolean fireResistant) {
+        var properties = new Item.Properties().stacksTo(1).durability(512);
+        return fireResistant ? properties.fireResistant() : properties;
+    }
+
     private static BLibHolder<Item> create(String name, Item.Properties properties) {
         return create(name, () -> new Item(properties));
     }
@@ -213,6 +233,7 @@ public class AlienItems {
     }
 
     public static void initialize() {
+        AlienXenomorphHeadItems.initialize();
         REGISTRY.registerAll();
         DECORATED_POT_PATTERN_REGISTRY.register("ovoid_pottery_pattern", OVOID_POTTERY_SHERD);
         DECORATED_POT_PATTERN_REGISTRY.register("parasite_pottery_pattern", PARASITE_POTTERY_SHERD);

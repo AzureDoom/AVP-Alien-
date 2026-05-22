@@ -1,0 +1,5 @@
+{
+  "parent": "avp_alien:templates/xenomorph_head_shield",
+  "model": "avp_alien:geo/entity/razor_claw.geo.json",
+  "texture": "avp_alien:textures/entity/irradiated_razor_claw.png"
+}

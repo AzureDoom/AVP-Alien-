@@ -1,29 +1,23 @@
 package com.alien.common.gameplay.entity.dismemberment;
 
-import com.alien.AlienResources;
-import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.item.AlienItems;
+import com.alien.common.registry.init.item.AlienXenomorphHeadItems;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.dismemberment.v1.LimbCategories;
 import com.blib.api.common.dismemberment.v1.LimbInteractionRegistry;
 import com.blib.api.common.dismemberment.v1.entity.DismemberedLimbEntity;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Right-click drops for xenomorph limb fragments. Crusher and queen HEAD limbs drop their matching trophy head items.
- * Royal-class xenomorphs without a trophy head drop <em>plated</em> chitin from their HEAD limbs to reflect the heavier
- * armor on those forms; everything else (and other limb categories on royals) drops the regular chitin variant matching
- * the source's affliction (irradiated/nether/aberrant/normal).
+ * Right-click drops for xenomorph limb fragments. Mapped HEAD limbs drop their matching trophy head items. Royal-class
+ * xenomorphs without a trophy head drop <em>plated</em> chitin from their HEAD limbs to reflect the heavier armor on
+ * those forms; everything else (and other limb categories on royals) drops the regular chitin variant matching the
+ * source's affliction (irradiated/nether/aberrant/normal).
  */
 public final class AlienLimbDrops {
-
-    private static final ResourceLocation CRUSHER_HEAD_LIMB = AlienResources.location("crusher_head");
-
-    private static final ResourceLocation QUEEN_HEAD_LIMB = AlienResources.location("queen_head");
 
     private AlienLimbDrops() {}
 
@@ -80,61 +74,29 @@ public final class AlienLimbDrops {
 
     private static @Nullable Item trophyHeadItemFor(DismemberedLimbEntity limb) {
         var sourceType = limb.getSourceEntityType();
-        var limbId = limb.getLimbId();
 
-        if (sourceType == null || limbId == null) {
+        if (sourceType == null || !isHeadLimb(limb)) {
             return null;
         }
 
-        if (limbId.equals(CRUSHER_HEAD_LIMB)) {
-            return crusherHeadItemFor(sourceType);
-        }
-
-        if (limbId.equals(QUEEN_HEAD_LIMB)) {
-            return queenHeadItemFor(sourceType);
-        }
-
-        return null;
-    }
-
-    private static @Nullable Item crusherHeadItemFor(EntityType<?> sourceType) {
-        if (sourceType == AlienEntityTypes.IRRADIATED_CRUSHER.get()) {
-            return AlienItems.IRRADIATED_CRUSHER_HEAD.get();
-        }
-
-        if (sourceType == AlienEntityTypes.NETHER_CRUSHER.get()) {
-            return AlienItems.NETHER_CRUSHER_HEAD.get();
-        }
-
-        if (sourceType == AlienEntityTypes.ABERRANT_CRUSHER.get()) {
-            return AlienItems.ABERRANT_CRUSHER_HEAD.get();
-        }
-
-        if (sourceType == AlienEntityTypes.CRUSHER.get()) {
-            return AlienItems.CRUSHER_HEAD.get();
+        for (var entry : AlienXenomorphHeadItems.ALL) {
+            if (sourceType == entry.entityType().get()) {
+                return entry.head().get();
+            }
         }
 
         return null;
     }
 
-    private static @Nullable Item queenHeadItemFor(EntityType<?> sourceType) {
-        if (sourceType == AlienEntityTypes.IRRADIATED_QUEEN.get()) {
-            return AlienItems.IRRADIATED_QUEEN_HEAD.get();
+    private static boolean isHeadLimb(DismemberedLimbEntity limb) {
+        var definition = limb.resolveLimbDefinition();
+
+        if (definition != null) {
+            return definition.category().equals(LimbCategories.HEAD);
         }
 
-        if (sourceType == AlienEntityTypes.NETHER_QUEEN.get()) {
-            return AlienItems.NETHER_QUEEN_HEAD.get();
-        }
-
-        if (sourceType == AlienEntityTypes.ABERRANT_QUEEN.get()) {
-            return AlienItems.ABERRANT_QUEEN_HEAD.get();
-        }
-
-        if (sourceType == AlienEntityTypes.QUEEN.get()) {
-            return AlienItems.QUEEN_HEAD.get();
-        }
-
-        return null;
+        var limbId = limb.getLimbId();
+        return limbId != null && limbId.getPath().endsWith("_head");
     }
 
     private static @Nullable Item chitinItemFor(@Nullable EntityType<?> sourceType) {

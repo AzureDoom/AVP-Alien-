@@ -1,0 +1,5 @@
+{
+  "parent": "avp_alien:templates/xenomorph_head_trophy",
+  "model": "avp_alien:geo/entity/warrior.geo.json",
+  "texture": "avp_alien:textures/entity/warrior.png"
+}
