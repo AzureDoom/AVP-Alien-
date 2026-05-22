@@ -1,7 +1,6 @@
 package com.alien.common.registry.init.creative_mode_tab.initializer;
 
 import com.alien.common.registry.init.item.AlienArmorItems;
-import com.alien.common.registry.init.item.AlienXenomorphHeadItems;
 import com.alien.compatibility.avp_human.AVPHuman;
 import net.minecraft.world.item.CreativeModeTab;
 
@@ -18,7 +17,7 @@ public class CombatCreativeModeTabInitializer {
             addIrradiatedXenomorphArmors(output);
         }
 
-        addXenomorphHeadShields(output);
+        XenomorphHeadCreativeModeTabEntries.addHeadShields(output);
     };
 
     private static void addBaseXenomorphArmors(CreativeModeTab.Output output) {
@@ -71,7 +70,4 @@ public class CombatCreativeModeTabInitializer {
         // CreativeModeTabUtil.accept(output, AlienArmorItems.PLATED_IRRADIATED_CHITIN_BOOTS);
     }
 
-    private static void addXenomorphHeadShields(CreativeModeTab.Output output) {
-        AlienXenomorphHeadItems.ALL.forEach(entry -> CreativeModeTabUtil.accept(output, entry.headShield()));
-    }
 }
