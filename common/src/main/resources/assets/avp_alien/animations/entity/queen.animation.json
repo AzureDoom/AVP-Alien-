@@ -1,6 +1,200 @@
 {
 	"format_version": "1.8.0",
 	"animations": {
+		"idle": {
+			"loop": true,
+			"animation_length": 4,
+			"bones": {
+				"gTail1": {
+					"rotation": ["Math.cos(query.anim_time*180)*2", "Math.cos(query.anim_time*180)*-1", 0]
+				},
+				"gTail2": {
+					"rotation": [-22.5, "Math.cos((query.anim_time-0.2)*180)*-1.5", 0]
+				},
+				"gTail3": {
+					"rotation": [-22.5, "Math.cos((query.anim_time-0.4)*180)*-2", 0]
+				},
+				"gTail4": {
+					"rotation": [0, "Math.cos((query.anim_time-0.6)*180)*-2.5", 0]
+				},
+				"gTail5": {
+					"rotation": ["22.5+Math.cos(query.anim_time*180)*2", "Math.sin(query.anim_time*180)*-3", 0]
+				},
+				"gTail6": {
+					"rotation": {
+						"0.0": [22.5, "Math.sin((query.anim_time-0.2)*180)*-3.5", 0],
+						"0.5": [22, "Math.sin((query.anim_time-0.2)*180)*-3.5", 0],
+						"0.75": [23, "Math.sin((query.anim_time-0.2)*180)*-3.5", 0],
+						"1.0": [23.5, "Math.sin((query.anim_time-0.2)*180)*-3.5", 0],
+						"1.25": [23, "Math.sin((query.anim_time-0.2)*180)*-3.5", 0],
+						"1.5": [22, "Math.sin((query.anim_time-0.2)*180)*-3.5", 0],
+						"2.0": [22.5, "Math.sin((query.anim_time-0.2)*180)*-3.5", 0]
+					}
+				},
+				"gTail7": {
+					"rotation": ["22.5+Math.sin(query.anim_time*180)*2", "Math.sin((query.anim_time-0.4)*180)*-4", 0]
+				},
+				"gTail8": {
+					"rotation": ["22.5+Math.sin(query.anim_time*180)*2", "Math.sin((query.anim_time-0.6)*180)*-4.5", 0]
+				},
+				"gTail9": {
+					"rotation": [22.5, "Math.sin((query.anim_time-0.4)*180)*-4", 0]
+				},
+				"gTail10": {
+					"rotation": [22.5, "Math.sin((query.anim_time-0.6)*180)*-4.5", 0]
+				},
+				"gTailBlade": {
+					"rotation": [22.5, "Math.sin((query.anim_time-0.8)*180)*-5", 0]
+				},
+				"root": {
+					"position": {
+						"0.0": [0, -1, 0],
+						"2.0": [0, -1.3, 0],
+						"4.0": [0, -1, 0]
+					}
+				},
+				"gLowerBody": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"2.0": [2, 0, 0],
+						"4.0": [0, 0, 0]
+					}
+				},
+				"gUpperBody": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"2.0": [-3, 0, 0],
+						"4.0": [0, 0, 0]
+					}
+				},
+				"gNeck": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"2.0": [2.5, 0, 0],
+						"4.0": [0, 0, 0]
+					}
+				},
+				"gNeckEnd": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"2.0": [2.5, 0, 0],
+						"4.0": [0, 0, 0]
+					}
+				},
+				"gLeftShoulder": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"2.0": [5, 0, 0],
+						"4.0": [0, 0, 0]
+					}
+				},
+				"gLeftForearm": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"2.0": [-7.5, 0, 0],
+						"4.0": [0, 0, 0]
+					}
+				},
+				"gLeftTittyShoulder": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"2.0": [3, -4.61854, 1.91757],
+						"4.0": [0, 0, 0]
+					}
+				},
+				"gLeftTittyForearm": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"2.0": [-10, 0, 0],
+						"4.0": [0, 0, 0]
+					}
+				},
+				"gLeftLeg": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"2.0": [0, 0, -1.5],
+						"4.0": [0, 0, 0]
+					}
+				},
+				"gLeftShin": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"2.0": [1.5, -2.5, -0.1],
+						"4.0": [0, 0, 0]
+					}
+				},
+				"gLeftAnkle": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"2.0": [-1.5, 0, 0],
+						"4.0": [0, 0, 0]
+					}
+				},
+				"gLeftFoot": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"2.0": [0, 2.5, 1.5],
+						"4.0": [0, 0, 0]
+					}
+				},
+				"gRightLeg": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"2.0": [0, 0, 1.5],
+						"4.0": [0, 0, 0]
+					}
+				},
+				"gRightShin": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"2.0": [1.5, 2.5, -0.1],
+						"4.0": [0, 0, 0]
+					}
+				},
+				"gRightAnkle": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"2.0": [-1.5, 0, 0],
+						"4.0": [0, 0, 0]
+					}
+				},
+				"gRightFoot": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"2.0": [0, -2.5, -1.5],
+						"4.0": [0, 0, 0]
+					}
+				},
+				"gRightTittyShoulder": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"2.0": [3, 4.61854, -1.91757],
+						"4.0": [0, 0, 0]
+					}
+				},
+				"gRightTittyForearm": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"2.0": [-10, 0, 0],
+						"4.0": [0, 0, 0]
+					}
+				},
+				"gRightShoulder": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"2.0": [5, 0, 0],
+						"4.0": [0, 0, 0]
+					}
+				},
+				"gRightForearm": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"2.0": [-7.5, 0, 0],
+						"4.0": [0, 0, 0]
+					}
+				}
+			}
+		},
 		"run": {
 			"loop": true,
 			"animation_length": 1,

@@ -6,6 +6,8 @@ public class QueenAnimationRefs {
 
     public static final String CRAWL_IDLE_ANIMATION_NAME = "crawl.idle";
 
+    public static final String IDLE_ANIMATION_NAME = "idle";
+
     public static final String LEFT_BACKHAND_ANIMATION_NAME = "fullbodyattack.leftbackhand";
 
     public static final String LEFT_SWIPE_DOWN_ANIMATION_NAME = "fullbodyattack.leftarmdownward";

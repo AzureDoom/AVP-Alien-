@@ -6,9 +6,8 @@ import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
 
 public class QueenAnimationDispatcher {
 
-    // FIXME:
-    private static final AzCommand<Queen> IDLE = AzCommand.<Queen>builder()
-        .cancel(AzAlienAnimationUtil.BODY)
+    private static final AzCommand<Queen> IDLE = AzCommand.<Queen>idempotent()
+        .play(AzAlienAnimationUtil.BODY, QueenAnimationRefs.IDLE_ANIMATION_NAME, AzPlayBehaviors.LOOP)
         .build();
 
     private static final AzCommand<Queen> RUN = AzCommand.<Queen>idempotent()
