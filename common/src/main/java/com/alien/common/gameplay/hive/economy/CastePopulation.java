@@ -55,7 +55,7 @@ public final class CastePopulation {
 
     /** Count of one caste (loaded location members + reserves) in this location. */
     public static int countCaste(HiveLocation location, TagKey<EntityType<?>> caste) {
-        return countLoadedCaste(location, caste) + location.localReserves().getCountMatching(type -> type.is(caste));
+        return countLoadedCaste(location, caste) + location.localReserves().getReliableCountMatching(type -> type.is(caste));
     }
 
     /** Count of one caste from loaded location members only; reserve entries are intentionally excluded. */
@@ -74,7 +74,7 @@ public final class CastePopulation {
         var loaded = location.loadedMembersByType()
             .getOrDefault(entityType, java.util.Set.of())
             .size();
-        return loaded + location.localReserves().getCount(entityType);
+        return loaded + location.localReserves().getReliableCount(entityType);
     }
 
     /** Count loaded xenomorphs plus reserve xenomorphs, matching the hive boss-bar source of truth. */
@@ -85,6 +85,6 @@ public final class CastePopulation {
                 count += entry.getValue().size();
             }
         }
-        return count + location.localReserves().getCountMatching(type -> type.is(AlienEntityTypeTags.XENOMORPHS));
+        return count + location.localReserves().getReliableCountMatching(type -> type.is(AlienEntityTypeTags.XENOMORPHS));
     }
 }

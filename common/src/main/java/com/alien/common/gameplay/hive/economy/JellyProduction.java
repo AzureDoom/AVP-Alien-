@@ -98,7 +98,7 @@ public final class JellyProduction {
                 count += entry.getValue().size();
             }
         }
-        count += location.localReserves().getCountMatching(type -> type.is(tag));
+        count += location.localReserves().getReliableCountMatching(type -> type.is(tag));
         return count;
     }
 
