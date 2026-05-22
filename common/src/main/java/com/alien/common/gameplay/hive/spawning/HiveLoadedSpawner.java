@@ -117,9 +117,9 @@ public final class HiveLoadedSpawner {
 
     private static @Nullable EntityType<?> pickWeightedReserveType(ServerLevel level, HiveLocation location) {
         var reserves = location.localReserves();
-        var knownQueenCount = CastePopulation.countKnownCaste(location, AlienEntityTypeTags.QUEENS);
-        var knownHarbingerCount = CastePopulation.countKnownCaste(location, AlienEntityTypeTags.HARBINGERS);
-        if (knownQueenCount <= 0) {
+        var loadedQueenCount = CastePopulation.countLoadedCaste(location, AlienEntityTypeTags.QUEENS);
+        var loadedHarbingerCount = CastePopulation.countLoadedCaste(location, AlienEntityTypeTags.HARBINGERS);
+        if (loadedQueenCount <= 0) {
             for (var type : reserves.getAvailableEntityTypes()) {
                 if (type.is(AlienEntityTypeTags.QUEENS)) {
                     return type;
@@ -134,10 +134,10 @@ public final class HiveLoadedSpawner {
             if (!type.is(AlienEntityTypeTags.XENOMORPHS)) {
                 continue;
             }
-            if (type.is(AlienEntityTypeTags.QUEENS) && knownQueenCount > 0) {
+            if (type.is(AlienEntityTypeTags.QUEENS) && loadedQueenCount > 0) {
                 continue;
             }
-            if (type.is(AlienEntityTypeTags.HARBINGERS) && knownHarbingerCount > 0) {
+            if (type.is(AlienEntityTypeTags.HARBINGERS) && loadedHarbingerCount > 0) {
                 continue;
             }
 
