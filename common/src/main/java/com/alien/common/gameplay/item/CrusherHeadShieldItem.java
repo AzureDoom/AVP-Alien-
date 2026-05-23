@@ -5,9 +5,11 @@ import com.alien.common.gameplay.item.ability.ShieldAbilityItem;
 import com.alien.common.registry.key.AlienDamageTypeKeys;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
+import com.blib.api.common.block.v1.BlockBreakProgressManager;
 import com.blib.api.common.shield.v1.BLibShieldConfig;
 import com.blib.api.common.shield.v1.BLibShieldItem;
 import com.blib.api.common.shield.v1.BlockResult;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -22,6 +24,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -47,6 +50,9 @@ public class CrusherHeadShieldItem extends Item implements BLibShieldItem, Shiel
     private static final double DASH_VERTICAL_REACH = 1.25;
     private static final double KNOCKBACK_STRENGTH = 2.5;
     private static final double KNOCKBACK_VERTICAL_BOOST = 0.175;
+    private static final double WALL_PROBE_STEP = 0.25;
+    private static final double WALL_PROBE_EPSILON = 1.0E-4;
+    private static final float WALL_IMPACT_DAMAGE = 60F;
 
     public CrusherHeadShieldItem(Properties properties) {
         super(properties);
@@ -88,6 +94,7 @@ public class CrusherHeadShieldItem extends Item implements BLibShieldItem, Shiel
         var direction = getHorizontalLookDirection(player);
         dashPlayer(player, direction);
         knockEntitiesInPath(player, direction);
+        damageWallInPath(player, direction);
 
         player.level()
             .playSound(
@@ -140,6 +147,44 @@ public class CrusherHeadShieldItem extends Item implements BLibShieldItem, Shiel
             );
         }
         target.hurtMarked = true;
+    }
+
+    private static void damageWallInPath(ServerPlayer player, Vec3 direction) {
+        for (double distance = WALL_PROBE_STEP; distance <= DASH_RANGE; distance += WALL_PROBE_STEP) {
+            var probeBox = player.getBoundingBox().move(direction.scale(distance));
+            if (damageCollidingBlocks(player, probeBox)) {
+                return;
+            }
+        }
+    }
+
+    private static boolean damageCollidingBlocks(ServerPlayer player, AABB probeBox) {
+        var level = player.level();
+        var minX = Mth.floor(probeBox.minX + WALL_PROBE_EPSILON);
+        var minY = Mth.floor(probeBox.minY + WALL_PROBE_EPSILON);
+        var minZ = Mth.floor(probeBox.minZ + WALL_PROBE_EPSILON);
+        var maxX = Mth.floor(probeBox.maxX - WALL_PROBE_EPSILON);
+        var maxY = Mth.floor(probeBox.maxY - WALL_PROBE_EPSILON);
+        var maxZ = Mth.floor(probeBox.maxZ - WALL_PROBE_EPSILON);
+        var damaged = false;
+        var pos = new BlockPos.MutableBlockPos();
+
+        for (var x = minX; x <= maxX; x++) {
+            for (var y = minY; y <= maxY; y++) {
+                for (var z = minZ; z <= maxZ; z++) {
+                    pos.set(x, y, z);
+
+                    var blockState = level.getBlockState(pos);
+                    var collisionShape = blockState.getCollisionShape(level, pos);
+                    if (!collisionShape.isEmpty() && collisionShape.bounds().move(pos).intersects(probeBox)) {
+                        BlockBreakProgressManager.damage(level, pos, WALL_IMPACT_DAMAGE);
+                        damaged = true;
+                    }
+                }
+            }
+        }
+
+        return damaged;
     }
 
     private static boolean isInDashPath(ServerPlayer player, Entity target, Vec3 direction) {
