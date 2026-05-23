@@ -6,8 +6,10 @@ import com.alien.common.gameplay.item.CrusherHeadShieldItem;
 import com.alien.common.gameplay.item.PoisonJellyItem;
 import com.alien.common.gameplay.item.QueenHeadItem;
 import com.alien.common.gameplay.item.QueenHeadShieldItem;
+import com.alien.common.gameplay.item.SpitterHeadShieldItem;
 import com.alien.common.gameplay.item.XenomorphHeadItem;
 import com.alien.common.gameplay.item.XenomorphHeadShieldItem;
+import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.block.AlienBlocks;
 import com.alien.common.registry.key.AlienJukeboxSongKeys;
 import com.blib.api.common.registry.v1.BLibHolder;
@@ -222,6 +224,10 @@ public class AlienItems {
 
     static BLibHolder<Item> createXenomorphHeadShield(String name, boolean fireResistant) {
         return create(name, () -> new XenomorphHeadShieldItem(xenomorphHeadShieldProperties(fireResistant)));
+    }
+
+    static BLibHolder<Item> createSpitterHeadShield(String name, AlienVariant variant, boolean fireResistant) {
+        return create(name, () -> new SpitterHeadShieldItem(variant, xenomorphHeadShieldProperties(fireResistant)));
     }
 
     private static Item.Properties xenomorphHeadProperties(boolean fireResistant) {
