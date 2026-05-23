@@ -15,7 +15,9 @@
     "MixinProjectileUtil_AllowHittingVehicle",
     "MixinVillagerHostilesSensor_RunAwayFromAVPMonsters"
   ],
-  "client": [],
+  "client": [
+    "client.MixinMinecraft_ShieldAbility"
+  ],
   "server": [],
   "injectors": {
     "defaultRequire": 1
