@@ -16,6 +16,7 @@
     "MixinVillagerHostilesSensor_RunAwayFromAVPMonsters"
   ],
   "client": [
+    "client.MixinLocalPlayer_NoBlockingMovementPenalty",
     "client.MixinMinecraft_ShieldAbility"
   ],
   "server": [],

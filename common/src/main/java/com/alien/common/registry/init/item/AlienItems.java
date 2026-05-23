@@ -1,6 +1,7 @@
 package com.alien.common.registry.init.item;
 
 import com.alien.Alien;
+import com.alien.common.gameplay.item.AgileXenomorphHeadShieldItem;
 import com.alien.common.gameplay.item.CrusherHeadItem;
 import com.alien.common.gameplay.item.CrusherHeadShieldItem;
 import com.alien.common.gameplay.item.PoisonJellyItem;
@@ -224,6 +225,10 @@ public class AlienItems {
 
     static BLibHolder<Item> createXenomorphHeadShield(String name, boolean fireResistant) {
         return create(name, () -> new XenomorphHeadShieldItem(xenomorphHeadShieldProperties(fireResistant)));
+    }
+
+    static BLibHolder<Item> createAgileXenomorphHeadShield(String name, boolean fireResistant) {
+        return create(name, () -> new AgileXenomorphHeadShieldItem(xenomorphHeadShieldProperties(fireResistant)));
     }
 
     static BLibHolder<Item> createSpitterHeadShield(String name, AlienVariant variant, boolean fireResistant) {

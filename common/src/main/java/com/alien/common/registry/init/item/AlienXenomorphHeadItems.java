@@ -104,10 +104,10 @@ public final class AlienXenomorphHeadItems {
         item("aberrant_warrior_head", "Aberrant Warrior", "warrior", AlienEntityTypes.ABERRANT_WARRIOR, false),
         item("irradiated_warrior_head", "Irradiated Warrior", "warrior", AlienEntityTypes.IRRADIATED_WARRIOR, false),
         item("nether_warrior_head", "Nether Warrior", "warrior", AlienEntityTypes.NETHER_WARRIOR, true),
-        item("runner_head", "Runner", "runner", AlienEntityTypes.RUNNER, false),
-        item("aberrant_runner_head", "Aberrant Runner", "runner", AlienEntityTypes.ABERRANT_RUNNER, false),
-        item("irradiated_runner_head", "Irradiated Runner", "runner", AlienEntityTypes.IRRADIATED_RUNNER, false),
-        item("nether_runner_head", "Nether Runner", "runner", AlienEntityTypes.NETHER_RUNNER, true),
+        agileItem("runner_head", "Runner", "runner", AlienEntityTypes.RUNNER, false),
+        agileItem("aberrant_runner_head", "Aberrant Runner", "runner", AlienEntityTypes.ABERRANT_RUNNER, false),
+        agileItem("irradiated_runner_head", "Irradiated Runner", "runner", AlienEntityTypes.IRRADIATED_RUNNER, false),
+        agileItem("nether_runner_head", "Nether Runner", "runner", AlienEntityTypes.NETHER_RUNNER, true),
         spitterItem("spitter_head", "Spitter", AlienVariant.NORMAL, AlienEntityTypes.SPITTER, false),
         spitterItem("aberrant_spitter_head", "Aberrant Spitter", AlienVariant.ABERRANT, AlienEntityTypes.ABERRANT_SPITTER, false),
         spitterItem("nether_spitter_head", "Nether Spitter", AlienVariant.NETHER, AlienEntityTypes.NETHER_SPITTER, true),
@@ -126,10 +126,10 @@ public final class AlienXenomorphHeadItems {
         item("aberrant_ravager_head", "Aberrant Ravager", "ravager", AlienEntityTypes.ABERRANT_RAVAGER, false),
         item("irradiated_ravager_head", "Irradiated Ravager", "ravager", AlienEntityTypes.IRRADIATED_RAVAGER, false),
         item("nether_ravager_head", "Nether Ravager", "ravager", AlienEntityTypes.NETHER_RAVAGER, true),
-        item("prowler_head", "Prowler", "prowler", AlienEntityTypes.PROWLER, false),
-        item("aberrant_prowler_head", "Aberrant Prowler", "prowler", AlienEntityTypes.ABERRANT_PROWLER, false),
-        item("irradiated_prowler_head", "Irradiated Prowler", "prowler", AlienEntityTypes.IRRADIATED_PROWLER, false),
-        item("nether_prowler_head", "Nether Prowler", "prowler", AlienEntityTypes.NETHER_PROWLER, true),
+        agileItem("prowler_head", "Prowler", "prowler", AlienEntityTypes.PROWLER, false),
+        agileItem("aberrant_prowler_head", "Aberrant Prowler", "prowler", AlienEntityTypes.ABERRANT_PROWLER, false),
+        agileItem("irradiated_prowler_head", "Irradiated Prowler", "prowler", AlienEntityTypes.IRRADIATED_PROWLER, false),
+        agileItem("nether_prowler_head", "Nether Prowler", "prowler", AlienEntityTypes.NETHER_PROWLER, true),
         item("carrier_head", "Carrier", "carrier", AlienEntityTypes.CARRIER, false),
         item("aberrant_carrier_head", "Aberrant Carrier", "carrier", AlienEntityTypes.ABERRANT_CARRIER, false),
         item("irradiated_carrier_head", "Irradiated Carrier", "carrier", AlienEntityTypes.IRRADIATED_CARRIER, false),
@@ -193,6 +193,30 @@ public final class AlienXenomorphHeadItems {
             wallBlock,
             AlienItems.createXenomorphHead(itemPath, standingBlock, wallBlock, fireResistant),
             AlienItems.createXenomorphHeadShield(itemPath + "_shield", fireResistant),
+            true
+        );
+    }
+
+    private static Entry agileItem(
+        String itemPath,
+        String displayName,
+        String modelPath,
+        BLibHolder<? extends EntityType<?>> entityType,
+        boolean fireResistant
+    ) {
+        var standingBlock = AlienBlocks.createXenomorphHeadBlock(itemPath);
+        var wallBlock = AlienBlocks.createXenomorphWallHeadBlock(wallBlockPath(itemPath), itemPath);
+
+        return new Entry(
+            itemPath,
+            displayName,
+            modelPath,
+            texturePath(itemPath),
+            entityType,
+            standingBlock,
+            wallBlock,
+            AlienItems.createXenomorphHead(itemPath, standingBlock, wallBlock, fireResistant),
+            AlienItems.createAgileXenomorphHeadShield(itemPath + "_shield", fireResistant),
             true
         );
     }
