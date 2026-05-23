@@ -8,7 +8,7 @@ import com.alien.common.registry.init.block.AlienResinBlocks;
 import com.alien.common.registry.init.block.IrradiatedAlienResinBlocks;
 import com.alien.common.registry.init.block.NetherAlienChitinBlocks;
 import com.alien.common.registry.init.block.NetherAlienResinBlocks;
-import com.alien.common.registry.init.item.AlienItems;
+import com.alien.common.registry.init.item.AlienXenomorphHeadItems;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
 import net.minecraft.core.HolderLookup;
@@ -55,25 +55,12 @@ public class BlockLootTableProvider extends FabricBlockLootTableProvider {
         dropOther(AlienResinBlocks.RESIN_VENT, AlienResinBlocks.RESIN);
         dropWhenSilkTouch(AlienResinBlocks.RESIN_WEB);
 
-        // Queen head blocks (floor + wall) drop the matching head item. Both block forms map to the same
+        // Head blocks (floor + wall) drop the matching head item. Both block forms map to the same
         // item — `StandingAndWallBlockItem` placement re-derives floor-vs-wall from the placement context.
-        dropOther(AlienBlocks.QUEEN_HEAD, AlienItems.QUEEN_HEAD);
-        dropOther(AlienBlocks.QUEEN_WALL_HEAD, AlienItems.QUEEN_HEAD);
-        dropOther(AlienBlocks.ABERRANT_QUEEN_HEAD, AlienItems.ABERRANT_QUEEN_HEAD);
-        dropOther(AlienBlocks.ABERRANT_QUEEN_WALL_HEAD, AlienItems.ABERRANT_QUEEN_HEAD);
-        dropOther(AlienBlocks.IRRADIATED_QUEEN_HEAD, AlienItems.IRRADIATED_QUEEN_HEAD);
-        dropOther(AlienBlocks.IRRADIATED_QUEEN_WALL_HEAD, AlienItems.IRRADIATED_QUEEN_HEAD);
-        dropOther(AlienBlocks.NETHER_QUEEN_HEAD, AlienItems.NETHER_QUEEN_HEAD);
-        dropOther(AlienBlocks.NETHER_QUEEN_WALL_HEAD, AlienItems.NETHER_QUEEN_HEAD);
-
-        dropOther(AlienBlocks.CRUSHER_HEAD, AlienItems.CRUSHER_HEAD);
-        dropOther(AlienBlocks.CRUSHER_WALL_HEAD, AlienItems.CRUSHER_HEAD);
-        dropOther(AlienBlocks.ABERRANT_CRUSHER_HEAD, AlienItems.ABERRANT_CRUSHER_HEAD);
-        dropOther(AlienBlocks.ABERRANT_CRUSHER_WALL_HEAD, AlienItems.ABERRANT_CRUSHER_HEAD);
-        dropOther(AlienBlocks.IRRADIATED_CRUSHER_HEAD, AlienItems.IRRADIATED_CRUSHER_HEAD);
-        dropOther(AlienBlocks.IRRADIATED_CRUSHER_WALL_HEAD, AlienItems.IRRADIATED_CRUSHER_HEAD);
-        dropOther(AlienBlocks.NETHER_CRUSHER_HEAD, AlienItems.NETHER_CRUSHER_HEAD);
-        dropOther(AlienBlocks.NETHER_CRUSHER_WALL_HEAD, AlienItems.NETHER_CRUSHER_HEAD);
+        AlienXenomorphHeadItems.ALL.forEach(entry -> {
+            dropOther(entry.standingBlock(), entry.head());
+            dropOther(entry.wallBlock(), entry.head());
+        });
     }
 
     private void generateSelfDrops() {

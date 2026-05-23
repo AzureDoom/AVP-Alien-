@@ -17,6 +17,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.DiscFragmentItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.level.block.Block;
 
 import java.util.function.Supplier;
 
@@ -206,8 +207,17 @@ public class AlienItems {
         return create(name, new Item.Properties());
     }
 
-    static BLibHolder<Item> createXenomorphHead(String name, boolean fireResistant) {
-        return create(name, () -> new XenomorphHeadItem(xenomorphHeadProperties(fireResistant)));
+    static BLibHolder<Item> createXenomorphHead(
+        String name,
+        Supplier<? extends Block> standingBlock,
+        Supplier<? extends Block> wallBlock,
+        boolean fireResistant
+    ) {
+        return create(name, () -> new XenomorphHeadItem(
+            standingBlock.get(),
+            wallBlock.get(),
+            xenomorphHeadProperties(fireResistant)
+        ));
     }
 
     static BLibHolder<Item> createXenomorphHeadShield(String name, boolean fireResistant) {

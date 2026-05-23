@@ -1,23 +1,100 @@
 package com.alien.common.registry.init.item;
 
 import com.alien.common.registry.init.AlienEntityTypes;
+import com.alien.common.registry.init.block.AlienBlocks;
 import com.blib.api.common.registry.v1.BLibHolder;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public final class AlienXenomorphHeadItems {
 
     public static final List<Entry> ALL = List.of(
-        existing("queen_head", "Queen", "queen", AlienEntityTypes.QUEEN, AlienItems.QUEEN_HEAD, AlienItems.QUEEN_HEAD_SHIELD),
-        existing("aberrant_queen_head", "Aberrant Queen", "queen", AlienEntityTypes.ABERRANT_QUEEN, AlienItems.ABERRANT_QUEEN_HEAD, AlienItems.ABERRANT_QUEEN_HEAD_SHIELD),
-        existing("irradiated_queen_head", "Irradiated Queen", "queen", AlienEntityTypes.IRRADIATED_QUEEN, AlienItems.IRRADIATED_QUEEN_HEAD, AlienItems.IRRADIATED_QUEEN_HEAD_SHIELD),
-        existing("nether_queen_head", "Nether Queen", "queen", AlienEntityTypes.NETHER_QUEEN, AlienItems.NETHER_QUEEN_HEAD, AlienItems.NETHER_QUEEN_HEAD_SHIELD),
-        existing("crusher_head", "Crusher", "crusher", AlienEntityTypes.CRUSHER, AlienItems.CRUSHER_HEAD, AlienItems.CRUSHER_HEAD_SHIELD),
-        existing("aberrant_crusher_head", "Aberrant Crusher", "crusher", AlienEntityTypes.ABERRANT_CRUSHER, AlienItems.ABERRANT_CRUSHER_HEAD, AlienItems.ABERRANT_CRUSHER_HEAD_SHIELD),
-        existing("irradiated_crusher_head", "Irradiated Crusher", "crusher", AlienEntityTypes.IRRADIATED_CRUSHER, AlienItems.IRRADIATED_CRUSHER_HEAD, AlienItems.IRRADIATED_CRUSHER_HEAD_SHIELD),
-        existing("nether_crusher_head", "Nether Crusher", "crusher", AlienEntityTypes.NETHER_CRUSHER, AlienItems.NETHER_CRUSHER_HEAD, AlienItems.NETHER_CRUSHER_HEAD_SHIELD),
+        existing(
+            "queen_head",
+            "Queen",
+            "queen",
+            AlienEntityTypes.QUEEN,
+            AlienBlocks.QUEEN_HEAD,
+            AlienBlocks.QUEEN_WALL_HEAD,
+            AlienItems.QUEEN_HEAD,
+            AlienItems.QUEEN_HEAD_SHIELD
+        ),
+        existing(
+            "aberrant_queen_head",
+            "Aberrant Queen",
+            "queen",
+            AlienEntityTypes.ABERRANT_QUEEN,
+            AlienBlocks.ABERRANT_QUEEN_HEAD,
+            AlienBlocks.ABERRANT_QUEEN_WALL_HEAD,
+            AlienItems.ABERRANT_QUEEN_HEAD,
+            AlienItems.ABERRANT_QUEEN_HEAD_SHIELD
+        ),
+        existing(
+            "irradiated_queen_head",
+            "Irradiated Queen",
+            "queen",
+            AlienEntityTypes.IRRADIATED_QUEEN,
+            AlienBlocks.IRRADIATED_QUEEN_HEAD,
+            AlienBlocks.IRRADIATED_QUEEN_WALL_HEAD,
+            AlienItems.IRRADIATED_QUEEN_HEAD,
+            AlienItems.IRRADIATED_QUEEN_HEAD_SHIELD
+        ),
+        existing(
+            "nether_queen_head",
+            "Nether Queen",
+            "queen",
+            AlienEntityTypes.NETHER_QUEEN,
+            AlienBlocks.NETHER_QUEEN_HEAD,
+            AlienBlocks.NETHER_QUEEN_WALL_HEAD,
+            AlienItems.NETHER_QUEEN_HEAD,
+            AlienItems.NETHER_QUEEN_HEAD_SHIELD
+        ),
+        existing(
+            "crusher_head",
+            "Crusher",
+            "crusher",
+            AlienEntityTypes.CRUSHER,
+            AlienBlocks.CRUSHER_HEAD,
+            AlienBlocks.CRUSHER_WALL_HEAD,
+            AlienItems.CRUSHER_HEAD,
+            AlienItems.CRUSHER_HEAD_SHIELD
+        ),
+        existing(
+            "aberrant_crusher_head",
+            "Aberrant Crusher",
+            "crusher",
+            AlienEntityTypes.ABERRANT_CRUSHER,
+            AlienBlocks.ABERRANT_CRUSHER_HEAD,
+            AlienBlocks.ABERRANT_CRUSHER_WALL_HEAD,
+            AlienItems.ABERRANT_CRUSHER_HEAD,
+            AlienItems.ABERRANT_CRUSHER_HEAD_SHIELD
+        ),
+        existing(
+            "irradiated_crusher_head",
+            "Irradiated Crusher",
+            "crusher",
+            AlienEntityTypes.IRRADIATED_CRUSHER,
+            AlienBlocks.IRRADIATED_CRUSHER_HEAD,
+            AlienBlocks.IRRADIATED_CRUSHER_WALL_HEAD,
+            AlienItems.IRRADIATED_CRUSHER_HEAD,
+            AlienItems.IRRADIATED_CRUSHER_HEAD_SHIELD
+        ),
+        existing(
+            "nether_crusher_head",
+            "Nether Crusher",
+            "crusher",
+            AlienEntityTypes.NETHER_CRUSHER,
+            AlienBlocks.NETHER_CRUSHER_HEAD,
+            AlienBlocks.NETHER_CRUSHER_WALL_HEAD,
+            AlienItems.NETHER_CRUSHER_HEAD,
+            AlienItems.NETHER_CRUSHER_HEAD_SHIELD
+        ),
         item("drone_head", "Drone", "drone", AlienEntityTypes.DRONE, false),
         item("aberrant_drone_head", "Aberrant Drone", "drone", AlienEntityTypes.ABERRANT_DRONE, false),
         item("irradiated_drone_head", "Irradiated Drone", "drone", AlienEntityTypes.IRRADIATED_DRONE, false),
@@ -78,10 +155,21 @@ public final class AlienXenomorphHeadItems {
         item("nether_harbinger_head", "Nether Harbinger", "harbinger", AlienEntityTypes.NETHER_HARBINGER, true)
     );
 
+    public static final List<Entry> GENERIC_BLOCK_ENTRIES = ALL.stream()
+        .filter(Entry::usesGenericBlocks)
+        .toList();
+
+    private static final Map<String, Entry> BY_ITEM_PATH = ALL.stream()
+        .collect(Collectors.toUnmodifiableMap(Entry::itemPath, Function.identity()));
+
     private AlienXenomorphHeadItems() {}
 
     public static void initialize() {
-        // Static initialization creates the holders before AlienItems registers the item registry.
+        // Static initialization creates block and item holders before either registry is registered.
+    }
+
+    public static Entry getOrNull(String itemPath) {
+        return BY_ITEM_PATH.get(itemPath);
     }
 
     private static Entry item(
@@ -91,14 +179,20 @@ public final class AlienXenomorphHeadItems {
         BLibHolder<? extends EntityType<?>> entityType,
         boolean fireResistant
     ) {
+        var standingBlock = AlienBlocks.createXenomorphHeadBlock(itemPath);
+        var wallBlock = AlienBlocks.createXenomorphWallHeadBlock(wallBlockPath(itemPath), itemPath);
+
         return new Entry(
             itemPath,
             displayName,
             modelPath,
             texturePath(itemPath),
             entityType,
-            AlienItems.createXenomorphHead(itemPath, fireResistant),
-            AlienItems.createXenomorphHeadShield(itemPath + "_shield", fireResistant)
+            standingBlock,
+            wallBlock,
+            AlienItems.createXenomorphHead(itemPath, standingBlock, wallBlock, fireResistant),
+            AlienItems.createXenomorphHeadShield(itemPath + "_shield", fireResistant),
+            true
         );
     }
 
@@ -107,14 +201,31 @@ public final class AlienXenomorphHeadItems {
         String displayName,
         String modelPath,
         BLibHolder<? extends EntityType<?>> entityType,
+        BLibHolder<? extends Block> standingBlock,
+        BLibHolder<? extends Block> wallBlock,
         BLibHolder<Item> head,
         BLibHolder<Item> headShield
     ) {
-        return new Entry(itemPath, displayName, modelPath, texturePath(itemPath), entityType, head, headShield);
+        return new Entry(
+            itemPath,
+            displayName,
+            modelPath,
+            texturePath(itemPath),
+            entityType,
+            standingBlock,
+            wallBlock,
+            head,
+            headShield,
+            false
+        );
     }
 
     private static String texturePath(String itemPath) {
         return itemPath.substring(0, itemPath.length() - "_head".length());
+    }
+
+    private static String wallBlockPath(String itemPath) {
+        return itemPath.substring(0, itemPath.length() - "_head".length()) + "_wall_head";
     }
 
     public record Entry(
@@ -123,8 +234,11 @@ public final class AlienXenomorphHeadItems {
         String modelPath,
         String texturePath,
         BLibHolder<? extends EntityType<?>> entityType,
+        BLibHolder<? extends Block> standingBlock,
+        BLibHolder<? extends Block> wallBlock,
         BLibHolder<Item> head,
-        BLibHolder<Item> headShield
+        BLibHolder<Item> headShield,
+        boolean usesGenericBlocks
     ) {
 
         public String shieldItemPath() {

@@ -1,17 +1,19 @@
 package com.alien.common.gameplay.item;
 
+import net.minecraft.core.Direction;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Equipable;
-import net.minecraft.world.item.Item;
+import net.minecraft.world.item.StandingAndWallBlockItem;
+import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Wearable xenomorph head trophy without a placeable block form.
+ * Wearable and placeable xenomorph head trophy.
  */
-public class XenomorphHeadItem extends Item implements Equipable {
+public class XenomorphHeadItem extends StandingAndWallBlockItem implements Equipable {
 
-    public XenomorphHeadItem(Properties properties) {
-        super(properties);
+    public XenomorphHeadItem(Block standingBlock, Block wallBlock, Properties properties) {
+        super(standingBlock, wallBlock, properties, Direction.DOWN);
     }
 
     @Override

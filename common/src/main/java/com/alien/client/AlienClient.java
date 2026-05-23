@@ -15,6 +15,7 @@ import com.alien.client.render.armor.PlatedIrradiatedChitinArmorRenderer;
 import com.alien.client.render.armor.PlatedNetherChitinArmorRenderer;
 import com.alien.client.render.block.CrusherHeadBlockEntityRenderer;
 import com.alien.client.render.block.QueenHeadBlockEntityRenderer;
+import com.alien.client.render.block.XenomorphHeadBlockEntityRenderer;
 import com.alien.client.render.entity.AcidRenderer;
 import com.alien.client.render.entity.AcidSpitRenderer;
 import com.alien.client.render.entity.AdolescentRenderer;
@@ -393,6 +394,11 @@ public class AlienClient {
             .registerBlockEntityRenderer(
                 AlienBlockEntityTypes.CRUSHER_HEAD,
                 ctx -> new CrusherHeadBlockEntityRenderer()
+            );
+        MOD.registries()
+            .registerBlockEntityRenderer(
+                AlienBlockEntityTypes.XENOMORPH_HEAD,
+                ctx -> new XenomorphHeadBlockEntityRenderer()
             );
     }
 

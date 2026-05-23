@@ -16,6 +16,7 @@ import com.alien.fabric.data.loot.BlockLootTableProvider;
 import com.alien.fabric.data.loot.EntityLootTableProvider;
 import com.alien.fabric.data.model.BlockModelProvider;
 import com.alien.fabric.data.model.ItemModelProvider;
+import com.alien.fabric.data.model.XenomorphHeadBlockStateProvider;
 import com.alien.fabric.data.raid_wave.RaidWaveProfileDataProvider;
 import com.alien.fabric.data.recipe.RecipeProvider;
 import com.alien.fabric.data.reinforcement_profile.ReinforcementProfileDataProvider;
@@ -47,6 +48,7 @@ public class AlienDataGenerator implements DataGeneratorEntrypoint {
         // Model providers
         pack.addProvider(BlockModelProvider::new);
         pack.addProvider(ItemModelProvider::new);
+        pack.addProvider(XenomorphHeadBlockStateProvider::new);
 
         // Recipe providers
         pack.addProvider(RecipeProvider::new);
