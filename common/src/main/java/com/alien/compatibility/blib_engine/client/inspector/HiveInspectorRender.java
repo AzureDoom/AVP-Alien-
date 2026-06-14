@@ -1,9 +1,9 @@
 package com.alien.compatibility.blib_engine.client.inspector;
 
+import com.blib.engine.api.client.v1.inspector.InspectorStyle;
 import com.blib.engine.api.client.v1.ui.layout.UiRect;
 import com.blib.engine.api.client.v1.ui.layout.UiText;
 import com.blib.engine.api.client.v1.ui.layout.VerticalLayout;
-import com.blib.engine.api.client.v1.inspector.InspectorStyle;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 

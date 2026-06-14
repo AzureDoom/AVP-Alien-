@@ -19,8 +19,8 @@ import java.util.ArrayList;
  * <li>No reliable xenomorph population → kill. Reliable population matches the boss bar: actively loaded xenomorphs in
  * this location + local reserves.</li>
  * <li>No-contact safety net: {@link HiveLocation#noContactTicksAccrued()} accumulates while ≥1 claimed chunk is loaded
- * AND no loaded location member is currently in any claimed chunk. Pauses when nothing is loaded; resets when contact is
- * observed; triggers a kill at {@link com.alien.common.gameplay.hive.config.HiveConfig#locationMaxNoContactTicks()}
+ * AND no loaded location member is currently in any claimed chunk. Pauses when nothing is loaded; resets when contact
+ * is observed; triggers a kill at {@link com.alien.common.gameplay.hive.config.HiveConfig#locationMaxNoContactTicks()}
  * (default 7 game-days).</li>
  * </ol>
  * <p>

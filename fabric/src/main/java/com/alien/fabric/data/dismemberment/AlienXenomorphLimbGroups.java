@@ -129,5 +129,9 @@ final class AlienXenomorphLimbGroups {
         return new Group("queen", true, List.of(entityTypes));
     }
 
-    record Group(String prefix, boolean queen, List<BLibHolder<? extends EntityType<?>>> entityTypes) {}
+    record Group(
+        String prefix,
+        boolean queen,
+        List<BLibHolder<? extends EntityType<?>>> entityTypes
+    ) {}
 }

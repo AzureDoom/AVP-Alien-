@@ -1,8 +1,8 @@
 package com.alien.common.registry.init.item;
 
+import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.block.AlienBlocks;
-import com.alien.common.model.alien.variant.AlienVariant;
 import com.blib.api.common.registry.v1.BLibHolder;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;

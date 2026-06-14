@@ -2,8 +2,8 @@ package com.alien.common.gameplay.item;
 
 import com.alien.common.data.AlienAdvancements;
 import com.alien.common.gameplay.item.ability.ShieldAbilityItem;
-import com.alien.common.registry.key.AlienDamageTypeKeys;
 import com.alien.common.registry.init.AlienSoundEvents;
+import com.alien.common.registry.key.AlienDamageTypeKeys;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.block.v1.BlockBreakProgressManager;
 import com.blib.api.common.shield.v1.BLibShieldConfig;
@@ -18,8 +18,8 @@ import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.Item;
@@ -42,16 +42,27 @@ public class CrusherHeadShieldItem extends Item implements BLibShieldItem, Shiel
     );
 
     private static final int ABILITY_COOLDOWN_TICKS = 40;
+
     private static final int ABILITY_DURABILITY_COST = 8;
+
     private static final double DASH_SPEED = 1.75;
+
     private static final double DASH_VERTICAL_BOOST = 0.12;
+
     private static final double DASH_RANGE = 4.5;
+
     private static final double DASH_HALF_WIDTH = 1.1;
+
     private static final double DASH_VERTICAL_REACH = 1.25;
+
     private static final double KNOCKBACK_STRENGTH = 2.5;
+
     private static final double KNOCKBACK_VERTICAL_BOOST = 0.175;
+
     private static final double WALL_PROBE_STEP = 0.25;
+
     private static final double WALL_PROBE_EPSILON = 1.0E-4;
+
     private static final float WALL_IMPACT_DAMAGE = 60F;
 
     public CrusherHeadShieldItem(Properties properties) {

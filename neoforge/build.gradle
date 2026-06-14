@@ -8,9 +8,15 @@ dependencies {
     blibMod "me.shedaniel.cloth:cloth-config-neoforge:${project.cloth_version}"
 
     // Compatibility
-    blibCompileOnly "com.avp.human:avp_human-neoforge-1.21.1:${project.avp_human_version}"
-    blibCompileOnly "com.avp.predator:avp_predator-neoforge-1.21.1:${project.avp_predator_version}"
-    blibMod "com.blib.engine:blib_engine-neoforge-1.21.1:${project.blib_engine_version}"
+    blibCompileOnly("com.avp.human:avp_human-neoforge-1.21.1:${project.avp_human_version}") {
+        exclude group: 'com.blib'
+    }
+    blibCompileOnly("com.avp.predator:avp_predator-neoforge-1.21.1:${project.avp_predator_version}") {
+        exclude group: 'com.blib'
+    }
+    blibMod("com.blib.engine:blib_engine-neoforge-1.21.1:${project.blib_engine_version}") {
+        exclude group: 'com.blib'
+    }
 
     blibMod "maven.modrinth:gigeresque:${project.gigeresque_version}"
     // Required for gigeresque.

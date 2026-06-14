@@ -216,11 +216,14 @@ public class AlienItems {
         Supplier<? extends Block> wallBlock,
         boolean fireResistant
     ) {
-        return create(name, () -> new XenomorphHeadItem(
-            standingBlock.get(),
-            wallBlock.get(),
-            xenomorphHeadProperties(fireResistant)
-        ));
+        return create(
+            name,
+            () -> new XenomorphHeadItem(
+                standingBlock.get(),
+                wallBlock.get(),
+                xenomorphHeadProperties(fireResistant)
+            )
+        );
     }
 
     static BLibHolder<Item> createXenomorphHeadShield(String name, boolean fireResistant) {

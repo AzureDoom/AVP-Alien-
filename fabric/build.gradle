@@ -9,9 +9,15 @@ dependencies {
     modApi "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_version}"
 
     // Compatibility
-    blibModCompileOnly "com.avp.human:avp_human-fabric-1.21.1:${project.avp_human_version}"
-    blibModCompileOnly "com.avp.predator:avp_predator-fabric-1.21.1:${project.avp_predator_version}"
-    blibMod "com.blib.engine:blib_engine-fabric-1.21.1:${project.blib_engine_version}"
+    blibModCompileOnly("com.avp.human:avp_human-fabric-1.21.1:${project.avp_human_version}") {
+        exclude group: 'com.blib'
+    }
+    blibModCompileOnly("com.avp.predator:avp_predator-fabric-1.21.1:${project.avp_predator_version}") {
+        exclude group: 'com.blib'
+    }
+    blibMod("com.blib.engine:blib_engine-fabric-1.21.1:${project.blib_engine_version}") {
+        exclude group: 'com.blib'
+    }
 
     blibMod "maven.modrinth:gigeresque:${project.gigeresque_modrinth_version}"
     // Required for gigeresque.

@@ -11,7 +11,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public record HiveIdentityReserveEntry(EntityType<?> type, UUID uuid, CompoundTag entityTag) {
+public record HiveIdentityReserveEntry(
+    EntityType<?> type,
+    UUID uuid,
+    CompoundTag entityTag
+) {
 
     private static final String NBT_TYPE = "Type";
 

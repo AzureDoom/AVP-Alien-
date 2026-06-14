@@ -1,7 +1,7 @@
 package com.alien.common.network.handler;
 
-import com.alien.compatibility.blib_engine.client.inspector.ClientHiveInspectionCache;
 import com.alien.common.network.payload.S2CHiveInspectionPayload;
+import com.alien.compatibility.blib_engine.client.inspector.ClientHiveInspectionCache;
 import net.minecraft.world.entity.player.Player;
 
 /**

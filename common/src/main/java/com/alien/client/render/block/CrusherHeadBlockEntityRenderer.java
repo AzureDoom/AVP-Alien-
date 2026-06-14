@@ -81,7 +81,8 @@ public class CrusherHeadBlockEntityRenderer implements BlockEntityRenderer<Crush
             return;
         }
 
-        // Flip BLib's fixed-surface flags so the geo-bone item renderer picks the block-placement transform that matches
+        // Flip BLib's fixed-surface flags so the geo-bone item renderer picks the block-placement transform that
+        // matches
         // this render. Wrapped in try/finally so an exception in renderStatic doesn't leak the flag to later renders.
         var mc = Minecraft.getInstance();
         var priorWall = BLibItemTransformOverrides.isRenderAsWallBlock();

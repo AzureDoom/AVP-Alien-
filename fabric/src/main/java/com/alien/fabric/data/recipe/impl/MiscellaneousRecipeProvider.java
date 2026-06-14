@@ -59,11 +59,13 @@ public class MiscellaneousRecipeProvider {
             .into(1, AlienItems.ALIEN_MUSIC_DISC_1);
 
         // Head trophy + vanilla shield -> head shield. One-way conversion: crafting commits to combat utility.
-        AlienXenomorphHeadItems.ALL.forEach(entry -> builder.shapeless()
-            .withCategory(RecipeCategory.COMBAT)
-            .requires(1, entry.head())
-            .requires(1, Items.SHIELD)
-            .into(1, entry.headShield()));
+        AlienXenomorphHeadItems.ALL.forEach(
+            entry -> builder.shapeless()
+                .withCategory(RecipeCategory.COMBAT)
+                .requires(1, entry.head())
+                .requires(1, Items.SHIELD)
+                .into(1, entry.headShield())
+        );
     }
 
     private static void provideMiscellaneousNetherRecipes(RecipeBuilder builder) {

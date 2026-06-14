@@ -10,8 +10,8 @@ import java.util.Map;
 
 /**
  * Snapshot of a location's reliable per-caste population: currently loaded location members + local reserves, summed by
- * entity-type tag. Persisted known members are intentionally excluded because unloaded UUIDs can become stale and should
- * not keep a location alive or block new reserve materialization.
+ * entity-type tag. Persisted known members are intentionally excluded because unloaded UUIDs can become stale and
+ * should not keep a location alive or block new reserve materialization.
  */
 public final class CastePopulation {
 

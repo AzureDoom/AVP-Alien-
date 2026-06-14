@@ -7,31 +7,37 @@ import com.blib.api.common.dismemberment.v1.LimbCategory;
 import com.blib.api.common.dismemberment.v1.LimbDefinitionRegistry;
 
 public enum XenomorphAttackLimbRequirement {
+
     HEAD {
+
         @Override
         public boolean isSatisfiedBy(Xenomorph xenomorph) {
             return hasUsableLimb(xenomorph, LimbCategories.HEAD);
         }
     },
     TAIL {
+
         @Override
         public boolean isSatisfiedBy(Xenomorph xenomorph) {
             return hasUsableLimb(xenomorph, LimbCategories.TAIL);
         }
     },
     ANY_ARM {
+
         @Override
         public boolean isSatisfiedBy(Xenomorph xenomorph) {
             return hasUsableLimb(xenomorph, LimbCategories.ARM);
         }
     },
     BOTH_ARMS {
+
         @Override
         public boolean isSatisfiedBy(Xenomorph xenomorph) {
             return allLimbsAttached(xenomorph, LimbCategories.ARM);
         }
     },
     ALL_LEGS {
+
         @Override
         public boolean isSatisfiedBy(Xenomorph xenomorph) {
             return allLimbsAttached(xenomorph, LimbCategories.LEG);
