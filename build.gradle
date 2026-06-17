@@ -4,6 +4,13 @@ plugins {
 
 allprojects {
     repositories {
+        maven {
+            name = 'Vendored BLib'
+            url = uri("${rootProject.projectDir}/vendor/maven")
+            content {
+                includeGroup 'com.blib'
+            }
+        }
         mavenLocal()
     }
 
