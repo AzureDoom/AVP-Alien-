@@ -80,6 +80,25 @@ public class ResinRecipeProvider {
         AlienResinBlocks.RESIN_WEB
     );
 
+    private static final DecorativeResinSet BASE_DECORATIVE = new DecorativeResinSet(
+            AlienResinBlocks.RESIN,
+            AlienResinBlocks.RESIN_DOORWAY,
+            AlienResinBlocks.RESIN_SPINE,
+            AlienResinBlocks.RESIN_BONE,
+            AlienResinBlocks.RESIN_BONE_SLAB,
+            AlienResinBlocks.RESIN_BONE_STAIRS,
+            AlienResinBlocks.RESIN_ETCHED,
+            AlienResinBlocks.RESIN_ETCHED_SLAB,
+            AlienResinBlocks.RESIN_ETCHED_STAIRS,
+            AlienResinBlocks.RESIN_STRETCHED,
+            AlienResinBlocks.RESIN_STRETCHED_SLAB,
+            AlienResinBlocks.RESIN_STRETCHED_STAIRS,
+            AlienResinBlocks.RESIN_TENDRIL,
+            AlienResinBlocks.RESIN_TENDRIL_SLAB,
+            AlienResinBlocks.RESIN_TENDRIL_STAIRS
+            // + the 4th set's slab/stairs
+    );
+
     public static void provide(RecipeBuilder builder) {
         createResinRecipes(builder);
     }
@@ -89,6 +108,7 @@ public class ResinRecipeProvider {
         createResinRecipesFromSet(builder, NETHER_SET);
         createResinRecipesFromSet(builder, ABERRANT_SET);
         createResinRecipesFromSet(builder.withCondition(AVPHumanFabric.IS_LOADED), IRRADIATED_SET);
+        createDecorativeRecipesFromSet(builder, BASE_DECORATIVE);   // later: NETHER_DECORATIVE, etc.
     }
 
     private static void createResinRecipesFromSet(RecipeBuilder builder, ResinSet set) {
@@ -140,4 +160,26 @@ public class ResinRecipeProvider {
         RecipeUtil.createWallBlockManualAndStonecutterRecipes(builder, set.smooth().get(), set.brickWall().get());
     }
 
+    private static void createDecorativeRecipesFromSet(RecipeBuilder builder, DecorativeResinSet set) {
+        var resin = set.resinBlock();
+
+        // base resin block -> each decorative block
+        builder.stonecut(resin).withCategory(RecipeCategory.BUILDING_BLOCKS).into(1, set.doorway());
+        builder.stonecut(resin).withCategory(RecipeCategory.BUILDING_BLOCKS).into(1, set.spine());
+        builder.stonecut(resin).withCategory(RecipeCategory.BUILDING_BLOCKS).into(1, set.bone());
+        builder.stonecut(resin).withCategory(RecipeCategory.BUILDING_BLOCKS).into(1, set.etched());
+        builder.stonecut(resin).withCategory(RecipeCategory.BUILDING_BLOCKS).into(1, set.stretched());
+        builder.stonecut(resin).withCategory(RecipeCategory.BUILDING_BLOCKS).into(1, set.tendril());
+
+        // each decorative block -> its own slab/stairs (and from base resin too, like the existing code does)
+        RecipeUtil.createSlabBlockManualAndStonecutterRecipes(builder, set.etched().get(), set.etchedSlab().get());
+        RecipeUtil.createStairBlockManualAndStonecutterRecipes(builder, set.etched().get(), set.etchedStairs().get());
+        RecipeUtil.createSlabBlockManualAndStonecutterRecipes(builder, set.bone().get(), set.boneSlab().get());
+        RecipeUtil.createStairBlockManualAndStonecutterRecipes(builder, set.bone().get(), set.boneStairs().get());
+        RecipeUtil.createSlabBlockManualAndStonecutterRecipes(builder, set.stretched().get(), set.stretchedSlab().get());
+        RecipeUtil.createStairBlockManualAndStonecutterRecipes(builder, set.stretched().get(), set.stretchedStairs().get());
+        RecipeUtil.createSlabBlockManualAndStonecutterRecipes(builder, set.tendril().get(), set.tendrilSlab().get());
+        RecipeUtil.createStairBlockManualAndStonecutterRecipes(builder, set.tendril().get(), set.tendrilStairs().get());
+        // + the 4th block's slab/stairs
+    }
 }

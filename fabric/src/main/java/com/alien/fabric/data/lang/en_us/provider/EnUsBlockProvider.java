@@ -70,6 +70,20 @@ public class EnUsBlockProvider {
         addBlock(builder, AlienResinBlocks.RESIN_VEIN, "Resin Vein");
         addBlock(builder, AlienResinBlocks.RESIN_VENT, "Resin Vent");
         addBlock(builder, AlienResinBlocks.RESIN_WEB, "Resin Web");
+        addBlock(builder, AlienResinBlocks.RESIN_DOORWAY, "Resin Doorway");
+        addBlock(builder, AlienResinBlocks.RESIN_SPINE, "Resin Spine");
+        addBlock(builder, AlienResinBlocks.RESIN_BONE, "Resin Bone");
+        addBlock(builder, AlienResinBlocks.RESIN_BONE_SLAB, "Resin Bone Slab");
+        addBlock(builder, AlienResinBlocks.RESIN_BONE_STAIRS, "Resin Bone Stairs");
+        addBlock(builder, AlienResinBlocks.RESIN_ETCHED, "Resin Etched");
+        addBlock(builder, AlienResinBlocks.RESIN_ETCHED_SLAB, "Resin Etched Slab");
+        addBlock(builder, AlienResinBlocks.RESIN_ETCHED_STAIRS, "Resin Etched Stairs");
+        addBlock(builder, AlienResinBlocks.RESIN_STRETCHED, "Resin Stretched");
+        addBlock(builder, AlienResinBlocks.RESIN_STRETCHED_SLAB, "Resin Stretched Slab");
+        addBlock(builder, AlienResinBlocks.RESIN_STRETCHED_STAIRS, "Resin Stretched Stairs");
+        addBlock(builder, AlienResinBlocks.RESIN_TENDRIL, "Resin Tendril");
+        addBlock(builder, AlienResinBlocks.RESIN_TENDRIL_SLAB, "Resin Tendril Slab");
+        addBlock(builder, AlienResinBlocks.RESIN_TENDRIL_STAIRS, "Resin Tendril Stairs");
 
         addBlock(builder, AberrantAlienResinBlocks.RIBBED_ABERRANT_RESIN, "Ribbed Aberrant Resin");
         addBlock(builder, IrradiatedAlienResinBlocks.RIBBED_IRRADIATED_RESIN, "Ribbed Irradiated Resin");
