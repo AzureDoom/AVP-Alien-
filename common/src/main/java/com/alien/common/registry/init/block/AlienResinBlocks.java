@@ -106,6 +106,85 @@ public class AlienResinBlocks {
         () -> new WallBlock(AlienBlockProperties.RESIN.build())
     );
 
+    public static final BLibHolder<Block> RESIN_BONE = create("resin_bone", AlienBlockProperties.RESIN);
+
+    public static final BLibHolder<Block> RESIN_BONE_SLAB = create(
+            "resin_bone_slab",
+            () -> new SlabBlock(AlienBlockProperties.RESIN.build())
+    );
+
+    public static final BLibHolder<Block> RESIN_BONE_STAIRS = create(
+            "resin_bone_stairs",
+            () -> new StairBlock(
+                    RESIN_BONE.get().defaultBlockState(),
+                    AlienBlockProperties.RESIN.build()
+            )
+    );
+
+    public static final BLibHolder<Block> RESIN_DOORWAY = create(
+            "resin_doorway",
+            () -> new RotatedPillarBlock(AlienBlockProperties.RESIN.build())
+    );
+
+    public static final BLibHolder<Block> RESIN_ETCHED = create(
+            "resin_etched",
+            () -> new RotatedPillarBlock(AlienBlockProperties.RESIN.build())
+    );
+
+    public static final BLibHolder<Block> RESIN_ETCHED_SLAB = create(
+            "resin_etched_slab",
+            () -> new SlabBlock(AlienBlockProperties.RESIN.build())
+    );
+
+    public static final BLibHolder<Block> RESIN_ETCHED_STAIRS = create(
+            "resin_etched_stairs",
+            () -> new StairBlock(
+                    RESIN_ETCHED.get().defaultBlockState(),
+                    AlienBlockProperties.RESIN.build()
+            )
+    );
+
+    public static final BLibHolder<Block> RESIN_SPINE = create(
+            "resin_spine",
+            () -> new RotatedPillarBlock(AlienBlockProperties.RESIN.build())
+    );
+
+    public static final BLibHolder<Block> RESIN_STRETCHED = create(
+            "resin_stretched",
+            () -> new RotatedPillarBlock(AlienBlockProperties.RESIN.build())
+    );
+
+    public static final BLibHolder<Block> RESIN_STRETCHED_SLAB = create(
+            "resin_stretched_slab",
+            () -> new SlabBlock(AlienBlockProperties.RESIN.build())
+    );
+
+    public static final BLibHolder<Block> RESIN_STRETCHED_STAIRS = create(
+            "resin_stretched_stairs",
+            () -> new StairBlock(
+                    RESIN_STRETCHED.get().defaultBlockState(),
+                    AlienBlockProperties.RESIN.build()
+            )
+    );
+
+    public static final BLibHolder<Block> RESIN_TENDRIL = create(
+            "resin_tendril",
+            () -> new RotatedPillarBlock(AlienBlockProperties.RESIN.build())
+    );
+
+    public static final BLibHolder<Block> RESIN_TENDRIL_SLAB = create(
+            "resin_tendril_slab",
+            () -> new SlabBlock(AlienBlockProperties.RESIN.build())
+    );
+
+    public static final BLibHolder<Block> RESIN_TENDRIL_STAIRS = create(
+            "resin_tendril_stairs",
+            () -> new StairBlock(
+                    RESIN_TENDRIL.get().defaultBlockState(),
+                    AlienBlockProperties.RESIN.build()
+            )
+    );
+
     private static BLibHolder<Block> create(String path, BlockPropertyBuilder blockPropertyBuilder) {
         return create(path, () -> new Block(blockPropertyBuilder.build()));
     }

@@ -101,11 +101,17 @@ public class BlockModelProvider extends FabricModelProvider {
             .stairs(NetherAlienChitinBlocks.POLISHED_NETHER_CHITIN_STAIRS.get())
             .wall(NetherAlienChitinBlocks.POLISHED_NETHER_CHITIN_WALL.get());
 
-        generators.createRotatedVariantBlock(AlienResinBlocks.RESIN.get());
         createSlab(generators, AlienResinBlocks.RESIN.get(), AlienResinBlocks.RESIN_SLAB.get());
         createStairs(generators, AlienResinBlocks.RESIN.get(), AlienResinBlocks.RESIN_STAIRS.get());
+        createSlab(generators, AlienResinBlocks.RESIN_TENDRIL.get(), AlienResinBlocks.RESIN_TENDRIL_SLAB.get());
+        createStairs(generators, AlienResinBlocks.RESIN_TENDRIL.get(), AlienResinBlocks.RESIN_TENDRIL_STAIRS.get());
+        createSlab(generators, AlienResinBlocks.RESIN_ETCHED.get(), AlienResinBlocks.RESIN_ETCHED_SLAB.get());
+        createStairs(generators, AlienResinBlocks.RESIN_ETCHED.get(), AlienResinBlocks.RESIN_ETCHED_STAIRS.get());
+        createSlab(generators, AlienResinBlocks.RESIN_BONE.get(), AlienResinBlocks.RESIN_BONE_SLAB.get());
+        createStairs(generators, AlienResinBlocks.RESIN_BONE.get(), AlienResinBlocks.RESIN_BONE_STAIRS.get());
+        createSlab(generators, AlienResinBlocks.RESIN_STRETCHED.get(), AlienResinBlocks.RESIN_STRETCHED_SLAB.get());
+        createStairs(generators, AlienResinBlocks.RESIN_STRETCHED.get(), AlienResinBlocks.RESIN_STRETCHED_STAIRS.get());
         generators.createRotatedVariantBlock(AlienResinBlocks.RESIN_NODE.get());
-        MultiFaceGenerator.generate(generators, AlienResinBlocks.RESIN_VEIN.get());
         generators.createCrossBlock(AlienResinBlocks.RESIN_WEB.get(), BlockModelGenerators.TintState.NOT_TINTED);
 
         generators.family(AlienChitinBlocks.CHITIN_BLOCK.get())
@@ -153,7 +159,6 @@ public class BlockModelProvider extends FabricModelProvider {
         createRotatedPillar(generators, AberrantAlienResinBlocks.RIBBED_ABERRANT_RESIN.get(), TexturedModel.CUBE);
         createRotatedPillar(generators, IrradiatedAlienResinBlocks.RIBBED_IRRADIATED_RESIN.get(), TexturedModel.CUBE);
         createRotatedPillar(generators, NetherAlienResinBlocks.RIBBED_NETHER_RESIN.get(), TexturedModel.CUBE);
-        createRotatedPillar(generators, AlienResinBlocks.RIBBED_RESIN.get(), TexturedModel.CUBE);
 
         generators.family(AberrantAlienResinBlocks.SMOOTH_ABERRANT_RESIN.get())
             .slab(AberrantAlienResinBlocks.SMOOTH_ABERRANT_RESIN_SLAB.get())
