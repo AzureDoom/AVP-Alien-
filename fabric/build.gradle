@@ -3,6 +3,12 @@ plugins {
     id 'blib-multiloader-fabric'
 }
 
+loom {
+    mixin {
+        useLegacyMixinAp = true
+    }
+}
+
 dependencies {
     modApi "com.terraformersmc:modmenu:${project.modmenu_version}"
     modApi "dev.architectury:architectury-fabric:${project.architectury_version}"

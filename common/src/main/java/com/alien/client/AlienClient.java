@@ -175,17 +175,17 @@ public class AlienClient {
     }
 
     private static void registerBlockRenderLayers() {
-        MOD.registries().registerBlockRenderLayer(AlienResinBlocks.RESIN_VEIN, RenderType.cutout());
-        MOD.registries().registerBlockRenderLayer(AlienResinBlocks.RESIN_WEB, RenderType.cutout());
+        MOD.registries().registerBlockRenderLayer(AlienResinBlocks.RESIN_VEIN, RenderType.translucent());
+        MOD.registries().registerBlockRenderLayer(AlienResinBlocks.RESIN_WEB, RenderType.translucent());
 
-        MOD.registries().registerBlockRenderLayer(NetherAlienResinBlocks.NETHER_RESIN_VEIN, RenderType.cutout());
-        MOD.registries().registerBlockRenderLayer(NetherAlienResinBlocks.NETHER_RESIN_WEB, RenderType.cutout());
+        MOD.registries().registerBlockRenderLayer(NetherAlienResinBlocks.NETHER_RESIN_VEIN, RenderType.translucent());
+        MOD.registries().registerBlockRenderLayer(NetherAlienResinBlocks.NETHER_RESIN_WEB, RenderType.translucent());
 
-        MOD.registries().registerBlockRenderLayer(AberrantAlienResinBlocks.ABERRANT_RESIN_VEIN, RenderType.cutout());
-        MOD.registries().registerBlockRenderLayer(AberrantAlienResinBlocks.ABERRANT_RESIN_WEB, RenderType.cutout());
+        MOD.registries().registerBlockRenderLayer(AberrantAlienResinBlocks.ABERRANT_RESIN_VEIN, RenderType.translucent());
+        MOD.registries().registerBlockRenderLayer(AberrantAlienResinBlocks.ABERRANT_RESIN_WEB, RenderType.translucent());
 
-        MOD.registries().registerBlockRenderLayer(IrradiatedAlienResinBlocks.IRRADIATED_RESIN_VEIN, RenderType.cutout());
-        MOD.registries().registerBlockRenderLayer(IrradiatedAlienResinBlocks.IRRADIATED_RESIN_WEB, RenderType.cutout());
+        MOD.registries().registerBlockRenderLayer(IrradiatedAlienResinBlocks.IRRADIATED_RESIN_VEIN, RenderType.translucent());
+        MOD.registries().registerBlockRenderLayer(IrradiatedAlienResinBlocks.IRRADIATED_RESIN_WEB, RenderType.translucent());
 
         MOD.registries().registerBlockRenderLayer(AlienBlocks.ROYAL_JELLY_BLOCK, RenderType.translucent());
         MOD.registries().registerBlockRenderLayer(AlienBlocks.SCOURGE_JELLY_BLOCK, RenderType.translucent());
