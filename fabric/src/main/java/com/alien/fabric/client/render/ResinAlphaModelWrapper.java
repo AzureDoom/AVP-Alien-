@@ -48,7 +48,9 @@ public class ResinAlphaModelWrapper extends ForwardingBakedModel {
         ModelLoadingPlugin.register(
             pluginContext -> pluginContext.modifyModelAfterBake()
                 .register(ModelModifier.WRAP_PHASE, (model, context) -> {
-                    if (model == null || !RESIN_MODELS.contains(context.resourceId())) {
+                    var modelId = context.resourceId();
+
+                    if (model == null || modelId == null || !RESIN_MODELS.contains(modelId)) {
                         return model;
                     }
 
