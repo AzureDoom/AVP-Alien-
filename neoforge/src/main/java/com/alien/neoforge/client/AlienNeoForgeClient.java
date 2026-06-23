@@ -2,6 +2,7 @@ package com.alien.neoforge.client;
 
 import com.alien.Alien;
 import com.alien.client.AlienClient;
+import com.alien.neoforge.client.render.ResinAlphaBakedModel;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -11,6 +12,7 @@ import net.neoforged.neoforge.common.NeoForge;
 public class AlienNeoForgeClient {
 
     public AlienNeoForgeClient(IEventBus modBus) {
+        modBus.addListener(ResinAlphaBakedModel::modifyBakingResult);
         AlienClient.initialize();
         NeoForge.EVENT_BUS.register(com.alien.neoforge.client.render.HiveRenderHook.class);
     }
