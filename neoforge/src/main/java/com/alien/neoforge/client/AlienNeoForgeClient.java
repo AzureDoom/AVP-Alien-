@@ -5,11 +5,13 @@ import com.alien.client.AlienClient;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
 
 @Mod(value = Alien.MOD_ID, dist = Dist.CLIENT)
 public class AlienNeoForgeClient {
 
     public AlienNeoForgeClient(IEventBus modBus) {
         AlienClient.initialize();
+        NeoForge.EVENT_BUS.register(com.alien.neoforge.client.render.HiveRenderHook.class);
     }
 }

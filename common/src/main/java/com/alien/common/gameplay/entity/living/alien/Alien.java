@@ -213,9 +213,13 @@ public abstract class Alien extends Monster implements DataUser {
             setPathfindingMalus(PathType.DANGER_FIRE, 0.0F);
             setPathfindingMalus(PathType.DAMAGE_FIRE, 0.0F);
         } else {
-            setPathfindingMalus(PathType.LAVA, PathType.LAVA.getMalus());
-            setPathfindingMalus(PathType.DANGER_FIRE, PathType.DANGER_FIRE.getMalus());
-            setPathfindingMalus(PathType.DAMAGE_FIRE, PathType.DAMAGE_FIRE.getMalus());
+            // Hard-avoid lava/fire for non-Nether aliens. Vanilla LAVA malus is only -1 ("avoid but pass if the target
+            // demands it"), which let queens walk into flowing lava while chasing prey and burn to death. A large
+            // positive malus makes the pathfinder treat these as effectively impassable, so pursuit routes around them
+            // instead of through them.
+            setPathfindingMalus(PathType.LAVA, 16.0F);
+            setPathfindingMalus(PathType.DANGER_FIRE, 16.0F);
+            setPathfindingMalus(PathType.DAMAGE_FIRE, 16.0F);
         }
     }
 

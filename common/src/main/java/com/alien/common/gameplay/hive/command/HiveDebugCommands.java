@@ -30,11 +30,14 @@ import com.blib.api.common.faction.v1.FactionMember;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.world.level.ChunkPos;
 
 import java.util.Locale;
@@ -71,6 +74,13 @@ public final class HiveDebugCommands {
                     .then(
                         Commands.argument(LOCATION_ID_ARG, ResourceLocationArgument.id())
                             .executes(HiveDebugCommands::inspectLocation)
+                    )
+            )
+            .then(
+                Commands.literal("list_vents")
+                    .then(
+                        Commands.argument(LOCATION_ID_ARG, ResourceLocationArgument.id())
+                            .executes(HiveDebugCommands::listVents)
                     )
             )
             .then(
@@ -141,6 +151,25 @@ public final class HiveDebugCommands {
             .then(Commands.literal("rebuild_indexes").executes(HiveDebugCommands::rebuildIndexes))
             .then(Commands.literal("force_invariant_check").executes(HiveDebugCommands::forceInvariantCheck))
             .then(Commands.literal("list_emerging").executes(HiveDebugCommands::listEmerging))
+            .then(
+                Commands.literal("inspect_slab")
+                    .requires(CommandSourceStack::isPlayer)
+                    .executes(HiveDebugCommands::inspectSlab)
+            )
+            .then(
+                Commands.literal("inspect_ovipositor")
+                    .requires(CommandSourceStack::isPlayer)
+                    .executes(HiveDebugCommands::inspectOvipositor)
+            )
+            .then(
+                Commands.literal("log_spawns")
+                    .executes(HiveDebugCommands::toggleDebugSpawns)
+            )
+            .then(
+                Commands.literal("render")
+                    .requires(CommandSourceStack::isPlayer)
+                    .executes(HiveDebugCommands::toggleRender)
+            )
             .then(Commands.literal("force_emergence_scan").executes(HiveDebugCommands::forceEmergenceScan))
             .then(Commands.literal("inspect_settlement").executes(HiveDebugCommands::inspectSettlement))
             .then(
@@ -198,6 +227,16 @@ public final class HiveDebugCommands {
                     )
             )
             .then(
+                Commands.literal("add_biomass")
+                    .then(
+                        Commands.argument(LOCATION_ID_ARG, ResourceLocationArgument.id())
+                            .then(
+                                Commands.argument(COUNT_ARG, IntegerArgumentType.integer(1))
+                                    .executes(HiveDebugCommands::addBiomass)
+                            )
+                    )
+            )
+            .then(
                 Commands.literal("force_queenless_advance")
                     .then(
                         Commands.argument(LINEAGE_ID_ARG, ResourceLocationArgument.id())
@@ -224,20 +263,37 @@ public final class HiveDebugCommands {
         for (var id : ids) {
             var faction = Alien.MOD.factions().get(id);
             if (!(faction != null && faction.data() instanceof LineageFactionData lineage)) {
-                ctx.getSource().sendSuccess(() -> Component.literal("  " + id + " [missing data]"), false);
+                ctx.getSource()
+                    .sendSuccess(
+                        () -> Component.literal("  ").append(copyableId(id.toString())).append(Component.literal(" [missing data]")),
+                        false
+                    );
                 continue;
             }
 
             ctx.getSource()
                 .sendSuccess(
-                    () -> Component.literal(
-                        "  " + id + " variant=" + lineage.variant()
-                            + " dim=" + lineage.dimension().location()
-                            + " locations=" + lineage.locationsById().size()
-                            + " empress=" + (lineage.empressId() == null ? "none" : lineage.empressId().toString())
-                    ),
+                    () -> Component.literal("  ")
+                        .append(copyableId(id.toString()))
+                        .append(
+                            Component.literal(
+                                " variant=" + lineage.variant()
+                                    + " dim=" + lineage.dimension().location()
+                                    + " locations=" + lineage.locationsById().size()
+                                    + " empress=" + (lineage.empressId() == null ? "none" : lineage.empressId().toString())
+                            )
+                        ),
                     false
                 );
+
+            // List each location ID (clickable to copy) so players can feed it into inspect_location / kill_location.
+            for (var locId : lineage.locationsById().keySet()) {
+                ctx.getSource()
+                    .sendSuccess(
+                        () -> Component.literal("      location: ").append(copyableId(locId.value().toString())),
+                        false
+                    );
+            }
         }
 
         return ids.size();
@@ -295,6 +351,16 @@ public final class HiveDebugCommands {
         ctx.getSource()
             .sendSuccess(
                 () -> Component.literal("  centerPos=" + location.centerPos()),
+                false
+            );
+        ctx.getSource()
+            .sendSuccess(
+                () -> Component.literal(
+                    "  slab=Y " + location.hiveFloorY() + ".." + location.hiveCeilingY()
+                        + ", vents=" + location.ventManager().ventCount()
+                        + ", reproductive=" + location.reproductiveEstablished()
+                        + ", loadedMembers=" + location.loadedMembersByType().values().stream().mapToInt(java.util.Set::size).sum()
+                ),
                 false
             );
         ctx.getSource()
@@ -796,6 +862,161 @@ public final class HiveDebugCommands {
                 true
             );
         return shed;
+    }
+
+    /**
+     * Wraps an ID (or any string) in a chat component that copies the raw text to the clipboard when clicked, with a
+     * hover tooltip. Mirrors how vanilla {@code /locate} makes its results clickable. Use this anywhere a lineage or
+     * location ID is printed so players can grab the long numeric IDs without retyping them.
+     */
+    private static Component copyableId(String id) {
+        return Component.literal(id)
+            .withStyle(
+                style -> style
+                    .withColor(ChatFormatting.AQUA)
+                    .withUnderlined(true)
+                    .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, id))
+                    .withHoverEvent(
+                        new HoverEvent(
+                            HoverEvent.Action.SHOW_TEXT,
+                            Component.literal("Click to copy: " + id)
+                        )
+                    )
+            );
+    }
+
+    /**
+     * Lists all known vent positions in a location's territory (and the total count). Vents are held in memory and
+     * re-register on chunk load, so unloaded territory may under-report until visited.
+     */
+    private static int listVents(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
+        var locationId = ResourceLocationArgument.getId(ctx, LOCATION_ID_ARG);
+        var location = HiveLocationRegistry.INSTANCE.get(HiveLocationId.of(locationId));
+        if (location == null) {
+            ctx.getSource().sendFailure(Component.literal("No hive location with id " + locationId));
+            return 0;
+        }
+
+        var vents = location.ventManager().allVents();
+        ctx.getSource()
+            .sendSuccess(
+                () -> Component.literal("Location " + location.id() + " has " + vents.size() + " known vent(s):"),
+                false
+            );
+        for (var pos : vents) {
+            ctx.getSource().sendSuccess(() -> Component.literal("  " + pos.toShortString()), false);
+        }
+        return vents.size();
+    }
+
+    /**
+     * Debug: grants biomass to a location so ovipositor/claim/economy behaviour can be tested without waiting for
+     * passive income.
+     */
+    private static int addBiomass(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
+        var locationId = ResourceLocationArgument.getId(ctx, LOCATION_ID_ARG);
+        var amount = IntegerArgumentType.getInteger(ctx, COUNT_ARG);
+        var location = HiveLocationRegistry.INSTANCE.get(HiveLocationId.of(locationId));
+        if (location == null) {
+            ctx.getSource().sendFailure(Component.literal("No hive location with id " + locationId));
+            return 0;
+        }
+        location.setBiomass(location.biomass() + amount);
+        ctx.getSource()
+            .sendSuccess(
+                () -> Component.literal("Biomass for " + locationId + " is now " + location.biomass() + "."),
+                true
+            );
+        return location.biomass();
+    }
+
+    /**
+     * Finds the nearest queen to the player and prints which ovipositor-creation gate(s) are blocking egg-laying.
+     */
+    private static int inspectOvipositor(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
+        var player = Objects.requireNonNull(ctx.getSource().getPlayer());
+        var level = ctx.getSource().getLevel();
+
+        var queen = level.getEntitiesOfClass(
+            com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen.class,
+            player.getBoundingBox().inflate(64.0)
+        ).stream().min(java.util.Comparator.comparingDouble(q -> q.distanceToSqr(player))).orElse(null);
+
+        if (queen == null) {
+            ctx.getSource().sendFailure(Component.literal("No queen within 64 blocks."));
+            return 0;
+        }
+
+        var report = queen.getOvipositorManager().debugReport();
+        ctx.getSource().sendSuccess(() -> Component.literal(report), false);
+        return 1;
+    }
+
+    /**
+     * Reports the slab band of the hive location whose claimed chunk the player is standing in (or the nearest loaded
+     * location if the player is not inside one), and whether the player's current Y is inside that band. Phase 1 debug
+     * aid for verifying the spawn/resin Y-clamp.
+     */
+    private static int inspectSlab(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
+        var player = Objects.requireNonNull(ctx.getSource().getPlayer());
+        var level = ctx.getSource().getLevel();
+        var playerY = player.blockPosition().getY();
+
+        var chunk = new ChunkPos(player.blockPosition());
+        var location = HiveLocationRegistry.INSTANCE.getByChunk(level.dimension(), chunk);
+
+        if (location == null) {
+            ctx.getSource()
+                .sendFailure(
+                    Component.literal("You are not standing in any hive's claimed chunk (" + chunk + ").")
+                );
+            return 0;
+        }
+
+        var floor = location.hiveFloorY();
+        var ceiling = location.hiveCeilingY();
+        var inside = location.withinSlab(playerY);
+
+        ctx.getSource()
+            .sendSuccess(
+                () -> Component.literal(
+                    "Hive " + location.id() + "\n"
+                        + "  center=" + location.centerPos() + "\n"
+                        + "  slab band: Y " + floor + " .. " + ceiling + " (with tolerance)\n"
+                        + "  your Y=" + playerY + " -> " + (inside
+                            ? "INSIDE slab (spawns allowed here)"
+                            : "OUTSIDE slab (spawns clamped away here)")
+                ),
+                false
+            );
+        return inside ? 1 : 0;
+    }
+
+    /**
+     * Toggles {@link com.alien.common.gameplay.hive.spawning.HiveLoadedSpawner#DEBUG_SPAWN_REJECTS}. While on, every
+     * spawn attempt rejected for being outside a hive's slab is logged to the server console. Phase 1 debug aid.
+     */
+    private static int toggleRender(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
+        var player = Objects.requireNonNull(ctx.getSource().getPlayer());
+        var now = !com.alien.common.network.handler.HiveRenderToggleHandler.isEnabled(player.getUUID());
+        com.alien.common.network.handler.HiveRenderToggleHandler.setEnabled(player, now);
+        ctx.getSource()
+            .sendSuccess(
+                () -> Component.literal("Hive render overlay is now " + (now ? "ON" : "OFF") + "."),
+                false
+            );
+        return now ? 1 : 0;
+    }
+
+    private static int toggleDebugSpawns(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
+        var now = !com.alien.common.gameplay.hive.spawning.HiveLoadedSpawner.DEBUG_SPAWN_REJECTS;
+        com.alien.common.gameplay.hive.spawning.HiveLoadedSpawner.DEBUG_SPAWN_REJECTS = now;
+        ctx.getSource()
+            .sendSuccess(
+                () -> Component.literal("Hive spawn-reject logging is now " + (now ? "ON" : "OFF") + "."),
+                true
+            );
+        return now ? 1 : 0;
     }
 
     private static int claimRadius(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {

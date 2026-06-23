@@ -166,7 +166,14 @@ public class HiveManager implements NBTSerializable {
      * one-line {@code instanceof Player} check that's currently unreachable since {@link Alien} doesn't extend Player.
      */
     public boolean tryShedFromLineages(long currentTick) {
-        if (alien.getType().is(AlienEntityTypeTags.EMPRESSES)) {
+        // Royalty is never shed. Empresses and queens are the heart of a hive; culling a founding queen for standing
+        // outside her (often tiny, new) claimed footprint deletes the hive's only royal. Empresses were already exempt;
+        // queens must be too, otherwise a queen that hasn't yet settled into an ovipositor gets shed after the grace
+        // window and the lineage is left queenless.
+        if (
+            alien.getType().is(AlienEntityTypeTags.EMPRESSES)
+                || alien.getType().is(AlienEntityTypeTags.QUEENS)
+        ) {
             return false;
         }
 

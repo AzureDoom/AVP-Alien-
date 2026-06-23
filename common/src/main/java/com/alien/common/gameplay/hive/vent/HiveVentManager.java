@@ -36,4 +36,18 @@ public class HiveVentManager {
     public Set<BlockPos> getVentsWithinSection(SectionPos sectionPos) {
         return hiveVentCache.getVentsForSection(sectionPos);
     }
+
+    /**
+     * All known vent positions in this location's territory. Debug/inspection use.
+     */
+    public Set<BlockPos> allVents() {
+        return hiveVentCache.allVents();
+    }
+
+    /**
+     * Number of known vents in this location's territory.
+     */
+    public int ventCount() {
+        return hiveVentCache.allVents().size();
+    }
 }

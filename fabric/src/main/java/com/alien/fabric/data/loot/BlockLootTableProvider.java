@@ -135,6 +135,7 @@ public class BlockLootTableProvider extends FabricBlockLootTableProvider {
         dropSelf(IrradiatedAlienResinBlocks.RIBBED_IRRADIATED_RESIN);
         dropSelf(NetherAlienResinBlocks.RIBBED_NETHER_RESIN);
         dropSelf(AlienResinBlocks.RIBBED_RESIN);
+        dropSelf(AlienResinBlocks.RIBBED_RESIN_STAIRS);
 
         dropSelf(AberrantAlienResinBlocks.SMOOTH_ABERRANT_RESIN);
         dropSelf(AberrantAlienResinBlocks.SMOOTH_ABERRANT_RESIN_STAIRS);
@@ -174,6 +175,7 @@ public class BlockLootTableProvider extends FabricBlockLootTableProvider {
         dropSlab(NetherAlienChitinBlocks.POLISHED_NETHER_CHITIN_SLAB);
 
         dropSlab(AlienResinBlocks.RESIN_SLAB);
+        dropSlab(AlienResinBlocks.RIBBED_RESIN_SLAB);
         dropSlab(AlienResinBlocks.RESIN_BONE_SLAB);
         dropSlab(AlienResinBlocks.RESIN_ETCHED_SLAB);
         dropSlab(AlienResinBlocks.RESIN_STRETCHED_SLAB);

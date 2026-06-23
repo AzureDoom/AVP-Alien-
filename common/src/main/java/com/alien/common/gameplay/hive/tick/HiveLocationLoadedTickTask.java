@@ -6,6 +6,7 @@ import com.alien.common.gameplay.hive.growth.AbstractSpreadAttempt;
 import com.alien.common.gameplay.hive.growth.CatchUpEngine;
 import com.alien.common.gameplay.hive.growth.LoadedBiomassTicker;
 import com.alien.common.gameplay.hive.location.HiveLocation;
+import com.alien.common.gameplay.hive.location.HiveLocationRegistry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 
@@ -59,7 +60,7 @@ public final class HiveLocationLoadedTickTask {
 
         // Loaded biomass income — only for player-nearby locations (proxy: boss bar is showing). Cheap to call,
         // so we check every tick and let LoadedBiomassTicker decide whether this is its second.
-        if (isPlayerNearby(location) && LoadedBiomassTicker.shouldFire(currentTick)) {
+        if (isPlayerNearby(serverLevel, location) && LoadedBiomassTicker.shouldFire(currentTick)) {
             LoadedBiomassTicker.run(location, lineage, currentTick);
         }
 
@@ -82,8 +83,18 @@ public final class HiveLocationLoadedTickTask {
         return false;
     }
 
-    private static boolean isPlayerNearby(HiveLocation location) {
-        var bossBar = location.bossBar();
-        return bossBar != null && bossBar.isAngry();
+    private static boolean isPlayerNearby(ServerLevel level, HiveLocation location) {
+        // Loaded biomass income accrues whenever a player is within the boss-bar radius of the hive - NOT only when
+        // the hive is angry. (The old implementation checked bossBar.isAngry(), which meant a calm hive earned zero
+        // biomass - fatal for a founding queen who must stay calm to settle/lay but needs biomass for her ovipositor.)
+        var radius = HiveLocationRegistry.INSTANCE.config().bossBarDisplayRadiusBlocks();
+        var radiusSqr = (double) radius * radius;
+        var center = location.centerPos();
+        for (var player : level.players()) {
+            if (player.blockPosition().distSqr(center) <= radiusSqr) {
+                return true;
+            }
+        }
+        return false;
     }
 }

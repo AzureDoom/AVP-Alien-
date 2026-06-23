@@ -41,6 +41,23 @@ import java.util.UUID;
  */
 public final class HiveLocation {
 
+    /**
+     * Vertical extent of the hive's active "slab", measured upward from {@link #centerPos}'s Y. The hive's structures
+     * are 16 blocks tall, so the slab spans [floorY, floorY + SLAB_HEIGHT). Spawning and resin spread are confined to
+     * this band so players are not swarmed when far above or below the hive even while standing in a claimed chunk.
+     * <p>
+     * TODO(phase1-config): move these to {@code HiveConfig} once config persistence lands so they are tunable in-game.
+     * Hardcoded for now.
+     */
+    private static final int SLAB_HEIGHT = 16;
+
+    /**
+     * Extra blocks of leeway added above and below the slab when testing whether a Y is "inside" the hive. A small
+     * tolerance avoids edge cases where a spawn or resin target one block outside the structure shell is wrongly
+     * rejected.
+     */
+    private static final int SLAB_TOLERANCE = 2;
+
     private static final String NBT_ID = "Id";
 
     private static final String NBT_LINEAGE_FACTION_ID = "LineageFactionId";
@@ -90,6 +107,8 @@ public final class HiveLocation {
     private static final String NBT_QUEEN_SCOURGE_ACCUMULATOR = "QueenScourgeAccumulator";
 
     private static final String NBT_HARBINGER_SCOURGE_ACCUMULATOR = "HarbingerScourgeAccumulator";
+
+    private static final String NBT_REPRODUCTIVE_ESTABLISHED = "ReproductiveEstablished";
 
     private static final String NBT_CLAIMED_CHUNKS = "ClaimedChunks";
 
@@ -168,6 +187,8 @@ public final class HiveLocation {
     private @Nullable UUID queenlessLeaderSnapshot;
 
     private int biomass;
+
+    private boolean reproductiveEstablished;
 
     /** Refined resource produced by queens (1/min). Used by hive unit purchases to upgrade castes. */
     private int royalJelly;
@@ -290,6 +311,33 @@ public final class HiveLocation {
 
     public BlockPos centerPos() {
         return centerPos;
+    }
+
+    /**
+     * Y of the hive's floor — the elevation the hive was founded at. The slab band is measured from here.
+     */
+    public int hiveFloorY() {
+        return centerPos.getY();
+    }
+
+    /**
+     * Y of the top of the hive's slab band (exclusive). Floor + {@link #SLAB_HEIGHT}.
+     */
+    public int hiveCeilingY() {
+        return centerPos.getY() + SLAB_HEIGHT;
+    }
+
+    /**
+     * Whether the given world Y falls inside this hive's active slab band (with a small tolerance above and below).
+     * Spawning and resin spread should be confined to Ys for which this returns {@code true}, so the hive only operates
+     * at its built level rather than throughout the entire claimed chunk column.
+     *
+     * @param y a world Y coordinate
+     * @return true if {@code y} is within [floorY - tolerance, ceilingY + tolerance)
+     */
+    public boolean withinSlab(int y) {
+        return y >= hiveFloorY() - SLAB_TOLERANCE
+            && y < hiveCeilingY() + SLAB_TOLERANCE;
     }
 
     public @Nullable UUID founderId() {
@@ -445,6 +493,19 @@ public final class HiveLocation {
 
     public int biomass() {
         return biomass;
+    }
+
+    /**
+     * Whether this location's founding queen has become reproductive (created her ovipositor / begun laying). Until
+     * this is true, the hive should not spend biomass on expansion (chunk claims) so it can accumulate the ovipositor
+     * cost instead of bankrupting itself growing. Set once, persists. See the founding-priority design.
+     */
+    public boolean reproductiveEstablished() {
+        return reproductiveEstablished;
+    }
+
+    public void setReproductiveEstablished(boolean value) {
+        this.reproductiveEstablished = value;
     }
 
     public void setBiomass(int biomass) {
@@ -623,6 +684,7 @@ public final class HiveLocation {
             tag.putUUID(NBT_QUEENLESS_LEADER_SNAPSHOT, queenlessLeaderSnapshot);
         }
         tag.putInt(NBT_BIOMASS, biomass);
+        tag.putBoolean(NBT_REPRODUCTIVE_ESTABLISHED, reproductiveEstablished);
         if (royalJelly > 0) {
             tag.putInt(NBT_ROYAL_JELLY, royalJelly);
         }
@@ -746,6 +808,7 @@ public final class HiveLocation {
             ? tag.getUUID(NBT_QUEENLESS_LEADER_SNAPSHOT)
             : null;
         location.biomass = Math.max(0, tag.getInt(NBT_BIOMASS));
+        location.reproductiveEstablished = tag.getBoolean(NBT_REPRODUCTIVE_ESTABLISHED);
         location.royalJelly = Math.max(0, tag.getInt(NBT_ROYAL_JELLY));
         location.scourgeJelly = Math.max(0, tag.getInt(NBT_SCOURGE_JELLY));
         location.royalJellyAccumulator = Math.max(0L, tag.getLong(NBT_ROYAL_JELLY_ACCUMULATOR));

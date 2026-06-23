@@ -111,6 +111,8 @@ public class BlockModelProvider extends FabricModelProvider {
         createStairs(generators, AlienResinBlocks.RESIN_BONE.get(), AlienResinBlocks.RESIN_BONE_STAIRS.get());
         createSlab(generators, AlienResinBlocks.RESIN_STRETCHED.get(), AlienResinBlocks.RESIN_STRETCHED_SLAB.get());
         createStairs(generators, AlienResinBlocks.RESIN_STRETCHED.get(), AlienResinBlocks.RESIN_STRETCHED_STAIRS.get());
+        createSlab(generators, AlienResinBlocks.RIBBED_RESIN.get(), AlienResinBlocks.RIBBED_RESIN_SLAB.get());
+        createStairs(generators, AlienResinBlocks.RIBBED_RESIN.get(), AlienResinBlocks.RIBBED_RESIN_STAIRS.get());
         generators.createRotatedVariantBlock(AlienResinBlocks.RESIN_NODE.get());
         generators.createCrossBlock(AlienResinBlocks.RESIN_WEB.get(), BlockModelGenerators.TintState.NOT_TINTED);
 

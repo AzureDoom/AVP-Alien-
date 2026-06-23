@@ -18,6 +18,7 @@ public class AlienFabricClient implements ClientModInitializer {
         AlienClient.initialize();
         ResinAlphaModelWrapper.register();
         registerResinRenderLayers();
+        com.alien.fabric.client.render.HiveRenderHook.register();
     }
 
     private static void registerResinRenderLayers() {

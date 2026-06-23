@@ -57,6 +57,14 @@ public final class HiveBalanceTask {
     }
 
     private static void evaluate(HiveLocation location, LineageFactionData lineage, int populationPerChunk) {
+        // Founding lockout: a queen-founded hive buys NO population units until its queen is reproductive. Otherwise
+        // this
+        // task spends biomass on drones/runners the instant the hive can afford them, draining the pool the queen needs
+        // to fill for her ovipositor (the "biomass resets at ~50, spawns an army, no resin" symptom). Queenless hives
+        // are unaffected. See fill-then-commit founding design.
+        if (location.founderId() != null && !location.reproductiveEstablished()) {
+            return;
+        }
         var pop = CastePopulation.popByCaste(location);
         var totalPop = pop.values().stream().mapToInt(Integer::intValue).sum();
         var chunks = location.claimedChunks().size();

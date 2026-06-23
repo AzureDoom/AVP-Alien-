@@ -198,6 +198,7 @@ public class Alien {
 
         if (server != null) {
             HiveLocationRegistry.INSTANCE.tick(server);
+            com.alien.common.network.handler.HiveRenderToggleHandler.tick(server);
         }
     }
 

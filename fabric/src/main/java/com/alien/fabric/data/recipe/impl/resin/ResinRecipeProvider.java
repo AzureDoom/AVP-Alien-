@@ -84,6 +84,9 @@ public class ResinRecipeProvider {
         AlienResinBlocks.RESIN,
         AlienResinBlocks.RESIN_DOORWAY,
         AlienResinBlocks.RESIN_SPINE,
+        AlienResinBlocks.RIBBED_RESIN,
+        AlienResinBlocks.RIBBED_RESIN_SLAB,
+        AlienResinBlocks.RIBBED_RESIN_STAIRS,
         AlienResinBlocks.RESIN_BONE,
         AlienResinBlocks.RESIN_BONE_SLAB,
         AlienResinBlocks.RESIN_BONE_STAIRS,
@@ -166,6 +169,7 @@ public class ResinRecipeProvider {
         // base resin block -> each decorative block
         builder.stonecut(resin).withCategory(RecipeCategory.BUILDING_BLOCKS).into(1, set.doorway());
         builder.stonecut(resin).withCategory(RecipeCategory.BUILDING_BLOCKS).into(1, set.spine());
+        builder.stonecut(resin).withCategory(RecipeCategory.BUILDING_BLOCKS).into(1, set.ribbed());
         builder.stonecut(resin).withCategory(RecipeCategory.BUILDING_BLOCKS).into(1, set.bone());
         builder.stonecut(resin).withCategory(RecipeCategory.BUILDING_BLOCKS).into(1, set.etched());
         builder.stonecut(resin).withCategory(RecipeCategory.BUILDING_BLOCKS).into(1, set.stretched());
@@ -180,6 +184,8 @@ public class ResinRecipeProvider {
         RecipeUtil.createStairBlockManualAndStonecutterRecipes(builder, set.stretched().get(), set.stretchedStairs().get());
         RecipeUtil.createSlabBlockManualAndStonecutterRecipes(builder, set.tendril().get(), set.tendrilSlab().get());
         RecipeUtil.createStairBlockManualAndStonecutterRecipes(builder, set.tendril().get(), set.tendrilStairs().get());
+        RecipeUtil.createSlabBlockManualAndStonecutterRecipes(builder, set.ribbed().get(), set.ribbedSlab().get());
+        RecipeUtil.createStairBlockManualAndStonecutterRecipes(builder, set.ribbed().get(), set.ribbedStairs().get());
         // + the 4th block's slab/stairs
     }
 }

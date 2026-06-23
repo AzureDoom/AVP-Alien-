@@ -80,7 +80,14 @@ public final class LocationDormancyTask {
         }
 
         // Rule 2: boss-bar source of truth. Persisted unloaded members do not keep a location alive.
-        if (CastePopulation.totalReliableXenomorphPopulation(location) == 0) {
+        // EXCEPTION: newborn locations are shielded during the bootstrap grace window. A freshly-founded single-queen
+        // hive has no reserve buffer, and its founding queen can momentarily read as zero reliable population during
+        // the chunk-unload / return-to-reserves transition (or on player logout). Reaping it in that window would
+        // delete a legitimate new hive. The same grace window already protects newborn locations from shrink/evacuate.
+        if (
+            CastePopulation.totalReliableXenomorphPopulation(location) == 0
+                && location.ageInTicks() >= HiveLocationRegistry.INSTANCE.config().locationBootstrapGraceTicks()
+        ) {
             LocationDeathHandler.killNaturalDecay(level, location, lineage);
             return true;
         }

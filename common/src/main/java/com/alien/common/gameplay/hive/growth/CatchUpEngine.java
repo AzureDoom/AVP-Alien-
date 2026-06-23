@@ -98,6 +98,13 @@ public final class CatchUpEngine {
                 && location.claimedChunks().size() < config.maxChunksPerLocation()
                 && lineageTotal < config.maxChunksPerLineage()
         ) {
+            // Founding-priority gate: a queen-founded hive does not spend biomass on expansion until its queen is
+            // reproductive (has created her ovipositor). This stops the hive bankrupting itself claiming chunks before
+            // it can pay the ovipositor cost. Queenless hives (no founder) are unaffected and claim normally.
+            if (location.founderId() != null && !location.reproductiveEstablished()) {
+                return;
+            }
+
             if (!hasEnoughPopulationToClaim(location, config)) {
                 return;
             }

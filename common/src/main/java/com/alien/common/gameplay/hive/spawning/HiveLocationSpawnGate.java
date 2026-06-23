@@ -37,6 +37,13 @@ public final class HiveLocationSpawnGate {
             return null;
         }
 
+        // Slab clamp for the natural/resin spawn path. locationContaining is intentionally NOT clamped (it is shared
+        // with egg-laying, resin spread, and despawn-into-reserves routing, which must still work throughout the
+        // claimed column). The vertical restriction belongs here, on the spawn-specific entry point only.
+        if (!location.withinSlab(pos.getY())) {
+            return null;
+        }
+
         if (!location.localReserves().canSpawn(entityType)) {
             return null;
         }

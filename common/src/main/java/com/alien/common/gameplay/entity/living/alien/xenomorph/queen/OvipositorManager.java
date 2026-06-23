@@ -57,6 +57,13 @@ public class OvipositorManager implements NBTSerializable {
             return;
         }
 
+        // Founding preparation: a founding queen with a full biomass tank, standing near her center, prepares her
+        // chamber BEFORE the creation gate - carve the room and stamp the resin floor. This must happen before
+        // canCreateOvipositor() because that gate REQUIRES resin underfoot and clear space, which the prep provides.
+        // Without this the queen deadlocks: she can't create (no resin/no room) but the resin/room only came from
+        // create. Prep runs once; afterwards the gates pass and the normal flow below creates the ovipositor.
+        prepareFoundingChamberIfNeeded();
+
         if (!canCreateOvipositor()) {
             return;
         }
@@ -67,6 +74,51 @@ public class OvipositorManager implements NBTSerializable {
 
         createOvipositor();
         ovipositorCreationCooldown.reset();
+    }
+
+    /**
+     * If the queen is founding (location founded, not yet reproductive), has filled her founding biomass tank, and is
+     * near her center, carve the founding chamber and stamp the resin floor - ONCE. This prepares the space the
+     * ovipositor-creation gate requires (resin underfoot, clear room). Spends the resin-floor share of the biomass.
+     * No-op if already prepared (resin already underfoot), not founding, not full, or not near center.
+     */
+    private void prepareFoundingChamberIfNeeded() {
+        var location = currentLocation();
+        if (
+            location == null
+                || location.founderId() == null
+                || location.reproductiveEstablished()
+                || !isNearHiveCenter(location)
+        ) {
+            return;
+        }
+        // Already prepared? (resin already under her - don't re-carve/re-stamp every tick)
+        if (isStandingOnVariantResin()) {
+            return;
+        }
+        // Tank must be full (the founding target) before committing the prep spend.
+        var target = com.alien.common.gameplay.hive.growth.BiomassIncome.foundingBiomassTarget(
+            HiveLocationRegistry.INSTANCE.config()
+        );
+        if (location.biomass() < target) {
+            return;
+        }
+
+        carveFoundingChamber();
+        stampFoundingResinFloor();
+
+        // Place the queen at the chunk center on top of the fresh bone floor, so she's standing on resin at the middle
+        // of the carved chamber. This makes the resin / fit gates pass deterministically regardless of where exactly
+        // she
+        // wandered within the center area. (A light position correction - full navigate-to-center is Option B.)
+        var centerChunk = new ChunkPos(location.centerPos());
+        queen.moveTo(
+            centerChunk.getMiddleBlockX() + 0.5,
+            location.hiveFloorY() + 1,
+            centerChunk.getMiddleBlockZ() + 0.5,
+            queen.getYRot(),
+            queen.getXRot()
+        );
     }
 
     public Vec3 getEggLayingPosition() {
@@ -89,7 +141,37 @@ public class OvipositorManager implements NBTSerializable {
         return getOvipositorOrNull() != null;
     }
 
+    /**
+     * Debug-only: runs each ovipositor-creation gate independently and returns a human-readable pass/fail report. Used
+     * by {@code /avp_alien debug hive inspect_ovipositor} to pinpoint exactly which condition is blocking egg-laying,
+     * instead of the single opaque "unsatisfied" the GOAP inspector shows. Does not create anything or pay any cost.
+     */
+    public String debugReport() {
+        if (hasOvipositor()) {
+            return "Queen ALREADY HAS an ovipositor (should be laying).";
+        }
+        var sb = new StringBuilder("Ovipositor gates for nearest queen:\n");
+        sb.append("  no target:          ").append(queen.getTarget() == null).append('\n');
+        sb.append("  variant canReproduce: ").append(AlienVariantTypes.getFor(queen.getVariant()).canReproduce()).append('\n');
+        sb.append("  cooldown ready:     ").append(!ovipositorCreationCooldown.isActive()).append('\n');
+        sb.append("  on variant resin:   ").append(isStandingOnVariantResin()).append('\n');
+        sb.append("  suitable location:  ").append(hasSuitableHiveLocation()).append('\n');
+        sb.append("  ovipositor fits:    ").append(canOvipositorFit()).append('\n');
+        sb.append("  => canCreate:       ").append(canCreateOvipositor()).append('\n');
+        var loc = currentLocation();
+        var cost = HiveLocationRegistry.INSTANCE.config().ovipositorCreationBiomassCost();
+        var biomass = loc != null ? loc.biomass() : -1;
+        sb.append("  biomass: ")
+            .append(biomass)
+            .append(" / cost ")
+            .append(cost)
+            .append(biomass >= cost ? "  (CAN PAY)" : "  (TOO POOR - this is the blocker)");
+        return sb.toString();
+    }
+
     private void createOvipositor() {
+        // The founding chamber and resin floor were prepared before the gate (see prepareFoundingChamberIfNeeded), so
+        // by here the space is carved and resin is underfoot. This just creates the ovipositor entity and finalizes.
         var ovipositor = AlienEntityTypes.OVIPOSITOR.get().create(queen.level());
 
         if (ovipositor != null) {
@@ -102,7 +184,103 @@ public class OvipositorManager implements NBTSerializable {
             ovipositor.yHeadRot = queen.yHeadRot;
 
             queen.level().addFreshEntity(ovipositor);
+
+            // The hive is now reproductive - founding mode ends. Cap reverts to the normal formula and the location may
+            // resume expansion (claims), resin spread, and spawning. See founding-priority design.
+            var loc = currentLocation();
+            if (loc != null) {
+                loc.setReproductiveEstablished(true);
+            }
         }
+    }
+
+    /**
+     * Carves the founding chamber: clears the center chunk's slab band ABOVE the floor to air (solids and fluids alike,
+     * so water/lava drain), leaving a hollow room for the eggsack. The bottom floor layer is left for
+     * {@link #stampFoundingResinFloor()} to surface with resin, so she doesn't fall through. Instant block-deletion for
+     * now; animated excavation comes with the structure system (same carve primitive). See carve-contract design.
+     */
+    private void carveFoundingChamber() {
+        var location = currentLocation();
+        if (location == null) {
+            return;
+        }
+        var level = queen.level();
+        var center = location.centerPos();
+        var centerChunk = new ChunkPos(center);
+        var minX = centerChunk.getMinBlockX();
+        var minZ = centerChunk.getMinBlockZ();
+        var maxX = centerChunk.getMaxBlockX();
+        var maxZ = centerChunk.getMaxBlockZ();
+
+        // Floor is the bottom of the slab band; clear from floor+1 up to the ceiling, leaving the floor layer intact.
+        var floorY = location.hiveFloorY();
+        var ceilingY = location.hiveCeilingY();
+        var air = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+
+        var pos = new BlockPos.MutableBlockPos();
+        for (var x = minX; x <= maxX; x++) {
+            for (var z = minZ; z <= maxZ; z++) {
+                for (var y = floorY + 1; y < ceilingY; y++) {
+                    pos.set(x, y, z);
+                    if (!level.getBlockState(pos).isAir()) {
+                        // setBlock with flag 3 (update + notify) so fluids drain and lighting updates correctly.
+                        level.setBlock(pos, air, 3);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Stamps a small resin floor patch centered on the queen's feet, in her variant's resin, spending the resin-floor
+     * share of the founding biomass. Gives her ovipositor support points a valid resin surface (fixes the chronic "on
+     * variant resin: false" for a queen who founded on bare stone). Instant stamp - no wandering, no partial floors.
+     */
+    private void stampFoundingResinFloor() {
+        var location = currentLocation();
+        if (location == null) {
+            return;
+        }
+        var level = queen.level();
+        // resin_bone is in NORMAL_RESIN, so it satisfies the "on variant resin" / support-point gates and counts as
+        // spawnable resin. Used for the founding floor as a distinct, bone-like pad.
+        var floorState = com.alien.common.registry.init.block.AlienResinBlocks.RESIN_BONE.get().defaultBlockState();
+
+        // Anchor the disc to the CENTER CHUNK's middle at the slab floor Y (the row the carve left as the base), NOT
+        // under the queen - so the floor is deterministic and aligned with the carved chamber regardless of exactly
+        // where she's standing. FILL every cell in the circle (including air/gaps from drained fluids or caves) so the
+        // chamber has a complete, hole-free floor for the ovipositor support points.
+        var centerChunk = new ChunkPos(location.centerPos());
+        var centerX = centerChunk.getMiddleBlockX();
+        var centerZ = centerChunk.getMiddleBlockZ();
+        var floorY = location.hiveFloorY();
+
+        // Circular pad, radius 6 (12-block diameter). Circle = dx^2 + dz^2 <= radius^2. Sized to cover the ovipositor
+        // support-point reach (~8 back / 6 side) so the "ovipositor fits" gate passes.
+        var radius = 6;
+        var radiusSq = radius * radius;
+        var resinTag = AlienVariantTypes.getFor(queen.getVariant()).resinBlockTag();
+        var pos = new BlockPos.MutableBlockPos();
+        for (var dx = -radius; dx <= radius; dx++) {
+            for (var dz = -radius; dz <= radius; dz++) {
+                if (dx * dx + dz * dz > radiusSq) {
+                    continue; // outside the circle
+                }
+                pos.set(centerX + dx, floorY, centerZ + dz);
+                // Fill any cell that isn't already this variant's resin - convert solid ground AND fill air gaps, so
+                // the
+                // floor is complete. (Don't overwrite existing variant resin so we don't churn already-valid floor.)
+                if (!level.getBlockState(pos).is(resinTag)) {
+                    level.setBlock(pos, floorState, 3);
+                }
+            }
+        }
+
+        // Spend the resin-floor share of the founding biomass (mirrors the ovipositor cost so total founding cost is
+        // 2x).
+        var floorCost = HiveLocationRegistry.INSTANCE.config().ovipositorCreationBiomassCost();
+        location.setBiomass(Math.max(0, location.biomass() - floorCost));
     }
 
     private boolean canCreateOvipositor() {

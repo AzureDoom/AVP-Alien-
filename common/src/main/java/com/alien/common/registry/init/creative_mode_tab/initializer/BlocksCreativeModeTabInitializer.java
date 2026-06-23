@@ -55,6 +55,8 @@ public class BlocksCreativeModeTabInitializer {
         CreativeModeTabUtil.accept(output, AlienResinBlocks.RESIN_VENT);
         CreativeModeTabUtil.accept(output, AlienResinBlocks.RESIN_WEB);
         CreativeModeTabUtil.accept(output, AlienResinBlocks.RIBBED_RESIN);
+        CreativeModeTabUtil.accept(output, AlienResinBlocks.RIBBED_RESIN_SLAB);
+        CreativeModeTabUtil.accept(output, AlienResinBlocks.RIBBED_RESIN_STAIRS);
         CreativeModeTabUtil.accept(output, AlienResinBlocks.SMOOTH_RESIN);
         CreativeModeTabUtil.accept(output, AlienResinBlocks.SMOOTH_RESIN_SLAB);
         CreativeModeTabUtil.accept(output, AlienResinBlocks.SMOOTH_RESIN_STAIRS);

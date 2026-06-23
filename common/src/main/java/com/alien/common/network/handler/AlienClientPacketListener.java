@@ -1,6 +1,8 @@
 package com.alien.common.network.handler;
 
+import com.alien.client.render.hive.ClientHiveRenderCache;
 import com.alien.common.network.payload.S2CHiveInspectionPayload;
+import com.alien.common.network.payload.S2CHiveRenderDataPayload;
 import com.alien.compatibility.blib_engine.client.inspector.ClientHiveInspectionCache;
 import net.minecraft.world.entity.player.Player;
 
@@ -16,5 +18,10 @@ public final class AlienClientPacketListener {
     /** Server-pushed hive inspection snapshot for the currently-selected AVP faction. */
     public static void handleHiveInspection(S2CHiveInspectionPayload payload, Player player) {
         ClientHiveInspectionCache.apply(payload);
+    }
+
+    /** Server-pushed hive render data for the debug wireframe overlay. */
+    public static void handleHiveRenderData(S2CHiveRenderDataPayload payload, Player player) {
+        ClientHiveRenderCache.apply(payload);
     }
 }

@@ -8,6 +8,9 @@ record DecorativeResinSet(
     Supplier<Block> resinBlock, // the input you cut from
     Supplier<Block> doorway,
     Supplier<Block> spine,
+    Supplier<Block> ribbed,
+    Supplier<Block> ribbedSlab,
+    Supplier<Block> ribbedStairs,
     Supplier<Block> bone,
     Supplier<Block> boneSlab,
     Supplier<Block> boneStairs,

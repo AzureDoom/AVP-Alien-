@@ -89,6 +89,8 @@ public class EnUsBlockProvider {
         addBlock(builder, IrradiatedAlienResinBlocks.RIBBED_IRRADIATED_RESIN, "Ribbed Irradiated Resin");
         addBlock(builder, NetherAlienResinBlocks.RIBBED_NETHER_RESIN, "Ribbed Nether Resin");
         addBlock(builder, AlienResinBlocks.RIBBED_RESIN, "Ribbed Resin");
+        addBlock(builder, AlienResinBlocks.RIBBED_RESIN_SLAB, "Ribbed Resin Slab");
+        addBlock(builder, AlienResinBlocks.RIBBED_RESIN_STAIRS, "Ribbed Resin Stairs");
         addBlock(builder, AberrantAlienResinBlocks.SMOOTH_ABERRANT_RESIN, "Smooth Aberrant Resin");
         addBlock(builder, AberrantAlienResinBlocks.SMOOTH_ABERRANT_RESIN_SLAB, "Smooth Aberrant Resin Slab");
         addBlock(builder, AberrantAlienResinBlocks.SMOOTH_ABERRANT_RESIN_STAIRS, "Smooth Aberrant Resin Stairs");

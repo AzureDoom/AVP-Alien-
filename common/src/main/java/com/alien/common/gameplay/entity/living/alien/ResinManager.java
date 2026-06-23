@@ -79,6 +79,18 @@ public class ResinManager implements GameEventListener.Provider<ResinSpreadListe
     }
 
     public boolean canSpreadResin() {
+        // Founding lockout: members of a queen-founded hive that has not yet established its egg sack do NOT spread
+        // resin. During founding the queen fills her biomass tank and then stamps the resin floor + ovipositor all at
+        // once at COMMIT - no piecemeal resin beforehand. Queenless hives (no founder) are unaffected.
+        var foundingLocation = currentLocation();
+        if (
+            foundingLocation != null
+                && foundingLocation.founderId() != null
+                && !foundingLocation.reproductiveEstablished()
+        ) {
+            return false;
+        }
+
         if (
             alien.tickCount - lastSpreadTick < SPREAD_COOLDOWN_IN_TICKS
                 || isNodePlacementOnCooldown()
