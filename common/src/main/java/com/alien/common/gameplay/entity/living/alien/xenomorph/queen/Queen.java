@@ -282,6 +282,16 @@ public class Queen extends Xenomorph implements GOAPUser<Queen>, EggLayer {
     }
 
     @Override
+    public boolean hurt(DamageSource damageSource, float amount) {
+        var wasHurt = super.hurt(damageSource, amount);
+        if (wasHurt) {
+            // Stage 3b: a solid hit rouses a hibernating queen (the manager filters by phase + damage threshold).
+            getLifecyclePhaseManager().onHibernationDamage(amount);
+        }
+        return wasHurt;
+    }
+
+    @Override
     public Entity asEntity() {
         return this;
     }

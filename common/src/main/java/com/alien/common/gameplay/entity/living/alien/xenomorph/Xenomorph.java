@@ -82,13 +82,13 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
     private static final double MAX_HEALTH_REDUCTION_PER_LOST_LIMB = 0.1D;
 
     private static final PathBlockBreakingConfig PATH_BLOCK_BREAKING_CONFIG = new PathBlockBreakingConfig(
-            true,
-            2,
-            PATH_BLOCK_BREAK_MAX_HARDNESS,
-            4.0f,
-            8.0f,
-            PATH_BLOCK_BREAK_DAMAGE_PER_TICK,
-            Xenomorph::canPathBreakBlock
+        true,
+        2,
+        PATH_BLOCK_BREAK_MAX_HARDNESS,
+        4.0f,
+        8.0f,
+        PATH_BLOCK_BREAK_DAMAGE_PER_TICK,
+        Xenomorph::canPathBreakBlock
     );
 
     public final DataAccessor<Integer> attackDurationInTicks;
@@ -158,20 +158,20 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         this.crawlingManager = new CrawlingManager(this, isCrawling, config.canCrawl());
         this.cocoonManager = new CocoonManager(this);
         this.growthManager = new GrowthManager(this)
-                .setGrowOverTime(false);
+            .setGrowOverTime(false);
         this.resinManager = new ResinManager(this);
         this.xenomorphData = new XenomorphData(getRandom());
         this.entitySenseCache = EntitySenseCache.builder(this)
-                .withScanRadius(40)
-                .addTrackedTag(AlienEntityTypeTags.XENOMORPHS)
-                .withRefreshPolicy(cache -> {
-                    var ticksSinceRefresh = cache.getEntity().tickCount - cache.getLastSenseTick();
-                    var wasRecentlyHurt = getLastHurtByMobTimestamp() > 0
-                            && tickCount - getLastHurtByMobTimestamp() < 10;
+            .withScanRadius(40)
+            .addTrackedTag(AlienEntityTypeTags.XENOMORPHS)
+            .withRefreshPolicy(cache -> {
+                var ticksSinceRefresh = cache.getEntity().tickCount - cache.getLastSenseTick();
+                var wasRecentlyHurt = getLastHurtByMobTimestamp() > 0
+                    && tickCount - getLastHurtByMobTimestamp() < 10;
 
-                    return ticksSinceRefresh > 20 || (wasRecentlyHurt && ticksSinceRefresh > 10);
-                })
-                .build();
+                return ticksSinceRefresh > 20 || (wasRecentlyHurt && ticksSinceRefresh > 10);
+            })
+            .build();
         this.pathNavigator = createPathNavigator(level, config.pathConfig());
         this.hiveIntruderPathNavigator = createPathNavigator(level, config.pathConfig(), createHiveIntruderSearchConfig());
         this.cooldownTracker = new AttackCooldownTracker();
@@ -189,25 +189,25 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
 
     private PathNavigator createPathNavigator(Level level, XenomorphPathConfig pathConfig, SearchConfig searchConfig) {
         var crawlConfig = config.canCrawl()
-                ? PathCrawlConfig.enabled(pathConfig.crawlHeight())
-                : PathCrawlConfig.DISABLED;
+            ? PathCrawlConfig.enabled(pathConfig.crawlHeight())
+            : PathCrawlConfig.DISABLED;
         var waterConfig = PathWaterConfig.enabled((int) Math.ceil(pathConfig.entityHeight() * UNDERWATER_HEIGHT_SCALE));
         var evaluatorConfig = TerrainEvaluatorConfig.builder()
-                .addTerrain(TerrainType.GROUND, 1.0f)
-                .addTerrain(TerrainType.WATER, 1.5f)
-                .withTerrainClassifier(TerrainClassifiers.GROUND_AND_WATER)
-                .withEntitySize(pathConfig.entityWidth(), pathConfig.entityHeight())
-                .withCrawlConfig(crawlConfig)
-                .withWaterConfig(waterConfig)
-                .withBlockBreakingConfig(PATH_BLOCK_BREAKING_CONFIG)
-                .withMaxFallDistance(14)
-                .withCanOpenDoors(pathConfig.canOpenDoors())
-                .build();
+            .addTerrain(TerrainType.GROUND, 1.0f)
+            .addTerrain(TerrainType.WATER, 1.5f)
+            .withTerrainClassifier(TerrainClassifiers.GROUND_AND_WATER)
+            .withEntitySize(pathConfig.entityWidth(), pathConfig.entityHeight())
+            .withCrawlConfig(crawlConfig)
+            .withWaterConfig(waterConfig)
+            .withBlockBreakingConfig(PATH_BLOCK_BREAKING_CONFIG)
+            .withMaxFallDistance(14)
+            .withCanOpenDoors(pathConfig.canOpenDoors())
+            .build();
 
         var navigatorConfig = PathNavigatorConfig.builder(evaluatorConfig)
-                .withSearchConfig(searchConfig)
-                .withPathfindingProfile(PathfindingProfile.LEGACY_PERMISSIVE)
-                .build();
+            .withSearchConfig(searchConfig)
+            .withPathfindingProfile(PathfindingProfile.LEGACY_PERMISSIVE)
+            .build();
 
         var classificationCache = TerrainCacheRegistry.getOrCreate(level, evaluatorConfig.getTerrainClassifier());
 
@@ -216,25 +216,25 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
 
     private static boolean canPathBreakBlock(LevelReader level, BlockPos pos, BlockState state) {
         if (
-                !(level instanceof Level world)
-                        || !world.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)
+            !(level instanceof Level world)
+                || !world.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)
         ) {
             return false;
         }
 
         return !state.hasBlockEntity()
-                && state.getDestroySpeed(level, pos) >= 0.0f
-                && !state.is(AlienBlockTags.XENOMORPH_IMMUNE);
+            && state.getDestroySpeed(level, pos) >= 0.0f
+            && !state.is(AlienBlockTags.XENOMORPH_IMMUNE);
     }
 
     private SearchConfig createHiveIntruderSearchConfig() {
         var searchConfig = SearchConfig.fromFollowRange(HIVE_INTRUDER_PATH_SEARCH_RANGE);
 
         return new SearchConfig(
-                searchConfig.maxSearchNodes(),
-                searchConfig.heuristicWeight(),
-                HIVE_INTRUDER_MAX_PATH_LENGTH,
-                searchConfig.elevationWeight()
+            searchConfig.maxSearchNodes(),
+            searchConfig.heuristicWeight(),
+            HIVE_INTRUDER_MAX_PATH_LENGTH,
+            searchConfig.elevationWeight()
         );
     }
 
@@ -345,9 +345,9 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         }
 
         playSound(
-                attack.sound().get(),
-                getSoundVolume(),
-                (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F
+            attack.sound().get(),
+            getSoundVolume(),
+            (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F
         );
     }
 
@@ -445,11 +445,11 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         }
 
         attributeInstance.addTransientModifier(
-                new AttributeModifier(
-                        LOST_LIMB_MAX_HEALTH_MODIFIER,
-                        -detachedLimbs * MAX_HEALTH_REDUCTION_PER_LOST_LIMB,
-                        AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
-                )
+            new AttributeModifier(
+                LOST_LIMB_MAX_HEALTH_MODIFIER,
+                -detachedLimbs * MAX_HEALTH_REDUCTION_PER_LOST_LIMB,
+                AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
+            )
         );
 
         if (getHealth() > getMaxHealth()) {
@@ -558,9 +558,9 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
 
         if (livingEntity != null && !livingEntity.equals(getTarget()) && ambientSoundTime > getAmbientSoundInterval()) {
             playSound(
-                    AlienSoundEvents.ENTITY_XENOMORPH_HISS.get(),
-                    getSoundVolume(),
-                    (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F
+                AlienSoundEvents.ENTITY_XENOMORPH_HISS.get(),
+                getSoundVolume(),
+                (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F
             );
         }
 
@@ -623,10 +623,10 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
 
         for (var entity : nearbyXenomorphs) {
             if (
-                    entity instanceof Xenomorph xenomorph
-                            && xenomorph != this
-                            && xenomorph.getTarget() == null
-                            && AlienPredicates.canAcquireTarget(xenomorph, attacker)
+                entity instanceof Xenomorph xenomorph
+                    && xenomorph != this
+                    && xenomorph.getTarget() == null
+                    && AlienPredicates.canAcquireTarget(xenomorph, attacker)
             ) {
                 xenomorph.setTarget(attacker);
             }
@@ -641,9 +641,9 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
     @Override
     protected void doPush(Entity entity) {
         if (
-                !entity.getType().is(AlienEntityTypeTags.FACEHUGGERS)
-                        && !entity.getType().is(AlienEntityTypeTags.CHESTBURSTERS)
-                        && !entity.getType().is(AlienEntityTypeTags.ADOLESCENTS)
+            !entity.getType().is(AlienEntityTypeTags.FACEHUGGERS)
+                && !entity.getType().is(AlienEntityTypeTags.CHESTBURSTERS)
+                && !entity.getType().is(AlienEntityTypeTags.ADOLESCENTS)
         ) {
             super.doPush(entity);
         }

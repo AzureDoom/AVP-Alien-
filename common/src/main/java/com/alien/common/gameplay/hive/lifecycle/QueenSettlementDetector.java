@@ -72,6 +72,13 @@ public final class QueenSettlementDetector {
         return settlementChunk.getMiddleBlockPosition(queen.blockPosition().getY());
     }
 
+    /**
+     * True while this queen is mid-settlement: out of combat with the timer running (the "actively founding" window).
+     */
+    public static boolean isSettling(UUID queenId) {
+        return states.containsKey(queenId);
+    }
+
     /** Drops the queen's anchor without firing settlement. Use when she dies, despawns, or is otherwise removed. */
     public static void forget(UUID queenId) {
         states.remove(queenId);

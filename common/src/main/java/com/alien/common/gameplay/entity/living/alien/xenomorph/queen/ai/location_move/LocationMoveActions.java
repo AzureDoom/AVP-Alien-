@@ -23,8 +23,8 @@ import net.minecraft.world.phys.Vec3;
  * Two stages, tracked in the action blackboard:
  * <ol>
  * <li><b>Wind-up</b> ({@link #WINDUP_TICKS}): she holds in place on the surface, telegraphing with particles but
- * <em>not</em> yet clipping — a window for the player to interrupt her (attacking her drops the action, which resets the
- * wind-up when it re-selects). She is a normal, solid, attackable entity here.</li>
+ * <em>not</em> yet clipping — a window for the player to interrupt her (attacking her drops the action, which resets
+ * the wind-up when it re-selects). She is a normal, solid, attackable entity here.</li>
  * <li><b>Descent</b>: she goes noclip and sinks toward the committed anchor — slowly ({@link #DESCENT_SPEED}) while
  * cutting through blocks so a player can race her down, but quickly ({@link #AIR_DESCENT_SPEED}) through open air/caves
  * where there is nothing to dig.</li>
@@ -52,7 +52,9 @@ public final class LocationMoveActions {
     /** Close enough that the phase manager's arrival handling takes over; avoids jittering on the last fraction. */
     private static final double ARRIVAL_EPSILON = 0.3;
 
-    /** Negative so the planner prefers digging over idle wandering; shallower than combat costs so combat still wins. */
+    /**
+     * Negative so the planner prefers digging over idle wandering; shallower than combat costs so combat still wins.
+     */
     private static final float COST = -1.0F;
 
     private static final int WINDUP_PARTICLE_COUNT = 10;
@@ -62,22 +64,22 @@ public final class LocationMoveActions {
     private static final StateKey<Integer> KEY_WINDUP_REMAINING = StateKey.sensed("location_dig_windup_remaining");
 
     public static final Action<Xenomorph> DIG_TO_ANCHOR = BLibAction.<Xenomorph>builder("DigToLocationAnchorAction")
-            .addMasks(ActionMasks.MOVE, ActionMasks.LOOK)
-            .addPrecondition(GOAPSensors.HAS_ATTACK_TARGET.key(), Expressions.Boolean.isFalse())
-            .addPrecondition(LocationMoveSensors.IS_LOCATING.key(), Expressions.Boolean.isTrue())
-            .addPrecondition(LocationMoveSensors.IS_AT_ANCHOR.key(), Expressions.Boolean.isFalse())
-            .addEffect(LocationMoveSensors.IS_AT_ANCHOR.key().asDerived(), true)
-            .withCost(COST)
-            .withPerformCallback(LocationMoveActions::performDig)
-            .withFinishCallback(context -> {
-                // Digging is scoped to this action running: clear the clip/no-gravity state the instant it stops (arrival,
-                // combat, leaving LOCATION) so she is never noclip while some other behaviour is moving her.
-                if (context.getActor() instanceof Queen queen) {
-                    queen.setDigging(false);
-                }
-                context.getBlackboard(Blackboard.Scope.ACTION).clear();
-            })
-            .build();
+        .addMasks(ActionMasks.MOVE, ActionMasks.LOOK)
+        .addPrecondition(GOAPSensors.HAS_ATTACK_TARGET.key(), Expressions.Boolean.isFalse())
+        .addPrecondition(LocationMoveSensors.IS_LOCATING.key(), Expressions.Boolean.isTrue())
+        .addPrecondition(LocationMoveSensors.IS_AT_ANCHOR.key(), Expressions.Boolean.isFalse())
+        .addEffect(LocationMoveSensors.IS_AT_ANCHOR.key().asDerived(), true)
+        .withCost(COST)
+        .withPerformCallback(LocationMoveActions::performDig)
+        .withFinishCallback(context -> {
+            // Digging is scoped to this action running: clear the clip/no-gravity state the instant it stops (arrival,
+            // combat, leaving LOCATION) so she is never noclip while some other behaviour is moving her.
+            if (context.getActor() instanceof Queen queen) {
+                queen.setDigging(false);
+            }
+            context.getBlackboard(Blackboard.Scope.ACTION).clear();
+        })
+        .build();
 
     private static Action.Signal performDig(Action.Context<? extends Xenomorph> context) {
         var actor = context.getActor();
@@ -127,9 +129,9 @@ public final class LocationMoveActions {
         // or a block entity — not resin-replaceable or alien-breakable, and not air), she can't pass. Settle here.
         var direction = delta.scale(1.0 / distance);
         var lead = BlockPos.containing(
-                current.x + direction.x,
-                current.y + direction.y,
-                current.z + direction.z
+            current.x + direction.x,
+            current.y + direction.y,
+            current.z + direction.z
         );
         if (!QueenLifecyclePhaseManager.isDiggable(actor.level(), lead)) {
             actor.setDeltaMovement(Vec3.ZERO);
@@ -149,8 +151,10 @@ public final class LocationMoveActions {
         return Action.Signal.CONTINUE;
     }
 
-    /** Owns yaw so nothing else spins her. Only turns when there is meaningful horizontal travel (a vertical shaft keeps
-     *  her current facing). */
+    /**
+     * Owns yaw so nothing else spins her. Only turns when there is meaningful horizontal travel (a vertical shaft keeps
+     * her current facing).
+     */
     private static void faceHorizontal(Xenomorph actor, Vec3 delta) {
         var horizontal = Math.sqrt(delta.x * delta.x + delta.z * delta.z);
         if (horizontal < 1.0E-3) {
@@ -182,28 +186,28 @@ public final class LocationMoveActions {
 
         // Body cloud.
         serverLevel.sendParticles(
-                particle,
-                actor.getX(),
-                actor.getY() + height * 0.5,
-                actor.getZ(),
-                count,
-                width * 0.6,
-                height * 0.45,
-                width * 0.6,
-                0.02
+            particle,
+            actor.getX(),
+            actor.getY() + height * 0.5,
+            actor.getZ(),
+            count,
+            width * 0.6,
+            height * 0.45,
+            width * 0.6,
+            0.02
         );
 
         // Heavier burst at her feet, where the displacement reads as digging.
         serverLevel.sendParticles(
-                particle,
-                actor.getX(),
-                actor.getY() + 0.1,
-                actor.getZ(),
-                Math.max(4, count / 2),
-                width * 0.7,
-                0.1,
-                width * 0.7,
-                0.06
+            particle,
+            actor.getX(),
+            actor.getY() + 0.1,
+            actor.getZ(),
+            Math.max(4, count / 2),
+            width * 0.7,
+            0.1,
+            width * 0.7,
+            0.06
         );
     }
 

@@ -17,27 +17,27 @@ import com.just.ai.goap.graph.Graph;
 public class QueenGOAP {
 
     public static final Graph<Queen> GRAPH = Graph.<Queen>builder()
-            .apply(XenomorphGOAP::applyBaseGraph)
-            .apply(XenomorphGOAP::addResinPackage)
-            .apply(XenomorphGOAP::addEggLayingPackage)
-            .apply(QueenGOAP::addLocationMovePackage)
-            .apply(QueenGOAP::addHibernationPackage)
-            .apply(QueenGOAP::addFoundingMovePackage)
-            .build();
+        .apply(XenomorphGOAP::applyBaseGraph)
+        .apply(XenomorphGOAP::addResinPackage)
+        .apply(XenomorphGOAP::addEggLayingPackage)
+        .apply(QueenGOAP::addLocationMovePackage)
+        .apply(QueenGOAP::addHibernationPackage)
+        .apply(QueenGOAP::addFoundingMovePackage)
+        .build();
 
     public static final Graph<Queen> OVIPOSITOR_GRAPH = Graph.<Queen>builder()
-            // The shared queen agent's replan policy reads is_on_fire / health_ratio every replan, so this graph must
-            // register the base sensors too — otherwise BLib warns "no sensor exists for key" each replan while she lays,
-            // and the on-fire / health-drop replan triggers silently never fire. Sensors only; no goals/actions, so the
-            // working laying flow is unaffected.
-            .apply(XenomorphGOAP::addSensorsPackage)
-            .apply(XenomorphGOAP::applyEggLayingOnlyGraph)
-            .build();
+        // The shared queen agent's replan policy reads is_on_fire / health_ratio every replan, so this graph must
+        // register the base sensors too — otherwise BLib warns "no sensor exists for key" each replan while she lays,
+        // and the on-fire / health-drop replan triggers silently never fire. Sensors only; no goals/actions, so the
+        // working laying flow is unaffected.
+        .apply(XenomorphGOAP::addSensorsPackage)
+        .apply(XenomorphGOAP::applyEggLayingOnlyGraph)
+        .build();
 
     /**
      * Location-phase dig-to-anchor (Stage 2b). Queen-specific and attached only to the normal {@link #GRAPH} (never the
-     * egg-laying-only {@link #OVIPOSITOR_GRAPH}), so it can never touch a reproductive queen. Active only while she is a
-     * never-founded queen in the LOCATION phase with a committed anchor; gated as a whole by
+     * egg-laying-only {@link #OVIPOSITOR_GRAPH}), so it can never touch a reproductive queen. Active only while she is
+     * a never-founded queen in the LOCATION phase with a committed anchor; gated as a whole by
      * {@link LocationMoveSensors#locationAnchorOrNull} returning null when the front-end is off.
      */
     public static Graph.Builder<Queen> addLocationMovePackage(Graph.Builder<Queen> graphBuilder) {
@@ -52,16 +52,21 @@ public class QueenGOAP {
     }
 
     /**
-     * Hibernation hold (Stage 3a). Queen-specific and attached only to the normal {@link #GRAPH} (never the
+     * Hibernation behaviours (Stages 3a + 3b). Queen-specific and attached only to the normal {@link #GRAPH} (never the
      * egg-laying-only {@link #OVIPOSITOR_GRAPH}). Active only while she is a never-founded queen in the HIBERNATION
-     * phase; gated as a whole by {@link HibernationSensors#IS_HIBERNATING} (false when the front-end is off).
+     * phase: {@link HibernationActions#HIBERNATE_HOLD} keeps her asleep at the anchor, and
+     * {@link HibernationActions#HIBERNATE_RETURN} walks her back after a disturbance clears. The sub-state sensors are
+     * false when the front-end is off, so the package drops out with it.
      */
     public static Graph.Builder<Queen> addHibernationPackage(Graph.Builder<Queen> graphBuilder) {
         graphBuilder.addGoal(HibernationGoals.HIBERNATE);
+        graphBuilder.addGoal(HibernationGoals.RETURN_TO_ANCHOR);
 
         graphBuilder.addAction(HibernationActions.HIBERNATE_HOLD);
+        graphBuilder.addAction(HibernationActions.HIBERNATE_RETURN);
 
-        graphBuilder.addSensor(HibernationSensors.IS_HIBERNATING);
+        graphBuilder.addSensor(HibernationSensors.IS_ASLEEP);
+        graphBuilder.addSensor(HibernationSensors.IS_RETURNING);
 
         return graphBuilder;
     }

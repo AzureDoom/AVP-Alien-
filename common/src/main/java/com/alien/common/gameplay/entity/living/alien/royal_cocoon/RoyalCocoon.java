@@ -4,13 +4,13 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.CocoonState;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.registry.init.block.AlienResinBlocks;
 import com.alien.common.registry.tag.AlienDamageTypesTags;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,8 +27,8 @@ public class RoyalCocoon extends Mob {
 
     public static AttributeSupplier.Builder createRoyalCocoonAttributes() {
         return createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 60)
-                .add(Attributes.MOVEMENT_SPEED, 0);
+            .add(Attributes.MAX_HEALTH, 60)
+            .add(Attributes.MOVEMENT_SPEED, 0);
     }
 
     public RoyalCocoon(EntityType<? extends RoyalCocoon> entityType, Level level) {
@@ -90,11 +90,13 @@ public class RoyalCocoon extends Mob {
         }
         // Kill whoever is currently cocooning inside this cage (the source praetorian/crusher early on, or the
         // queen herself once she has formed) -- proximity rather than a stored link, so it survives the swap.
-        for (Xenomorph cocooning : level().getEntitiesOfClass(
+        for (
+            Xenomorph cocooning : level().getEntitiesOfClass(
                 Xenomorph.class,
                 getBoundingBox().inflate(1.0),
                 xeno -> xeno.cocoonState.get() != CocoonState.NONE
-        )) {
+            )
+        ) {
             cocooning.discard();
         }
     }

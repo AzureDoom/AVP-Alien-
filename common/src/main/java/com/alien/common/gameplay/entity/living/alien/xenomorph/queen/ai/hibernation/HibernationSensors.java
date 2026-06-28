@@ -4,28 +4,36 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.QueenLifecyclePhase;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.QueenLifecyclePhaseManager;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.QueenLifecyclePhaseManager.HibernationActivity;
 import com.just.ai.goap.StateKey;
 import com.just.ai.goap.sensor.Sensor;
 import com.just.ai.goap.sensor.Sensors;
 
 /**
- * Sensor for the hibernation hold (Stage 3a). {@link #IS_HIBERNATING} is the single on/off switch for the package: true
- * only while she is a never-founded queen in {@link QueenLifecyclePhase#HIBERNATION}. False when the front-end is
- * disabled (she never reaches HIBERNATION), so the package drops out with it. Once the sleep timer expires the phase
- * advances to FOUNDING_HANDOFF, this flips false, and the hold is released — handing her to the founding system.
+ * Sensors for hibernation (Stages 3a + 3b). HIBERNATION has three sub-states (see {@link HibernationActivity}): ASLEEP
+ * (held, sleep clock running), DEFENDING (roused by damage, fighting, clock paused), and RETURNING (walking back to the
+ * anchor once the threat clears). DEFENDING intentionally exposes no sensor — when neither flag is true her normal
+ * combat/idle AI runs. Both flags are false whenever the front-end is disabled or she is not a queen in HIBERNATION.
  */
 public final class HibernationSensors {
 
-    public static final Sensor.Mono<Xenomorph, Boolean> IS_HIBERNATING = Sensors.map(
-            StateKey.sensed("hibernation_is_hibernating"),
-            HibernationSensors::isHibernating
+    public static final Sensor.Mono<Xenomorph, Boolean> IS_ASLEEP = Sensors.map(
+        StateKey.sensed("hibernation_is_asleep"),
+        xenomorph -> isInActivity(xenomorph, HibernationActivity.ASLEEP)
     );
 
-    public static boolean isHibernating(Xenomorph xenomorph) {
+    public static final Sensor.Mono<Xenomorph, Boolean> IS_RETURNING = Sensors.map(
+        StateKey.sensed("hibernation_is_returning"),
+        xenomorph -> isInActivity(xenomorph, HibernationActivity.RETURNING)
+    );
+
+    public static boolean isInActivity(Xenomorph xenomorph, HibernationActivity activity) {
         if (!QueenLifecyclePhaseManager.isEnabled() || !(xenomorph instanceof Queen queen)) {
             return false;
         }
-        return queen.getLifecyclePhaseManager().getPhase() == QueenLifecyclePhase.HIBERNATION;
+        var manager = queen.getLifecyclePhaseManager();
+        return manager.getPhase() == QueenLifecyclePhase.HIBERNATION
+            && manager.getHibernationActivity() == activity;
     }
 
     private HibernationSensors() {

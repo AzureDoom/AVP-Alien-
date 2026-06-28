@@ -15,8 +15,10 @@ import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.faction.v1.FactionMember;
 import com.blib.api.common.nbt.v1.model.NBTSerializable;
 import com.just.core.functional.option.Option;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 
 /**
@@ -90,6 +92,11 @@ public class HiveManager implements NBTSerializable {
 
         var settlementPos = QueenSettlementDetector.observe(queen, currentGameTime);
         if (settlementPos == null) {
+            // Still counting down the out-of-combat settlement timer — trail purple "founding" particles so the act of
+            // settling is visible in-world. (The actual found() below is instant once the timer expires.)
+            if (QueenSettlementDetector.isSettling(queen.getUUID())) {
+                spawnFoundingParticles(queen);
+            }
             return;
         }
 
@@ -99,6 +106,27 @@ public class HiveManager implements NBTSerializable {
         }
 
         HiveLocationFoundingService.foundFromResult(queen, settlementPos, result);
+    }
+
+    /** Purple spell-swirl while she is actively settling, throttled so it reads as a gentle aura rather than a fog. */
+    private void spawnFoundingParticles(Queen queen) {
+        if (queen.tickCount % 4 != 0 || !(queen.level() instanceof ServerLevel serverLevel)) {
+            return;
+        }
+
+        var width = queen.getBbWidth();
+        var height = queen.getBbHeight();
+        serverLevel.sendParticles(
+            ParticleTypes.WITCH,
+            queen.getX(),
+            queen.getY() + height * 0.6,
+            queen.getZ(),
+            4,
+            width * 0.6,
+            height * 0.5,
+            width * 0.6,
+            0.02
+        );
     }
 
     /**

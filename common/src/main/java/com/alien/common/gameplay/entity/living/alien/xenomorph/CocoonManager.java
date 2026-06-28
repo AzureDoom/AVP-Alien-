@@ -2,19 +2,19 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph;
 
 import com.alien.common.gameplay.entity.living.alien.GrowthManager;
 import com.alien.common.gameplay.entity.living.alien.royal_cocoon.RoyalCocoon;
-import com.alien.common.registry.init.AlienEntityTypes;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.Crusher;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.praetorian.Praetorian;
 import com.alien.common.gameplay.hive.faction.FactionMembershipTransfer;
 import com.alien.common.gameplay.hive.faction.LocationMembership;
 import com.alien.common.model.lifecycle.growth.CocooningConfig;
+import com.alien.common.registry.init.AlienEntityTypes;
 import com.blib.api.common.entity.v1.EntityTransitionUtil;
 import com.blib.api.common.nbt.v1.model.NBTSerializable;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.Crusher;
-import com.alien.common.gameplay.entity.living.alien.xenomorph.praetorian.Praetorian;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -153,10 +153,10 @@ public class CocoonManager implements NBTSerializable {
         var factionSnapshot = FactionMembershipTransfer.snapshot(xenomorph);
 
         var transitionResult = EntityTransitionUtil.transitionInto(
-                xenomorph,
-                targetType,
-                GrowthManager.TRANSITION_NBT_KEY_BLACKLIST,
-                true
+            xenomorph,
+            targetType,
+            GrowthManager.TRANSITION_NBT_KEY_BLACKLIST,
+            true
         );
 
         if (transitionResult instanceof EntityTransitionUtil.EntityTransitionResult.Success<?> success) {
@@ -270,8 +270,7 @@ public class CocoonManager implements NBTSerializable {
         if (!(xenomorph.level() instanceof ServerLevel)) {
             return;
         }
-        for (RoyalCocoon cocoon :
-                xenomorph.level().getEntitiesOfClass(RoyalCocoon.class, xenomorph.getBoundingBox().inflate(4.0))) {
+        for (RoyalCocoon cocoon : xenomorph.level().getEntitiesOfClass(RoyalCocoon.class, xenomorph.getBoundingBox().inflate(4.0))) {
             cocoon.discard();
         }
     }

@@ -10,9 +10,11 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -20,26 +22,27 @@ import java.util.List;
 
 /**
  * Per-queen front-end life-cycle driver: developing → location → hibernation → founding-handoff (see
- * {@code AVP_Queen_Lifecycle_Design.pdf}, Part 1). Owned by {@link Queen}, ticked server-side from {@link Queen#tick()},
- * and persisted alongside the other queen managers in {@link Queen#addAdditionalSaveData}/{@code readAdditionalSaveData}.
+ * {@code AVP_Queen_Lifecycle_Design.pdf}, Part 1). Owned by {@link Queen}, ticked server-side from
+ * {@link Queen#tick()}, and persisted alongside the other queen managers in
+ * {@link Queen#addAdditionalSaveData}/{@code readAdditionalSaveData}.
  * <p>
  * <b>Stage 2b scope.</b> {@link QueenLifecyclePhase#DEVELOPING} → {@link QueenLifecyclePhase#LOCATION} →
- * {@link QueenLifecyclePhase#FOUNDING_HANDOFF} are live. On entering LOCATION she commits an anchor — a weighted-Y
- * band pick plus an XZ search that prefers ~16 chunks from existing claims (reusing the exact spacing gate
+ * {@link QueenLifecyclePhase#FOUNDING_HANDOFF} are live. On entering LOCATION she commits an anchor — a weighted-Y band
+ * pick plus an XZ search that prefers ~16 chunks from existing claims (reusing the exact spacing gate
  * {@code SpreadZoneCheck} enforces, so the spot passes founding). The {@code location_move} GOAP package then clip-digs
  * her there (this manager reconciles her {@code digging} state — noPhysics/noGravity/fire-immunity — each tick); on
  * arrival she carves a small breathable pocket and hands off, founding at the committed anchor. {@code HIBERNATION}
- * arrives in Stage 3, slotting between LOCATION and FOUNDING_HANDOFF (replacing the arrival pocket with the 6x6 clear
- * + 3-day sleep).
+ * arrives in Stage 3, slotting between LOCATION and FOUNDING_HANDOFF (replacing the arrival pocket with the 6x6 clear +
+ * 3-day sleep).
  * <p>
  * <b>Single disable point.</b> {@link #isEnabled()} reads the {@code queenFrontEndPhasesEnabled} hive-config flag, so
  * the whole front-end can be toggled at runtime (in-game config inspector / {@code HiveConfigUpdateHandler}) or shipped
  * off by default. When disabled, {@link #isReadyToFound()} returns {@code true} unconditionally and {@link #tick()}
  * no-ops, so the queen founds via the existing path exactly as she does today. No other code changes.
  * <p>
- * <b>Hand-off gate.</b> The only touch-point in the working founding system is
- * {@code HiveManager#tryQueenSettlement}, which early-returns while {@link #isReadyToFound()} is {@code false}. That is
- * what holds a developing/locating/hibernating queen back from settling.
+ * <b>Hand-off gate.</b> The only touch-point in the working founding system is {@code HiveManager#tryQueenSettlement},
+ * which early-returns while {@link #isReadyToFound()} is {@code false}. That is what holds a
+ * developing/locating/hibernating queen back from settling.
  */
 public class QueenLifecyclePhaseManager implements NBTSerializable {
 
@@ -49,16 +52,42 @@ public class QueenLifecyclePhaseManager implements NBTSerializable {
     /** Sleep length before she wakes and founds: 3 Minecraft days. Zeroed via the hibernation_skip debug command. */
     public static final int HIBERNATION_DURATION_TICKS = 3 * 24000;
 
+    /** Damage at or above which a hit rouses her from hibernation; below this (a stray arrow) she sleeps through it. */
+    public static final float HIBERNATION_DISTURBANCE_DAMAGE = 6.0F;
+
+    /** She must stay clear of threats this long (out of combat, no survival player in her chunk) before resettling. */
+    private static final int HIBERNATION_CALM_TICKS = 10 * 20;
+
+    /** How close to the anchor (blocks) counts as home when walking back after a disturbance. */
+    private static final double RETURN_ARRIVAL_RADIUS = 2.0;
+
+    /**
+     * Sub-state within HIBERNATION (Stage 3b). ASLEEP: held at the anchor, sleep clock running. DEFENDING: roused by
+     * damage, fighting under normal AI, clock paused. RETURNING: walking back to the anchor after the threat clears.
+     */
+    public enum HibernationActivity {
+        ASLEEP,
+        DEFENDING,
+        RETURNING
+    }
+
     // ---- Weighted target-Y bands (AVP_Queen_Lifecycle_Design.pdf, location phase). Config candidates for later. ----
     private static final int COMMON_Y_MIN = -15;
+
     private static final int COMMON_Y_MAX = 20;
+
     private static final int RARE_Y_MIN = -50;
+
     private static final int RARE_Y_MAX = -25;
+
     private static final int VERY_RARE_Y_MIN = 25;
+
     private static final int VERY_RARE_Y_MAX = 45;
 
     private static final int COMMON_WEIGHT = 70;
+
     private static final int RARE_WEIGHT = 22;
+
     private static final int VERY_RARE_WEIGHT = 8;
 
     /** How far out (in chunks) the anchor search looks for a far-enough spot before giving up and settling in place. */
@@ -90,6 +119,14 @@ public class QueenLifecyclePhaseManager implements NBTSerializable {
 
     private int hibernationTicksRemaining;
 
+    /**
+     * Sub-state within HIBERNATION (Stage 3b). Transient — a reload simply restarts her ASLEEP, which is acceptable.
+     */
+    private HibernationActivity hibernationActivity = HibernationActivity.ASLEEP;
+
+    /** Ticks she has been threat-free while DEFENDING; at {@link #HIBERNATION_CALM_TICKS} she heads back. Transient. */
+    private int disturbanceCalmTicks;
+
     /** The committed hive anchor (chunk-center XZ + target Y) chosen in LOCATION. Null until then; never re-chosen. */
     private @Nullable BlockPos anchor;
 
@@ -99,7 +136,9 @@ public class QueenLifecyclePhaseManager implements NBTSerializable {
         this.developingTicksRemaining = DEVELOPING_DURATION_TICKS;
     }
 
-    /** Whether the front-end phase machine is active. Backed by the {@code queenFrontEndPhasesEnabled} hive-config flag. */
+    /**
+     * Whether the front-end phase machine is active. Backed by the {@code queenFrontEndPhasesEnabled} hive-config flag.
+     */
     public static boolean isEnabled() {
         return HiveLocationRegistry.INSTANCE.config().queenFrontEndPhasesEnabled();
     }
@@ -108,7 +147,9 @@ public class QueenLifecyclePhaseManager implements NBTSerializable {
         return phase;
     }
 
-    /** The committed anchor, or null if she has not reached LOCATION yet. Read by the Stage 2b location_move package. */
+    /**
+     * The committed anchor, or null if she has not reached LOCATION yet. Read by the Stage 2b location_move package.
+     */
     public @Nullable BlockPos getAnchor() {
         return anchor;
     }
@@ -144,7 +185,8 @@ public class QueenLifecyclePhaseManager implements NBTSerializable {
         }
 
         // Safety net only: the DIG action owns the digging state (set while it performs, cleared on its finish), so she
-        // is noclip *only* while actively digging — never while idle/combat movement is in control. This just clears any
+        // is noclip *only* while actively digging — never while idle/combat movement is in control. This just clears
+        // any
         // lingering flag if she has left LOCATION without the action's finish firing (e.g. an abrupt state change).
         if (queen.isDigging() && phase != QueenLifecyclePhase.LOCATION) {
             queen.setDigging(false);
@@ -197,11 +239,11 @@ public class QueenLifecyclePhaseManager implements NBTSerializable {
         this.phase = QueenLifecyclePhase.LOCATION;
 
         Alien.LOGGER.info(
-                "Queen lifecycle: {} entering LOCATION — committed anchor chunk {} target Y {} (anchor {})",
-                queen.getUUID(),
-                chunk,
-                targetY,
-                anchor
+            "Queen lifecycle: {} entering LOCATION — committed anchor chunk {} target Y {} (anchor {})",
+            queen.getUUID(),
+            chunk,
+            targetY,
+            anchor
         );
     }
 
@@ -223,30 +265,43 @@ public class QueenLifecyclePhaseManager implements NBTSerializable {
         enterHibernation();
     }
 
-    /** Begins the sleep at the committed anchor. The hibernation GOAP hold pins her here and runs the sleep animation. */
+    /**
+     * Begins the sleep at the committed anchor. The hibernation GOAP hold pins her here and runs the sleep animation.
+     */
     private void enterHibernation() {
         this.phase = QueenLifecyclePhase.HIBERNATION;
         this.hibernationTicksRemaining = HIBERNATION_DURATION_TICKS;
+        this.hibernationActivity = HibernationActivity.ASLEEP;
+        this.disturbanceCalmTicks = 0;
         queen.isHibernating.set(true);
 
         // Settle her onto the pocket floor (anchor Y) instead of wherever she stopped digging. She arrives within the
         // arrival radius — typically a block or two above the anchor — and the hold then zeroes her velocity, which
-        // would otherwise pin her floating in the middle of the cleared pocket. Snapping her down puts her on the floor.
+        // would otherwise pin her floating in the middle of the cleared pocket. Snapping her down puts her on the
+        // floor.
         if (anchor != null) {
             queen.setPos(anchor.getX() + 0.5, anchor.getY(), anchor.getZ() + 0.5);
         }
 
         Alien.LOGGER.info(
-                "Queen lifecycle: {} entering HIBERNATION at anchor {} — sleeping {} ticks",
-                queen.getUUID(),
-                anchor,
-                hibernationTicksRemaining
+            "Queen lifecycle: {} entering HIBERNATION at anchor {} — sleeping {} ticks",
+            queen.getUUID(),
+            anchor,
+            hibernationTicksRemaining
         );
     }
 
     /** Counts the sleep down; on completion hands off to the founding system (Stage 3a: undisturbed sleep only). */
     private void tickHibernation() {
-        // Re-assert the synced flag each tick so a queen restored mid-sleep drives the client hibernate pose too.
+        switch (hibernationActivity) {
+            case ASLEEP -> tickHibernationAsleep();
+            case DEFENDING -> tickHibernationDefending();
+            case RETURNING -> tickHibernationReturning();
+        }
+    }
+
+    /** ASLEEP: hold + sleep clock. Re-asserts the synced pose flag each tick (covers a queen restored mid-sleep). */
+    private void tickHibernationAsleep() {
         queen.isHibernating.set(true);
 
         if (hibernationTicksRemaining > 0) {
@@ -255,13 +310,152 @@ public class QueenLifecyclePhaseManager implements NBTSerializable {
         }
 
         queen.isHibernating.set(false);
-
         Alien.LOGGER.info(
-                "Queen lifecycle: {} woke from HIBERNATION at anchor {} — handing off to founding",
-                queen.getUUID(),
-                anchor
+            "Queen lifecycle: {} woke from HIBERNATION at anchor {} — handing off to founding",
+            queen.getUUID(),
+            anchor
         );
         phase = QueenLifecyclePhase.FOUNDING_HANDOFF;
+    }
+
+    /**
+     * DEFENDING: awake and fighting, sleep clock paused. Once threats stay clear long enough, head back to the anchor.
+     */
+    private void tickHibernationDefending() {
+        if (isThreatPresent()) {
+            disturbanceCalmTicks = 0;
+            return;
+        }
+
+        disturbanceCalmTicks++;
+        if (disturbanceCalmTicks >= HIBERNATION_CALM_TICKS) {
+            hibernationActivity = HibernationActivity.RETURNING;
+            Alien.LOGGER.info(
+                "Queen lifecycle: {} hibernation threat clear — returning to anchor {}",
+                queen.getUUID(),
+                anchor
+            );
+        }
+    }
+
+    /**
+     * RETURNING: walking back (the GOAP return action drives the steps). Re-disturb on a new threat; sleep on arrival.
+     */
+    private void tickHibernationReturning() {
+        if (isThreatPresent()) {
+            hibernationActivity = HibernationActivity.DEFENDING;
+            disturbanceCalmTicks = 0;
+            return;
+        }
+
+        if (anchor == null) {
+            resumeSleep();
+            return;
+        }
+
+        var arrived = queen.distanceToSqr(anchor.getX() + 0.5, anchor.getY(), anchor.getZ() + 0.5) <= RETURN_ARRIVAL_RADIUS
+            * RETURN_ARRIVAL_RADIUS;
+        if (arrived) {
+            resumeSleep();
+        }
+    }
+
+    /**
+     * Damage hook (called from {@link Queen#hurt}). A hit at or above {@link #HIBERNATION_DISTURBANCE_DAMAGE} rouses a
+     * sleeping or returning queen into the defend sub-state; weaker hits, and any damage taken when she is not
+     * hibernating, are ignored.
+     */
+    public void onHibernationDamage(float amount) {
+        if (phase != QueenLifecyclePhase.HIBERNATION) {
+            return;
+        }
+        if (amount < HIBERNATION_DISTURBANCE_DAMAGE) {
+            return;
+        }
+        if (hibernationActivity == HibernationActivity.DEFENDING) {
+            return;
+        }
+
+        hibernationActivity = HibernationActivity.DEFENDING;
+        disturbanceCalmTicks = 0;
+        queen.isHibernating.set(false);
+        Alien.LOGGER.info(
+            "Queen lifecycle: {} disturbed in HIBERNATION ({} dmg) — defending",
+            queen.getUUID(),
+            amount
+        );
+    }
+
+    /**
+     * Called by the return action when there is no walkable route back to the anchor: she abandons the old spot,
+     * re-anchors where she is standing, and sleeps there. The paused sleep clock resumes from where it stopped.
+     */
+    public void onReturnPathBlocked() {
+        if (phase != QueenLifecyclePhase.HIBERNATION || hibernationActivity != HibernationActivity.RETURNING) {
+            return;
+        }
+        this.anchor = queen.blockPosition();
+        Alien.LOGGER.info(
+            "Queen lifecycle: {} could not path back to its anchor — re-anchoring at {}",
+            queen.getUUID(),
+            anchor
+        );
+        resumeSleep();
+    }
+
+    /** Drops back into the ASLEEP sub-state at the (possibly re-chosen) anchor, preserving the paused sleep clock. */
+    private void resumeSleep() {
+        hibernationActivity = HibernationActivity.ASLEEP;
+        disturbanceCalmTicks = 0;
+        if (anchor != null) {
+            queen.setPos(anchor.getX() + 0.5, anchor.getY(), anchor.getZ() + 0.5);
+        }
+        queen.isHibernating.set(true);
+        Alien.LOGGER.info(
+            "Queen lifecycle: {} resumed HIBERNATION at anchor {} — {} ticks left",
+            queen.getUUID(),
+            anchor,
+            hibernationTicksRemaining
+        );
+    }
+
+    /**
+     * Threat test for the defend/return loop: an attack target, a recent hit, or a survival-mode player inside her
+     * chunk (a hostile lingering in her territory keeps her awake even after the hits stop). Damage itself is not
+     * tested here — that is the wake trigger ({@link #onHibernationDamage}); this only gates when she may resettle.
+     */
+    private boolean isThreatPresent() {
+        if (queen.getTarget() != null) {
+            return true;
+        }
+        if (queen.hurtTime > 0) {
+            return true;
+        }
+
+        var chunkPos = new ChunkPos(queen.blockPosition());
+        var box = new AABB(
+            chunkPos.getMinBlockX(),
+            queen.getY() - 24.0,
+            chunkPos.getMinBlockZ(),
+            chunkPos.getMaxBlockX() + 1,
+            queen.getY() + 24.0,
+            chunkPos.getMaxBlockZ() + 1
+        );
+        for (var player : queen.level().getEntitiesOfClass(Player.class, box)) {
+            if (!player.isCreative() && !player.isSpectator()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public HibernationActivity getHibernationActivity() {
+        return hibernationActivity;
+    }
+
+    /** Ticks she has currently been threat-free while DEFENDING (counts toward returning to the anchor). Debug aid. */
+    public int getDisturbanceCalmTicks() {
+        return disturbanceCalmTicks;
     }
 
     /** Within {@link #ARRIVAL_TOLERANCE} of the anchor (3D). Must match {@code LocationMoveSensors} so GOAP agrees. */
@@ -289,8 +483,8 @@ public class QueenLifecyclePhaseManager implements NBTSerializable {
             return true;
         }
         return !state.hasBlockEntity()
-                && state.getDestroySpeed(level, pos) >= 0.0F
-                && !state.is(AlienBlockTags.XENOMORPH_IMMUNE);
+            && state.getDestroySpeed(level, pos) >= 0.0F
+            && !state.is(AlienBlockTags.XENOMORPH_IMMUNE);
     }
 
     /**
@@ -326,10 +520,10 @@ public class QueenLifecyclePhaseManager implements NBTSerializable {
     }
 
     /**
-     * Picks the anchor chunk. If her current chunk is already far enough from every existing location she digs in place;
-     * otherwise she searches outward for the nearest far-enough chunk (the "prefer to relocate ~16 chunks away" rule),
-     * and if boxed in on all sides within the search radius she settles for her current chunk (the "settle for what she
-     * can get" rule — that overlap case is a parked design item). The far-enough test is the exact gate
+     * Picks the anchor chunk. If her current chunk is already far enough from every existing location she digs in
+     * place; otherwise she searches outward for the nearest far-enough chunk (the "prefer to relocate ~16 chunks away"
+     * rule), and if boxed in on all sides within the search radius she settles for her current chunk (the "settle for
+     * what she can get" rule — that overlap case is a parked design item). The far-enough test is the exact gate
      * {@code SpreadZoneCheck} enforces, so any chunk returned here that isn't the boxed-in fallback will pass founding.
      */
     private ChunkPos pickAnchorChunk() {
@@ -353,10 +547,10 @@ public class QueenLifecyclePhaseManager implements NBTSerializable {
     }
 
     private static List<ChunkPos> farEnoughChunksInRing(
-            ChunkPos center,
-            int radius,
-            ResourceKey<Level> dimension,
-            int minimum
+        ChunkPos center,
+        int radius,
+        ResourceKey<Level> dimension,
+        int minimum
     ) {
         var out = new ArrayList<ChunkPos>();
         for (var dx = -radius; dx <= radius; dx++) {
@@ -412,8 +606,8 @@ public class QueenLifecyclePhaseManager implements NBTSerializable {
     public void load(CompoundTag compoundTag) {
         if (compoundTag.contains(PHASE_TAG)) {
             this.phase = QueenLifecyclePhase.byNameOrDefault(
-                    compoundTag.getString(PHASE_TAG),
-                    QueenLifecyclePhase.DEVELOPING
+                compoundTag.getString(PHASE_TAG),
+                QueenLifecyclePhase.DEVELOPING
             );
         }
 
