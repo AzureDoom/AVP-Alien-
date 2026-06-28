@@ -1,6 +1,8 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph;
 
 import com.alien.common.gameplay.entity.living.alien.GrowthManager;
+import com.alien.common.gameplay.entity.living.alien.royal_cocoon.RoyalCocoon;
+import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.gameplay.hive.faction.FactionMembershipTransfer;
 import com.alien.common.gameplay.hive.faction.LocationMembership;
 import com.alien.common.model.lifecycle.growth.CocooningConfig;
@@ -9,7 +11,10 @@ import com.blib.api.common.nbt.v1.model.NBTSerializable;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.crusher.Crusher;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.praetorian.Praetorian;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,6 +23,8 @@ public class CocoonManager implements NBTSerializable {
     public static final String COCOON_STATE_TAG = "cocoonState";
 
     public static final String COCOON_TARGET_TYPE_TAG = "cocoonTargetType";
+
+    public static final String COCOON_SOURCE_FORM_TAG = "cocoonSourceForm";
 
     public static final String COCOON_SOURCE_TIME_TAG = "cocoonSourceTimeInTicks";
 
@@ -112,6 +119,13 @@ public class CocoonManager implements NBTSerializable {
         this.elapsedTicks = 0;
         setState(CocoonState.SOURCE_COCOONING);
         incrementAnimationId();
+
+        // Praetorian/crusher -> queen transitions form inside a visible resin "royal cocoon". Other
+        // metamorphoses (e.g. chestburster -> adolescent) get no cocoon: royalCocoonTypeFor returns null.
+        EntityType<RoyalCocoon> cocoonType = royalCocoonTypeFor(this.targetType);
+        if (cocoonType != null) {
+            spawnRoyalCocoon(cocoonType);
+        }
     }
 
     private boolean tickSourceCocooning() {
@@ -139,10 +153,10 @@ public class CocoonManager implements NBTSerializable {
         var factionSnapshot = FactionMembershipTransfer.snapshot(xenomorph);
 
         var transitionResult = EntityTransitionUtil.transitionInto(
-            xenomorph,
-            targetType,
-            GrowthManager.TRANSITION_NBT_KEY_BLACKLIST,
-            true
+                xenomorph,
+                targetType,
+                GrowthManager.TRANSITION_NBT_KEY_BLACKLIST,
+                true
         );
 
         if (transitionResult instanceof EntityTransitionUtil.EntityTransitionResult.Success<?> success) {
@@ -157,6 +171,9 @@ public class CocoonManager implements NBTSerializable {
 
             if (newEntity instanceof Xenomorph newXenomorph) {
                 newXenomorph.getCocoonManager().beginDestinationCocooning(destinationTimeInTicks);
+                // Record what she emerged from so the client can pick a source-specific emerge animation
+                // (queen: molt.prae vs molt.crusher). 'xenomorph' here is the source that is being replaced.
+                newXenomorph.cocoonSourceForm.set(sourceFormOf(xenomorph));
             }
 
             return false;
@@ -195,6 +212,16 @@ public class CocoonManager implements NBTSerializable {
         return false;
     }
 
+    private static CocoonSourceForm sourceFormOf(Xenomorph source) {
+        if (source instanceof Praetorian) {
+            return CocoonSourceForm.PRAETORIAN;
+        }
+        if (source instanceof Crusher) {
+            return CocoonSourceForm.CRUSHER;
+        }
+        return CocoonSourceForm.NONE;
+    }
+
     private void stopMovementAndTargeting() {
         xenomorph.setDeltaMovement(Vec3.ZERO);
         xenomorph.getNavigation().stop();
@@ -202,10 +229,51 @@ public class CocoonManager implements NBTSerializable {
     }
 
     private void clear() {
+        // She has emerged (or the transition aborted): the cage is consumed and vanishes. Proximity-based so it
+        // works across the source -> destination entity swap; a no-op for non-royal metamorphoses (none nearby).
+        discardNearbyRoyalCocoons();
         this.targetType = null;
+        xenomorph.cocoonSourceForm.set(CocoonSourceForm.NONE);
         this.elapsedTicks = 0;
         this.retryTicks = 0;
         setState(CocoonState.NONE);
+    }
+
+    private static @Nullable EntityType<RoyalCocoon> royalCocoonTypeFor(@Nullable EntityType<?> target) {
+        if (target == AlienEntityTypes.QUEEN.get()) {
+            return AlienEntityTypes.ROYAL_COCOON.get();
+        }
+        if (target == AlienEntityTypes.ABERRANT_QUEEN.get()) {
+            return AlienEntityTypes.ABERRANT_ROYAL_COCOON.get();
+        }
+        if (target == AlienEntityTypes.NETHER_QUEEN.get()) {
+            return AlienEntityTypes.NETHER_ROYAL_COCOON.get();
+        }
+        // Irradiated queens don't molt, and empresses use their own layer: no royal cocoon.
+        return null;
+    }
+
+    private void spawnRoyalCocoon(EntityType<RoyalCocoon> type) {
+        if (!(xenomorph.level() instanceof ServerLevel serverLevel)) {
+            return;
+        }
+        RoyalCocoon cocoon = type.create(serverLevel);
+        if (cocoon == null) {
+            return;
+        }
+        cocoon.moveTo(xenomorph.getX(), xenomorph.getY(), xenomorph.getZ(), xenomorph.getYRot(), 0.0F);
+        cocoon.setPersistenceRequired();
+        serverLevel.addFreshEntity(cocoon);
+    }
+
+    private void discardNearbyRoyalCocoons() {
+        if (!(xenomorph.level() instanceof ServerLevel)) {
+            return;
+        }
+        for (RoyalCocoon cocoon :
+                xenomorph.level().getEntitiesOfClass(RoyalCocoon.class, xenomorph.getBoundingBox().inflate(4.0))) {
+            cocoon.discard();
+        }
     }
 
     private void setState(CocoonState state) {
@@ -224,6 +292,10 @@ public class CocoonManager implements NBTSerializable {
 
         if (compoundTag.contains(COCOON_TARGET_TYPE_TAG)) {
             this.targetType = BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.parse(compoundTag.getString(COCOON_TARGET_TYPE_TAG)));
+        }
+
+        if (compoundTag.contains(COCOON_SOURCE_FORM_TAG)) {
+            xenomorph.cocoonSourceForm.set(CocoonSourceForm.valueOf(compoundTag.getString(COCOON_SOURCE_FORM_TAG)));
         }
 
         if (compoundTag.contains(COCOON_SOURCE_TIME_TAG)) {
@@ -252,6 +324,8 @@ public class CocoonManager implements NBTSerializable {
         if (targetType != null) {
             compoundTag.putString(COCOON_TARGET_TYPE_TAG, BuiltInRegistries.ENTITY_TYPE.getKey(targetType).toString());
         }
+
+        compoundTag.putString(COCOON_SOURCE_FORM_TAG, xenomorph.cocoonSourceForm.get().name());
 
         compoundTag.putInt(COCOON_SOURCE_TIME_TAG, sourceTimeInTicks);
         compoundTag.putInt(COCOON_DESTINATION_TIME_TAG, destinationTimeInTicks);

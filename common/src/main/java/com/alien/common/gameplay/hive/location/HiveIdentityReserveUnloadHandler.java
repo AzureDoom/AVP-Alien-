@@ -14,7 +14,17 @@ public final class HiveIdentityReserveUnloadHandler {
     private HiveIdentityReserveUnloadHandler() {}
 
     public static boolean returnUnloaded(com.alien.common.gameplay.entity.living.alien.Alien alien) {
-        if (!alien.getType().is(AlienEntityTypeTags.XENOMORPHS) || alien.isRemoved() || alien.convoyMembership() != null) {
+        // Queens and empresses (the QUEENS tag) are unique identity entities, not fungible reserve members: a founder
+        // queen carries the hive's lineage, sits on a riding ovipositor (a non-Alien Mob that would be orphaned if she
+        // were discarded), and must survive chunk unload/reload as a real entity. Virtualizing her into the reserve
+        // pool here discards her before serialization, so she vanishes on relog and the orphaned location then decays.
+        // Never virtualize them — let them serialize normally.
+        if (
+            !alien.getType().is(AlienEntityTypeTags.XENOMORPHS)
+                || alien.getType().is(AlienEntityTypeTags.QUEENS)
+                || alien.isRemoved()
+                || alien.convoyMembership() != null
+        ) {
             return false;
         }
 

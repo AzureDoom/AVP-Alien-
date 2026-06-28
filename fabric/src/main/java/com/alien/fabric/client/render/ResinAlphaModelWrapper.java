@@ -26,18 +26,18 @@ public class ResinAlphaModelWrapper extends ForwardingBakedModel {
     private static final int RESIN_COLOR = ((int) (RESIN_ALPHA * 255.0F) << 24) | 0x00FFFFFF;
 
     private static final Set<ResourceLocation> RESIN_MODELS = Set.of(
-        AlienResources.location("block/aberrant_resin_vein"),
-        AlienResources.location("block/aberrant_resin_web"),
-        AlienResources.location("block/irradiated_resin_vein"),
-        AlienResources.location("block/irradiated_resin_web"),
-        AlienResources.location("block/nether_resin_vein"),
-        AlienResources.location("block/nether_resin_web"),
-        AlienResources.location("block/resin_vein"),
-        AlienResources.location("block/resin_vein_1"),
-        AlienResources.location("block/resin_vein_2"),
-        AlienResources.location("block/resin_vein_3"),
-        AlienResources.location("block/resin_vein_4"),
-        AlienResources.location("block/resin_web")
+            AlienResources.location("block/aberrant_resin_vein"),
+            AlienResources.location("block/aberrant_resin_web"),
+            AlienResources.location("block/irradiated_resin_vein"),
+            AlienResources.location("block/irradiated_resin_web"),
+            AlienResources.location("block/nether_resin_vein"),
+            AlienResources.location("block/nether_resin_web"),
+            AlienResources.location("block/resin_vein"),
+            AlienResources.location("block/resin_vein_1"),
+            AlienResources.location("block/resin_vein_2"),
+            AlienResources.location("block/resin_vein_3"),
+            AlienResources.location("block/resin_vein_4"),
+            AlienResources.location("block/resin_web")
     );
 
     private ResinAlphaModelWrapper(BakedModel wrapped) {
@@ -46,14 +46,18 @@ public class ResinAlphaModelWrapper extends ForwardingBakedModel {
 
     public static void register() {
         ModelLoadingPlugin.register(
-            pluginContext -> pluginContext.modifyModelAfterBake()
-                .register(ModelModifier.WRAP_PHASE, (model, context) -> {
-                    if (model == null || !RESIN_MODELS.contains(context.resourceId())) {
-                        return model;
-                    }
+                pluginContext -> pluginContext.modifyModelAfterBake()
+                        .register(ModelModifier.WRAP_PHASE, (model, context) -> {
+                            // Many baked models have a null resourceId (generated/special models); RESIN_MODELS is an immutable
+                            // Set, whose contains(null) throws NPE. Without this guard the modifier threw once per such model,
+                            // spamming "Failed to modify baked model after bake" thousands of times every resource reload.
+                            var resourceId = context.resourceId();
+                            if (model == null || resourceId == null || !RESIN_MODELS.contains(resourceId)) {
+                                return model;
+                            }
 
-                    return new ResinAlphaModelWrapper(model);
-                })
+                            return new ResinAlphaModelWrapper(model);
+                        })
         );
     }
 
@@ -64,11 +68,11 @@ public class ResinAlphaModelWrapper extends ForwardingBakedModel {
 
     @Override
     public void emitBlockQuads(
-        BlockAndTintGetter blockView,
-        BlockState state,
-        BlockPos pos,
-        Supplier<RandomSource> randomSupplier,
-        RenderContext context
+            BlockAndTintGetter blockView,
+            BlockState state,
+            BlockPos pos,
+            Supplier<RandomSource> randomSupplier,
+            RenderContext context
     ) {
         emitWithResinAlpha(context, () -> wrapped.emitBlockQuads(blockView, state, pos, randomSupplier, context));
     }

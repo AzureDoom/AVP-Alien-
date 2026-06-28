@@ -6,13 +6,25 @@ public class QueenAnimationRefs {
 
     public static final String CRAWL_IDLE_ANIMATION_NAME = "crawl.idle";
 
+    public static final String HIBERNATE_ANIMATION_NAME = "hibernate";
+
     public static final String IDLE_ANIMATION_NAME = "idle";
+
+    public static final String INCAPACITATED_ANIMATION_NAME = "incapacitated";
 
     public static final String LEFT_BACKHAND_ANIMATION_NAME = "fullbodyattack.leftbackhand";
 
     public static final String LEFT_SWIPE_DOWN_ANIMATION_NAME = "fullbodyattack.leftarmdownward";
 
     public static final String LEFT_TAIL_STRIKE_ANIMATION_NAME = "fullbodyattack.lefttail";
+
+    public static final String EMERGE_CRUSHER_ANIMATION_NAME = "emerge.crusher";
+
+    public static final String EMERGE_PRAE_ANIMATION_NAME = "emerge.prae";
+
+    public static final String MOLTING_CRUSHER_ANIMATION_NAME = "molting.crusher";
+
+    public static final String MOLTING_PRAE_ANIMATION_NAME = "molting.prae";
 
     public static final String RIDE_EGG_SACK_ANIMATION_NAME = "rideeggsack";
 

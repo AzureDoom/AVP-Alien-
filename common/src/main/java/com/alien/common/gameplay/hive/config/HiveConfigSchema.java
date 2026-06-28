@@ -119,7 +119,8 @@ public final class HiveConfigSchema {
             "royalJellyTicksPerProduction",
             "scourgeJellyTicksPerQueenProduction",
             "scourgeJellyTicksPerHarbingerProduction"
-        )
+        ),
+        group("Queen Lifecycle", "queenFrontEndPhasesEnabled")
     );
 
     private static final List<Field> FIELDS;

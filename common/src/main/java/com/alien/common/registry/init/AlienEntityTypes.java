@@ -9,6 +9,7 @@ import com.alien.common.gameplay.entity.living.alien.ovomorph.Ovomorph;
 import com.alien.common.gameplay.entity.living.alien.parasite.facehugger.Facehugger;
 import com.alien.common.gameplay.entity.living.alien.predalien_adolescent.PredalienAdolescent;
 import com.alien.common.gameplay.entity.living.alien.predalien_chestburster.PredalienChestburster;
+import com.alien.common.gameplay.entity.living.alien.royal_cocoon.RoyalCocoon;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.boiler.Boiler;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.burster.Burster;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.Carrier;
@@ -101,6 +102,10 @@ public class AlienEntityTypes {
     public static final float OVIPOSITOR_WIDTH = 5.0F;
 
     public static final float OVIPOSITOR_HEIGHT = 3.25F;
+
+    public static final float ROYAL_COCOON_WIDTH = 4.0F;
+
+    public static final float ROYAL_COCOON_HEIGHT = 6.0F;
 
     // Ovomorph
     public static final float OVOMORPH_WIDTH = 0.65F;
@@ -601,6 +606,24 @@ public class AlienEntityTypes {
             .sized(OVIPOSITOR_WIDTH, OVIPOSITOR_HEIGHT)
     );
 
+    public static final BLibHolder<EntityType<RoyalCocoon>> ROYAL_COCOON = create(
+        "royal_cocoon",
+        EntityType.Builder.of(RoyalCocoon::new, MobCategory.MONSTER)
+            .sized(ROYAL_COCOON_WIDTH, ROYAL_COCOON_HEIGHT)
+    );
+
+    public static final BLibHolder<EntityType<RoyalCocoon>> ABERRANT_ROYAL_COCOON = create(
+        "aberrant_royal_cocoon",
+        EntityType.Builder.of(RoyalCocoon::new, MobCategory.MONSTER)
+            .sized(ROYAL_COCOON_WIDTH, ROYAL_COCOON_HEIGHT)
+    );
+
+    public static final BLibHolder<EntityType<RoyalCocoon>> NETHER_ROYAL_COCOON = create(
+        "nether_royal_cocoon",
+        EntityType.Builder.of(RoyalCocoon::new, MobCategory.MONSTER)
+            .sized(ROYAL_COCOON_WIDTH, ROYAL_COCOON_HEIGHT)
+    );
+
     public static final BLibHolder<EntityType<Ovomorph>> OVOMORPH = create(
         "ovomorph",
         EntityType.Builder.of(Ovomorph::new, MobCategory.MISC)
@@ -844,6 +867,9 @@ public class AlienEntityTypes {
         ATTRIBUTE_REGISTRY.register(NETHER_SPITTER, Spitter::createSpitterAttributes);
         ATTRIBUTE_REGISTRY.register(NETHER_WARRIOR, Warrior::createWarriorAttributes);
         ATTRIBUTE_REGISTRY.register(OVIPOSITOR, Ovipositor::createOvipositorAttributes);
+        ATTRIBUTE_REGISTRY.register(ROYAL_COCOON, RoyalCocoon::createRoyalCocoonAttributes);
+        ATTRIBUTE_REGISTRY.register(ABERRANT_ROYAL_COCOON, RoyalCocoon::createRoyalCocoonAttributes);
+        ATTRIBUTE_REGISTRY.register(NETHER_ROYAL_COCOON, RoyalCocoon::createRoyalCocoonAttributes);
         ATTRIBUTE_REGISTRY.register(OVOMORPH, Ovomorph::createOvomorphAttributes);
         ATTRIBUTE_REGISTRY.register(PRAETORIAN, Praetorian::createPraetorianAttributes);
         ATTRIBUTE_REGISTRY.register(PREDALIEN, Predalien::createPredalienAttributes);

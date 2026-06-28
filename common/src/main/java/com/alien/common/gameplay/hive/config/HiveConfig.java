@@ -119,7 +119,10 @@ public record HiveConfig(
     int maxOvomorphsPerHiveLocation,
     long royalJellyTicksPerProduction,
     long scourgeJellyTicksPerQueenProduction,
-    long scourgeJellyTicksPerHarbingerProduction
+    long scourgeJellyTicksPerHarbingerProduction,
+
+    // ---------- § 14 Queen lifecycle ----------
+    boolean queenFrontEndPhasesEnabled
 ) {
 
     private static final int TICKS_PER_SECOND = 20;
@@ -238,7 +241,10 @@ public record HiveConfig(
             30, // maxOvomorphsPerHiveLocation
             TICKS_PER_MINUTE, // royalJellyTicksPerProduction (1 game-min per queen)
             100L * TICKS_PER_MINUTE, // scourgeJellyTicksPerQueenProduction (100 game-min per queen)
-            TICKS_PER_MINUTE // scourgeJellyTicksPerHarbingerProduction (1 game-min per harbinger)
+            TICKS_PER_MINUTE, // scourgeJellyTicksPerHarbingerProduction (1 game-min per harbinger)
+
+            // § 14 Queen lifecycle
+            true // queenFrontEndPhasesEnabled: run developing->location->hibernation before founding
         );
     }
 }

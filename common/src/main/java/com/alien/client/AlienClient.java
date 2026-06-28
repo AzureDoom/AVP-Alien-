@@ -38,6 +38,7 @@ import com.alien.client.render.entity.ProwlerRenderer;
 import com.alien.client.render.entity.QueenRenderer;
 import com.alien.client.render.entity.RavagerRenderer;
 import com.alien.client.render.entity.RazorClawRenderer;
+import com.alien.client.render.entity.RoyalCocoonRenderer;
 import com.alien.client.render.entity.RunnerRenderer;
 import com.alien.client.render.entity.SpitterRenderer;
 import com.alien.client.render.entity.WarriorRenderer;
@@ -312,6 +313,9 @@ public class AlienClient {
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_SPITTER, SpitterRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_WARRIOR, WarriorRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.OVIPOSITOR, OvipositorRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ROYAL_COCOON, RoyalCocoonRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.ABERRANT_ROYAL_COCOON, RoyalCocoonRenderer::new);
+        MOD.registries().registerEntityRenderer(AlienEntityTypes.NETHER_ROYAL_COCOON, RoyalCocoonRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.OVOMORPH, OvomorphRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.PRAETORIAN, PraetorianRenderer::new);
         MOD.registries().registerEntityRenderer(AlienEntityTypes.PREDALIEN, PredalienRenderer::new);

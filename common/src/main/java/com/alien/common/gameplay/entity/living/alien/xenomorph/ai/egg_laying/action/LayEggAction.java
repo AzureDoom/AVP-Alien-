@@ -18,7 +18,7 @@ public class LayEggAction {
 
         eggLayer.resetEggLayCooldown();
 
-        var level = eggLayer.level();
+        var level = eggLayer.asEntity().level();
         var variant = shouldBeAberrant(eggLayer) ? AlienVariant.ABERRANT : eggLayer.getVariant();
         var ovomorphType = Ovomorph.getType(variant, false);
 
@@ -57,7 +57,7 @@ public class LayEggAction {
                 var totalGeneIntegrity = Math.abs(GeneIntegrityUtil.getTotalGeneticIntegrity(geneCarrier));
                 var chance = totalGeneIntegrity - Math.floor(totalGeneIntegrity);
 
-                yield eggLayer.getRandom().nextDouble() < chance;
+                yield eggLayer.asEntity().getRandom().nextDouble() < chance;
             }
         };
     }

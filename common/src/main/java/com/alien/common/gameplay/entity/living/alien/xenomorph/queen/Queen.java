@@ -27,6 +27,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -93,11 +94,19 @@ public class Queen extends Xenomorph implements GOAPUser<Queen>, EggLayer {
 
     private final QueenData queenData;
 
+    private final QueenLifecyclePhaseManager lifecyclePhaseManager;
+
+    /**
+     * Transient: true while clip-digging to her location anchor (Stage 2b). Not saved — a reload never stays noclip.
+     */
+    private boolean digging;
+
     public Queen(EntityType<? extends Queen> entityType, Level level) {
         super(entityType, level, CONFIG);
         this.animationDispatcher = new QueenAnimationDispatcher(this);
         this.ovipositorManager = new OvipositorManager(this);
         this.queenData = new QueenData();
+        this.lifecyclePhaseManager = new QueenLifecyclePhaseManager(this);
     }
 
     @Override
@@ -119,6 +128,7 @@ public class Queen extends Xenomorph implements GOAPUser<Queen>, EggLayer {
         super.tick();
         ovipositorManager.tick();
         queenData.tick();
+        lifecyclePhaseManager.tick();
     }
 
     @Override
@@ -240,6 +250,37 @@ public class Queen extends Xenomorph implements GOAPUser<Queen>, EggLayer {
         return queenData;
     }
 
+    public QueenLifecyclePhaseManager getLifecyclePhaseManager() {
+        return lifecyclePhaseManager;
+    }
+
+    public boolean isDigging() {
+        return digging;
+    }
+
+    /**
+     * Toggles the location-phase spectator dig. While digging she clips through blocks (noPhysics) and ignores gravity
+     * so she can travel straight to her committed anchor; noPhysics also suppresses suffocation, and
+     * {@link #isInvulnerableTo} adds fire/lava immunity. She stays an ordinary, attackable entity in every other
+     * respect. Owned by {@code QueenLifecyclePhaseManager}, which reconciles it every tick.
+     */
+    public void setDigging(boolean digging) {
+        if (this.digging == digging) {
+            return;
+        }
+        this.digging = digging;
+        this.noPhysics = digging;
+        setNoGravity(digging);
+    }
+
+    @Override
+    public boolean isInvulnerableTo(DamageSource source) {
+        if (digging && source.is(DamageTypeTags.IS_FIRE)) {
+            return true;
+        }
+        return super.isInvulnerableTo(source);
+    }
+
     @Override
     public Entity asEntity() {
         return this;
@@ -270,6 +311,7 @@ public class Queen extends Xenomorph implements GOAPUser<Queen>, EggLayer {
         super.readAdditionalSaveData(compoundTag);
         ovipositorManager.load(compoundTag);
         queenData.load(compoundTag);
+        lifecyclePhaseManager.load(compoundTag);
     }
 
     @Override
@@ -277,6 +319,7 @@ public class Queen extends Xenomorph implements GOAPUser<Queen>, EggLayer {
         super.addAdditionalSaveData(compoundTag);
         ovipositorManager.save(compoundTag);
         queenData.save(compoundTag);
+        lifecyclePhaseManager.save(compoundTag);
     }
 
     public static EntityType<? extends Alien> getType(AlienVariant alienVariant) {

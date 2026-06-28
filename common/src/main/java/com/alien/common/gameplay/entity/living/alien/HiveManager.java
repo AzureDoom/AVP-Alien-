@@ -82,6 +82,12 @@ public class HiveManager implements NBTSerializable {
      * {@link HiveLocationFoundingService} to mint a new lineage or location.
      */
     private void tryQueenSettlement(Queen queen, long currentGameTime) {
+        // Front-end life-cycle gate: a queen must finish developing -> location -> hibernation before she may settle.
+        // When the phase machine is disabled this is always true, so the legacy settlement path runs unchanged.
+        if (!queen.getLifecyclePhaseManager().isReadyToFound()) {
+            return;
+        }
+
         var settlementPos = QueenSettlementDetector.observe(queen, currentGameTime);
         if (settlementPos == null) {
             return;

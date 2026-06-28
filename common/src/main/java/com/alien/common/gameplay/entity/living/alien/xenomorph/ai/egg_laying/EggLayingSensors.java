@@ -30,14 +30,14 @@ public class EggLayingSensors {
                 }
 
                 if (
-                    !eggLayer.isAlive()
+                    !eggLayer.asEntity().isAlive()
                         || !eggLayer.hasOvipositor()
                         || !AlienVariantTypes.getFor(eggLayer.getVariant()).canReproduce()
                 ) {
                     return false;
                 }
 
-                var location = HiveLocationSpawnGate.locationContaining(eggLayer.level(), eggLayer.asEntity().blockPosition());
+                var location = HiveLocationSpawnGate.locationContaining(eggLayer.asEntity().level(), eggLayer.asEntity().blockPosition());
                 if (location == null) {
                     return false;
                 }
@@ -52,7 +52,7 @@ public class EggLayingSensors {
 
     private static boolean hasOvomorphCapacity(EggLayer eggLayer, HiveLocation location) {
         var cap = HiveLocationRegistry.INSTANCE.config().maxOvomorphsPerHiveLocation();
-        return cap > 0 && countSameVariantOvomorphs(eggLayer.level(), location, eggLayer.getVariant()) < cap;
+        return cap > 0 && countSameVariantOvomorphs(eggLayer.asEntity().level(), location, eggLayer.getVariant()) < cap;
     }
 
     private static int countSameVariantOvomorphs(Level level, HiveLocation location, AlienVariant fallbackVariant) {
@@ -112,14 +112,15 @@ public class EggLayingSensors {
 
         var searchBox = new AABB(
             eggPos.x - halfSize,
-            eggPos.y - eggLayer.level().dimensionType().height(),
+            eggPos.y - eggLayer.asEntity().level().dimensionType().height(),
             eggPos.z - halfSize,
             eggPos.x + halfSize,
             eggPos.y + 5,
             eggPos.z + halfSize
         );
 
-        return eggLayer.level()
+        return eggLayer.asEntity()
+            .level()
             .getEntitiesOfClass(
                 Ovomorph.class,
                 searchBox,

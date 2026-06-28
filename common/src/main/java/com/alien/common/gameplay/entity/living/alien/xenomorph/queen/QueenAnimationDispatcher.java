@@ -10,6 +10,14 @@ public class QueenAnimationDispatcher {
         .play(AzAlienAnimationUtil.BODY, QueenAnimationRefs.IDLE_ANIMATION_NAME, AzPlayBehaviors.LOOP)
         .build();
 
+    private static final AzCommand<Queen> HIBERNATE = AzCommand.<Queen>idempotent()
+        .play(AzAlienAnimationUtil.BODY, QueenAnimationRefs.HIBERNATE_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
+
+    private static final AzCommand<Queen> INCAPACITATED = AzCommand.<Queen>idempotent()
+        .play(AzAlienAnimationUtil.BODY, QueenAnimationRefs.INCAPACITATED_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
+
     private static final AzCommand<Queen> RUN = AzCommand.<Queen>idempotent()
         .play(AzAlienAnimationUtil.BODY, QueenAnimationRefs.RUN_ANIMATION_NAME, AzPlayBehaviors.LOOP)
         .build();
@@ -34,6 +42,16 @@ public class QueenAnimationDispatcher {
 
     public void idle() {
         IDLE.dispatchForEntity(queen);
+    }
+
+    /** Voluntary curled sleep during the hibernation phase (Stage 3). Looping; driven while she sleeps. */
+    public void hibernate() {
+        HIBERNATE.dispatchForEntity(queen);
+    }
+
+    /** Involuntary defeat collapse when downed/captured. Looping; driven while she is incapacitated. */
+    public void incapacitated() {
+        INCAPACITATED.dispatchForEntity(queen);
     }
 
     public void run() {

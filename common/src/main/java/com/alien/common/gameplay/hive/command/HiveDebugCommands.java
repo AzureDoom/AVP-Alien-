@@ -67,232 +67,242 @@ public final class HiveDebugCommands {
 
     public static LiteralArgumentBuilder<CommandSourceStack> create() {
         return Commands.literal("hive")
-            .then(Commands.literal("list_lineages").executes(HiveDebugCommands::listLineages))
-            .then(Commands.literal("dump_indexes").executes(HiveDebugCommands::dumpIndexes))
-            .then(
-                Commands.literal("inspect_location")
-                    .then(
-                        Commands.argument(LOCATION_ID_ARG, ResourceLocationArgument.id())
-                            .executes(HiveDebugCommands::inspectLocation)
-                    )
-            )
-            .then(
-                Commands.literal("list_vents")
-                    .then(
-                        Commands.argument(LOCATION_ID_ARG, ResourceLocationArgument.id())
-                            .executes(HiveDebugCommands::listVents)
-                    )
-            )
-            .then(
-                Commands.literal("kill_location")
-                    .then(
-                        Commands.argument(LOCATION_ID_ARG, ResourceLocationArgument.id())
-                            .executes(HiveDebugCommands::killLocation)
-                    )
-            )
-            .then(
-                Commands.literal("mint_lineage_at_player")
-                    .requires(CommandSourceStack::isPlayer)
-                    .executes(ctx -> mintLineageAtPlayer(ctx, AlienVariant.NORMAL))
-                    .then(
-                        Commands.argument(VARIANT_ARG, StringArgumentType.string())
-                            .executes(ctx -> {
-                                var variantName = StringArgumentType.getString(ctx, VARIANT_ARG)
-                                    .toUpperCase(Locale.ROOT);
-                                AlienVariant variant;
+                .then(Commands.literal("list_lineages").executes(HiveDebugCommands::listLineages))
+                .then(Commands.literal("dump_indexes").executes(HiveDebugCommands::dumpIndexes))
+                .then(
+                        Commands.literal("inspect_location")
+                                .then(
+                                        Commands.argument(LOCATION_ID_ARG, ResourceLocationArgument.id())
+                                                .executes(HiveDebugCommands::inspectLocation)
+                                )
+                )
+                .then(
+                        Commands.literal("list_vents")
+                                .then(
+                                        Commands.argument(LOCATION_ID_ARG, ResourceLocationArgument.id())
+                                                .executes(HiveDebugCommands::listVents)
+                                )
+                )
+                .then(
+                        Commands.literal("kill_location")
+                                .then(
+                                        Commands.argument(LOCATION_ID_ARG, ResourceLocationArgument.id())
+                                                .executes(HiveDebugCommands::killLocation)
+                                )
+                )
+                .then(
+                        Commands.literal("mint_lineage_at_player")
+                                .requires(CommandSourceStack::isPlayer)
+                                .executes(ctx -> mintLineageAtPlayer(ctx, AlienVariant.NORMAL))
+                                .then(
+                                        Commands.argument(VARIANT_ARG, StringArgumentType.string())
+                                                .executes(ctx -> {
+                                                    var variantName = StringArgumentType.getString(ctx, VARIANT_ARG)
+                                                            .toUpperCase(Locale.ROOT);
+                                                    AlienVariant variant;
 
-                                try {
-                                    variant = AlienVariant.valueOf(variantName);
-                                } catch (IllegalArgumentException ignored) {
-                                    ctx.getSource()
-                                        .sendFailure(
-                                            Component.literal("Unknown variant: " + variantName)
-                                        );
-                                    return 0;
-                                }
+                                                    try {
+                                                        variant = AlienVariant.valueOf(variantName);
+                                                    } catch (IllegalArgumentException ignored) {
+                                                        ctx.getSource()
+                                                                .sendFailure(
+                                                                        Component.literal("Unknown variant: " + variantName)
+                                                                );
+                                                        return 0;
+                                                    }
 
-                                return mintLineageAtPlayer(ctx, variant);
-                            })
-                    )
-            )
-            .then(
-                Commands.literal("mint_location_in_lineage")
-                    .requires(CommandSourceStack::isPlayer)
-                    .then(
-                        Commands.argument(LINEAGE_ID_ARG, ResourceLocationArgument.id())
-                            .executes(HiveDebugCommands::mintLocationInLineage)
-                    )
-            )
-            .then(
-                Commands.literal("inspect_variant")
-                    .then(
-                        Commands.argument(VARIANT_ARG, StringArgumentType.string())
-                            .executes(HiveDebugCommands::inspectVariant)
-                    )
-            )
-            .then(
-                Commands.literal("force_variant_join_nearby")
-                    .requires(CommandSourceStack::isPlayer)
-                    .executes(HiveDebugCommands::forceVariantJoinNearby)
-            )
-            .then(
-                Commands.literal("force_lineage_join_nearby")
-                    .requires(CommandSourceStack::isPlayer)
-                    .then(
-                        Commands.argument(LINEAGE_ID_ARG, ResourceLocationArgument.id())
-                            .executes(HiveDebugCommands::forceLineageJoinNearby)
-                    )
-            )
-            .then(
-                Commands.literal("force_shed_check_nearby")
-                    .requires(CommandSourceStack::isPlayer)
-                    .executes(HiveDebugCommands::forceShedCheckNearby)
-            )
-            .then(Commands.literal("rebuild_indexes").executes(HiveDebugCommands::rebuildIndexes))
-            .then(Commands.literal("force_invariant_check").executes(HiveDebugCommands::forceInvariantCheck))
-            .then(Commands.literal("list_emerging").executes(HiveDebugCommands::listEmerging))
-            .then(
-                Commands.literal("inspect_slab")
-                    .requires(CommandSourceStack::isPlayer)
-                    .executes(HiveDebugCommands::inspectSlab)
-            )
-            .then(
-                Commands.literal("inspect_ovipositor")
-                    .requires(CommandSourceStack::isPlayer)
-                    .executes(HiveDebugCommands::inspectOvipositor)
-            )
-            .then(
-                Commands.literal("log_spawns")
-                    .executes(HiveDebugCommands::toggleDebugSpawns)
-            )
-            .then(
-                Commands.literal("render")
-                    .requires(CommandSourceStack::isPlayer)
-                    .executes(HiveDebugCommands::toggleRender)
-            )
-            .then(Commands.literal("force_emergence_scan").executes(HiveDebugCommands::forceEmergenceScan))
-            .then(Commands.literal("inspect_settlement").executes(HiveDebugCommands::inspectSettlement))
-            .then(
-                Commands.literal("force_grow_location")
-                    .then(
-                        Commands.argument(LOCATION_ID_ARG, ResourceLocationArgument.id())
-                            .executes(HiveDebugCommands::forceGrowLocation)
-                    )
-            )
-            .then(Commands.literal("list_convoys").executes(HiveDebugCommands::listConvoys))
-            .then(Commands.literal("force_dispatch_reinforcements").executes(HiveDebugCommands::forceDispatchReinforcements))
-            .then(
-                Commands.literal("force_migration")
-                    .then(
-                        Commands.argument(LOCATION_ID_ARG, ResourceLocationArgument.id())
-                            .executes(HiveDebugCommands::forceMigration)
-                    )
-            )
-            .then(
-                Commands.literal("force_raid")
-                    .requires(CommandSourceStack::isPlayer)
-                    .then(
-                        Commands.argument(LINEAGE_ID_ARG, ResourceLocationArgument.id())
-                            .executes(HiveDebugCommands::forceRaidOnSelf)
-                    )
-            )
-            .then(
-                Commands.literal("inspect_kill_attribution")
-                    .then(
-                        Commands.argument(LINEAGE_ID_ARG, ResourceLocationArgument.id())
-                            .executes(HiveDebugCommands::inspectKillAttribution)
-                    )
-            )
-            .then(
-                Commands.literal("claim_radius")
-                    .then(
-                        Commands.argument(LOCATION_ID_ARG, ResourceLocationArgument.id())
-                            .then(
-                                Commands.argument("radius", IntegerArgumentType.integer(0, 32))
-                                    .executes(HiveDebugCommands::claimRadius)
-                            )
-                    )
-            )
-            .then(
-                Commands.literal("add_reserve")
-                    .then(
-                        Commands.argument(LOCATION_ID_ARG, ResourceLocationArgument.id())
-                            .then(
-                                Commands.argument(ENTITY_TYPE_ARG, ResourceLocationArgument.id())
-                                    .then(
-                                        Commands.argument(COUNT_ARG, IntegerArgumentType.integer(1))
-                                            .executes(HiveDebugCommands::addReserve)
-                                    )
-                            )
-                    )
-            )
-            .then(
-                Commands.literal("add_biomass")
-                    .then(
-                        Commands.argument(LOCATION_ID_ARG, ResourceLocationArgument.id())
-                            .then(
-                                Commands.argument(COUNT_ARG, IntegerArgumentType.integer(1))
-                                    .executes(HiveDebugCommands::addBiomass)
-                            )
-                    )
-            )
-            .then(
-                Commands.literal("force_queenless_advance")
-                    .then(
-                        Commands.argument(LINEAGE_ID_ARG, ResourceLocationArgument.id())
-                            .executes(HiveDebugCommands::forceQueenlessAdvance)
-                    )
-            )
-            .then(Commands.literal("inspect_queenless_maturation").executes(HiveDebugCommands::inspectQueenlessMaturation))
-            .then(Commands.literal("validate").executes(HiveDebugCommands::validate));
+                                                    return mintLineageAtPlayer(ctx, variant);
+                                                })
+                                )
+                )
+                .then(
+                        Commands.literal("mint_location_in_lineage")
+                                .requires(CommandSourceStack::isPlayer)
+                                .then(
+                                        Commands.argument(LINEAGE_ID_ARG, ResourceLocationArgument.id())
+                                                .executes(HiveDebugCommands::mintLocationInLineage)
+                                )
+                )
+                .then(
+                        Commands.literal("inspect_variant")
+                                .then(
+                                        Commands.argument(VARIANT_ARG, StringArgumentType.string())
+                                                .executes(HiveDebugCommands::inspectVariant)
+                                )
+                )
+                .then(
+                        Commands.literal("force_variant_join_nearby")
+                                .requires(CommandSourceStack::isPlayer)
+                                .executes(HiveDebugCommands::forceVariantJoinNearby)
+                )
+                .then(
+                        Commands.literal("force_lineage_join_nearby")
+                                .requires(CommandSourceStack::isPlayer)
+                                .then(
+                                        Commands.argument(LINEAGE_ID_ARG, ResourceLocationArgument.id())
+                                                .executes(HiveDebugCommands::forceLineageJoinNearby)
+                                )
+                )
+                .then(
+                        Commands.literal("force_shed_check_nearby")
+                                .requires(CommandSourceStack::isPlayer)
+                                .executes(HiveDebugCommands::forceShedCheckNearby)
+                )
+                .then(Commands.literal("rebuild_indexes").executes(HiveDebugCommands::rebuildIndexes))
+                .then(Commands.literal("force_invariant_check").executes(HiveDebugCommands::forceInvariantCheck))
+                .then(Commands.literal("list_emerging").executes(HiveDebugCommands::listEmerging))
+                .then(
+                        Commands.literal("inspect_slab")
+                                .requires(CommandSourceStack::isPlayer)
+                                .executes(HiveDebugCommands::inspectSlab)
+                )
+                .then(
+                        Commands.literal("inspect_ovipositor")
+                                .requires(CommandSourceStack::isPlayer)
+                                .executes(HiveDebugCommands::inspectOvipositor)
+                )
+                .then(
+                        Commands.literal("inspect_lifecycle")
+                                .requires(CommandSourceStack::isPlayer)
+                                .executes(HiveDebugCommands::inspectLifecycle)
+                )
+                .then(
+                        Commands.literal("hibernation_skip")
+                                .requires(CommandSourceStack::isPlayer)
+                                .executes(HiveDebugCommands::hibernationSkip)
+                )
+                .then(
+                        Commands.literal("log_spawns")
+                                .executes(HiveDebugCommands::toggleDebugSpawns)
+                )
+                .then(
+                        Commands.literal("render")
+                                .requires(CommandSourceStack::isPlayer)
+                                .executes(HiveDebugCommands::toggleRender)
+                )
+                .then(Commands.literal("force_emergence_scan").executes(HiveDebugCommands::forceEmergenceScan))
+                .then(Commands.literal("inspect_settlement").executes(HiveDebugCommands::inspectSettlement))
+                .then(
+                        Commands.literal("force_grow_location")
+                                .then(
+                                        Commands.argument(LOCATION_ID_ARG, ResourceLocationArgument.id())
+                                                .executes(HiveDebugCommands::forceGrowLocation)
+                                )
+                )
+                .then(Commands.literal("list_convoys").executes(HiveDebugCommands::listConvoys))
+                .then(Commands.literal("force_dispatch_reinforcements").executes(HiveDebugCommands::forceDispatchReinforcements))
+                .then(
+                        Commands.literal("force_migration")
+                                .then(
+                                        Commands.argument(LOCATION_ID_ARG, ResourceLocationArgument.id())
+                                                .executes(HiveDebugCommands::forceMigration)
+                                )
+                )
+                .then(
+                        Commands.literal("force_raid")
+                                .requires(CommandSourceStack::isPlayer)
+                                .then(
+                                        Commands.argument(LINEAGE_ID_ARG, ResourceLocationArgument.id())
+                                                .executes(HiveDebugCommands::forceRaidOnSelf)
+                                )
+                )
+                .then(
+                        Commands.literal("inspect_kill_attribution")
+                                .then(
+                                        Commands.argument(LINEAGE_ID_ARG, ResourceLocationArgument.id())
+                                                .executes(HiveDebugCommands::inspectKillAttribution)
+                                )
+                )
+                .then(
+                        Commands.literal("claim_radius")
+                                .then(
+                                        Commands.argument(LOCATION_ID_ARG, ResourceLocationArgument.id())
+                                                .then(
+                                                        Commands.argument("radius", IntegerArgumentType.integer(0, 32))
+                                                                .executes(HiveDebugCommands::claimRadius)
+                                                )
+                                )
+                )
+                .then(
+                        Commands.literal("add_reserve")
+                                .then(
+                                        Commands.argument(LOCATION_ID_ARG, ResourceLocationArgument.id())
+                                                .then(
+                                                        Commands.argument(ENTITY_TYPE_ARG, ResourceLocationArgument.id())
+                                                                .then(
+                                                                        Commands.argument(COUNT_ARG, IntegerArgumentType.integer(1))
+                                                                                .executes(HiveDebugCommands::addReserve)
+                                                                )
+                                                )
+                                )
+                )
+                .then(
+                        Commands.literal("add_biomass")
+                                .then(
+                                        Commands.argument(LOCATION_ID_ARG, ResourceLocationArgument.id())
+                                                .then(
+                                                        Commands.argument(COUNT_ARG, IntegerArgumentType.integer(1))
+                                                                .executes(HiveDebugCommands::addBiomass)
+                                                )
+                                )
+                )
+                .then(
+                        Commands.literal("force_queenless_advance")
+                                .then(
+                                        Commands.argument(LINEAGE_ID_ARG, ResourceLocationArgument.id())
+                                                .executes(HiveDebugCommands::forceQueenlessAdvance)
+                                )
+                )
+                .then(Commands.literal("inspect_queenless_maturation").executes(HiveDebugCommands::inspectQueenlessMaturation))
+                .then(Commands.literal("validate").executes(HiveDebugCommands::validate));
     }
 
     private static int listLineages(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
         var ids = Alien.MOD.factions()
-            .getAllIds()
-            .stream()
-            .filter(LineageIds::isLineageId)
-            .toList();
+                .getAllIds()
+                .stream()
+                .filter(LineageIds::isLineageId)
+                .toList();
 
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal("Lineages (" + ids.size() + "):"),
-                false
-            );
+                .sendSuccess(
+                        () -> Component.literal("Lineages (" + ids.size() + "):"),
+                        false
+                );
 
         for (var id : ids) {
             var faction = Alien.MOD.factions().get(id);
             if (!(faction != null && faction.data() instanceof LineageFactionData lineage)) {
                 ctx.getSource()
-                    .sendSuccess(
-                        () -> Component.literal("  ").append(copyableId(id.toString())).append(Component.literal(" [missing data]")),
-                        false
-                    );
+                        .sendSuccess(
+                                () -> Component.literal("  ").append(copyableId(id.toString())).append(Component.literal(" [missing data]")),
+                                false
+                        );
                 continue;
             }
 
             ctx.getSource()
-                .sendSuccess(
-                    () -> Component.literal("  ")
-                        .append(copyableId(id.toString()))
-                        .append(
-                            Component.literal(
-                                " variant=" + lineage.variant()
-                                    + " dim=" + lineage.dimension().location()
-                                    + " locations=" + lineage.locationsById().size()
-                                    + " empress=" + (lineage.empressId() == null ? "none" : lineage.empressId().toString())
-                            )
-                        ),
-                    false
-                );
+                    .sendSuccess(
+                            () -> Component.literal("  ")
+                                    .append(copyableId(id.toString()))
+                                    .append(
+                                            Component.literal(
+                                                    " variant=" + lineage.variant()
+                                                            + " dim=" + lineage.dimension().location()
+                                                            + " locations=" + lineage.locationsById().size()
+                                                            + " empress=" + (lineage.empressId() == null ? "none" : lineage.empressId().toString())
+                                            )
+                                    ),
+                            false
+                    );
 
             // List each location ID (clickable to copy) so players can feed it into inspect_location / kill_location.
             for (var locId : lineage.locationsById().keySet()) {
                 ctx.getSource()
-                    .sendSuccess(
-                        () -> Component.literal("      location: ").append(copyableId(locId.value().toString())),
-                        false
-                    );
+                        .sendSuccess(
+                                () -> Component.literal("      location: ").append(copyableId(locId.value().toString())),
+                                false
+                        );
             }
         }
 
@@ -301,25 +311,25 @@ public final class HiveDebugCommands {
 
     private static int dumpIndexes(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    "HiveLocationRegistry: locations=" + HiveLocationRegistry.INSTANCE.locationCount()
-                        + " lineages=" + HiveLocationRegistry.INSTANCE.lineageCount()
-                ),
-                false
-            );
+                .sendSuccess(
+                        () -> Component.literal(
+                                "HiveLocationRegistry: locations=" + HiveLocationRegistry.INSTANCE.locationCount()
+                                        + " lineages=" + HiveLocationRegistry.INSTANCE.lineageCount()
+                        ),
+                        false
+                );
 
         for (var location : HiveLocationRegistry.INSTANCE.all()) {
             ctx.getSource()
-                .sendSuccess(
-                    () -> Component.literal(
-                        "  " + location.id() + " @ " + location.centerPos()
-                            + " in " + location.dimension().location()
-                            + " chunks=" + location.claimedChunks().size()
-                            + " biomass=" + location.biomass()
-                    ),
-                    false
-                );
+                    .sendSuccess(
+                            () -> Component.literal(
+                                    "  " + location.id() + " @ " + location.centerPos()
+                                            + " in " + location.dimension().location()
+                                            + " chunks=" + location.claimedChunks().size()
+                                            + " biomass=" + location.biomass()
+                            ),
+                            false
+                    );
         }
 
         return HiveLocationRegistry.INSTANCE.locationCount();
@@ -334,96 +344,96 @@ public final class HiveDebugCommands {
         }
 
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal("Location " + location.id()),
-                false
-            );
+                .sendSuccess(
+                        () -> Component.literal("Location " + location.id()),
+                        false
+                );
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal("  lineage=" + location.lineageFactionId()),
-                false
-            );
+                .sendSuccess(
+                        () -> Component.literal("  lineage=" + location.lineageFactionId()),
+                        false
+                );
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal("  dimension=" + location.dimension().location()),
-                false
-            );
+                .sendSuccess(
+                        () -> Component.literal("  dimension=" + location.dimension().location()),
+                        false
+                );
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal("  centerPos=" + location.centerPos()),
-                false
-            );
+                .sendSuccess(
+                        () -> Component.literal("  centerPos=" + location.centerPos()),
+                        false
+                );
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    "  slab=Y " + location.hiveFloorY() + ".." + location.hiveCeilingY()
-                        + ", vents=" + location.ventManager().ventCount()
-                        + ", reproductive=" + location.reproductiveEstablished()
-                        + ", loadedMembers=" + location.loadedMembersByType().values().stream().mapToInt(java.util.Set::size).sum()
-                ),
-                false
-            );
+                .sendSuccess(
+                        () -> Component.literal(
+                                "  slab=Y " + location.hiveFloorY() + ".." + location.hiveCeilingY()
+                                        + ", vents=" + location.ventManager().ventCount()
+                                        + ", reproductive=" + location.reproductiveEstablished()
+                                        + ", loadedMembers=" + location.loadedMembersByType().values().stream().mapToInt(java.util.Set::size).sum()
+                        ),
+                        false
+                );
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal("  founderId=" + location.founderId()),
-                false
-            );
+                .sendSuccess(
+                        () -> Component.literal("  founderId=" + location.founderId()),
+                        false
+                );
         var config = HiveLocationRegistry.INSTANCE.config();
         var nextCost = BiomassIncome.claimCost(location, config);
         var biomassCap = BiomassIncome.biomassCap(location, config);
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    "  age=" + location.ageInTicks() + " ticks, biomass=" + location.biomass()
-                        + "/" + biomassCap + " (next claim costs " + nextCost + ")"
-                        + ", peakXeno=" + location.peakXenomorphCount()
-                        + ", lastGrowthTick=" + location.lastGrowthTick()
-                ),
-                false
-            );
+                .sendSuccess(
+                        () -> Component.literal(
+                                "  age=" + location.ageInTicks() + " ticks, biomass=" + location.biomass()
+                                        + "/" + biomassCap + " (next claim costs " + nextCost + ")"
+                                        + ", peakXeno=" + location.peakXenomorphCount()
+                                        + ", lastGrowthTick=" + location.lastGrowthTick()
+                        ),
+                        false
+                );
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    "  claimedChunks=" + location.claimedChunks().size()
-                        + ", decoratedChunks=" + location.decoratedChunks().size()
-                        + ", reserves total=" + location.localReserves().getReliableCount()
-                ),
-                false
-            );
+                .sendSuccess(
+                        () -> Component.literal(
+                                "  claimedChunks=" + location.claimedChunks().size()
+                                        + ", decoratedChunks=" + location.decoratedChunks().size()
+                                        + ", reserves total=" + location.localReserves().getReliableCount()
+                        ),
+                        false
+                );
 
         var leaderId = location.leadership().getLeaderIdOrNull();
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal("  leader=" + (leaderId == null ? "none" : leaderId.toString())),
-                false
-            );
+                .sendSuccess(
+                        () -> Component.literal("  leader=" + (leaderId == null ? "none" : leaderId.toString())),
+                        false
+                );
 
         var loadedHere = location.loadedMembersByType()
-            .values()
-            .stream()
-            .mapToInt(java.util.Set::size)
-            .sum();
+                .values()
+                .stream()
+                .mapToInt(java.util.Set::size)
+                .sum();
         var bossBar = location.bossBar();
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    "  loadedHere=" + loadedHere
-                        + ", bossBar=" + (bossBar == null
-                            ? "(uninitialized)"
-                            : "angry=" + bossBar.isAngry() + " evacuating=" + bossBar.isEvacuating())
-                        + ", evacuatingTicksLeft=" + location.evacuatingRemainingTicks()
-                        + ", combatRespiteTicksLeft=" + location.combatRespiteRemainingTicks()
-                        + ", combatKillsSinceLastRespite=" + location.combatKillsSinceLastRespite()
-                ),
-                false
-            );
+                .sendSuccess(
+                        () -> Component.literal(
+                                "  loadedHere=" + loadedHere
+                                        + ", bossBar=" + (bossBar == null
+                                        ? "(uninitialized)"
+                                        : "angry=" + bossBar.isAngry() + " evacuating=" + bossBar.isEvacuating())
+                                        + ", evacuatingTicksLeft=" + location.evacuatingRemainingTicks()
+                                        + ", combatRespiteTicksLeft=" + location.combatRespiteRemainingTicks()
+                                        + ", combatKillsSinceLastRespite=" + location.combatKillsSinceLastRespite()
+                        ),
+                        false
+                );
 
         if (!location.loadedMembersByType().isEmpty()) {
             ctx.getSource().sendSuccess(() -> Component.literal("  loaded members by type:"), false);
             for (var entry : location.loadedMembersByType().entrySet()) {
                 var typeId = BuiltInRegistries.ENTITY_TYPE.getKey(entry.getKey());
                 ctx.getSource()
-                    .sendSuccess(() -> Component.literal("    " + typeId + " = " + entry.getValue().size()), false);
+                        .sendSuccess(() -> Component.literal("    " + typeId + " = " + entry.getValue().size()), false);
                 for (var uuid : entry.getValue()) {
                     ctx.getSource().sendSuccess(() -> Component.literal("      " + uuid), false);
                 }
@@ -444,46 +454,46 @@ public final class HiveDebugCommands {
         }
         final var finalChunksLoaded = chunksLoaded;
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    "  location-faction members=" + locationMemberCount
-                        + ", noContactTicksAccrued=" + location.noContactTicksAccrued()
-                        + "/" + HiveLocationRegistry.INSTANCE.config().locationMaxNoContactTicks()
-                        + ", chunksLoaded=" + finalChunksLoaded + "/" + location.claimedChunks().size()
-                ),
-                false
-            );
+                .sendSuccess(
+                        () -> Component.literal(
+                                "  location-faction members=" + locationMemberCount
+                                        + ", noContactTicksAccrued=" + location.noContactTicksAccrued()
+                                        + "/" + HiveLocationRegistry.INSTANCE.config().locationMaxNoContactTicks()
+                                        + ", chunksLoaded=" + finalChunksLoaded + "/" + location.claimedChunks().size()
+                        ),
+                        false
+                );
 
         // Economy snapshot: resources + population vs cap + per-caste counts.
         var econConfig = HiveLocationRegistry.INSTANCE.config();
         var totalPop = com.alien.common.gameplay.hive.economy.CastePopulation.totalTrackedPopulation(location);
         var popCap = econConfig.populationPerChunk() * location.claimedChunks().size();
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    "  resources: biomass=" + location.biomass()
-                        + ", royalJelly=" + location.royalJelly() + "/"
-                        + com.alien.common.gameplay.hive.economy.JellyProduction.royalJellyCap(location)
-                        + ", scourgeJelly=" + location.scourgeJelly() + "/"
-                        + com.alien.common.gameplay.hive.economy.JellyProduction.scourgeJellyCap(location)
-                ),
-                false
-            );
+                .sendSuccess(
+                        () -> Component.literal(
+                                "  resources: biomass=" + location.biomass()
+                                        + ", royalJelly=" + location.royalJelly() + "/"
+                                        + com.alien.common.gameplay.hive.economy.JellyProduction.royalJellyCap(location)
+                                        + ", scourgeJelly=" + location.scourgeJelly() + "/"
+                                        + com.alien.common.gameplay.hive.economy.JellyProduction.scourgeJellyCap(location)
+                        ),
+                        false
+                );
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal("  population=" + totalPop + "/" + popCap),
-                false
-            );
+                .sendSuccess(
+                        () -> Component.literal("  population=" + totalPop + "/" + popCap),
+                        false
+                );
 
         var castePop = com.alien.common.gameplay.hive.economy.CastePopulation.popByCaste(location);
         ctx.getSource().sendSuccess(() -> Component.literal("  per-caste:"), false);
         for (var entry : castePop.entrySet()) {
             if (entry.getValue() > 0) {
                 ctx.getSource()
-                    .sendSuccess(
-                        () -> Component.literal("    " + entry.getKey().location() + " = " + entry.getValue()),
-                        false
-                    );
+                        .sendSuccess(
+                                () -> Component.literal("    " + entry.getKey().location() + " = " + entry.getValue()),
+                                false
+                        );
             }
         }
 
@@ -494,14 +504,14 @@ public final class HiveDebugCommands {
         if (lineageFaction != null) {
             var lineageMembers = lineageFaction.membership().getMembers();
             ctx.getSource()
-                .sendSuccess(
-                    () -> Component.literal("  lineage membership total=" + lineageMembers.size()),
-                    false
-                );
+                    .sendSuccess(
+                            () -> Component.literal("  lineage membership total=" + lineageMembers.size()),
+                            false
+                    );
             for (var member : lineageMembers) {
                 if (member instanceof FactionMember.Entity entityMember) {
                     ctx.getSource()
-                        .sendSuccess(() -> Component.literal("    " + entityMember.uuid()), false);
+                            .sendSuccess(() -> Component.literal("    " + entityMember.uuid()), false);
                 }
             }
         }
@@ -509,22 +519,22 @@ public final class HiveDebugCommands {
         var reservesByType = location.localReserves().underlying().getBackingMap();
         if (!reservesByType.isEmpty()) {
             ctx.getSource()
-                .sendSuccess(() -> Component.literal("  reserves breakdown:"), false);
+                    .sendSuccess(() -> Component.literal("  reserves breakdown:"), false);
             for (var entry : reservesByType.entrySet()) {
                 var typeId = BuiltInRegistries.ENTITY_TYPE.getKey(entry.getKey());
                 ctx.getSource()
-                    .sendSuccess(() -> Component.literal("    " + typeId + " = " + entry.getValue()), false);
+                        .sendSuccess(() -> Component.literal("    " + typeId + " = " + entry.getValue()), false);
             }
         }
         var identityReserves = location.localReserves().identity();
         if (identityReserves.getCount() > 0) {
             ctx.getSource()
-                .sendSuccess(() -> Component.literal("  identity reserves breakdown:"), false);
+                    .sendSuccess(() -> Component.literal("  identity reserves breakdown:"), false);
             for (var type : identityReserves.getAvailableEntityTypes()) {
                 var typeId = BuiltInRegistries.ENTITY_TYPE.getKey(type);
                 var count = identityReserves.getCount(type);
                 ctx.getSource()
-                    .sendSuccess(() -> Component.literal("    " + typeId + " = " + count), false);
+                        .sendSuccess(() -> Component.literal("    " + typeId + " = " + count), false);
             }
         }
 
@@ -550,27 +560,27 @@ public final class HiveDebugCommands {
         var entityType = BuiltInRegistries.ENTITY_TYPE.get(entityTypeId);
         if (!location.localReserves().tryAdd(entityType, count)) {
             ctx.getSource()
-                .sendFailure(
-                    Component.literal(
-                        "Reserve add rejected: " + entityTypeId + " does not match " + locationId + "'s variant"
-                    )
-                );
+                    .sendFailure(
+                            Component.literal(
+                                    "Reserve add rejected: " + entityTypeId + " does not match " + locationId + "'s variant"
+                            )
+                    );
             return 0;
         }
 
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    "Added " + count + " of " + entityTypeId + " to " + locationId
-                ),
-                true
-            );
+                .sendSuccess(
+                        () -> Component.literal(
+                                "Added " + count + " of " + entityTypeId + " to " + locationId
+                        ),
+                        true
+                );
         return count;
     }
 
     private static int mintLineageAtPlayer(
-        com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx,
-        AlienVariant variant
+            com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx,
+            AlienVariant variant
     ) {
         var player = Objects.requireNonNull(ctx.getSource().getPlayer());
         var level = ctx.getSource().getLevel();
@@ -611,20 +621,20 @@ public final class HiveDebugCommands {
         HiveLocationRegistry.INSTANCE.register(location);
 
         com.alien.common.gameplay.hive.growth.HiveLocationClaims.claim(
-            level,
-            location,
-            centerChunk,
-            level.getGameTime()
+                level,
+                location,
+                centerChunk,
+                level.getGameTime()
         );
 
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    "Minted lineage " + lineageId + " (" + variant + ") with location " + locationId
-                        + " at " + centerPos
-                ),
-                true
-            );
+                .sendSuccess(
+                        () -> Component.literal(
+                                "Minted lineage " + lineageId + " (" + variant + ") with location " + locationId
+                                        + " at " + centerPos
+                        ),
+                        true
+                );
 
         return 1;
     }
@@ -642,12 +652,12 @@ public final class HiveDebugCommands {
 
         if (!lineageData.dimension().equals(level.dimension())) {
             ctx.getSource()
-                .sendFailure(
-                    Component.literal(
-                        "Lineage is in " + lineageData.dimension().location()
-                            + ", but you are in " + level.dimension().location()
-                    )
-                );
+                    .sendFailure(
+                            Component.literal(
+                                    "Lineage is in " + lineageData.dimension().location()
+                                            + ", but you are in " + level.dimension().location()
+                            )
+                    );
             return 0;
         }
 
@@ -660,10 +670,10 @@ public final class HiveDebugCommands {
         HiveLocationRegistry.INSTANCE.register(location);
 
         com.alien.common.gameplay.hive.growth.HiveLocationClaims.claim(
-            level,
-            location,
-            centerChunk,
-            level.getGameTime()
+                level,
+                location,
+                centerChunk,
+                level.getGameTime()
         );
 
         var locationNumber = lineageData.allocateLocationNumber();
@@ -676,17 +686,17 @@ public final class HiveDebugCommands {
             locationData.setLocationId(locationId);
         }
         locationFaction.setName(
-            FactionNaming.forLocation(lineageData.variant(), lineageData.lineageNumber(), locationNumber)
+                FactionNaming.forLocation(lineageData.variant(), lineageData.lineageNumber(), locationNumber)
         );
 
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    "Minted location " + locationId + " in lineage " + lineageFactionId
-                        + " at " + centerPos
-                ),
-                true
-            );
+                .sendSuccess(
+                        () -> Component.literal(
+                                "Minted location " + locationId + " in lineage " + lineageFactionId
+                                        + " at " + centerPos
+                        ),
+                        true
+                );
 
         return 1;
     }
@@ -707,18 +717,18 @@ public final class HiveDebugCommands {
 
         if (faction == null) {
             ctx.getSource()
-                .sendFailure(Component.literal("Variant faction does not exist yet: " + factionId));
+                    .sendFailure(Component.literal("Variant faction does not exist yet: " + factionId));
             return 0;
         }
 
         var members = faction.membership().getMembers();
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    "Variant " + variant + " (" + factionId + ") has " + members.size() + " members:"
-                ),
-                false
-            );
+                .sendSuccess(
+                        () -> Component.literal(
+                                "Variant " + variant + " (" + factionId + ") has " + members.size() + " members:"
+                        ),
+                        false
+                );
 
         if (members.isEmpty()) {
             ctx.getSource().sendSuccess(() -> Component.literal("  (none)"), false);
@@ -726,21 +736,21 @@ public final class HiveDebugCommands {
             for (var member : members) {
                 if (member instanceof FactionMember.Entity entityMember) {
                     ctx.getSource()
-                        .sendSuccess(() -> Component.literal("  " + entityMember.uuid()), false);
+                            .sendSuccess(() -> Component.literal("  " + entityMember.uuid()), false);
                 }
             }
         }
 
         if (faction.data() instanceof VariantFactionData variantData) {
             ctx.getSource()
-                .sendSuccess(
-                    () -> Component.literal(
-                        "  data.variant=" + variantData.variant()
-                            + " ageInTicks=" + variantData.ageInTicks()
-                            + " queenMothers=" + variantData.queenMotherIdsByDimension().size()
-                    ),
-                    false
-                );
+                    .sendSuccess(
+                            () -> Component.literal(
+                                    "  data.variant=" + variantData.variant()
+                                            + " ageInTicks=" + variantData.ageInTicks()
+                                            + " queenMothers=" + variantData.queenMotherIdsByDimension().size()
+                            ),
+                            false
+                    );
         }
 
         return members.size();
@@ -760,19 +770,19 @@ public final class HiveDebugCommands {
 
         if (!lineageData.dimension().equals(level.dimension())) {
             ctx.getSource()
-                .sendFailure(
-                    Component.literal(
-                        "Lineage is in " + lineageData.dimension().location()
-                            + ", but you are in " + level.dimension().location()
-                    )
-                );
+                    .sendFailure(
+                            Component.literal(
+                                    "Lineage is in " + lineageData.dimension().location()
+                                            + ", but you are in " + level.dimension().location()
+                            )
+                    );
             return 0;
         }
 
         var area = player.getBoundingBox().inflate(FORCE_JOIN_RADIUS_BLOCKS);
         var aliens = level.getEntitiesOfClass(
-            com.alien.common.gameplay.entity.living.alien.Alien.class,
-            area
+                com.alien.common.gameplay.entity.living.alien.Alien.class,
+                area
         );
 
         var joined = 0;
@@ -785,13 +795,13 @@ public final class HiveDebugCommands {
         var finalJoined = joined;
         var finalScanned = aliens.size();
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    "Force-joined " + finalJoined + " of " + finalScanned
-                        + " nearby aliens to lineage " + lineageFactionId + " (variant filter applied)."
-                ),
-                true
-            );
+                .sendSuccess(
+                        () -> Component.literal(
+                                "Force-joined " + finalJoined + " of " + finalScanned
+                                        + " nearby aliens to lineage " + lineageFactionId + " (variant filter applied)."
+                        ),
+                        true
+                );
         return joined;
     }
 
@@ -801,8 +811,8 @@ public final class HiveDebugCommands {
 
         var area = player.getBoundingBox().inflate(FORCE_JOIN_RADIUS_BLOCKS);
         var aliens = level.getEntitiesOfClass(
-            com.alien.common.gameplay.entity.living.alien.Alien.class,
-            area
+                com.alien.common.gameplay.entity.living.alien.Alien.class,
+                area
         );
 
         var joined = 0;
@@ -823,12 +833,12 @@ public final class HiveDebugCommands {
         var finalJoined = joined;
         var finalScanned = aliens.size();
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    "Force-joined " + finalJoined + " of " + finalScanned + " nearby aliens to their variant factions."
-                ),
-                true
-            );
+                .sendSuccess(
+                        () -> Component.literal(
+                                "Force-joined " + finalJoined + " of " + finalScanned + " nearby aliens to their variant factions."
+                        ),
+                        true
+                );
         return joined;
     }
 
@@ -838,8 +848,8 @@ public final class HiveDebugCommands {
 
         var area = player.getBoundingBox().inflate(FORCE_JOIN_RADIUS_BLOCKS);
         var aliens = level.getEntitiesOfClass(
-            com.alien.common.gameplay.entity.living.alien.Alien.class,
-            area
+                com.alien.common.gameplay.entity.living.alien.Alien.class,
+                area
         );
 
         var shed = 0;
@@ -855,12 +865,12 @@ public final class HiveDebugCommands {
         var finalShed = shed;
         var finalChecked = checked;
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    "Force-shed check on " + finalChecked + " nearby aliens; " + finalShed + " were shed."
-                ),
-                true
-            );
+                .sendSuccess(
+                        () -> Component.literal(
+                                "Force-shed check on " + finalChecked + " nearby aliens; " + finalShed + " were shed."
+                        ),
+                        true
+                );
         return shed;
     }
 
@@ -871,18 +881,18 @@ public final class HiveDebugCommands {
      */
     private static Component copyableId(String id) {
         return Component.literal(id)
-            .withStyle(
-                style -> style
-                    .withColor(ChatFormatting.AQUA)
-                    .withUnderlined(true)
-                    .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, id))
-                    .withHoverEvent(
-                        new HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT,
-                            Component.literal("Click to copy: " + id)
-                        )
-                    )
-            );
+                .withStyle(
+                        style -> style
+                                .withColor(ChatFormatting.AQUA)
+                                .withUnderlined(true)
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, id))
+                                .withHoverEvent(
+                                        new HoverEvent(
+                                                HoverEvent.Action.SHOW_TEXT,
+                                                Component.literal("Click to copy: " + id)
+                                        )
+                                )
+                );
     }
 
     /**
@@ -899,10 +909,10 @@ public final class HiveDebugCommands {
 
         var vents = location.ventManager().allVents();
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal("Location " + location.id() + " has " + vents.size() + " known vent(s):"),
-                false
-            );
+                .sendSuccess(
+                        () -> Component.literal("Location " + location.id() + " has " + vents.size() + " known vent(s):"),
+                        false
+                );
         for (var pos : vents) {
             ctx.getSource().sendSuccess(() -> Component.literal("  " + pos.toShortString()), false);
         }
@@ -923,10 +933,10 @@ public final class HiveDebugCommands {
         }
         location.setBiomass(location.biomass() + amount);
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal("Biomass for " + locationId + " is now " + location.biomass() + "."),
-                true
-            );
+                .sendSuccess(
+                        () -> Component.literal("Biomass for " + locationId + " is now " + location.biomass() + "."),
+                        true
+                );
         return location.biomass();
     }
 
@@ -938,8 +948,8 @@ public final class HiveDebugCommands {
         var level = ctx.getSource().getLevel();
 
         var queen = level.getEntitiesOfClass(
-            com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen.class,
-            player.getBoundingBox().inflate(64.0)
+                com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen.class,
+                player.getBoundingBox().inflate(64.0)
         ).stream().min(java.util.Comparator.comparingDouble(q -> q.distanceToSqr(player))).orElse(null);
 
         if (queen == null) {
@@ -949,6 +959,67 @@ public final class HiveDebugCommands {
 
         var report = queen.getOvipositorManager().debugReport();
         ctx.getSource().sendSuccess(() -> Component.literal(report), false);
+        return 1;
+    }
+
+    private static com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen nearestQueen(
+            com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx
+    ) {
+        var player = Objects.requireNonNull(ctx.getSource().getPlayer());
+        var level = ctx.getSource().getLevel();
+        return level.getEntitiesOfClass(
+                com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen.class,
+                player.getBoundingBox().inflate(64.0)
+        ).stream().min(java.util.Comparator.comparingDouble(q -> q.distanceToSqr(player))).orElse(null);
+    }
+
+    /** Prints the nearest queen's front-end lifecycle phase and timers (developing / hibernation) plus her anchor. */
+    private static int inspectLifecycle(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
+        var queen = nearestQueen(ctx);
+        if (queen == null) {
+            ctx.getSource().sendFailure(Component.literal("No queen within 64 blocks."));
+            return 0;
+        }
+
+        var mgr = queen.getLifecyclePhaseManager();
+        ctx.getSource()
+                .sendSuccess(
+                        () -> Component.literal(
+                                "Queen " + queen.getUUID() + " front-end lifecycle:\n"
+                                        + "  enabled="
+                                        + com.alien.common.gameplay.entity.living.alien.xenomorph.queen.QueenLifecyclePhaseManager.isEnabled()
+                                        + "\n  phase=" + mgr.getPhase()
+                                        + "\n  developingTicksRemaining=" + mgr.getDevelopingTicksRemaining()
+                                        + "\n  anchor=" + mgr.getAnchor()
+                                        + "\n  hibernationTicksRemaining=" + mgr.getHibernationTicksRemaining()
+                        ),
+                        false
+                );
+        return 1;
+    }
+
+    /** Zeroes the nearest hibernating queen's sleep timer so she wakes and founds on the next tick. */
+    private static int hibernationSkip(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
+        var queen = nearestQueen(ctx);
+        if (queen == null) {
+            ctx.getSource().sendFailure(Component.literal("No queen within 64 blocks."));
+            return 0;
+        }
+
+        var mgr = queen.getLifecyclePhaseManager();
+        if (mgr.getPhase()
+                != com.alien.common.gameplay.entity.living.alien.xenomorph.queen.QueenLifecyclePhase.HIBERNATION) {
+            ctx.getSource()
+                    .sendFailure(Component.literal("Nearest queen is in phase " + mgr.getPhase() + ", not HIBERNATION."));
+            return 0;
+        }
+
+        mgr.skipHibernation();
+        ctx.getSource()
+                .sendSuccess(
+                        () -> Component.literal("Skipped hibernation for queen " + queen.getUUID() + " — she founds next tick."),
+                        true
+                );
         return 1;
     }
 
@@ -967,9 +1038,9 @@ public final class HiveDebugCommands {
 
         if (location == null) {
             ctx.getSource()
-                .sendFailure(
-                    Component.literal("You are not standing in any hive's claimed chunk (" + chunk + ").")
-                );
+                    .sendFailure(
+                            Component.literal("You are not standing in any hive's claimed chunk (" + chunk + ").")
+                    );
             return 0;
         }
 
@@ -978,17 +1049,17 @@ public final class HiveDebugCommands {
         var inside = location.withinSlab(playerY);
 
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    "Hive " + location.id() + "\n"
-                        + "  center=" + location.centerPos() + "\n"
-                        + "  slab band: Y " + floor + " .. " + ceiling + " (with tolerance)\n"
-                        + "  your Y=" + playerY + " -> " + (inside
-                            ? "INSIDE slab (spawns allowed here)"
-                            : "OUTSIDE slab (spawns clamped away here)")
-                ),
-                false
-            );
+                .sendSuccess(
+                        () -> Component.literal(
+                                "Hive " + location.id() + "\n"
+                                        + "  center=" + location.centerPos() + "\n"
+                                        + "  slab band: Y " + floor + " .. " + ceiling + " (with tolerance)\n"
+                                        + "  your Y=" + playerY + " -> " + (inside
+                                        ? "INSIDE slab (spawns allowed here)"
+                                        : "OUTSIDE slab (spawns clamped away here)")
+                        ),
+                        false
+                );
         return inside ? 1 : 0;
     }
 
@@ -1001,10 +1072,10 @@ public final class HiveDebugCommands {
         var now = !com.alien.common.network.handler.HiveRenderToggleHandler.isEnabled(player.getUUID());
         com.alien.common.network.handler.HiveRenderToggleHandler.setEnabled(player, now);
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal("Hive render overlay is now " + (now ? "ON" : "OFF") + "."),
-                false
-            );
+                .sendSuccess(
+                        () -> Component.literal("Hive render overlay is now " + (now ? "ON" : "OFF") + "."),
+                        false
+                );
         return now ? 1 : 0;
     }
 
@@ -1012,10 +1083,10 @@ public final class HiveDebugCommands {
         var now = !com.alien.common.gameplay.hive.spawning.HiveLoadedSpawner.DEBUG_SPAWN_REJECTS;
         com.alien.common.gameplay.hive.spawning.HiveLoadedSpawner.DEBUG_SPAWN_REJECTS = now;
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal("Hive spawn-reject logging is now " + (now ? "ON" : "OFF") + "."),
-                true
-            );
+                .sendSuccess(
+                        () -> Component.literal("Hive spawn-reject logging is now " + (now ? "ON" : "OFF") + "."),
+                        true
+                );
         return now ? 1 : 0;
     }
 
@@ -1037,12 +1108,12 @@ public final class HiveDebugCommands {
             for (var dz = -radius; dz <= radius; dz++) {
                 var chunk = new ChunkPos(centerChunk.x + dx, centerChunk.z + dz);
                 if (
-                    com.alien.common.gameplay.hive.growth.HiveLocationClaims.claim(
-                        serverLevel,
-                        location,
-                        chunk,
-                        serverLevel.getGameTime()
-                    )
+                        com.alien.common.gameplay.hive.growth.HiveLocationClaims.claim(
+                                serverLevel,
+                                location,
+                                chunk,
+                                serverLevel.getGameTime()
+                        )
                 ) {
                     added++;
                 }
@@ -1051,13 +1122,13 @@ public final class HiveDebugCommands {
 
         var finalAdded = added;
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    "Claimed " + finalAdded + " new chunks around " + locationId + " (radius=" + radius + ")."
-                        + " Total claimed=" + location.claimedChunks().size()
-                ),
-                true
-            );
+                .sendSuccess(
+                        () -> Component.literal(
+                                "Claimed " + finalAdded + " new chunks around " + locationId + " (radius=" + radius + ")."
+                                        + " Total claimed=" + location.claimedChunks().size()
+                        ),
+                        true
+                );
         return added;
     }
 
@@ -1067,20 +1138,20 @@ public final class HiveDebugCommands {
         var settlementTicks = HiveLocationRegistry.INSTANCE.config().settlementTicks();
 
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    "Settlement detector: " + snapshot.size() + " queens currently anchored "
-                        + "(threshold=" + settlementTicks + " ticks):"
-                ),
-                false
-            );
+                .sendSuccess(
+                        () -> Component.literal(
+                                "Settlement detector: " + snapshot.size() + " queens currently anchored "
+                                        + "(threshold=" + settlementTicks + " ticks):"
+                        ),
+                        false
+                );
 
         if (snapshot.isEmpty()) {
             ctx.getSource()
-                .sendSuccess(
-                    () -> Component.literal("  (none — no queens are standing still without combat)"),
-                    false
-                );
+                    .sendSuccess(
+                            () -> Component.literal("  (none — no queens are standing still without combat)"),
+                            false
+                    );
             return 0;
         }
 
@@ -1088,14 +1159,14 @@ public final class HiveDebugCommands {
             var elapsed = currentTick - entry.getValue().startedAtTick();
             var remaining = Math.max(0L, settlementTicks - elapsed);
             ctx.getSource()
-                .sendSuccess(
-                    () -> Component.literal(
-                        "  " + entry.getKey()
-                            + " @ chunk " + entry.getValue().chunk()
-                            + " elapsed=" + elapsed + "t remaining=" + remaining + "t"
-                    ),
-                    false
-                );
+                    .sendSuccess(
+                            () -> Component.literal(
+                                    "  " + entry.getKey()
+                                            + " @ chunk " + entry.getValue().chunk()
+                                            + " elapsed=" + elapsed + "t remaining=" + remaining + "t"
+                            ),
+                            false
+                    );
         }
 
         return snapshot.size();
@@ -1125,7 +1196,7 @@ public final class HiveDebugCommands {
         LocationDeathHandler.killAdmin(serverLevel, location, lineage, "kill_location debug command");
 
         ctx.getSource()
-            .sendSuccess(() -> Component.literal("Killed location " + locationId), true);
+                .sendSuccess(() -> Component.literal("Killed location " + locationId), true);
         return 1;
     }
 
@@ -1158,13 +1229,13 @@ public final class HiveDebugCommands {
         var biomassDelta = location.biomass() - beforeBiomass;
 
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    "Force-grew " + locationId + ": +" + addedChunks + " chunks, biomass " + beforeBiomass
-                        + " → " + location.biomass() + " (delta=" + biomassDelta + ")"
-                ),
-                true
-            );
+                .sendSuccess(
+                        () -> Component.literal(
+                                "Force-grew " + locationId + ": +" + addedChunks + " chunks, biomass " + beforeBiomass
+                                        + " → " + location.biomass() + " (delta=" + biomassDelta + ")"
+                        ),
+                        true
+                );
         return addedChunks;
     }
 
@@ -1185,54 +1256,54 @@ public final class HiveDebugCommands {
             }
             lineagesWithConvoys++;
             ctx.getSource()
-                .sendSuccess(
-                    () -> Component.literal(
-                        "Lineage " + factionId + " has " + lineage.convoys().size() + " convoy(s):"
-                    ),
-                    false
-                );
+                    .sendSuccess(
+                            () -> Component.literal(
+                                    "Lineage " + factionId + " has " + lineage.convoys().size() + " convoy(s):"
+                            ),
+                            false
+                    );
             for (var convoy : lineage.convoys()) {
                 totalConvoys++;
                 if (convoy instanceof Convoy.Reinforcement reinforcement) {
                     ctx.getSource()
-                        .sendSuccess(
-                            () -> Component.literal(
-                                "  REINFORCEMENT " + reinforcement.id()
-                                    + " src=" + reinforcement.sourceLocationId()
-                                    + " dst=" + reinforcement.destinationLocationId()
-                                    + " pos=" + formatVec(reinforcement.currentPos())
-                                    + " composition=" + reinforcement.composition().getCount()
-                            ),
-                            false
-                        );
+                            .sendSuccess(
+                                    () -> Component.literal(
+                                            "  REINFORCEMENT " + reinforcement.id()
+                                                    + " src=" + reinforcement.sourceLocationId()
+                                                    + " dst=" + reinforcement.destinationLocationId()
+                                                    + " pos=" + formatVec(reinforcement.currentPos())
+                                                    + " composition=" + reinforcement.composition().getCount()
+                                    ),
+                                    false
+                            );
                 } else if (convoy instanceof Convoy.Migration migration) {
                     ctx.getSource()
-                        .sendSuccess(
-                            () -> Component.literal(
-                                "  MIGRATION " + migration.id()
-                                    + " src=" + migration.sourceLocationId()
-                                    + " dst=" + migration.destinationLocationId()
-                                    + " pos=" + formatVec(migration.currentPos())
-                                    + " composition=" + migration.composition().getCount()
-                                    + " biomass=" + migration.biomassPayload()
-                                    + (migration.carriesEmpress() ? " (carries empress)" : "")
-                            ),
-                            false
-                        );
+                            .sendSuccess(
+                                    () -> Component.literal(
+                                            "  MIGRATION " + migration.id()
+                                                    + " src=" + migration.sourceLocationId()
+                                                    + " dst=" + migration.destinationLocationId()
+                                                    + " pos=" + formatVec(migration.currentPos())
+                                                    + " composition=" + migration.composition().getCount()
+                                                    + " biomass=" + migration.biomassPayload()
+                                                    + (migration.carriesEmpress() ? " (carries empress)" : "")
+                                    ),
+                                    false
+                            );
                 } else if (convoy instanceof Convoy.Raid raid) {
                     ctx.getSource()
-                        .sendSuccess(
-                            () -> Component.literal(
-                                "  RAID " + raid.id()
-                                    + " src=" + raid.sourceLocationId()
-                                    + " target=" + raid.targetPlayerId()
-                                    + " pos=" + formatVec(raid.currentPos())
-                                    + " lastSeen=" + raid.lastKnownTargetPos()
-                                    + " composition=" + raid.composition().getCount()
-                                    + " expiresAt=" + raid.expiresAtTick()
-                            ),
-                            false
-                        );
+                            .sendSuccess(
+                                    () -> Component.literal(
+                                            "  RAID " + raid.id()
+                                                    + " src=" + raid.sourceLocationId()
+                                                    + " target=" + raid.targetPlayerId()
+                                                    + " pos=" + formatVec(raid.currentPos())
+                                                    + " lastSeen=" + raid.lastKnownTargetPos()
+                                                    + " composition=" + raid.composition().getCount()
+                                                    + " expiresAt=" + raid.expiresAtTick()
+                                    ),
+                                    false
+                            );
                 }
             }
         }
@@ -1240,12 +1311,12 @@ public final class HiveDebugCommands {
         var finalTotalConvoys = totalConvoys;
         var finalLineagesWithConvoys = lineagesWithConvoys;
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    "Total: " + finalTotalConvoys + " convoy(s) across " + finalLineagesWithConvoys + " lineage(s)"
-                ),
-                false
-            );
+                .sendSuccess(
+                        () -> Component.literal(
+                                "Total: " + finalTotalConvoys + " convoy(s) across " + finalLineagesWithConvoys + " lineage(s)"
+                        ),
+                        false
+                );
         return totalConvoys;
     }
 
@@ -1256,10 +1327,10 @@ public final class HiveDebugCommands {
     private static int forceDispatchReinforcements(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
         ReinforcementDispatcher.scanAndDispatch(ctx.getSource().getServer());
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal("Triggered ReinforcementDispatcher.scanAndDispatch — see /list_convoys for results"),
-                true
-            );
+                .sendSuccess(
+                        () -> Component.literal("Triggered ReinforcementDispatcher.scanAndDispatch — see /list_convoys for results"),
+                        true
+                );
         return 1;
     }
 
@@ -1280,14 +1351,14 @@ public final class HiveDebugCommands {
 
         var ok = MigrationDispatch.forceMigration(ctx.getSource().getServer(), location, lineage);
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    ok
-                        ? "Migration dispatched from " + locationId + " — see /list_convoys for the convoy"
-                        : "Migration declined (no sister destination, or lineage data missing)"
-                ),
-                true
-            );
+                .sendSuccess(
+                        () -> Component.literal(
+                                ok
+                                        ? "Migration dispatched from " + locationId + " — see /list_convoys for the convoy"
+                                        : "Migration declined (no sister destination, or lineage data missing)"
+                        ),
+                        true
+                );
         return ok ? 1 : 0;
     }
 
@@ -1304,18 +1375,18 @@ public final class HiveDebugCommands {
         var waveProfile = RaidWaveProfileRegistry.forVariant(lineage.variant());
         var ok = RaidDispatch.forceRaid(ctx.getSource().getServer(), lineage, lineageFactionId, player);
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    ok
-                        ? "Raid dispatched against " + player.getGameProfile().getName()
-                            + " from largest eligible source — see /list_convoys"
-                        : "Raid declined (no eligible source — needs empress + a location with " +
-                            HiveLocationRegistry.INSTANCE.config().raidMinLocationSizeChunks() + "+ chunks, " +
-                            "and reserves that satisfy the " + waveProfile.totalSize() + "-member " +
-                            lineage.variant().name() + " raid wave profile)"
-                ),
-                true
-            );
+                .sendSuccess(
+                        () -> Component.literal(
+                                ok
+                                        ? "Raid dispatched against " + player.getGameProfile().getName()
+                                        + " from largest eligible source — see /list_convoys"
+                                        : "Raid declined (no eligible source — needs empress + a location with " +
+                                        HiveLocationRegistry.INSTANCE.config().raidMinLocationSizeChunks() + "+ chunks, " +
+                                        "and reserves that satisfy the " + waveProfile.totalSize() + "-member " +
+                                        lineage.variant().name() + " raid wave profile)"
+                        ),
+                        true
+                );
         return ok ? 1 : 0;
     }
 
@@ -1333,13 +1404,13 @@ public final class HiveDebugCommands {
         var aggroWindow = HiveLocationRegistry.INSTANCE.config().raidAggroWindowTicks();
 
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    "Lineage " + lineageFactionId + " kill attribution (" + attribution.size() + " players, "
-                        + "aggro window=" + aggroWindow + " ticks):"
-                ),
-                false
-            );
+                .sendSuccess(
+                        () -> Component.literal(
+                                "Lineage " + lineageFactionId + " kill attribution (" + attribution.size() + " players, "
+                                        + "aggro window=" + aggroWindow + " ticks):"
+                        ),
+                        false
+                );
 
         if (attribution.isEmpty()) {
             ctx.getSource().sendSuccess(() -> Component.literal("  (none)"), false);
@@ -1349,12 +1420,12 @@ public final class HiveDebugCommands {
         for (var entry : attribution.entrySet()) {
             var recent = lineage.countRecentKills(entry.getKey(), currentTick, aggroWindow);
             ctx.getSource()
-                .sendSuccess(
-                    () -> Component.literal(
-                        "  " + entry.getKey() + " — " + recent + " kill(s) within window"
-                    ),
-                    false
-                );
+                    .sendSuccess(
+                            () -> Component.literal(
+                                    "  " + entry.getKey() + " — " + recent + " kill(s) within window"
+                            ),
+                            false
+                    );
         }
         return attribution.size();
     }
@@ -1365,19 +1436,19 @@ public final class HiveDebugCommands {
         var moltDuration = HiveLocationRegistry.INSTANCE.config().empressMoltDurationTicks();
 
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    "Empress emergence: " + snapshot.size() + " queens currently molting (duration=" + moltDuration + "t):"
-                ),
-                false
-            );
+                .sendSuccess(
+                        () -> Component.literal(
+                                "Empress emergence: " + snapshot.size() + " queens currently molting (duration=" + moltDuration + "t):"
+                        ),
+                        false
+                );
 
         if (snapshot.isEmpty()) {
             ctx.getSource()
-                .sendSuccess(
-                    () -> Component.literal("  (none — run /force_emergence_scan to trigger if conditions are met)"),
-                    false
-                );
+                    .sendSuccess(
+                            () -> Component.literal("  (none — run /force_emergence_scan to trigger if conditions are met)"),
+                            false
+                    );
             return 0;
         }
 
@@ -1385,14 +1456,14 @@ public final class HiveDebugCommands {
             var elapsed = currentTick - entry.getValue().startedAtTick();
             var remaining = Math.max(0L, moltDuration - elapsed);
             ctx.getSource()
-                .sendSuccess(
-                    () -> Component.literal(
-                        "  queen=" + entry.getKey()
-                            + " lineage=" + entry.getValue().lineageFactionId()
-                            + " elapsed=" + elapsed + "t remaining=" + remaining + "t"
-                    ),
-                    false
-                );
+                    .sendSuccess(
+                            () -> Component.literal(
+                                    "  queen=" + entry.getKey()
+                                            + " lineage=" + entry.getValue().lineageFactionId()
+                                            + " elapsed=" + elapsed + "t remaining=" + remaining + "t"
+                            ),
+                            false
+                    );
         }
 
         return snapshot.size();
@@ -1401,22 +1472,22 @@ public final class HiveDebugCommands {
     private static int forceEmergenceScan(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
         EmpressEmergenceTask.scanAndStart(ctx.getSource().getServer());
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    "EmpressEmergenceTask.scanAndStart fired — see /list_emerging for results"
-                ),
-                true
-            );
+                .sendSuccess(
+                        () -> Component.literal(
+                                "EmpressEmergenceTask.scanAndStart fired — see /list_emerging for results"
+                        ),
+                        true
+                );
         return 1;
     }
 
     private static int forceInvariantCheck(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
         LineageInvariantTask.scanAll();
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal("LineageInvariantTask.scanAll fired — see server log for any evictions"),
-                true
-            );
+                .sendSuccess(
+                        () -> Component.literal("LineageInvariantTask.scanAll fired — see server log for any evictions"),
+                        true
+                );
         return 1;
     }
 
@@ -1424,16 +1495,16 @@ public final class HiveDebugCommands {
         HiveLocationRegistry.INSTANCE.rebuildFromFactions();
         HiveLocationRegistry.INSTANCE.repairTerritoryClaims(ctx.getSource().getServer());
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    "HiveLocationRegistry rebuilt: locations="
-                        + HiveLocationRegistry.INSTANCE.locationCount()
-                        + " lineages="
-                        + HiveLocationRegistry.INSTANCE.lineageCount()
-                        + " (see server log for details)"
-                ),
-                true
-            );
+                .sendSuccess(
+                        () -> Component.literal(
+                                "HiveLocationRegistry rebuilt: locations="
+                                        + HiveLocationRegistry.INSTANCE.locationCount()
+                                        + " lineages="
+                                        + HiveLocationRegistry.INSTANCE.lineageCount()
+                                        + " (see server log for details)"
+                        ),
+                        true
+                );
         return HiveLocationRegistry.INSTANCE.locationCount();
     }
 
@@ -1441,28 +1512,28 @@ public final class HiveDebugCommands {
         HiveLocationRegistry.INSTANCE.validate();
         HiveLocationRegistry.INSTANCE.repairTerritoryClaims(ctx.getSource().getServer());
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal(
-                    "Validate complete. Locations=" + HiveLocationRegistry.INSTANCE.locationCount()
-                        + " lineages=" + HiveLocationRegistry.INSTANCE.lineageCount()
-                        + " (see server log for details)"
-                ),
-                false
-            );
+                .sendSuccess(
+                        () -> Component.literal(
+                                "Validate complete. Locations=" + HiveLocationRegistry.INSTANCE.locationCount()
+                                        + " lineages=" + HiveLocationRegistry.INSTANCE.lineageCount()
+                                        + " (see server log for details)"
+                        ),
+                        false
+                );
         return 1;
     }
 
     private static int forceQueenlessAdvance(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
         var lineageId = ResourceLocationArgument.getId(ctx, LINEAGE_ID_ARG);
         var advanced = com.alien.common.gameplay.hive.lifecycle.QueenlessMaturationTask.forceAdvance(
-            ctx.getSource().getServer(),
-            lineageId
+                ctx.getSource().getServer(),
+                lineageId
         );
         ctx.getSource()
-            .sendSuccess(
-                () -> Component.literal("Queenless maturation force-advanced " + advanced + " location(s) in lineage " + lineageId),
-                true
-            );
+                .sendSuccess(
+                        () -> Component.literal("Queenless maturation force-advanced " + advanced + " location(s) in lineage " + lineageId),
+                        true
+                );
         return advanced;
     }
 
@@ -1491,8 +1562,8 @@ public final class HiveDebugCommands {
                 var leaderId = location.leadership().getLeaderIdOrNull();
                 var leader = com.alien.common.gameplay.hive.lifecycle.QueenlessMaturationTask.peekLeader(server, location);
                 var ticksSinceAdvance = location.queenlessMaturationLastAdvanceTick() == Long.MIN_VALUE
-                    ? -1
-                    : currentTick - location.queenlessMaturationLastAdvanceTick();
+                        ? -1
+                        : currentTick - location.queenlessMaturationLastAdvanceTick();
                 var ticksUntilNext = ticksSinceAdvance < 0 ? -1 : Math.max(0, stageInterval - ticksSinceAdvance);
 
                 final var localFactionId = factionId;
@@ -1500,25 +1571,25 @@ public final class HiveDebugCommands {
                 final var localLeader = leader;
                 final var localUntil = ticksUntilNext;
                 ctx.getSource()
-                    .sendSuccess(
-                        () -> Component.literal(
-                            "  lineage=" + localFactionId
-                                + " location=" + location.id()
-                                + " leader=" + localLeaderId
-                                + " type=" + (localLeader == null
-                                    ? "(unloaded)"
-                                    : localLeader.getType().builtInRegistryHolder().key().location())
-                                + " ticksUntilNextAdvance=" + (localUntil < 0 ? "(timer reset on next scan)" : localUntil)
-                        ),
-                        false
-                    );
+                        .sendSuccess(
+                                () -> Component.literal(
+                                        "  lineage=" + localFactionId
+                                                + " location=" + location.id()
+                                                + " leader=" + localLeaderId
+                                                + " type=" + (localLeader == null
+                                                ? "(unloaded)"
+                                                : localLeader.getType().builtInRegistryHolder().key().location())
+                                                + " ticksUntilNextAdvance=" + (localUntil < 0 ? "(timer reset on next scan)" : localUntil)
+                                ),
+                                false
+                        );
                 reported++;
             }
         }
 
         var finalReported = reported;
         ctx.getSource()
-            .sendSuccess(() -> Component.literal("Queenless maturation: " + finalReported + " location(s) eligible"), false);
+                .sendSuccess(() -> Component.literal("Queenless maturation: " + finalReported + " location(s) eligible"), false);
         return reported;
     }
 
