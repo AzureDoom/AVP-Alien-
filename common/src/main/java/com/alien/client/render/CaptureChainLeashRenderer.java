@@ -16,8 +16,7 @@ import net.minecraft.world.phys.Vec3;
  */
 public final class CaptureChainLeashRenderer {
 
-    private CaptureChainLeashRenderer() {
-    }
+    private CaptureChainLeashRenderer() {}
 
     /**
      * Draw the chain from {@code holder}'s rope-hold position to {@code entity}'s leash attach point. The pose stack is
@@ -25,11 +24,11 @@ public final class CaptureChainLeashRenderer {
      * coordinate below is expressed in that entity-local frame.
      */
     public static void render(
-            Entity entity,
-            Entity holder,
-            float partialTick,
-            PoseStack poseStack,
-            MultiBufferSource buffer
+        Entity entity,
+        Entity holder,
+        float partialTick,
+        PoseStack poseStack,
+        MultiBufferSource buffer
     ) {
         Vec3 entityPos = entity.getPosition(partialTick);
 
@@ -39,9 +38,9 @@ public final class CaptureChainLeashRenderer {
         double cos = Math.cos(bodyRot);
         double sin = Math.sin(bodyRot);
         Vec3 start = new Vec3(
-                cos * leashOffset.z + sin * leashOffset.x,
-                leashOffset.y,
-                sin * leashOffset.z - cos * leashOffset.x
+            cos * leashOffset.z + sin * leashOffset.x,
+            leashOffset.y,
+            sin * leashOffset.z - cos * leashOffset.x
         );
 
         // Holder hand and camera, in the same entity-local frame.

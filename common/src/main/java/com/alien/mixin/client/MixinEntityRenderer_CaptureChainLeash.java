@@ -23,13 +23,13 @@ public abstract class MixinEntityRenderer_CaptureChainLeash {
 
     @Inject(method = "render", at = @At("HEAD"))
     private void avp_alien$drawCaptureChain(
-            Entity entity,
-            float entityYaw,
-            float partialTick,
-            PoseStack poseStack,
-            MultiBufferSource buffer,
-            int packedLight,
-            CallbackInfo ci
+        Entity entity,
+        float entityYaw,
+        float partialTick,
+        PoseStack poseStack,
+        MultiBufferSource buffer,
+        int packedLight,
+        CallbackInfo ci
     ) {
         Entity holder = CaptureHoldClientState.holderOf(entity);
         if (holder != null) {

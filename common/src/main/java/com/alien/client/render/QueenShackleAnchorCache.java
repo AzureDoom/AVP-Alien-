@@ -1,9 +1,10 @@
 package com.alien.client.render;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Per-queen client cache of the three shackle bones' live world positions, published each frame by
@@ -14,7 +15,9 @@ import org.jetbrains.annotations.Nullable;
 public final class QueenShackleAnchorCache {
 
     public static final int LEFT_ARM = 0;
+
     public static final int RIGHT_ARM = 1;
+
     public static final int NECK = 2;
 
     private static final Map<Integer, Vec3[]> CACHE = new ConcurrentHashMap<>();

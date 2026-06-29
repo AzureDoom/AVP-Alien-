@@ -42,12 +42,21 @@ public class AnchorBlockEntity extends BlockEntity {
 
     private static final String TAG_CLIENT_MOB_ID = "ChainMobNetId";
 
+    private static final String TAG_CLIENT_SHACKLE_SLOT = "ChainShackleSlot";
+
     /** Persisted: which mob this chain holds (null = no chain). */
     @Nullable
     private UUID boundMobId;
 
     /** Server-side cache of the bound mob's network id, mirrored to clients for rendering (-1 = none). */
     private int boundMobNetId = -1;
+
+    /**
+     * Which queen shackle slot this anchor occupies, mirrored to clients for the shackle-bone chain render. Re-asserted
+     * every queen tick from her bind order, so it tracks mid-list releases. {@code -1} = not a queen shackle (the chain
+     * then attaches to the generic body point).
+     */
+    private int shackleSlot = -1;
 
     public AnchorBlockEntity(BlockPos pos, BlockState state) {
         super(AlienBlockEntityTypes.ANCHOR.get(), pos, state);
@@ -67,6 +76,20 @@ public class AnchorBlockEntity extends BlockEntity {
     /** Network id of the bound mob for client rendering (-1 if none / not loaded). */
     public int getBoundMobNetId() {
         return boundMobNetId;
+    }
+
+    /** Queen shackle slot for the chain render (-1 = generic body attach). */
+    public int getShackleSlot() {
+        return shackleSlot;
+    }
+
+    /** Set by the queen each tick from her bind order; syncs to clients only when it actually changes. */
+    public void setShackleSlot(int slot) {
+        if (this.shackleSlot != slot) {
+            this.shackleSlot = slot;
+            setChanged();
+            syncToClients();
+        }
     }
 
     /** Attach this anchor's chain to the given mob. */
@@ -190,12 +213,16 @@ public class AnchorBlockEntity extends BlockEntity {
         if (tag.contains(TAG_CLIENT_MOB_ID)) {
             boundMobNetId = tag.getInt(TAG_CLIENT_MOB_ID);
         }
+        if (tag.contains(TAG_CLIENT_SHACKLE_SLOT)) {
+            shackleSlot = tag.getInt(TAG_CLIENT_SHACKLE_SLOT);
+        }
     }
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         var tag = new CompoundTag();
         tag.putInt(TAG_CLIENT_MOB_ID, boundMobNetId);
+        tag.putInt(TAG_CLIENT_SHACKLE_SLOT, shackleSlot);
         return tag;
     }
 

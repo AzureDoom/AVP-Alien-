@@ -5,15 +5,16 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
 import com.blib.api.client.model.v1.AzBone;
 import com.blib.api.client.render.v1.AzRendererPipelineContext;
 import com.blib.api.client.render.v1.layer.AzRenderLayer;
-import java.util.UUID;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.UUID;
 
 /**
  * Publishes the queen's three shackle bones' live world positions every frame so the capture-chain anchors can draw to
- * the actual animated attach points -- following her as she moves, swings, and lunges -- instead of fixed body
- * offsets. As a render layer it runs after the base model is posed, so {@link AzBone#getWorldPosition()} returns this
- * frame's transform; matrix tracking on these bones is enabled in {@code QueenAnimator}. Hidden bones (their chain not
- * yet attached) are skipped -- nothing draws to them.
+ * the actual animated attach points -- following her as she moves, swings, and lunges -- instead of fixed body offsets.
+ * As a render layer it runs after the base model is posed, so {@link AzBone#getWorldPosition()} returns this frame's
+ * transform; matrix tracking on these bones is enabled in {@code QueenAnimator}. Hidden bones (their chain not yet
+ * attached) are skipped -- nothing draws to them.
  */
 public class ShackleAnchorLayer<T> implements AzRenderLayer<UUID, T> {
 

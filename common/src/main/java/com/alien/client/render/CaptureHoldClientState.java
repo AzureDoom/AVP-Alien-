@@ -1,16 +1,17 @@
 package com.alien.client.render;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Client-side mirror of {@code CaptureHoldManager}: which mobs are currently held, and by whom. Populated from
  * {@code S2CCaptureHoldPayload} (grab/release) and read by the draw-only render inject to draw the capture chain.
- *
- * <p>Keyed by network entity id rather than UUID because that is what the payload ships and what the client level can
+ * <p>
+ * Keyed by network entity id rather than UUID because that is what the payload ships and what the client level can
  * resolve cheaply. Stale entries are self-healing: a hold that ends sends a release, and {@link #holderOf} only returns
  * a holder that still resolves to a {@link Player}, so a recycled id can never draw a chain to the wrong entity.
  */
