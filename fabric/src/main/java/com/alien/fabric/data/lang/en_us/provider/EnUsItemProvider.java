@@ -51,6 +51,7 @@ public class EnUsItemProvider {
 
         // UNSORTED
         addItem(builder, AlienItems.ALIEN_MUSIC_DISC_1, "Music Disc");
+        addItem(builder, AlienItems.CAPTURE_CHAIN, "Capture Chain");
         addItem(builder, AlienItems.ALIEN_MUSIC_DISC_1_FRAGMENT, "Disc Fragment");
         builder.add(AlienItems.ALIEN_MUSIC_DISC_1_FRAGMENT.get().getDescriptionId() + ".desc", "Music Disc - Silver Smile");
         addItem(builder, AlienItems.CHITIN, "Chitin");

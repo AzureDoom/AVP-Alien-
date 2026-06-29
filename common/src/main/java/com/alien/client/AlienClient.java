@@ -13,6 +13,7 @@ import com.alien.client.render.armor.PlatedAberrantChitinArmorRenderer;
 import com.alien.client.render.armor.PlatedChitinArmorRenderer;
 import com.alien.client.render.armor.PlatedIrradiatedChitinArmorRenderer;
 import com.alien.client.render.armor.PlatedNetherChitinArmorRenderer;
+import com.alien.client.render.block.AnchorBlockEntityRenderer;
 import com.alien.client.render.block.CrusherHeadBlockEntityRenderer;
 import com.alien.client.render.block.QueenHeadBlockEntityRenderer;
 import com.alien.client.render.block.XenomorphHeadBlockEntityRenderer;
@@ -56,6 +57,7 @@ import com.alien.common.registry.init.block.AlienResinBlocks;
 import com.alien.common.registry.init.block.IrradiatedAlienResinBlocks;
 import com.alien.common.registry.init.block.NetherAlienResinBlocks;
 import com.alien.common.registry.init.item.AlienArmorItems;
+import com.alien.common.registry.init.item.AlienItems;
 import com.alien.common.registry.init.item.AlienXenomorphHeadItems;
 import com.alien.compatibility.blib_engine.BLibEngine;
 import com.blib.api.client.mod.v1.BLibClientMod;
@@ -382,6 +384,7 @@ public class AlienClient {
             registerAsset(entry.head(), entry.itemPath());
             registerAsset(entry.headShield(), entry.shieldItemPath());
         });
+        registerAsset(AlienItems.ANCHOR, "anchor");
     }
 
     private static void registerAsset(BLibHolder<Item> holder, String configPath) {
@@ -403,6 +406,11 @@ public class AlienClient {
             .registerBlockEntityRenderer(
                 AlienBlockEntityTypes.XENOMORPH_HEAD,
                 ctx -> new XenomorphHeadBlockEntityRenderer()
+            );
+        MOD.registries()
+            .registerBlockEntityRenderer(
+                AlienBlockEntityTypes.ANCHOR,
+                ctx -> new AnchorBlockEntityRenderer()
             );
     }
 

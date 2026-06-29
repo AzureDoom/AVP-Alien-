@@ -1,6 +1,7 @@
 package com.alien.common.registry.init.block;
 
 import com.alien.Alien;
+import com.alien.common.gameplay.block.capture.anchor.AnchorBlock;
 import com.alien.common.gameplay.block.crusher.CrusherHeadBlock;
 import com.alien.common.gameplay.block.crusher.CrusherHeadVariant;
 import com.alien.common.gameplay.block.crusher.CrusherWallHeadBlock;
@@ -35,6 +36,11 @@ public class AlienBlocks {
     public static final BLibHolder<Block> SCOURGE_JELLY_BLOCK = create(
         "scourge_jelly_block",
         () -> new JellyBlock(AlienBlockProperties.JELLY.build().speedFactor(0.4F).jumpFactor(0.5F))
+    );
+
+    public static final BLibHolder<AnchorBlock> ANCHOR = create(
+        "anchor",
+        () -> new AnchorBlock(anchorProperties())
     );
 
     public static final BLibHolder<QueenHeadBlock> QUEEN_HEAD = create(
@@ -122,6 +128,14 @@ public class AlienBlocks {
      * by hand in ~1.5s, no resistance, instrument NONE), and {@code noOcclusion} since the BE renderer paints a
      * non-cube shape that doesn't fill the full 1x1x1 voxel.
      */
+    private static BlockBehaviour.Properties anchorProperties() {
+        return BlockBehaviour.Properties.of()
+            .mapColor(MapColor.METAL)
+            .strength(3.5F, 6.0F)
+            .sound(SoundType.METAL)
+            .noOcclusion();
+    }
+
     private static BlockBehaviour.Properties queenHeadProperties() {
         return BlockBehaviour.Properties.of()
             .mapColor(MapColor.COLOR_GRAY)

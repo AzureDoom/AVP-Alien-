@@ -2,6 +2,7 @@ package com.alien.common.registry.init.item;
 
 import com.alien.Alien;
 import com.alien.common.gameplay.item.AgileXenomorphHeadShieldItem;
+import com.alien.common.gameplay.item.CaptureChainItem;
 import com.alien.common.gameplay.item.CrusherHeadItem;
 import com.alien.common.gameplay.item.CrusherHeadShieldItem;
 import com.alien.common.gameplay.item.PoisonJellyItem;
@@ -17,6 +18,7 @@ import com.blib.api.common.registry.v1.BLibHolder;
 import com.blib.api.common.registry.v1.BLibRegistry;
 import com.blib.api.common.registry.v1.impl.BLibDecoratedPotPatternRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DiscFragmentItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
@@ -83,6 +85,16 @@ public class AlienItems {
     );
 
     public static final BLibHolder<Item> POISON_JELLY = create("poison_jelly", PoisonJellyItem::new);
+
+    public static final BLibHolder<Item> ANCHOR = create(
+        "anchor",
+        () -> new BlockItem(AlienBlocks.ANCHOR.get(), new Item.Properties())
+    );
+
+    public static final BLibHolder<Item> CAPTURE_CHAIN = create(
+        "capture_chain",
+        () -> new CaptureChainItem(new Item.Properties())
+    );
 
     public static final BLibHolder<Item> QUEEN_HEAD = create(
         "queen_head",

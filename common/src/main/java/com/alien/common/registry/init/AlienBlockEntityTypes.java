@@ -1,6 +1,7 @@
 package com.alien.common.registry.init;
 
 import com.alien.Alien;
+import com.alien.common.gameplay.block.entity.capture.anchor.AnchorBlockEntity;
 import com.alien.common.gameplay.block.entity.crusher.CrusherHeadBlockEntity;
 import com.alien.common.gameplay.block.entity.queen.QueenHeadBlockEntity;
 import com.alien.common.gameplay.block.entity.resin.node.ResinNodeBlockEntity;
@@ -81,6 +82,11 @@ public class AlienBlockEntityTypes {
     public static final BLibHolder<BlockEntityType<XenomorphHeadBlockEntity>> XENOMORPH_HEAD = create(
         "xenomorph_head",
         () -> BlockEntityType.Builder.of(XenomorphHeadBlockEntity::new, xenomorphHeadBlocks())
+    );
+
+    public static final BLibHolder<BlockEntityType<AnchorBlockEntity>> ANCHOR = create(
+        "anchor",
+        () -> BlockEntityType.Builder.of(AnchorBlockEntity::new, AlienBlocks.ANCHOR.get())
     );
 
     private static Block[] xenomorphHeadBlocks() {

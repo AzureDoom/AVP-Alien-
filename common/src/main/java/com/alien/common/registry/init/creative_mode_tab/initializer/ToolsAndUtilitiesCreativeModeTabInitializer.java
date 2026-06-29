@@ -8,6 +8,8 @@ import java.util.function.Consumer;
 public class ToolsAndUtilitiesCreativeModeTabInitializer {
 
     public static final Consumer<CreativeModeTab.Output> OUTPUT_CONSUMER = output -> {
+        CreativeModeTabUtil.accept(output, AlienItems.ANCHOR);
+        CreativeModeTabUtil.accept(output, AlienItems.CAPTURE_CHAIN);
         CreativeModeTabUtil.accept(output, AlienItems.ALIEN_MUSIC_DISC_1);
     };
 }

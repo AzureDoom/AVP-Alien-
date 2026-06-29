@@ -33,30 +33,6 @@ public class EmpressAnimator extends AzEntityAnimator<Empress> {
         animationTrackContainer.add(
             AzAnimationTrack.builder(this, AzAlienAnimationUtil.BODY)
                 .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.HEAD)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_ARM)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_LEG)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.LEFT_TITTY_ARM)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_ARM)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_LEG)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.RIGHT_TITTY_ARM)
-                .setTransitionLength(5)
-                .build(),
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.TAIL)
-                .setTransitionLength(5)
                 .build()
         );
     }
@@ -132,11 +108,11 @@ public class EmpressAnimator extends AzEntityAnimator<Empress> {
         String animationName = null;
 
         if (attackType == Empress.SWIPE_DOWN)
-            animationName = EmpressAnimationRefs.SWIPEDOWN_BODY_ANIMATION_NAME;
+            animationName = EmpressAnimationRefs.SWIPEDOWN_ANIMATION_NAME;
         else if (attackType == Empress.BACKHAND)
-            animationName = EmpressAnimationRefs.BACKHAND_BODY_ANIMATION_NAME;
+            animationName = EmpressAnimationRefs.BACKHAND_ANIMATION_NAME;
         else if (attackType == Empress.TAIL_STRIKE)
-            animationName = EmpressAnimationRefs.TAILSTRIKE_BODY_ANIMATION_NAME;
+            animationName = EmpressAnimationRefs.TAILSTRIKE_ANIMATION_NAME;
 
         var durationInTicks = empress.attackDurationInTicks.get();
 

@@ -28,6 +28,19 @@ public class QueenAnimator extends AzEntityAnimator<Queen> {
 
     private static final ResourceLocation RIGHT_ARM_LIMB_ID = AlienResources.location("queen_right_arm");
 
+    /**
+     * Capture attachment-point groups on the queen model. Off by default; Layer 2 reveals them per capture state
+     * (gLeftArmShackle = chain 1, gRightArmShackle = chain 2, gNeckShackle = chains 3/4, gTracker = tracker applied,
+     * gInhibitor = inhibitor applied).
+     */
+    private static final String[] CAPTURE_ATTACHMENT_GROUPS = {
+        "gLeftArmShackle",
+        "gRightArmShackle",
+        "gNeckShackle",
+        "gTracker",
+        "gInhibitor"
+    };
+
     private int previousAttackId = Integer.MIN_VALUE;
 
     private final CocoonAnimationStateTracker<Queen> cocoonAnimationStateTracker =
@@ -68,6 +81,14 @@ public class QueenAnimator extends AzEntityAnimator<Queen> {
 
         if (eggSack != null) {
             eggSack.setHidden(true);
+        }
+
+        // Capture attachment points stay hidden until Layer 2 reveals them based on the queen's capture state.
+        for (String group : CAPTURE_ATTACHMENT_GROUPS) {
+            var bone = bakedModel.getBoneOrNull(group);
+            if (bone != null) {
+                bone.setHidden(true);
+            }
         }
     }
 

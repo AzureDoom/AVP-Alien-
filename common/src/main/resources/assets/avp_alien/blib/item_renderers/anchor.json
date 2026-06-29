@@ -1,0 +1,4 @@
+{
+  "parent": "avp_alien:templates/anchor",
+  "texture": "avp_alien:textures/block/anchor.png"
+}

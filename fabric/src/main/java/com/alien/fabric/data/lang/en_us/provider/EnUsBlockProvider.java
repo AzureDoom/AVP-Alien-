@@ -22,6 +22,7 @@ public class EnUsBlockProvider {
     public static final Consumer<FabricLanguageProvider.TranslationBuilder> CONSUMER = builder -> {
         addBlock(builder, AlienBlocks.ROYAL_JELLY_BLOCK, "Royal Jelly Block");
         addBlock(builder, AlienBlocks.SCOURGE_JELLY_BLOCK, "Scourge Jelly Block");
+        addBlock(builder, AlienBlocks.ANCHOR, "Anchor");
 
         addBlock(builder, AberrantAlienResinBlocks.ABERRANT_RESIN, "Aberrant Resin");
         addBlock(builder, AberrantAlienResinBlocks.ABERRANT_RESIN_BRICKS, "Aberrant Resin Bricks");
