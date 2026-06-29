@@ -10,6 +10,7 @@ import com.alien.common.network.payload.C2SActivateShieldAbilityPayload;
 import com.alien.common.network.payload.C2SRequestHiveInspectionPayload;
 import com.alien.common.network.payload.C2SToggleHiveRenderPayload;
 import com.alien.common.network.payload.C2SUpdateHiveConfigPayload;
+import com.alien.common.network.payload.S2CCaptureHoldPayload;
 import com.alien.common.network.payload.S2CHiveInspectionPayload;
 import com.alien.common.network.payload.S2CHiveRenderDataPayload;
 import com.blib.api.common.network.v1.NetworkHandler;
@@ -28,65 +29,75 @@ public final class AlienNetworking {
         var registry = Alien.MOD.registries().createNetworkRegistry();
 
         registry.registerPacketDirection(
-            new PacketDirection.C2S<>(C2SRequestHiveInspectionPayload.TYPE, C2SRequestHiveInspectionPayload.CODEC)
+                new PacketDirection.C2S<>(C2SRequestHiveInspectionPayload.TYPE, C2SRequestHiveInspectionPayload.CODEC)
         );
         registry.registerPacketDirection(
-            new PacketDirection.C2S<>(C2SUpdateHiveConfigPayload.TYPE, C2SUpdateHiveConfigPayload.CODEC)
+                new PacketDirection.C2S<>(C2SUpdateHiveConfigPayload.TYPE, C2SUpdateHiveConfigPayload.CODEC)
         );
         registry.registerPacketDirection(
-            new PacketDirection.C2S<>(C2SActivateShieldAbilityPayload.TYPE, C2SActivateShieldAbilityPayload.CODEC)
+                new PacketDirection.C2S<>(C2SActivateShieldAbilityPayload.TYPE, C2SActivateShieldAbilityPayload.CODEC)
         );
         registry.registerPacketDirection(
-            new PacketDirection.S2C<>(S2CHiveInspectionPayload.TYPE, S2CHiveInspectionPayload.CODEC)
+                new PacketDirection.S2C<>(S2CHiveInspectionPayload.TYPE, S2CHiveInspectionPayload.CODEC)
         );
         registry.registerPacketDirection(
-            new PacketDirection.C2S<>(C2SToggleHiveRenderPayload.TYPE, C2SToggleHiveRenderPayload.CODEC)
+                new PacketDirection.C2S<>(C2SToggleHiveRenderPayload.TYPE, C2SToggleHiveRenderPayload.CODEC)
         );
         registry.registerPacketDirection(
-            new PacketDirection.S2C<>(S2CHiveRenderDataPayload.TYPE, S2CHiveRenderDataPayload.CODEC)
+                new PacketDirection.S2C<>(S2CHiveRenderDataPayload.TYPE, S2CHiveRenderDataPayload.CODEC)
+        );
+        registry.registerPacketDirection(
+                new PacketDirection.S2C<>(S2CCaptureHoldPayload.TYPE, S2CCaptureHoldPayload.CODEC)
         );
 
         registry.registerPacketHandler(
-            new NetworkHandler.FromClient<>(
-                C2SRequestHiveInspectionPayload.TYPE,
-                C2SRequestHiveInspectionPayload.CODEC,
-                HiveInspectionRequestHandler::handle
-            )
+                new NetworkHandler.FromClient<>(
+                        C2SRequestHiveInspectionPayload.TYPE,
+                        C2SRequestHiveInspectionPayload.CODEC,
+                        HiveInspectionRequestHandler::handle
+                )
         );
         registry.registerPacketHandler(
-            new NetworkHandler.FromClient<>(
-                C2SUpdateHiveConfigPayload.TYPE,
-                C2SUpdateHiveConfigPayload.CODEC,
-                HiveConfigUpdateHandler::handle
-            )
+                new NetworkHandler.FromClient<>(
+                        C2SUpdateHiveConfigPayload.TYPE,
+                        C2SUpdateHiveConfigPayload.CODEC,
+                        HiveConfigUpdateHandler::handle
+                )
         );
         registry.registerPacketHandler(
-            new NetworkHandler.FromClient<>(
-                C2SActivateShieldAbilityPayload.TYPE,
-                C2SActivateShieldAbilityPayload.CODEC,
-                ShieldAbilityActivationHandler::handle
-            )
+                new NetworkHandler.FromClient<>(
+                        C2SActivateShieldAbilityPayload.TYPE,
+                        C2SActivateShieldAbilityPayload.CODEC,
+                        ShieldAbilityActivationHandler::handle
+                )
         );
         registry.registerPacketHandler(
-            new NetworkHandler.FromServer<>(
-                S2CHiveInspectionPayload.TYPE,
-                S2CHiveInspectionPayload.CODEC,
-                AlienClientPacketListener::handleHiveInspection
-            )
+                new NetworkHandler.FromServer<>(
+                        S2CHiveInspectionPayload.TYPE,
+                        S2CHiveInspectionPayload.CODEC,
+                        AlienClientPacketListener::handleHiveInspection
+                )
         );
         registry.registerPacketHandler(
-            new NetworkHandler.FromClient<>(
-                C2SToggleHiveRenderPayload.TYPE,
-                C2SToggleHiveRenderPayload.CODEC,
-                HiveRenderToggleHandler::handle
-            )
+                new NetworkHandler.FromClient<>(
+                        C2SToggleHiveRenderPayload.TYPE,
+                        C2SToggleHiveRenderPayload.CODEC,
+                        HiveRenderToggleHandler::handle
+                )
         );
         registry.registerPacketHandler(
-            new NetworkHandler.FromServer<>(
-                S2CHiveRenderDataPayload.TYPE,
-                S2CHiveRenderDataPayload.CODEC,
-                AlienClientPacketListener::handleHiveRenderData
-            )
+                new NetworkHandler.FromServer<>(
+                        S2CHiveRenderDataPayload.TYPE,
+                        S2CHiveRenderDataPayload.CODEC,
+                        AlienClientPacketListener::handleHiveRenderData
+                )
+        );
+        registry.registerPacketHandler(
+                new NetworkHandler.FromServer<>(
+                        S2CCaptureHoldPayload.TYPE,
+                        S2CCaptureHoldPayload.CODEC,
+                        AlienClientPacketListener::handleCaptureHold
+                )
         );
     }
 }

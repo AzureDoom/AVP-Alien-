@@ -28,23 +28,10 @@ public class QueenAnimator extends AzEntityAnimator<Queen> {
 
     private static final ResourceLocation RIGHT_ARM_LIMB_ID = AlienResources.location("queen_right_arm");
 
-    /**
-     * Capture attachment-point groups on the queen model. Off by default; Layer 2 reveals them per capture state
-     * (gLeftArmShackle = chain 1, gRightArmShackle = chain 2, gNeckShackle = chains 3/4, gTracker = tracker applied,
-     * gInhibitor = inhibitor applied).
-     */
-    private static final String[] CAPTURE_ATTACHMENT_GROUPS = {
-        "gLeftArmShackle",
-        "gRightArmShackle",
-        "gNeckShackle",
-        "gTracker",
-        "gInhibitor"
-    };
-
     private int previousAttackId = Integer.MIN_VALUE;
 
     private final CocoonAnimationStateTracker<Queen> cocoonAnimationStateTracker =
-        new CocoonAnimationStateTracker<>(QueenAnimator::selectLoopAnimation, QueenAnimator::selectEmergeAnimation);
+            new CocoonAnimationStateTracker<>(QueenAnimator::selectLoopAnimation, QueenAnimator::selectEmergeAnimation);
 
     public QueenAnimator() {
         super(AzAnimatorConfig.defaultConfig());
@@ -53,9 +40,9 @@ public class QueenAnimator extends AzEntityAnimator<Queen> {
     @Override
     public void registerTracks(AzAnimationTrackContainer<Queen> animationTrackContainer) {
         animationTrackContainer.add(
-            AzAnimationTrack.builder(this, AzAlienAnimationUtil.BODY)
-                .setTransitionLength(5)
-                .build()
+                AzAnimationTrack.builder(this, AzAlienAnimationUtil.BODY)
+                        .setTransitionLength(5)
+                        .build()
         );
     }
 
@@ -83,34 +70,57 @@ public class QueenAnimator extends AzEntityAnimator<Queen> {
             eggSack.setHidden(true);
         }
 
-        // Capture attachment points stay hidden until Layer 2 reveals them based on the queen's capture state.
-        for (String group : CAPTURE_ATTACHMENT_GROUPS) {
-            var bone = bakedModel.getBoneOrNull(group);
-            if (bone != null) {
-                bone.setHidden(true);
-            }
+        // Layer 2: reveal each shackle once its chain is attached (chain 1 -> left arm, 2 -> right arm, 3+ -> neck;
+        // chains 5-8 reuse those same bones). Tracker/inhibitor attachment points stay hidden until their slices land.
+        int chainCount = animatable.bindChainCount.get();
+
+        var leftArmShackle = bakedModel.getBoneOrNull("gLeftArmShackle");
+        if (leftArmShackle != null) {
+            leftArmShackle.setHidden(chainCount < 1);
+            leftArmShackle.setTrackingMatrices(true);
+        }
+
+        var rightArmShackle = bakedModel.getBoneOrNull("gRightArmShackle");
+        if (rightArmShackle != null) {
+            rightArmShackle.setHidden(chainCount < 2);
+            rightArmShackle.setTrackingMatrices(true);
+        }
+
+        var neckShackle = bakedModel.getBoneOrNull("gNeckShackle");
+        if (neckShackle != null) {
+            neckShackle.setHidden(chainCount < 3);
+            neckShackle.setTrackingMatrices(true);
+        }
+
+        var tracker = bakedModel.getBoneOrNull("gTracker");
+        if (tracker != null) {
+            tracker.setHidden(true);
+        }
+
+        var inhibitor = bakedModel.getBoneOrNull("gInhibitor");
+        if (inhibitor != null) {
+            inhibitor.setHidden(true);
         }
     }
 
     /** Source-specific in-cocoon loop: from a crusher she plays molting.crusher, otherwise molting.prae. */
     private static String selectLoopAnimation(Queen queen) {
         return queen.cocoonSourceForm.get() == CocoonSourceForm.CRUSHER
-            ? QueenAnimationRefs.MOLTING_CRUSHER_ANIMATION_NAME
-            : QueenAnimationRefs.MOLTING_PRAE_ANIMATION_NAME;
+                ? QueenAnimationRefs.MOLTING_CRUSHER_ANIMATION_NAME
+                : QueenAnimationRefs.MOLTING_PRAE_ANIMATION_NAME;
     }
 
     /** Source-specific emerge burst: from a crusher she plays emerge.crusher, otherwise emerge.prae. */
     private static String selectEmergeAnimation(Queen queen) {
         return queen.cocoonSourceForm.get() == CocoonSourceForm.CRUSHER
-            ? QueenAnimationRefs.EMERGE_CRUSHER_ANIMATION_NAME
-            : QueenAnimationRefs.EMERGE_PRAE_ANIMATION_NAME;
+                ? QueenAnimationRefs.EMERGE_CRUSHER_ANIMATION_NAME
+                : QueenAnimationRefs.EMERGE_PRAE_ANIMATION_NAME;
     }
 
     private void runPassiveAnimations(Queen queen) {
         var dispatcher = queen.getAnimationDispatcher();
 
-        // Front-end Stage 3: while hibernating she holds the curled sleep pose, overriding idle/walk/run. Driven off
-        // the
+        // Front-end Stage 3: while hibernating she holds the curled sleep pose, overriding idle/walk/run. Driven off the
         // synced flag because the lifecycle phase is server-only state — animation dispatch must happen client-side.
         if (queen.isHibernating.get()) {
             dispatcher.hibernate();
@@ -176,24 +186,24 @@ public class QueenAnimator extends AzEntityAnimator<Queen> {
     private String selectAttackAnimation(Queen queen, AttackType attackType, int attackId) {
         if (attackType == Queen.SWIPE_DOWN) {
             return chooseArmAnimation(
-                queen,
-                attackId,
-                QueenAnimationRefs.LEFT_SWIPE_DOWN_ANIMATION_NAME,
-                QueenAnimationRefs.RIGHT_SWIPE_DOWN_ANIMATION_NAME
+                    queen,
+                    attackId,
+                    QueenAnimationRefs.LEFT_SWIPE_DOWN_ANIMATION_NAME,
+                    QueenAnimationRefs.RIGHT_SWIPE_DOWN_ANIMATION_NAME
             );
         } else if (attackType == Queen.BACKHAND) {
             return chooseArmAnimation(
-                queen,
-                attackId,
-                QueenAnimationRefs.LEFT_BACKHAND_ANIMATION_NAME,
-                QueenAnimationRefs.RIGHT_BACKHAND_ANIMATION_NAME
+                    queen,
+                    attackId,
+                    QueenAnimationRefs.LEFT_BACKHAND_ANIMATION_NAME,
+                    QueenAnimationRefs.RIGHT_BACKHAND_ANIMATION_NAME
             );
         } else if (attackType == Queen.TAIL_STRIKE) {
             return chooseTailAnimation(
-                queen,
-                attackId,
-                QueenAnimationRefs.LEFT_TAIL_STRIKE_ANIMATION_NAME,
-                QueenAnimationRefs.RIGHT_TAIL_STRIKE_ANIMATION_NAME
+                    queen,
+                    attackId,
+                    QueenAnimationRefs.LEFT_TAIL_STRIKE_ANIMATION_NAME,
+                    QueenAnimationRefs.RIGHT_TAIL_STRIKE_ANIMATION_NAME
             );
         }
 

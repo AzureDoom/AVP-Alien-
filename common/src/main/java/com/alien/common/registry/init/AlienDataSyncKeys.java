@@ -121,6 +121,12 @@ public class AlienDataSyncKeys {
             .build(0)
     );
 
+    public static final BLibHolder<DataSyncKey<Integer>> QUEEN_BIND_CHAIN_COUNT = create(
+        "queen_bind_chain_count",
+        builder -> builder.networkSynchronized(StreamCodecs.INT)
+            .build(0)
+    );
+
     public static final BLibHolder<DataSyncKey<Integer>> XENOMORPH_ATTACK_DURATION_IN_TICKS = create(
         "xenomorph_attack_duration_in_ticks",
         builder -> builder.networkSynchronized(StreamCodecs.INT)

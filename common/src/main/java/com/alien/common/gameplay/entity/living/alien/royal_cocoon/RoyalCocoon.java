@@ -2,6 +2,8 @@ package com.alien.common.gameplay.entity.living.alien.royal_cocoon;
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.CocoonState;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
+import com.alien.common.model.alien.variant.AlienVariant;
+import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.block.AlienResinBlocks;
 import com.alien.common.registry.tag.AlienDamageTypesTags;
 import net.minecraft.server.level.ServerLevel;
@@ -33,6 +35,21 @@ public class RoyalCocoon extends Mob {
 
     public RoyalCocoon(EntityType<? extends RoyalCocoon> entityType, Level level) {
         super(entityType, level);
+    }
+
+    /**
+     * The strain this cocoon belongs to, derived from its entity type (see class doc). Drives strain-aware targeting: a
+     * xenomorph ignores its own strain's forming royal but a rival strain attacks it.
+     */
+    public AlienVariant getVariant() {
+        var type = getType();
+        if (type == AlienEntityTypes.ABERRANT_ROYAL_COCOON.get()) {
+            return AlienVariant.ABERRANT;
+        }
+        if (type == AlienEntityTypes.NETHER_ROYAL_COCOON.get()) {
+            return AlienVariant.NETHER;
+        }
+        return AlienVariant.NORMAL;
     }
 
     @Override

@@ -2,6 +2,8 @@ package com.alien.common.util;
 
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.entity.living.alien.Alien;
+import com.alien.common.gameplay.entity.living.alien.royal_cocoon.RoyalCocoon;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
 import com.alien.common.model.alien.Host;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.tag.AlienBlockTags;
@@ -30,11 +32,18 @@ public class AlienPredicates {
     }
 
     public static boolean canContinueTargeting(@NotNull Alien alien, @NotNull LivingEntity potentialTarget) {
+        // A fully-bound queen (4+ capture chains) is subdued: she can neither acquire nor keep a combat target.
+        if (alien instanceof Queen boundQueen && boundQueen.getBindManager().isFullyBound()) {
+            return false;
+        }
         // Target must still be valid...
         return isValidTarget(alien.getVariant(), potentialTarget)
             // AND is not an alien OR if it is an alien, is an enemy alien.
             // We add this check here because the target alien might change strain or hive membership mid-targeting.
-            && (!(potentialTarget instanceof Alien targetedAlien) || areAliensEnemies(alien, targetedAlien));
+            && (!(potentialTarget instanceof Alien targetedAlien) || areAliensEnemies(alien, targetedAlien))
+            // AND, for a royal-change cocoon (a plain Mob with its strain encoded in its entity type), only a rival
+            // strain may attack it -- a xenomorph never strikes its own strain's forming royal.
+            && (!(potentialTarget instanceof RoyalCocoon cocoon) || alien.getVariant() != cocoon.getVariant());
     }
 
     public static boolean isAlienTarget(@NotNull Alien alien, @NotNull LivingEntity potentialTarget) {

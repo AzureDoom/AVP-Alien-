@@ -1,6 +1,8 @@
 package com.alien.common.network.handler;
 
+import com.alien.client.render.CaptureHoldClientState;
 import com.alien.client.render.hive.ClientHiveRenderCache;
+import com.alien.common.network.payload.S2CCaptureHoldPayload;
 import com.alien.common.network.payload.S2CHiveInspectionPayload;
 import com.alien.common.network.payload.S2CHiveRenderDataPayload;
 import com.alien.compatibility.blib_engine.client.inspector.ClientHiveInspectionCache;
@@ -18,6 +20,15 @@ public final class AlienClientPacketListener {
     /** Server-pushed hive inspection snapshot for the currently-selected AVP faction. */
     public static void handleHiveInspection(S2CHiveInspectionPayload payload, Player player) {
         ClientHiveInspectionCache.apply(payload);
+    }
+
+    /** Server-pushed capture-chain grab/release: mirror it into the client hold map for rendering. */
+    public static void handleCaptureHold(S2CCaptureHoldPayload payload, Player player) {
+        if (payload.holderId() < 0) {
+            CaptureHoldClientState.remove(payload.mobId());
+        } else {
+            CaptureHoldClientState.put(payload.mobId(), payload.holderId());
+        }
     }
 
     /** Server-pushed hive render data for the debug wireframe overlay. */

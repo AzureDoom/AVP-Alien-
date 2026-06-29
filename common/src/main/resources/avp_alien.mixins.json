@@ -17,7 +17,8 @@
   ],
   "client": [
     "client.MixinLocalPlayer_NoBlockingMovementPenalty",
-    "client.MixinMinecraft_ShieldAbility"
+    "client.MixinMinecraft_ShieldAbility",
+    "client.MixinEntityRenderer_CaptureChainLeash"
   ],
   "server": [],
   "injectors": {

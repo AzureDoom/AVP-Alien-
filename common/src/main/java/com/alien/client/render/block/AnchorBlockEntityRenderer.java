@@ -1,5 +1,6 @@
 package com.alien.client.render.block;
 
+import com.alien.client.render.QueenShackleAnchorCache;
 import com.alien.common.gameplay.block.capture.anchor.AnchorBlock;
 import com.alien.common.gameplay.block.entity.capture.anchor.AnchorBlockEntity;
 import com.alien.common.registry.init.item.AlienItems;
@@ -20,11 +21,11 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Draws the anchor geo (as the item-as-block, the same path the head trophies use) oriented to its mount surface: floor
- * upright, ceiling flipped, wall tilted onto the surface, each yawed by FACING. The wall/ground transform mode is
+ * Draws the anchor geo (as the item-as-block, the same path the head trophies use) oriented to its mount surface:
+ * floor upright, ceiling flipped, wall tilted onto the surface, each yawed by FACING. The wall/ground transform mode is
  * toggled so the BLib template picks its {@code fixed_wall} vs {@code fixed} transform.
- * <p>
- * NOTE: the exact wall/ceiling rotations are a sensible first pass and may need a small in-game tuning tweak.
+ *
+ * <p>NOTE: the exact wall/ceiling rotations are a sensible first pass and may need a small in-game tuning tweak.
  */
 public class AnchorBlockEntityRenderer implements BlockEntityRenderer<AnchorBlockEntity> {
 
@@ -38,12 +39,12 @@ public class AnchorBlockEntityRenderer implements BlockEntityRenderer<AnchorBloc
 
     @Override
     public void render(
-        @NotNull AnchorBlockEntity entity,
-        float partialTick,
-        @NotNull PoseStack poseStack,
-        @NotNull MultiBufferSource source,
-        int packedLight,
-        int packedOverlay
+            @NotNull AnchorBlockEntity entity,
+            float partialTick,
+            @NotNull PoseStack poseStack,
+            @NotNull MultiBufferSource source,
+            int packedLight,
+            int packedOverlay
     ) {
         var state = entity.getBlockState();
         if (!(state.getBlock() instanceof AnchorBlock)) {
@@ -69,9 +70,9 @@ public class AnchorBlockEntityRenderer implements BlockEntityRenderer<AnchorBloc
             case WALL -> {
                 wall = true;
                 poseStack.translate(
-                    0.5 - facing.getStepX() * SEAT_OFFSET,
-                    0.5,
-                    0.5 - facing.getStepZ() * SEAT_OFFSET
+                        0.5 - facing.getStepX() * SEAT_OFFSET,
+                        0.5,
+                        0.5 - facing.getStepZ() * SEAT_OFFSET
                 );
                 poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - facing.toYRot()));
                 poseStack.mulPose(Axis.XP.rotationDegrees(-90.0F));
@@ -86,16 +87,16 @@ public class AnchorBlockEntityRenderer implements BlockEntityRenderer<AnchorBloc
 
         try {
             mc.getItemRenderer()
-                .renderStatic(
-                    new ItemStack(AlienItems.ANCHOR.get()),
-                    ItemDisplayContext.FIXED,
-                    packedLight,
-                    packedOverlay,
-                    poseStack,
-                    source,
-                    entity.getLevel(),
-                    0
-                );
+                    .renderStatic(
+                            new ItemStack(AlienItems.ANCHOR.get()),
+                            ItemDisplayContext.FIXED,
+                            packedLight,
+                            packedOverlay,
+                            poseStack,
+                            source,
+                            entity.getLevel(),
+                            0
+                    );
         } finally {
             BLibItemTransformOverrides.setRenderAsWallBlock(priorWall);
             BLibItemTransformOverrides.setRenderAsGroundBlock(priorGround);
@@ -108,11 +109,11 @@ public class AnchorBlockEntityRenderer implements BlockEntityRenderer<AnchorBloc
 
     /** Draws the capture chain from the anchor's bind point to the held mob, if any. */
     private void renderChainIfBound(
-        AnchorBlockEntity entity,
-        float partialTick,
-        PoseStack poseStack,
-        MultiBufferSource source,
-        int packedLight
+            AnchorBlockEntity entity,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource source,
+            int packedLight
     ) {
         int netId = entity.getBoundMobNetId();
         if (netId < 0 || entity.getLevel() == null) {
@@ -127,13 +128,43 @@ public class AnchorBlockEntityRenderer implements BlockEntityRenderer<AnchorBloc
         Vec3 origin = new Vec3(pos.getX(), pos.getY(), pos.getZ());
 
         Vec3 start = entity.chainAnchorPoint().subtract(origin);
-        Vec3 mobPoint = mob.getPosition(partialTick).add(0.0, mob.getBbHeight() * 0.6, 0.0);
+        Vec3 mobPoint = shackleAttachPoint(mob, entity.getShackleSlot(), partialTick);
         Vec3 end = mobPoint.subtract(origin);
 
-        Vec3 cameraLocal = Minecraft.getInstance().gameRenderer.getMainCamera()
-            .getPosition()
-            .subtract(origin);
+        Vec3 cameraLocal = Minecraft.getInstance()
+                .gameRenderer.getMainCamera().getPosition()
+                .subtract(origin);
 
         ChainRenderer.render(poseStack, source, start, end, cameraLocal, packedLight);
+    }
+
+    // ---- queen shackle attach points -----------------------------------------------------------------------------
+
+    /**
+     * World attach point for a chain. For a queen shackle slot we read the live, animated bone world position that
+     * {@code ShackleAnchorLayer} publishes each frame (so the chain tracks her through movement and attacks); if she
+     * has not been rendered recently the cache is empty and we fall back to a generic body point. Non-queen mobs
+     * ({@code slot < 0}) always use the generic point.
+     */
+    private static Vec3 shackleAttachPoint(LivingEntity mob, int slot, float partialTick) {
+        if (slot >= 0) {
+            Vec3 bonePos = QueenShackleAnchorCache.get(mob.getId(), boneIndexFor(slot));
+            if (bonePos != null) {
+                return bonePos;
+            }
+        }
+        return mob.getPosition(partialTick).add(0.0, mob.getBbHeight() * 0.6, 0.0);
+    }
+
+    /**
+     * Map a bind slot to its shackle bone, matching the reveal order and the eight-chain distribution: slots 0,4 →
+     * left arm; 1,5 → right arm; 2,3,6,7 → neck.
+     */
+    private static int boneIndexFor(int slot) {
+        return switch (slot % 4) {
+            case 0 -> QueenShackleAnchorCache.LEFT_ARM;
+            case 1 -> QueenShackleAnchorCache.RIGHT_ARM;
+            default -> QueenShackleAnchorCache.NECK;
+        };
     }
 }

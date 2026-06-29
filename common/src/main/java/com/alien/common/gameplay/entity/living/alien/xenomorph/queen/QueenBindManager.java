@@ -1,5 +1,6 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.queen;
 
+import com.alien.common.gameplay.block.entity.capture.anchor.AnchorBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.ChunkPos;
@@ -9,17 +10,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Layer 2 — queen-side capture bind state. Tracks up to 8 capture chains (anchor block positions, in attach order)
- * and the bind chunk locked when the first chain attaches. Drives the progressive movement restriction toward that
- * chunk's center; at 4+ chains she is pinned dead-center.
- *
- * <p>This is the source of truth for a queen's restraint; the per-anchor Layer 1 clamp is suppressed for queens (see
+ * Layer 2 — queen-side capture bind state. Tracks up to 8 capture chains (anchor block positions, in attach order) and
+ * the bind chunk locked when the first chain attaches. Drives the progressive movement restriction toward that chunk's
+ * center; at 4+ chains she is pinned dead-center.
+ * <p>
+ * This is the source of truth for a queen's restraint; the per-anchor Layer 1 clamp is suppressed for queens (see
  * {@code AnchorBlockEntity.serverTick}). Attach/detach are fired from {@code AnchorBlockEntity.bind/release}, the
  * single choke points every chain attach/release flows through.
- *
- * <p>Slice 1 scope: state, attach/detach, persistence, and the restriction clamp (server-side). Geo reveal, the
- * anchor-to-shackle render, break-on-attack, AI suppression at 4 chains, and founding suppression are later slices;
- * the queries here ({@link #chainCount()}, {@link #isFullyBound()}, {@link #anchors()}) are the hooks they will read.
+ * <p>
+ * Slice 1 scope: state, attach/detach, persistence, and the restriction clamp (server-side). Geo reveal, the
+ * anchor-to-shackle render, break-on-attack, AI suppression at 4 chains, and founding suppression are later slices; the
+ * queries here ({@link #chainCount()}, {@link #isFullyBound()}, {@link #anchors()}) are the hooks they will read.
  */
 public class QueenBindManager {
 
@@ -27,6 +28,7 @@ public class QueenBindManager {
     public static final int MAX_CHAINS = 8;
 
     private static final String TAG_ANCHORS = "BindAnchors";
+
     private static final String TAG_BIND_CHUNK = "BindChunk";
 
     private final Queen queen;
@@ -51,7 +53,9 @@ public class QueenBindManager {
         return !anchors.isEmpty();
     }
 
-    /** Fully restrained: 4+ chains, pinned at chunk center. (AI suppression that stops her fighting is a later slice.) */
+    /**
+     * Fully restrained: 4+ chains, pinned at chunk center. (AI suppression that stops her fighting is a later slice.)
+     */
     public boolean isFullyBound() {
         return anchors.size() >= 4;
     }
@@ -82,14 +86,54 @@ public class QueenBindManager {
         }
     }
 
+    // ---- break-on-attack (slice 2) ----
+
+    /**
+     * One break roll per attack the queen makes. While she can still fight (1-3 chains) each swing has a chance to snap
+     * the most-recently-attached chain, letting her unravel one step toward freedom; at 4+ chains she is locked (0%)
+     * and no longer attacks anyway. Server-only.
+     */
+    public void onQueenAttack() {
+        if (queen.level().isClientSide() || anchors.isEmpty()) {
+            return;
+        }
+        double chance = switch (anchors.size()) {
+            case 1 -> 0.05;
+            case 2 -> 0.03;
+            case 3 -> 0.01;
+            default -> 0.0; // 4+ chains: unbreakable
+        };
+        if (chance <= 0.0 || queen.getRandom().nextDouble() >= chance) {
+            return;
+        }
+        breakNewestChain();
+    }
+
+    /** Snap the newest chain: the anchor block survives (just freed) and this bind drops, so she unravels one step. */
+    private void breakNewestChain() {
+        BlockPos newest = anchors.get(anchors.size() - 1);
+        if (queen.level().getBlockEntity(newest) instanceof AnchorBlockEntity anchor) {
+            anchor.release(); // clears the anchor's bind and detaches it here through the bind wiring
+        } else {
+            detach(newest); // fallback: the anchor block is already gone
+        }
+    }
+
     // ---- tick: restriction clamp (server-side) ----
 
     public void tick() {
+        if (queen.level().isClientSide()) {
+            return;
+        }
+        // Keep the synced chain count in lockstep so the client (shackle reveal + chain render) sees the right value.
+        if (queen.bindChainCount.get() != anchors.size()) {
+            queen.bindChainCount.set(anchors.size());
+        }
         if (anchors.isEmpty()) {
             bindChunk = null;
             return;
         }
-        if (bindChunk == null || queen.level().isClientSide()) {
+        if (bindChunk == null) {
             return;
         }
         applyRestrictionClamp();
