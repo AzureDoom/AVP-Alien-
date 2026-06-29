@@ -1,5 +1,6 @@
 package com.alien.common.gameplay.entity.living.alien.xenomorph.queen.ai.founding_move;
 
+import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.hive.location.HiveLocation;
 import com.alien.common.gameplay.hive.location.HiveLocationRegistry;
@@ -53,13 +54,13 @@ public final class FoundingMoveSensors {
     private static final double AT_CENTER_RADIUS_SQ = AT_CENTER_RADIUS * AT_CENTER_RADIUS;
 
     public static final Sensor.Mono<Xenomorph, Boolean> IS_FOUNDING = Sensors.map(
-        StateKey.sensed("founding_move_is_founding"),
-        xenomorph -> foundingLocationOrNull(xenomorph) != null
+            StateKey.sensed("founding_move_is_founding"),
+            xenomorph -> foundingLocationOrNull(xenomorph) != null
     );
 
     public static final Sensor.Mono<Xenomorph, Boolean> IS_AT_CENTER = Sensors.map(
-        StateKey.sensed("founding_move_at_center"),
-        FoundingMoveSensors::isAtFoundingCenter
+            StateKey.sensed("founding_move_at_center"),
+            FoundingMoveSensors::isAtFoundingCenter
     );
 
     /** Whether the navigate-to-center behaviour is active at all. Single hook for a future config/condition gate. */
@@ -77,15 +78,20 @@ public final class FoundingMoveSensors {
             return null;
         }
 
+        // A bound queen does not found — her front-end is frozen until she is fully released.
+        if (xenomorph instanceof Queen queen && queen.getBindManager().hasAnyChain()) {
+            return null;
+        }
+
         var dimension = xenomorph.level().dimension();
         var founderId = xenomorph.getUUID();
 
         for (var location : HiveLocationRegistry.INSTANCE.all()) {
             if (
-                location.isAlive()
-                    && founderId.equals(location.founderId())
-                    && !location.reproductiveEstablished()
-                    && location.dimension().equals(dimension)
+                    location.isAlive()
+                            && founderId.equals(location.founderId())
+                            && !location.reproductiveEstablished()
+                            && location.dimension().equals(dimension)
             ) {
                 return location;
             }

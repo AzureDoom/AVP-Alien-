@@ -1,6 +1,7 @@
 package com.alien.common.gameplay.block.entity.capture.anchor;
 
 import com.alien.common.gameplay.block.capture.anchor.AnchorBlock;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
 import com.alien.common.registry.init.AlienBlockEntityTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -25,9 +26,9 @@ import java.util.UUID;
  * Block entity for the capture anchor. Renders the custom geo, exposes the chain bind point
  * ({@link #chainAnchorPoint()} — the {@code gHandle} pivot in world space), and owns one capture chain: it stores the
  * bound mob, holds it within the chain's length each tick, and renders the chain to it.
- * <p>
- * The link lives only on the anchor side (the bound mob's UUID), so no mob classes are touched. Queens drive their own
- * multi-anchor restriction elsewhere; this entity applies the generic single-chain clamp (Layer 1).
+ *
+ * <p>The link lives only on the anchor side (the bound mob's UUID), so no mob classes are touched. Queens drive their
+ * own multi-anchor restriction elsewhere; this entity applies the generic single-chain clamp (Layer 1).
  */
 public class AnchorBlockEntity extends BlockEntity {
 
@@ -38,7 +39,6 @@ public class AnchorBlockEntity extends BlockEntity {
     public static final double DEFAULT_CHAIN_LENGTH = 10.0;
 
     private static final String TAG_BOUND_MOB = "ChainBoundMob";
-
     private static final String TAG_CLIENT_MOB_ID = "ChainMobNetId";
 
     /** Persisted: which mob this chain holds (null = no chain). */
@@ -72,12 +72,20 @@ public class AnchorBlockEntity extends BlockEntity {
     public void bind(LivingEntity mob) {
         this.boundMobId = mob.getUUID();
         this.boundMobNetId = mob.getId();
+        if (mob instanceof Queen queen) {
+            queen.getBindManager().attach(getBlockPos());
+        }
         setChanged();
         syncToClients();
     }
 
     /** Drop this anchor's chain (frees the mob; the mob keeps whatever AI/state it had). */
     public void release() {
+        if (boundMobId != null
+                && level instanceof ServerLevel server
+                && server.getEntity(boundMobId) instanceof Queen queen) {
+            queen.getBindManager().detach(getBlockPos());
+        }
         this.boundMobId = null;
         this.boundMobNetId = -1;
         setChanged();
@@ -99,12 +107,13 @@ public class AnchorBlockEntity extends BlockEntity {
             boundMobNetId = mob.getId();
             syncToClients();
         }
-        enforceTether(mob);
+        // The queen runs her own multi-anchor restriction (Layer 2); the generic per-anchor clamp is for other mobs.
+        if (!(mob instanceof Queen)) {
+            enforceTether(mob);
+        }
     }
 
-    /**
-     * Hard stop: if the mob passes the chain length it is pulled back to the boundary and its outward motion cancelled.
-     */
+    /** Hard stop: if the mob passes the chain length it is pulled back to the boundary and its outward motion cancelled. */
     private void enforceTether(LivingEntity mob) {
         Vec3 anchor = chainAnchorPoint();
         Vec3 pos = mob.position();
@@ -145,9 +154,9 @@ public class AnchorBlockEntity extends BlockEntity {
             case WALL -> {
                 var normal = state.getValue(HorizontalDirectionalBlock.FACING).getNormal();
                 yield new Vec3(
-                    cx + normal.getX() * (HANDLE_OFFSET - 0.5),
-                    pos.getY() + 0.5,
-                    cz + normal.getZ() * (HANDLE_OFFSET - 0.5)
+                        cx + normal.getX() * (HANDLE_OFFSET - 0.5),
+                        pos.getY() + 0.5,
+                        cz + normal.getZ() * (HANDLE_OFFSET - 0.5)
                 );
             }
         };
