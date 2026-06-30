@@ -49,7 +49,12 @@ public class OvipositorManager implements NBTSerializable {
             // Captive-eggsack teardown: an inhibited queen who has lost containment (chains stripped) is "inhibited
             // but loose" and produces nothing per design — drop the eggsack. A non-inhibited queen's ovipositor is the
             // normal founding one and is never touched here.
-            if (queen.isInhibited() && !queen.isContained()) {
+            //
+            // Read the AUTHORITATIVE anchor count (isFullyBound), not the synced isContained(): the bind-chain-count
+            // sync key isn't persisted, so just after a reload it reads 0 for one tick (this manager ticks before the
+            // bind manager re-syncs it). The persisted anchors are correct immediately, so this avoids tearing the
+            // eggsack down on every reload.
+            if (queen.isInhibited() && !queen.getBindManager().isFullyBound()) {
                 getOvipositor().ifSome(ovipositor -> ovipositor.discard());
                 return;
             }
@@ -102,10 +107,10 @@ public class OvipositorManager implements NBTSerializable {
     private void prepareFoundingChamberIfNeeded() {
         var location = currentLocation();
         if (
-            location == null
-                || location.founderId() == null
-                || location.reproductiveEstablished()
-                || !isNearHiveCenter(location)
+                location == null
+                        || location.founderId() == null
+                        || location.reproductiveEstablished()
+                        || !isNearHiveCenter(location)
         ) {
             return;
         }
@@ -115,7 +120,7 @@ public class OvipositorManager implements NBTSerializable {
         }
         // Tank must be full (the founding target) before committing the prep spend.
         var target = com.alien.common.gameplay.hive.growth.BiomassIncome.foundingBiomassTarget(
-            HiveLocationRegistry.INSTANCE.config()
+                HiveLocationRegistry.INSTANCE.config()
         );
         if (location.biomass() < target) {
             return;
@@ -130,11 +135,11 @@ public class OvipositorManager implements NBTSerializable {
         // wandered within the center area. (A light position correction - full navigate-to-center is Option B.)
         var centerChunk = new ChunkPos(location.centerPos());
         queen.moveTo(
-            centerChunk.getMiddleBlockX() + 0.5,
-            location.hiveFloorY() + 1,
-            centerChunk.getMiddleBlockZ() + 0.5,
-            queen.getYRot(),
-            queen.getXRot()
+                centerChunk.getMiddleBlockX() + 0.5,
+                location.hiveFloorY() + 1,
+                centerChunk.getMiddleBlockZ() + 0.5,
+                queen.getYRot(),
+                queen.getXRot()
         );
     }
 
@@ -144,10 +149,10 @@ public class OvipositorManager implements NBTSerializable {
 
     public @Nullable Ovipositor getOvipositorOrNull() {
         return (Ovipositor) queen.getPassengers()
-            .stream()
-            .filter(passenger -> passenger.getType() == AlienEntityTypes.OVIPOSITOR.get())
-            .findFirst()
-            .orElse(null);
+                .stream()
+                .filter(passenger -> passenger.getType() == AlienEntityTypes.OVIPOSITOR.get())
+                .findFirst()
+                .orElse(null);
     }
 
     public Option<Ovipositor> getOvipositor() {
@@ -179,10 +184,10 @@ public class OvipositorManager implements NBTSerializable {
         var cost = HiveLocationRegistry.INSTANCE.config().ovipositorCreationBiomassCost();
         var biomass = loc != null ? loc.biomass() : -1;
         sb.append("  biomass: ")
-            .append(biomass)
-            .append(" / cost ")
-            .append(cost)
-            .append(biomass >= cost ? "  (CAN PAY)" : "  (TOO POOR - this is the blocker)");
+                .append(biomass)
+                .append(" / cost ")
+                .append(cost)
+                .append(biomass >= cost ? "  (CAN PAY)" : "  (TOO POOR - this is the blocker)");
         return sb.toString();
     }
 
@@ -308,10 +313,10 @@ public class OvipositorManager implements NBTSerializable {
      */
     private boolean canCreateChainedEggsack() {
         return queen.isInhibited()
-            && queen.isContained()
-            && queen.getTarget() == null
-            && AlienVariantTypes.getFor(queen.getVariant()).canReproduce()
-            && !ovipositorCreationCooldown.isActive();
+                && queen.getBindManager().isFullyBound()
+                && queen.getTarget() == null
+                && AlienVariantTypes.getFor(queen.getVariant()).canReproduce()
+                && !ovipositorCreationCooldown.isActive();
     }
 
     /**
@@ -326,24 +331,27 @@ public class OvipositorManager implements NBTSerializable {
             ovipositor.startRiding(queen, true);
             ovipositor.yBodyRot = queen.yBodyRot;
             ovipositor.yHeadRot = queen.yHeadRot;
+            // A captive breeder's eggsack must not vanish to far-away despawn while she's contained; the teardown above
+            // is the only thing that removes it.
+            ovipositor.setPersistenceRequired();
             queen.level().addFreshEntity(ovipositor);
         }
     }
 
     private boolean canCreateOvipositor() {
         return !queen.isInhibited()
-            && queen.getTarget() == null
-            && AlienVariantTypes.getFor(queen.getVariant()).canReproduce()
-            && !ovipositorCreationCooldown.isActive()
-            && isStandingOnVariantResin()
-            && hasSuitableHiveLocation()
-            && canOvipositorFit();
+                && queen.getTarget() == null
+                && AlienVariantTypes.getFor(queen.getVariant()).canReproduce()
+                && !ovipositorCreationCooldown.isActive()
+                && isStandingOnVariantResin()
+                && hasSuitableHiveLocation()
+                && canOvipositorFit();
     }
 
     private boolean isStandingOnVariantResin() {
         return queen.level()
-            .getBlockState(queen.blockPosition().below())
-            .is(AlienVariantTypes.getFor(queen.getVariant()).resinBlockTag());
+                .getBlockState(queen.blockPosition().below())
+                .is(AlienVariantTypes.getFor(queen.getVariant()).resinBlockTag());
     }
 
     /**
@@ -401,10 +409,10 @@ public class OvipositorManager implements NBTSerializable {
         var backBottomSupport = EntityUtil.getRelativePosition(queen, 0, 0, 7);
 
         return canOvipositorSupportExistAt(leftBottomSupport)
-            && canOvipositorSupportExistAt(rightBottomSupport)
-            && canOvipositorSupportExistAt(farLeftBottomSupport)
-            && canOvipositorSupportExistAt(backBottomSupport)
-            && isEggLayingPositionValid();
+                && canOvipositorSupportExistAt(rightBottomSupport)
+                && canOvipositorSupportExistAt(farLeftBottomSupport)
+                && canOvipositorSupportExistAt(backBottomSupport)
+                && isEggLayingPositionValid();
     }
 
     private boolean isEggLayingPositionValid() {
@@ -427,7 +435,7 @@ public class OvipositorManager implements NBTSerializable {
 
             var aboveBlockState = queen.level().getBlockState(blockPos.above());
             isSupported = (aboveBlockState.isAir() || aboveBlockState.canBeReplaced())
-                && blockState.is(AlienVariantTypes.getFor(queen.getVariant()).resinBlockTag());
+                    && blockState.is(AlienVariantTypes.getFor(queen.getVariant()).resinBlockTag());
 
             stepsDown++;
         }
