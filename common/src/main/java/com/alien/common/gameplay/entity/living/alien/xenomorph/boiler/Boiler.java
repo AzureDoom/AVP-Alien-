@@ -8,18 +8,22 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphPathConf
 import com.alien.common.gameplay.entity.living.alien.xenomorph.boiler.ai.BoilerGOAP;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienEntityTypes;
+import com.alien.common.util.AlienPredicates;
+import com.blib.api.common.dismemberment.v1.LimbDismemberer;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.entity.v1.vibration.VibrationSystemManager;
 import com.blib.api.common.goap.v1.GOAPUser;
 import com.just.ai.goap.Agent;
 import com.just.ai.goap.graph.Graph;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.DynamicGameEventListener;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,6 +34,16 @@ public class Boiler extends Xenomorph implements GOAPUser<Boiler> {
     private static final XenomorphConfig CONFIG = XenomorphConfig.builder(XenomorphPathConfig.MEDIUM_DOOR, Boiler::getType)
         .parallelDigCount(2)
         .build();
+
+    private static final float EXPLOSION_RADIUS = 2F;
+
+    private static final int ACID_AMOUNT = 3;
+
+    private static final double TARGET_EXPLOSION_PADDING = 0.75D;
+
+    private static final double LIMB_HORIZONTAL_VELOCITY = 0.18D;
+
+    private static final double LIMB_VERTICAL_VELOCITY = 0.14D;
 
     public static AttributeSupplier.Builder createBoilerAttributes() {
         return Alien.createAlienAttributes()
@@ -47,6 +61,8 @@ public class Boiler extends Xenomorph implements GOAPUser<Boiler> {
     private final VibrationSystemManager vibrationSystemManager;
 
     private final BoilerData boilerData;
+
+    private boolean hasExploded;
 
     public Boiler(EntityType<? extends Boiler> entityType, Level level) {
         super(entityType, level, CONFIG);
@@ -70,6 +86,7 @@ public class Boiler extends Xenomorph implements GOAPUser<Boiler> {
         super.tick();
         vibrationSystemManager.tick();
         boilerData.tick();
+        tryExplodeNearTarget();
     }
 
     @Override
@@ -79,12 +96,71 @@ public class Boiler extends Xenomorph implements GOAPUser<Boiler> {
 
     @Override
     public boolean doHurtTarget(@NotNull Entity entity) {
-        var radius = 2F;
-        ExplosiveXenomorphUtil.explodeWithAcid(this, radius, 3);
-        triggerOnDeathMobEffects(RemovalReason.KILLED);
-        discard();
+        explodeAndDiscard();
 
         return true;
+    }
+
+    @Override
+    public boolean hurt(@NotNull DamageSource damageSource, float damage) {
+        var isHurt = super.hurt(damageSource, damage);
+
+        if (isHurt && damage > 0F) {
+            explodeAndDiscard();
+        }
+
+        return isHurt;
+    }
+
+    private void tryExplodeNearTarget() {
+        if (level().isClientSide || hasExploded || isRemoved()) {
+            return;
+        }
+
+        var target = getTarget();
+
+        if (target == null || !target.isAlive() || !AlienPredicates.canTarget(this, target)) {
+            return;
+        }
+
+        var explosionRange = getBbWidth() * 0.5D + target.getBbWidth() * 0.5D + TARGET_EXPLOSION_PADDING;
+
+        if (distanceToSqr(target) <= explosionRange * explosionRange) {
+            explodeAndDiscard();
+        }
+    }
+
+    private void explodeAndDiscard() {
+        if (level().isClientSide || hasExploded || isRemoved()) {
+            return;
+        }
+
+        hasExploded = true;
+        detachAllLimbs();
+        ExplosiveXenomorphUtil.explodeWithAcid(this, EXPLOSION_RADIUS, ACID_AMOUNT);
+        triggerOnDeathMobEffects(RemovalReason.KILLED);
+        discard();
+    }
+
+    private void detachAllLimbs() {
+        var randomSource = getRandom();
+        var bodyCenter = position().add(0.0D, getBbHeight() * 0.5D, 0.0D);
+
+        for (var definition : LimbDismemberer.getRemainingDefinitions(this)) {
+            var angle = randomSource.nextDouble() * Math.TAU;
+            var horizontalVelocity = LIMB_HORIZONTAL_VELOCITY * (0.65D + randomSource.nextDouble() * 0.7D);
+            var verticalVelocity = LIMB_VERTICAL_VELOCITY * (0.65D + randomSource.nextDouble() * 0.7D);
+            var velocity = new Vec3(
+                Math.cos(angle) * horizontalVelocity,
+                verticalVelocity,
+                Math.sin(angle) * horizontalVelocity
+            );
+
+            LimbDismemberer.detach(this, definition.id(), limb -> {
+                limb.moveTo(bodyCenter, getYRot(), getXRot());
+                limb.launch(velocity);
+            });
+        }
     }
 
     public BoilerAnimationDispatcher getAnimationDispatcher() {

@@ -3,6 +3,7 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.chrysalis;
 import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.command.AzCommand;
 import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
+import com.blib.api.client.animation.v1.command.policy.AzDispatchMode;
 
 public class ChrysalisAnimationDispatcher {
 
@@ -32,6 +33,14 @@ public class ChrysalisAnimationDispatcher {
 
     private static final AzCommand<Chrysalis> WALK = AzCommand.<Chrysalis>idempotent()
         .play(AzAlienAnimationUtil.BODY, ChrysalisAnimationRefs.WALK_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
+
+    private static final AzCommand<Chrysalis> CRAWL = AzCommand.<Chrysalis>idempotent()
+        .play(AzAlienAnimationUtil.BODY, ChrysalisAnimationRefs.CRAWL_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
+
+    private static final AzCommand<Chrysalis> CRAWL_HOLD = AzCommand.<Chrysalis>idempotent()
+        .play(AzAlienAnimationUtil.BODY, ChrysalisAnimationRefs.CRAWL_ANIMATION_NAME, AzPlayBehaviors.HOLD_ON_LAST_FRAME)
         .build();
 
     private static final AzCommand<Chrysalis> ROLL_START = AzCommand.<Chrysalis>replay()
@@ -70,6 +79,24 @@ public class ChrysalisAnimationDispatcher {
 
     public void walk() {
         WALK.dispatchForEntity(chrysalis);
+    }
+
+    public void crawl() {
+        CRAWL.dispatchForEntity(chrysalis);
+    }
+
+    public void crawl(float speed) {
+        AzAlienAnimationUtil.singleWithSpeed(
+            AzAlienAnimationUtil.BODY,
+            ChrysalisAnimationRefs.CRAWL_ANIMATION_NAME,
+            AzPlayBehaviors.LOOP,
+            AzDispatchMode.PLAY_IF_NOT_PLAYING,
+            speed
+        ).dispatchForEntity(chrysalis);
+    }
+
+    public void crawlHold() {
+        CRAWL_HOLD.dispatchForEntity(chrysalis);
     }
 
     public void rollStart() {

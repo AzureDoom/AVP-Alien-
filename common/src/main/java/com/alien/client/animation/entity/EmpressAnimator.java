@@ -85,6 +85,7 @@ public class EmpressAnimator extends AzEntityAnimator<Empress> {
         }
 
         var isMovingOnGround = empress.isMovingHorizontally.get() && empress.onGround();
+        var isCrawling = empress.getCrawlingManager().isCrawling();
         Runnable animFunction;
 
         if (empress.getEmpressOvipositorManager().hasOvipositor()) {
@@ -92,13 +93,15 @@ public class EmpressAnimator extends AzEntityAnimator<Empress> {
         } else if (empress.isUnderWater()) {
             animFunction = dispatcher::swim;
         } else if (isMovingOnGround) {
-            if (empress.isMovingQuickly.get()) {
+            if (isCrawling) {
+                animFunction = () -> dispatcher.crawl(AzAlienAnimationUtil.crawlAnimationSpeed(empress));
+            } else if (empress.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {
                 animFunction = dispatcher::walk;
             }
         } else {
-            animFunction = dispatcher::idle;
+            animFunction = isCrawling ? dispatcher::crawlHold : dispatcher::idle;
         }
 
         animFunction.run();

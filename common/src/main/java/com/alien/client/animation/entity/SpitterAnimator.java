@@ -76,6 +76,8 @@ public class SpitterAnimator extends AzEntityAnimator<Spitter> {
                     dispatcher.rightClawAttack(speed);
                 } else if (attackType == Spitter.TAIL) {
                     dispatcher.tailAttack(speed);
+                } else if (attackType == Spitter.SPIT) {
+                    dispatcher.spitAttack(speed);
                 }
 
                 previousAttackId = attackId;
@@ -115,6 +117,8 @@ public class SpitterAnimator extends AzEntityAnimator<Spitter> {
             animationName = SpitterAnimationRefs.FULL_ATTACK_CLAW_ANIMATION_NAME;
         } else if (attackType == Spitter.TAIL) {
             animationName = SpitterAnimationRefs.FULL_ATTACK_TAIL_ANIMATION_NAME;
+        } else if (attackType == Spitter.SPIT) {
+            animationName = SpitterAnimationRefs.SPECIAL_ATTACK_SPIT_ANIMATION_NAME;
         } else {
             animationName = null;
         }

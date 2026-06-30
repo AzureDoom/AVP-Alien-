@@ -3,6 +3,7 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.carrier;
 import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.command.AzCommand;
 import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
+import com.blib.api.client.animation.v1.command.policy.AzDispatchMode;
 
 public class CarrierAnimationDispatcher {
 
@@ -12,6 +13,14 @@ public class CarrierAnimationDispatcher {
 
     private static final AzCommand<Carrier> WALK = AzCommand.<Carrier>idempotent()
         .play(AzAlienAnimationUtil.BODY, CarrierAnimationRefs.WALK_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
+
+    private static final AzCommand<Carrier> CRAWL = AzCommand.<Carrier>idempotent()
+        .play(AzAlienAnimationUtil.BODY, CarrierAnimationRefs.SWIM_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
+
+    private static final AzCommand<Carrier> CRAWL_HOLD = AzCommand.<Carrier>idempotent()
+        .play(AzAlienAnimationUtil.BODY, CarrierAnimationRefs.SWIM_ANIMATION_NAME, AzPlayBehaviors.HOLD_ON_LAST_FRAME)
         .build();
 
     private static final AzCommand<Carrier> RUN = AzCommand.<Carrier>idempotent()
@@ -62,6 +71,24 @@ public class CarrierAnimationDispatcher {
 
     public void walk() {
         WALK.dispatchForEntity(carrier);
+    }
+
+    public void crawl() {
+        CRAWL.dispatchForEntity(carrier);
+    }
+
+    public void crawl(float speed) {
+        AzAlienAnimationUtil.singleWithSpeed(
+            AzAlienAnimationUtil.BODY,
+            CarrierAnimationRefs.SWIM_ANIMATION_NAME,
+            AzPlayBehaviors.LOOP,
+            AzDispatchMode.PLAY_IF_NOT_PLAYING,
+            speed
+        ).dispatchForEntity(carrier);
+    }
+
+    public void crawlHold() {
+        CRAWL_HOLD.dispatchForEntity(carrier);
     }
 
     public void run() {

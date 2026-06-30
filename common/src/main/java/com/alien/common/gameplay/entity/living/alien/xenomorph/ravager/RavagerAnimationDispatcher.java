@@ -3,6 +3,7 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.ravager;
 import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.command.AzCommand;
 import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
+import com.blib.api.client.animation.v1.command.policy.AzDispatchMode;
 
 public class RavagerAnimationDispatcher {
 
@@ -50,6 +51,14 @@ public class RavagerAnimationDispatcher {
         .play(AzAlienAnimationUtil.BODY, RavagerAnimationRefs.WALK_ANIMATION_NAME, AzPlayBehaviors.LOOP)
         .build();
 
+    private static final AzCommand<Ravager> CRAWL = AzCommand.<Ravager>idempotent()
+        .play(AzAlienAnimationUtil.BODY, RavagerAnimationRefs.SWIM_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
+
+    private static final AzCommand<Ravager> CRAWL_HOLD = AzCommand.<Ravager>idempotent()
+        .play(AzAlienAnimationUtil.BODY, RavagerAnimationRefs.SWIM_ANIMATION_NAME, AzPlayBehaviors.HOLD_ON_LAST_FRAME)
+        .build();
+
     private final Ravager ravager;
 
     public RavagerAnimationDispatcher(Ravager ravager) {
@@ -70,6 +79,24 @@ public class RavagerAnimationDispatcher {
 
     public void walk() {
         WALK.dispatchForEntity(ravager);
+    }
+
+    public void crawl() {
+        CRAWL.dispatchForEntity(ravager);
+    }
+
+    public void crawl(float speed) {
+        AzAlienAnimationUtil.singleWithSpeed(
+            AzAlienAnimationUtil.BODY,
+            RavagerAnimationRefs.SWIM_ANIMATION_NAME,
+            AzPlayBehaviors.LOOP,
+            AzDispatchMode.PLAY_IF_NOT_PLAYING,
+            speed
+        ).dispatchForEntity(ravager);
+    }
+
+    public void crawlHold() {
+        CRAWL_HOLD.dispatchForEntity(ravager);
     }
 
     public void biteAttack() {

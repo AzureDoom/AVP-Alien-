@@ -83,18 +83,21 @@ public class RazorClawAnimator extends AzEntityAnimator<RazorClaw> {
         }
 
         var isMovingOnGround = razorClaw.isMovingHorizontally.get() && razorClaw.onGround();
+        var isCrawling = razorClaw.getCrawlingManager().isCrawling();
         Runnable animFunction;
 
         if (razorClaw.isUnderWater()) {
             animFunction = dispatcher::swim;
         } else if (isMovingOnGround) {
-            if (razorClaw.isMovingQuickly.get()) {
+            if (isCrawling) {
+                animFunction = () -> dispatcher.crawl(AzAlienAnimationUtil.crawlAnimationSpeed(razorClaw));
+            } else if (razorClaw.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {
                 animFunction = dispatcher::walk;
             }
         } else {
-            animFunction = dispatcher::idle;
+            animFunction = isCrawling ? dispatcher::crawlHold : dispatcher::idle;
         }
 
         animFunction.run();

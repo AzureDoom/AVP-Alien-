@@ -93,18 +93,21 @@ public class CarrierAnimator extends AzEntityAnimator<Carrier> {
         }
 
         var isMovingOnGround = carrier.isMovingHorizontally.get() && carrier.onGround();
+        var isCrawling = carrier.getCrawlingManager().isCrawling();
         Runnable animFunction;
 
         if (carrier.isUnderWater()) {
             animFunction = dispatcher::swim;
         } else if (isMovingOnGround) {
-            if (carrier.isMovingQuickly.get()) {
+            if (isCrawling) {
+                animFunction = () -> dispatcher.crawl(AzAlienAnimationUtil.crawlAnimationSpeed(carrier));
+            } else if (carrier.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {
                 animFunction = dispatcher::walk;
             }
         } else {
-            animFunction = dispatcher::idle;
+            animFunction = isCrawling ? dispatcher::crawlHold : dispatcher::idle;
         }
 
         animFunction.run();

@@ -87,18 +87,21 @@ public class RavagerAnimator extends AzEntityAnimator<Ravager> {
         }
 
         var isMovingOnGround = ravager.isMovingHorizontally.get() && ravager.onGround();
+        var isCrawling = ravager.getCrawlingManager().isCrawling();
         Runnable animFunction;
 
         if (ravager.isUnderWater()) {
             animFunction = dispatcher::swim;
         } else if (isMovingOnGround) {
-            if (ravager.isMovingQuickly.get()) {
+            if (isCrawling) {
+                animFunction = () -> dispatcher.crawl(AzAlienAnimationUtil.crawlAnimationSpeed(ravager));
+            } else if (ravager.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {
                 animFunction = dispatcher::walk;
             }
         } else {
-            animFunction = dispatcher::idle;
+            animFunction = isCrawling ? dispatcher::crawlHold : dispatcher::idle;
         }
 
         animFunction.run();

@@ -41,6 +41,12 @@ public class AlienEntityTypeTags {
 
     public static final TagKey<EntityType<?>> IGNORED_BY_XENOMORPHS = create("ignored_by_xenomorphs");
 
+    public static final TagKey<EntityType<?>> XENOMORPH_THREAT_1_PASSIVE = create("xenomorph_threat_1_passive");
+
+    public static final TagKey<EntityType<?>> XENOMORPH_THREAT_2_LOW_DANGER = create("xenomorph_threat_2_low_danger");
+
+    public static final TagKey<EntityType<?>> XENOMORPH_THREAT_3_HIGH_DANGER = create("xenomorph_threat_3_high_danger");
+
     public static final TagKey<EntityType<?>> IRRADIATED_ALIENS = create("irradiated_aliens");
 
     public static final TagKey<EntityType<?>> NETHER_ALIENS = create("nether_aliens");

@@ -97,20 +97,22 @@ public class PredalienAnimator extends AzEntityAnimator<Predalien> {
         }
 
         var isMovingOnGround = predalien.isMovingHorizontally.get() && predalien.onGround();
+        var isCrawling = predalien.getCrawlingManager().isCrawling();
         Runnable animFunction;
 
         if (predalien.isUnderWater()) {
             // TODO: idle swim
             animFunction = dispatcher::swim;
         } else if (isMovingOnGround) {
-            if (predalien.isMovingQuickly.get()) {
+            if (isCrawling) {
+                animFunction = () -> dispatcher.crawl(AzAlienAnimationUtil.crawlAnimationSpeed(predalien));
+            } else if (predalien.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {
                 animFunction = dispatcher::walk;
             }
         } else {
-            // TODO: idle crawl
-            animFunction = dispatcher::idle;
+            animFunction = isCrawling ? dispatcher::crawlHold : dispatcher::idle;
         }
 
         animFunction.run();
