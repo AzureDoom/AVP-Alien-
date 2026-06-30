@@ -2,6 +2,10 @@ package com.alien.common.gameplay.capture;
 
 import com.alien.Alien;
 import com.alien.common.network.payload.S2CCaptureHoldPayload;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.UUID;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -11,22 +15,17 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.UUID;
-
 /**
  * Server-side registry of mobs currently held by a player via the capture chain.
- * <p>
- * This is the clean replacement for vanilla leashing during the player-held window. Instead of {@code
+ *
+ * <p>This is the clean replacement for vanilla leashing during the player-held window. Instead of {@code
  * setLeashedTo} — which draws a vanilla rope and hard-spawns a {@code minecraft:lead} when it snaps — the chain
  * registers the hold here. A per-tick tether gently pulls the held mob toward its holder and breaks the hold past a
  * hard distance. Binding the mob to an anchor hands ownership to the anchor and clears the hold.
- * <p>
- * State is transient and server-authoritative: it is never persisted, so a server restart (or the holder/mob leaving)
- * simply frees the mob. Every grab and release is mirrored to nearby clients via {@link S2CCaptureHoldPayload} so the
- * chain can be drawn client-side; the manager itself never touches render state.
+ *
+ * <p>State is transient and server-authoritative: it is never persisted, so a server restart (or the holder/mob
+ * leaving) simply frees the mob. Every grab and release is mirrored to nearby clients via {@link S2CCaptureHoldPayload}
+ * so the chain can be drawn client-side; the manager itself never touches render state.
  */
 public final class CaptureHoldManager {
 
@@ -45,8 +44,14 @@ public final class CaptureHoldManager {
     /** Sentinel holder id meaning "the hold ended". */
     private static final int RELEASE = -1;
 
+    /** How often (in ticks) each active hold is re-announced, so players who came into range mid-hold see the chain. */
+    private static final int RESYNC_INTERVAL = 20;
+
     /** mob UUID -> holding player UUID. */
     private static final Map<UUID, UUID> HELD = new HashMap<>();
+
+    /** Rolling tick counter that gates the periodic re-announce. */
+    private static int resyncTick;
 
     private CaptureHoldManager() {}
 
@@ -97,6 +102,7 @@ public final class CaptureHoldManager {
         if (HELD.isEmpty()) {
             return;
         }
+        boolean resync = (++resyncTick % RESYNC_INTERVAL) == 0;
         Iterator<Map.Entry<UUID, UUID>> it = HELD.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<UUID, UUID> entry = it.next();
@@ -104,13 +110,11 @@ public final class CaptureHoldManager {
             Entity mobEntity = resolve(server, entry.getKey());
             Mob mob = mobEntity instanceof Mob m ? m : null;
 
-            if (
-                holder == null
+            if (holder == null
                     || !holder.isAlive()
                     || mob == null
                     || !mob.isAlive()
-                    || mob.level() != holder.level()
-            ) {
+                    || mob.level() != holder.level()) {
                 it.remove();
                 if (mob != null && mob.isAlive()) {
                     broadcast(mob, RELEASE);
@@ -123,6 +127,11 @@ public final class CaptureHoldManager {
                 it.remove();
                 broadcast(mob, RELEASE);
                 continue;
+            }
+            // Periodic re-announce so a player who entered range mid-hold picks up the chain. Idempotent for clients
+            // that already have it (the client map just overwrites the same entry).
+            if (resync) {
+                broadcast(mob, holder.getId());
             }
             if (dist > FOLLOW_DISTANCE) {
                 Vec3 pull = holder.position().subtract(mob.position());

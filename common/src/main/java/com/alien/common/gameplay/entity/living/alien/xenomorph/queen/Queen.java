@@ -3,6 +3,8 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.queen;
 import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.AttackType;
+import com.alien.common.registry.init.AlienDataSyncKeys;
+import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.Xenomorph;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphAttackConfig;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.XenomorphConfig;
@@ -13,28 +15,26 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.ai.QueenGOA
 import com.alien.common.gameplay.level.saveddata.QueenSpawnChunkData;
 import com.alien.common.gameplay.level.saveddata.StrainLeakData;
 import com.alien.common.model.alien.variant.AlienVariant;
-import com.alien.common.registry.init.AlienDataSyncKeys;
 import com.alien.common.registry.init.AlienEntityTypes;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
-import com.blib.api.common.data_sync.v1.DataAccessor;
 import com.blib.api.common.entity.v1.PlayerStatConstants;
 import com.blib.api.common.entity.v1.PlayerUtil;
 import com.blib.api.common.goap.v1.GOAPUser;
 import com.just.ai.goap.Agent;
 import com.just.ai.goap.graph.Graph;
 import net.minecraft.ChatFormatting;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -50,45 +50,45 @@ import java.util.Objects;
 public class Queen extends Xenomorph implements GOAPUser<Queen>, EggLayer {
 
     public static final AttackType SWIPE_DOWN = AttackType.builder("queen_swipe_down")
-        .requiresAnyArm()
-        .defaultDurationInTicks(18)
-        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
-        .build();
+            .requiresAnyArm()
+            .defaultDurationInTicks(18)
+            .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+            .build();
 
     public static final AttackType BACKHAND = AttackType.builder("queen_backhand")
-        .requiresAnyArm()
-        .defaultDurationInTicks(15)
-        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
-        .build();
+            .requiresAnyArm()
+            .defaultDurationInTicks(15)
+            .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+            .build();
 
     public static final AttackType TAIL_STRIKE = AttackType.builder("queen_tail_strike")
-        .requiresTail()
-        .defaultDurationInTicks(20)
-        .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
-        .build();
+            .requiresTail()
+            .defaultDurationInTicks(20)
+            .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
+            .build();
 
     private static final XenomorphConfig CONFIG = XenomorphConfig.builder(XenomorphPathConfig.WIDE_TALL, Queen::getType)
-        .attackConfig(
-            XenomorphAttackConfig.builder()
-                .addRegular(SWIPE_DOWN)
-                .addRegular(BACKHAND)
-                .addRegular(TAIL_STRIKE)
-                .build()
-        )
-        .parallelDigCount(4)
-        .pushedByFluid(false)
-        .canCrawl(false)
-        .build();
+            .attackConfig(
+                    XenomorphAttackConfig.builder()
+                            .addRegular(SWIPE_DOWN)
+                            .addRegular(BACKHAND)
+                            .addRegular(TAIL_STRIKE)
+                            .build()
+            )
+            .parallelDigCount(4)
+            .pushedByFluid(false)
+            .canCrawl(false)
+            .build();
 
     public static AttributeSupplier.Builder createQueenAttributes() {
         return Alien.createAlienAttributes()
-            .add(Attributes.ARMOR, 16.0F)
-            .add(Attributes.ARMOR_TOUGHNESS, 16.0F)
-            .add(Attributes.ATTACK_DAMAGE, PlayerStatConstants.BASE_HEALTH * 2.5F)
-            .add(Attributes.FOLLOW_RANGE, 35F)
-            .add(Attributes.KNOCKBACK_RESISTANCE, 1f)
-            .add(Attributes.MAX_HEALTH, PlayerStatConstants.BASE_HEALTH * 10F)
-            .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 0.9F);
+                .add(Attributes.ARMOR, 16.0F)
+                .add(Attributes.ARMOR_TOUGHNESS, 16.0F)
+                .add(Attributes.ATTACK_DAMAGE, PlayerStatConstants.BASE_HEALTH * 2.5F)
+                .add(Attributes.FOLLOW_RANGE, 35F)
+                .add(Attributes.KNOCKBACK_RESISTANCE, 1f)
+                .add(Attributes.MAX_HEALTH, PlayerStatConstants.BASE_HEALTH * 10F)
+                .add(Attributes.MOVEMENT_SPEED, PlayerStatConstants.BASE_WALK_SPEED * 0.9F);
     }
 
     private final QueenAnimationDispatcher animationDispatcher;
@@ -99,17 +99,17 @@ public class Queen extends Xenomorph implements GOAPUser<Queen>, EggLayer {
 
     private final QueenLifecyclePhaseManager lifecyclePhaseManager;
 
-    /**
-     * Synced chain count for the client (shackle reveal + chain render). The bind manager keeps it in lockstep with the
-     * anchor list each server tick.
-     */
+    /** Synced chain count for the client (shackle reveal + chain render). The bind manager keeps it in lockstep with
+     * the anchor list each server tick. */
     public final DataAccessor<Integer> bindChainCount;
 
     private final QueenBindManager bindManager;
 
-    /**
-     * Transient: true while clip-digging to her location anchor (Stage 2b). Not saved — a reload never stays noclip.
-     */
+    /** Synced + persisted: whether the inhibitor device is attached. Drives the {@code gInhibitor} bone reveal and (in
+     * later slices) the contained-breeder behaviour — hive autonomy off, claim capped at one chunk. */
+    public final DataAccessor<Boolean> hasInhibitor;
+
+    /** Transient: true while clip-digging to her location anchor (Stage 2b). Not saved — a reload never stays noclip. */
     private boolean digging;
 
     public Queen(EntityType<? extends Queen> entityType, Level level) {
@@ -120,6 +120,7 @@ public class Queen extends Xenomorph implements GOAPUser<Queen>, EggLayer {
         this.lifecyclePhaseManager = new QueenLifecyclePhaseManager(this);
         this.bindChainCount = new DataAccessor<>(this, AlienDataSyncKeys.QUEEN_BIND_CHAIN_COUNT.get());
         this.bindManager = new QueenBindManager(this);
+        this.hasInhibitor = new DataAccessor<>(this, AlienDataSyncKeys.QUEEN_HAS_INHIBITOR.get());
     }
 
     @Override
@@ -173,10 +174,10 @@ public class Queen extends Xenomorph implements GOAPUser<Queen>, EggLayer {
 
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(
-        @NotNull ServerLevelAccessor serverLevelAccessor,
-        @NotNull DifficultyInstance difficulty,
-        @NotNull MobSpawnType spawnType,
-        @Nullable SpawnGroupData spawnGroupData
+            @NotNull ServerLevelAccessor serverLevelAccessor,
+            @NotNull DifficultyInstance difficulty,
+            @NotNull MobSpawnType spawnType,
+            @Nullable SpawnGroupData spawnGroupData
     ) {
         if (spawnType == MobSpawnType.NATURAL) {
             applyNaturalSpawnEffects();
@@ -197,15 +198,15 @@ public class Queen extends Xenomorph implements GOAPUser<Queen>, EggLayer {
         resetQueenSpawnCooldown();
 
         StrainLeakData.getOrCreate(level)
-            .ifSome(strainLeakData -> strainLeakData.add(getVariant(), -1));
+                .ifSome(strainLeakData -> strainLeakData.add(getVariant(), -1));
     }
 
     private void alertPlayersOfSpawn() {
         for (var player : PlayerUtil.getTrackingPlayers(this)) {
             player.playNotifySound(AlienSoundEvents.ENTITY_QUEEN_SCREAM.get(), SoundSource.MASTER, 1, 1);
             player.sendSystemMessage(
-                Component.literal("A scream from the depths sends chills down your spine...")
-                    .withStyle(AlienVariantTypes.getFor(this).chatColor(), ChatFormatting.ITALIC)
+                    Component.literal("A scream from the depths sends chills down your spine...")
+                            .withStyle(AlienVariantTypes.getFor(this).chatColor(), ChatFormatting.ITALIC)
             );
         }
     }
@@ -224,7 +225,7 @@ public class Queen extends Xenomorph implements GOAPUser<Queen>, EggLayer {
 
     private void resetQueenSpawnCooldown() {
         QueenSpawnChunkData.getOrCreate(level())
-            .ifSome(queenSpawnChunkData -> queenSpawnChunkData.getSpawnCooldown().reset());
+                .ifSome(queenSpawnChunkData -> queenSpawnChunkData.getSpawnCooldown().reset());
     }
 
     @Override
@@ -250,8 +251,8 @@ public class Queen extends Xenomorph implements GOAPUser<Queen>, EggLayer {
     @Override
     protected void doPush(@NotNull Entity entity) {
         if (
-            !ovipositorManager.hasOvipositor()
-                || !entity.getType().is(AlienEntityTypeTags.ALIENS)
+                !ovipositorManager.hasOvipositor()
+                        || !entity.getType().is(AlienEntityTypeTags.ALIENS)
         ) {
             super.doPush(entity);
         }
@@ -280,6 +281,16 @@ public class Queen extends Xenomorph implements GOAPUser<Queen>, EggLayer {
 
     public QueenBindManager getBindManager() {
         return bindManager;
+    }
+
+    /** Whether the inhibitor device is attached (synced + persisted). */
+    public boolean isInhibited() {
+        return hasInhibitor.get();
+    }
+
+    /** Attach or remove the inhibitor device. Server-authoritative; syncs and persists automatically. */
+    public void setInhibited(boolean inhibited) {
+        hasInhibitor.set(inhibited);
     }
 
     public boolean isDigging() {

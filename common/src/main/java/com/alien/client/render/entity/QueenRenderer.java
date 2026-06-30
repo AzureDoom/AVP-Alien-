@@ -3,8 +3,8 @@ package com.alien.client.render.entity;
 import com.alien.client.animation.entity.QueenAnimator;
 import com.alien.client.render.AlienRenderResourceCache;
 import com.alien.client.render.layer.MoltLayer;
-import com.alien.client.render.layer.RadiationGlowLayer;
 import com.alien.client.render.layer.ShackleAnchorLayer;
+import com.alien.client.render.layer.RadiationGlowLayer;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.blib.api.client.render.v1.entity.AzEntityRenderer;
@@ -21,15 +21,15 @@ public class QueenRenderer extends AzEntityRenderer<Queen> {
 
     public QueenRenderer(EntityRendererProvider.Context context) {
         super(
-            AzEntityRendererConfig.builder(QueenRenderer::modelLocation, QueenRenderer::textureLocation)
-                .setRenderType(QueenRenderer::renderType)
-                .setAnimatorProvider(QueenAnimator::new)
-                .addRenderLayer(new RadiationGlowLayer<>())
-                .addRenderLayer(new MoltLayer<>())
-                .addRenderLayer(new ShackleAnchorLayer<>())
-                .setShadowRadius(1F)
-                .build(),
-            context
+                AzEntityRendererConfig.builder(QueenRenderer::modelLocation, QueenRenderer::textureLocation)
+                        .setRenderType(QueenRenderer::renderType)
+                        .setAnimatorProvider(QueenAnimator::new)
+                        .addRenderLayer(new RadiationGlowLayer<>())
+                        .addRenderLayer(new MoltLayer<>())
+                        .addRenderLayer(new ShackleAnchorLayer<>())
+                        .setShadowRadius(1F)
+                        .build(),
+                context
         );
     }
 

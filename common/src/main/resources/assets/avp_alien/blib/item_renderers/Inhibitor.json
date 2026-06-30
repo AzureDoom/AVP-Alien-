@@ -1,0 +1,4 @@
+{
+  "parent": "avp_alien:templates/inhibitor",
+  "texture": "avp_alien:textures/item/inhibitor.png"
+}
