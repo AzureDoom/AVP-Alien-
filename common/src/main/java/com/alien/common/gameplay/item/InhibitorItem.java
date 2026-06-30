@@ -15,10 +15,10 @@ import org.jetbrains.annotations.NotNull;
  * The inhibitor device — right-click a queen to clamp it to her crest. An inhibited queen becomes a contained breeder:
  * her hive autonomy is suppressed and her claim is capped at one chunk (wired in a later slice), though she can still
  * fight and defend. Chaining an inhibited queen later gives her the ridable chained eggsack to lay from.
- *
- * <p>Slice A scope: attach the device (set the synced + persisted flag, reveal the {@code gInhibitor} bone) and
- * consume the item. Application is gated to a helpless queen — incapacitated, hibernating, or secured with all four
- * chains (see {@link Queen#canBeInhibited()}). The behavioural effects land in their own slices.
+ * <p>
+ * Slice A scope: attach the device (set the synced + persisted flag, reveal the {@code gInhibitor} bone) and consume
+ * the item. Application is gated to a helpless queen — incapacitated, hibernating, or secured with all four chains (see
+ * {@link Queen#canBeInhibited()}). The behavioural effects land in their own slices.
  */
 public class InhibitorItem extends Item {
 
@@ -28,10 +28,10 @@ public class InhibitorItem extends Item {
 
     @Override
     public @NotNull InteractionResult interactLivingEntity(
-            @NotNull ItemStack stack,
-            @NotNull Player player,
-            @NotNull LivingEntity target,
-            @NotNull InteractionHand hand
+        @NotNull ItemStack stack,
+        @NotNull Player player,
+        @NotNull LivingEntity target,
+        @NotNull InteractionHand hand
     ) {
         if (target instanceof Queen queen && !queen.isInhibited() && queen.canBeInhibited()) {
             if (player.level() instanceof ServerLevel serverLevel) {

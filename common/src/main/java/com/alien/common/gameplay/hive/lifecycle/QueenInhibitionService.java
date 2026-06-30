@@ -18,12 +18,12 @@ import java.util.ArrayList;
  * contained-breeder claim). The inhibitor flips her wild -&gt; inhibited; this service gives that flag a real claim so
  * the autonomy gate (Slice B1) has a location to suppress, and so her eggs (once she is contained) have a lineage to
  * key to.
- *
- * <p>Both capture cases end the same way — she ends up alone in a fresh severed lineage whose single location claims
+ * <p>
+ * Both capture cases end the same way — she ends up alone in a fresh severed lineage whose single location claims
  * exactly the chunk she stands in, flagged inhibited so it never expands, spawns, or accrues, and which follows her as
  * she roams (B2a-2). A <b>pre-foundation</b> queen (no lineage yet) is minted that claim directly. A
- * <b>post-foundation</b> queen is first severed out of her existing hive — her founder link cleared and her
- * memberships dropped — which leaves that hive queenless-but-alive; the severing itself never kills it.
+ * <b>post-foundation</b> queen is first severed out of her existing hive — her founder link cleared and her memberships
+ * dropped — which leaves that hive queenless-but-alive; the severing itself never kills it.
  */
 public final class QueenInhibitionService {
 
@@ -75,10 +75,10 @@ public final class QueenInhibitionService {
             }
             faction.membership().removeMember(member);
             Alien.LOGGER.info(
-                    "Inhibition: severed queen {} from old lineage {}; left queenless-but-alive with {} location(s)",
-                    queen.getUUID(),
-                    factionId,
-                    lineage.locationsById().size()
+                "Inhibition: severed queen {} from old lineage {}; left queenless-but-alive with {} location(s)",
+                queen.getUUID(),
+                factionId,
+                lineage.locationsById().size()
             );
         }
     }
@@ -90,9 +90,9 @@ public final class QueenInhibitionService {
         var location = HiveLocationRegistry.INSTANCE.get(locationId);
         if (location == null) {
             Alien.LOGGER.warn(
-                    "Inhibition: minted location {} for queen {} vanished immediately",
-                    locationId,
-                    queen.getUUID()
+                "Inhibition: minted location {} for queen {} vanished immediately",
+                locationId,
+                queen.getUUID()
             );
             return;
         }
@@ -107,10 +107,10 @@ public final class QueenInhibitionService {
         }
 
         Alien.LOGGER.info(
-                "Inhibition: queen {} severed into personal inhibited location {} at chunk {}",
-                queen.getUUID(),
-                locationId,
-                herChunk
+            "Inhibition: queen {} severed into personal inhibited location {} at chunk {}",
+            queen.getUUID(),
+            locationId,
+            herChunk
         );
     }
 
@@ -129,9 +129,9 @@ public final class QueenInhibitionService {
         }
         HiveLocationRegistry.INSTANCE.unregister(location.id());
         Alien.LOGGER.info(
-                "Inhibition: queen {} released; tore down inhibited location {}",
-                queen.getUUID(),
-                location.id()
+            "Inhibition: queen {} released; tore down inhibited location {}",
+            queen.getUUID(),
+            location.id()
         );
     }
 

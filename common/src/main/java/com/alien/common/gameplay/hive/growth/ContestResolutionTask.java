@@ -127,10 +127,10 @@ public final class ContestResolutionTask {
         }
 
         Alien.LOGGER.info(
-                "Hive: contest resolved at {} → winner {} ({} losers released)",
-                chunk,
-                winner,
-                counts.size() - 1
+            "Hive: contest resolved at {} → winner {} ({} losers released)",
+            chunk,
+            winner,
+            counts.size() - 1
         );
     }
 

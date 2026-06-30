@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "tools",
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "N": {
+      "item": "minecraft:iron_nugget"
+    },
+    "J": {
+      "item": "avp_alien:poison_jelly"
+    }
+  },
+  "pattern": [
+    " I ",
+    "NJN",
+    "I I"
+  ],
+  "result": {
+    "count": 1,
+    "id": "avp_alien:inhibitor"
+  }
+}

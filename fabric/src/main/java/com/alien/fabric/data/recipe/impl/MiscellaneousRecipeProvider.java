@@ -53,6 +53,17 @@ public class MiscellaneousRecipeProvider {
             .requires(1, AlienItems.RAW_ROYAL_JELLY)
             .into(1, AlienItems.POISON_JELLY);
 
+        // Inhibitor: an iron frame (ingots top-centre + both bottom corners, nuggets mid-sides) around poison jelly.
+        builder.shaped()
+            .withCategory(RecipeCategory.TOOLS)
+            .define('I', Items.IRON_INGOT)
+            .define('N', Items.IRON_NUGGET)
+            .define('J', AlienItems.POISON_JELLY)
+            .pattern(" I ")
+            .pattern("NJN")
+            .pattern("I I")
+            .into(1, AlienItems.INHIBITOR);
+
         builder.shapeless()
             .withCategory(RecipeCategory.MISC)
             .requires(9, AlienItems.ALIEN_MUSIC_DISC_1_FRAGMENT)

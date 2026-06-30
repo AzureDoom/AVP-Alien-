@@ -10,17 +10,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Layer 2 — queen-side capture bind state. Tracks up to 8 capture chains (anchor block positions, in attach order)
- * and the bind chunk locked when the first chain attaches. Drives the progressive movement restriction toward that
- * chunk's center; at 4+ chains she is pinned dead-center.
- *
- * <p>This is the source of truth for a queen's restraint; the per-anchor Layer 1 clamp is suppressed for queens (see
+ * Layer 2 — queen-side capture bind state. Tracks up to 8 capture chains (anchor block positions, in attach order) and
+ * the bind chunk locked when the first chain attaches. Drives the progressive movement restriction toward that chunk's
+ * center; at 4+ chains she is pinned dead-center.
+ * <p>
+ * This is the source of truth for a queen's restraint; the per-anchor Layer 1 clamp is suppressed for queens (see
  * {@code AnchorBlockEntity.serverTick}). Attach/detach are fired from {@code AnchorBlockEntity.bind/release}, the
  * single choke points every chain attach/release flows through.
- *
- * <p>Slice 1 scope: state, attach/detach, persistence, and the restriction clamp (server-side). Geo reveal, the
- * anchor-to-shackle render, break-on-attack, AI suppression at 4 chains, and founding suppression are later slices;
- * the queries here ({@link #chainCount()}, {@link #isFullyBound()}, {@link #anchors()}) are the hooks they will read.
+ * <p>
+ * Slice 1 scope: state, attach/detach, persistence, and the restriction clamp (server-side). Geo reveal, the
+ * anchor-to-shackle render, break-on-attack, AI suppression at 4 chains, and founding suppression are later slices; the
+ * queries here ({@link #chainCount()}, {@link #isFullyBound()}, {@link #anchors()}) are the hooks they will read.
  */
 public class QueenBindManager {
 
@@ -31,6 +31,7 @@ public class QueenBindManager {
     public static final int FULLY_BOUND_CHAINS = 4;
 
     private static final String TAG_ANCHORS = "BindAnchors";
+
     private static final String TAG_BIND_CHUNK = "BindChunk";
 
     private final Queen queen;
@@ -55,7 +56,9 @@ public class QueenBindManager {
         return !anchors.isEmpty();
     }
 
-    /** Fully restrained: 4+ chains, pinned at chunk center. (AI suppression that stops her fighting is a later slice.) */
+    /**
+     * Fully restrained: 4+ chains, pinned at chunk center. (AI suppression that stops her fighting is a later slice.)
+     */
     public boolean isFullyBound() {
         return anchors.size() >= FULLY_BOUND_CHAINS;
     }
@@ -87,9 +90,9 @@ public class QueenBindManager {
     }
 
     /**
-     * Push each bound anchor's slot index to its block entity so the client knows which shackle bone its chain
-     * attaches to. Re-run every tick (the setter is change-gated, so this is a no-op once stable); this keeps slots
-     * correct across mid-list releases and world reload without persisting per-anchor render state.
+     * Push each bound anchor's slot index to its block entity so the client knows which shackle bone its chain attaches
+     * to. Re-run every tick (the setter is change-gated, so this is a no-op once stable); this keeps slots correct
+     * across mid-list releases and world reload without persisting per-anchor render state.
      */
     private void resyncShackleSlots() {
         for (int i = 0; i < anchors.size(); i++) {

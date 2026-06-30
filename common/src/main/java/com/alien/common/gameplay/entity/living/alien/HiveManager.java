@@ -2,8 +2,6 @@ package com.alien.common.gameplay.entity.living.alien;
 
 import com.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.server.level.ServerLevel;
 import com.alien.common.gameplay.hive.faction.HiveMemberLocationResolver;
 import com.alien.common.gameplay.hive.faction.LineageFactionData;
 import com.alien.common.gameplay.hive.faction.VariantFactionRegistry;
@@ -17,8 +15,10 @@ import com.alien.common.registry.tag.AlienEntityTypeTags;
 import com.blib.api.common.faction.v1.FactionMember;
 import com.blib.api.common.nbt.v1.model.NBTSerializable;
 import com.just.core.functional.option.Option;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 
 /**
@@ -121,15 +121,15 @@ public class HiveManager implements NBTSerializable {
         var width = queen.getBbWidth();
         var height = queen.getBbHeight();
         serverLevel.sendParticles(
-                ParticleTypes.WITCH,
-                queen.getX(),
-                queen.getY() + height * 0.6,
-                queen.getZ(),
-                4,
-                width * 0.6,
-                height * 0.5,
-                width * 0.6,
-                0.02
+            ParticleTypes.WITCH,
+            queen.getX(),
+            queen.getY() + height * 0.6,
+            queen.getZ(),
+            4,
+            width * 0.6,
+            height * 0.5,
+            width * 0.6,
+            0.02
         );
     }
 
@@ -209,8 +209,8 @@ public class HiveManager implements NBTSerializable {
         // queens must be too, otherwise a queen that hasn't yet settled into an ovipositor gets shed after the grace
         // window and the lineage is left queenless.
         if (
-                alien.getType().is(AlienEntityTypeTags.EMPRESSES)
-                        || alien.getType().is(AlienEntityTypeTags.QUEENS)
+            alien.getType().is(AlienEntityTypeTags.EMPRESSES)
+                || alien.getType().is(AlienEntityTypeTags.QUEENS)
         ) {
             return false;
         }

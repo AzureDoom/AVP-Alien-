@@ -1,9 +1,9 @@
 package com.alien.client.render.entity;
 
 import com.alien.AlienResources;
+import com.alien.client.render.layer.EggsackRestraintsLayer;
 import com.alien.common.gameplay.entity.living.alien.ovipositor.Ovipositor;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
-import com.alien.client.render.layer.EggsackRestraintsLayer;
 import com.blib.api.client.render.v1.entity.AzEntityRenderer;
 import com.blib.api.client.render.v1.entity.AzEntityRendererConfig;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -22,10 +22,10 @@ public class OvipositorRenderer extends AzEntityRenderer<Ovipositor> {
 
     public OvipositorRenderer(EntityRendererProvider.Context context) {
         super(
-                AzEntityRendererConfig.<Ovipositor>builder(OvipositorRenderer::modelFor, ovipositor -> TEXTURE)
-                        .addRenderLayer(new EggsackRestraintsLayer())
-                        .build(),
-                context
+            AzEntityRendererConfig.<Ovipositor>builder(OvipositorRenderer::modelFor, ovipositor -> TEXTURE)
+                .addRenderLayer(new EggsackRestraintsLayer())
+                .build(),
+            context
         );
         this.shadowRadius = 0.4F;
     }
@@ -33,7 +33,7 @@ public class OvipositorRenderer extends AzEntityRenderer<Ovipositor> {
     /** The captive chained-eggsack geo when she is a contained, inhibited queen; the normal ovipositor otherwise. */
     private static ResourceLocation modelFor(Ovipositor ovipositor) {
         return ovipositor.getVehicle() instanceof Queen queen && queen.isInhibited() && queen.isContained()
-                ? CHAINED_MODEL
-                : MODEL;
+            ? CHAINED_MODEL
+            : MODEL;
     }
 }

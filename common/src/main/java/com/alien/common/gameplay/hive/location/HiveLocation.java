@@ -192,9 +192,11 @@ public final class HiveLocation {
 
     private boolean reproductiveEstablished;
 
-    /** Wild → inhibited flag (Part 2). When true the location is a severed, contained breeder: all hive autonomy
-     * (claim expansion, biomass economy, caste spawning, contests) is suppressed by the growth tasks. Her combat and
-     * egg-laying are unaffected (those live off the entity / ovipositor path). Persisted. */
+    /**
+     * Wild → inhibited flag (Part 2). When true the location is a severed, contained breeder: all hive autonomy (claim
+     * expansion, biomass economy, caste spawning, contests) is suppressed by the growth tasks. Her combat and
+     * egg-laying are unaffected (those live off the entity / ovipositor path). Persisted.
+     */
     private boolean inhibited;
 
     /** Refined resource produced by queens (1/min). Used by hive unit purchases to upgrade castes. */
@@ -241,11 +243,11 @@ public final class HiveLocation {
     private @Nullable HiveLocationRemovalReason removalReason;
 
     public HiveLocation(
-            HiveLocationId id,
-            ResourceLocation lineageFactionId,
-            ResourceKey<Level> dimension,
-            BlockPos centerPos,
-            @Nullable UUID founderId
+        HiveLocationId id,
+        ResourceLocation lineageFactionId,
+        ResourceKey<Level> dimension,
+        BlockPos centerPos,
+        @Nullable UUID founderId
     ) {
         this(id);
         this.lineageFactionId = lineageFactionId;
@@ -321,8 +323,8 @@ public final class HiveLocation {
     }
 
     /**
-     * Relocates this location's anchor. <b>Founded hives never call this</b> — their center is fixed at founding because
-     * their structures and slab band are anchored to it (see the class doc). It exists solely for an inhibited,
+     * Relocates this location's anchor. <b>Founded hives never call this</b> — their center is fixed at founding
+     * because their structures and slab band are anchored to it (see the class doc). It exists solely for an inhibited,
      * single-chunk location whose claim follows its queen as she roams: she has no structures or slab to invalidate, so
      * the anchor can chase her current chunk. The inhibitor follow-chunk migrator is the only caller.
      */
@@ -354,7 +356,7 @@ public final class HiveLocation {
      */
     public boolean withinSlab(int y) {
         return y >= hiveFloorY() - SLAB_TOLERANCE
-                && y < hiveCeilingY() + SLAB_TOLERANCE;
+            && y < hiveCeilingY() + SLAB_TOLERANCE;
     }
 
     public @Nullable UUID founderId() {
@@ -402,11 +404,11 @@ public final class HiveLocation {
     }
 
     public void recordAbstractSpreadAttempt(
-            long tick,
-            String result,
-            @Nullable ChunkPos candidateChunk,
-            @Nullable HiveLocationId createdLocationId,
-            String detail
+        long tick,
+        String result,
+        @Nullable ChunkPos candidateChunk,
+        @Nullable HiveLocationId createdLocationId,
+        String detail
     ) {
         this.lastAbstractSpreadAttempt = new AbstractSpreadAttemptDebug(tick, result, candidateChunk, createdLocationId, detail);
     }
@@ -813,27 +815,27 @@ public final class HiveLocation {
         location.ageInTicks = tag.getLong(NBT_AGE_IN_TICKS);
         location.lastGrowthTick = tag.getLong(NBT_LAST_GROWTH_TICK);
         location.lastPassiveClaimTick = tag.contains(NBT_LAST_PASSIVE_CLAIM_TICK)
-                ? Math.max(0L, tag.getLong(NBT_LAST_PASSIVE_CLAIM_TICK))
-                : Math.max(0L, location.lastGrowthTick);
+            ? Math.max(0L, tag.getLong(NBT_LAST_PASSIVE_CLAIM_TICK))
+            : Math.max(0L, location.lastGrowthTick);
         location.lastAbstractSpreadTick = Math.max(0L, tag.getLong(NBT_LAST_ABSTRACT_SPREAD_TICK));
         location.lastAbstractSpreadAttempt = tag.contains(NBT_LAST_ABSTRACT_SPREAD_ATTEMPT)
-                ? AbstractSpreadAttemptDebug.load(tag.getCompound(NBT_LAST_ABSTRACT_SPREAD_ATTEMPT))
-                : AbstractSpreadAttemptDebug.none();
+            ? AbstractSpreadAttemptDebug.load(tag.getCompound(NBT_LAST_ABSTRACT_SPREAD_ATTEMPT))
+            : AbstractSpreadAttemptDebug.none();
         location.peakXenomorphCount = Math.max(1, tag.getInt(NBT_PEAK_XENOMORPH_COUNT));
         location.peakDecayElapsedTicks = Math.max(0L, tag.getLong(NBT_PEAK_DECAY_ELAPSED));
         location.evacuatingRemainingTicks = Math.max(0L, tag.getLong(NBT_EVACUATING_REMAINING));
         location.noContactTicksAccrued = tag.contains(NBT_NO_CONTACT_TICKS_ACCRUED)
-                ? Math.max(0L, tag.getLong(NBT_NO_CONTACT_TICKS_ACCRUED))
-                : 0L;
+            ? Math.max(0L, tag.getLong(NBT_NO_CONTACT_TICKS_ACCRUED))
+            : 0L;
         location.combatRespiteRemainingTicks = Math.max(0L, tag.getLong(NBT_COMBAT_RESPITE_REMAINING_TICKS));
         location.combatKillsSinceLastRespite = Math.max(0, tag.getInt(NBT_COMBAT_KILLS_SINCE_LAST_RESPITE));
         location.locationNumber = tag.contains(NBT_LOCATION_NUMBER) ? tag.getLong(NBT_LOCATION_NUMBER) : -1L;
         location.queenlessMaturationLastAdvanceTick = tag.contains(NBT_QUEENLESS_MATURATION_LAST_ADVANCE)
-                ? tag.getLong(NBT_QUEENLESS_MATURATION_LAST_ADVANCE)
-                : Long.MIN_VALUE;
+            ? tag.getLong(NBT_QUEENLESS_MATURATION_LAST_ADVANCE)
+            : Long.MIN_VALUE;
         location.queenlessLeaderSnapshot = tag.hasUUID(NBT_QUEENLESS_LEADER_SNAPSHOT)
-                ? tag.getUUID(NBT_QUEENLESS_LEADER_SNAPSHOT)
-                : null;
+            ? tag.getUUID(NBT_QUEENLESS_LEADER_SNAPSHOT)
+            : null;
         location.biomass = Math.max(0, tag.getInt(NBT_BIOMASS));
         location.reproductiveEstablished = tag.getBoolean(NBT_REPRODUCTIVE_ESTABLISHED);
         location.inhibited = tag.getBoolean(NBT_INHIBITED);
@@ -905,11 +907,11 @@ public final class HiveLocation {
     }
 
     public record AbstractSpreadAttemptDebug(
-            long tick,
-            String result,
-            @Nullable ChunkPos candidateChunk,
-            @Nullable HiveLocationId createdLocationId,
-            String detail
+        long tick,
+        String result,
+        @Nullable ChunkPos candidateChunk,
+        @Nullable HiveLocationId createdLocationId,
+        String detail
     ) {
 
         private static final String NBT_TICK = "Tick";
@@ -935,11 +937,11 @@ public final class HiveLocation {
 
         public static AbstractSpreadAttemptDebug none() {
             return new AbstractSpreadAttemptDebug(
-                    -1L,
-                    "never",
-                    null,
-                    null,
-                    "No abstract spread attempt has been recorded."
+                -1L,
+                "never",
+                null,
+                null,
+                "No abstract spread attempt has been recorded."
             );
         }
 
@@ -960,18 +962,18 @@ public final class HiveLocation {
 
         public static AbstractSpreadAttemptDebug load(CompoundTag tag) {
             var candidateChunk = tag.contains(NBT_CANDIDATE_CHUNK_X) && tag.contains(NBT_CANDIDATE_CHUNK_Z)
-                    ? new ChunkPos(tag.getInt(NBT_CANDIDATE_CHUNK_X), tag.getInt(NBT_CANDIDATE_CHUNK_Z))
-                    : null;
+                ? new ChunkPos(tag.getInt(NBT_CANDIDATE_CHUNK_X), tag.getInt(NBT_CANDIDATE_CHUNK_Z))
+                : null;
             var createdLocationId = tag.contains(NBT_CREATED_LOCATION_ID)
-                    ? new HiveLocationId(ResourceLocation.parse(tag.getString(NBT_CREATED_LOCATION_ID)))
-                    : null;
+                ? new HiveLocationId(ResourceLocation.parse(tag.getString(NBT_CREATED_LOCATION_ID)))
+                : null;
 
             return new AbstractSpreadAttemptDebug(
-                    tag.contains(NBT_TICK) ? tag.getLong(NBT_TICK) : -1L,
-                    tag.contains(NBT_RESULT) ? tag.getString(NBT_RESULT) : "unknown",
-                    candidateChunk,
-                    createdLocationId,
-                    tag.contains(NBT_DETAIL) ? tag.getString(NBT_DETAIL) : ""
+                tag.contains(NBT_TICK) ? tag.getLong(NBT_TICK) : -1L,
+                tag.contains(NBT_RESULT) ? tag.getString(NBT_RESULT) : "unknown",
+                candidateChunk,
+                createdLocationId,
+                tag.contains(NBT_DETAIL) ? tag.getString(NBT_DETAIL) : ""
             );
         }
     }

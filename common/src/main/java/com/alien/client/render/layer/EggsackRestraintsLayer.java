@@ -21,7 +21,7 @@ import java.util.UUID;
 public class EggsackRestraintsLayer implements AzRenderLayer<UUID, Ovipositor> {
 
     private static final ResourceLocation RESTRAINTS_TEXTURE =
-            AlienResources.entityTextureLocation("eggsack_iron_restraints");
+        AlienResources.entityTextureLocation("eggsack_iron_restraints");
 
     private static final float RESTRAINTS_INFLATE = 0.02F;
 

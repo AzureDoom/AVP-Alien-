@@ -43,8 +43,8 @@ public final class PopulationPressureDecayTask {
     }
 
     private static boolean isBelowPopulationRatio(
-            HiveLocation location,
-            com.alien.common.gameplay.hive.config.HiveConfig config
+        HiveLocation location,
+        com.alien.common.gameplay.hive.config.HiveConfig config
     ) {
         var cap = location.claimedChunks().size() * config.populationPerChunk();
         if (cap <= 0) {
@@ -59,17 +59,17 @@ public final class PopulationPressureDecayTask {
         var centerChunk = new ChunkPos(location.centerPos());
 
         return location.claimedChunks()
-                .stream()
-                .filter(chunk -> !chunk.equals(centerChunk))
-                .filter(chunk -> HiveLocationClaims.wouldRemainConnectedAfterRelease(location, chunk))
-                .max(
-                        Comparator.<ChunkPos>comparingInt(chunk -> chebyshev(chunk, centerChunk))
-                                .thenComparingInt(chunk -> manhattan(chunk, centerChunk))
-                                .thenComparingLong(chunk -> location.chunkClaimTicks().getOrDefault(chunk, 0L))
-                                .thenComparingInt(chunk -> chunk.x)
-                                .thenComparingInt(chunk -> chunk.z)
-                )
-                .orElse(null);
+            .stream()
+            .filter(chunk -> !chunk.equals(centerChunk))
+            .filter(chunk -> HiveLocationClaims.wouldRemainConnectedAfterRelease(location, chunk))
+            .max(
+                Comparator.<ChunkPos>comparingInt(chunk -> chebyshev(chunk, centerChunk))
+                    .thenComparingInt(chunk -> manhattan(chunk, centerChunk))
+                    .thenComparingLong(chunk -> location.chunkClaimTicks().getOrDefault(chunk, 0L))
+                    .thenComparingInt(chunk -> chunk.x)
+                    .thenComparingInt(chunk -> chunk.z)
+            )
+            .orElse(null);
     }
 
     private static int chebyshev(ChunkPos a, ChunkPos b) {

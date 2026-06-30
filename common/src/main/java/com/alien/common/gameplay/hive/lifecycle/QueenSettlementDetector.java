@@ -18,9 +18,9 @@ import java.util.UUID;
  * hand the position to {@link HiveLocationFoundingService}.
  * <p>
  * Combat <em>pauses</em> the timer rather than resetting it. While she has a target, was recently hurt, or has a
- * last-hurt-by attacker, no progress accrues — but the progress already banked is preserved and resumes when the
- * fight ends. Chunk crossings do not affect the timer; wandering during settlement is fine, and she founds at whichever
- * chunk she is standing in when the timer fills.
+ * last-hurt-by attacker, no progress accrues — but the progress already banked is preserved and resumes when the fight
+ * ends. Chunk crossings do not affect the timer; wandering during settlement is fine, and she founds at whichever chunk
+ * she is standing in when the timer fills.
  * <p>
  * State is in-memory only — a server stop or world reload starts every queen fresh. That's the design intent;
  * settlements are rare events and persistence isn't worth the complexity. A large gap between observations (chunk
@@ -50,8 +50,8 @@ public final class QueenSettlementDetector {
         if (existing == null) {
             // First observation — start banking from zero (whether or not she is currently in combat).
             states.put(
-                    uuid,
-                    new AnchorState(new ChunkPos(queen.blockPosition()), 0L, currentGameTime, queen.blockPosition())
+                uuid,
+                new AnchorState(new ChunkPos(queen.blockPosition()), 0L, currentGameTime, queen.blockPosition())
             );
             return null;
         }
@@ -60,8 +60,8 @@ public final class QueenSettlementDetector {
         if (delta < 0L || delta > MAX_OBSERVATION_GAP_TICKS) {
             // Discontinuous observation (unload/reload/time anomaly) — restart accrual rather than crediting the gap.
             states.put(
-                    uuid,
-                    new AnchorState(new ChunkPos(queen.blockPosition()), 0L, currentGameTime, queen.blockPosition())
+                uuid,
+                new AnchorState(new ChunkPos(queen.blockPosition()), 0L, currentGameTime, queen.blockPosition())
             );
             return null;
         }
@@ -115,9 +115,9 @@ public final class QueenSettlementDetector {
      * compute the per-tick delta and detect unload gaps).
      */
     public record AnchorState(
-            ChunkPos chunk,
-            long accumulatedTicks,
-            long lastObservedTick,
-            BlockPos lastSeenPos
+        ChunkPos chunk,
+        long accumulatedTicks,
+        long lastObservedTick,
+        BlockPos lastSeenPos
     ) {}
 }
