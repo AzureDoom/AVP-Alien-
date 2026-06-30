@@ -27,6 +27,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import com.alien.common.gameplay.hive.lifecycle.QueenInhibitionService;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -144,6 +145,9 @@ public class Queen extends Xenomorph implements GOAPUser<Queen>, EggLayer {
         queenData.tick();
         lifecyclePhaseManager.tick();
         bindManager.tick();
+        if (isInhibited() && tickCount % 20 == 0 && level() instanceof ServerLevel serverLevel) {
+            QueenInhibitionService.tickFollow(serverLevel, this);
+        }
     }
 
     @Override
@@ -291,6 +295,36 @@ public class Queen extends Xenomorph implements GOAPUser<Queen>, EggLayer {
     /** Attach or remove the inhibitor device. Server-authoritative; syncs and persists automatically. */
     public void setInhibited(boolean inhibited) {
         hasInhibitor.set(inhibited);
+    }
+
+    /**
+     * Whether she is in the involuntary, defeat-induced incapacitated state (Part 2). Not yet implemented — the
+     * incapacitation state machine (incap HP bar, kill/heal/self-recovery/capture exits) is a deferred feature, so this
+     * hook returns {@code false} for now. When that state lands it should read its flag here, and the inhibitor gate
+     * below picks it up automatically.
+     */
+    public boolean isIncapacitated() {
+        return false; // TODO(Part 2 incapacitation): return the real downed-state flag once it exists.
+    }
+
+    /**
+     * Whether the inhibitor may be applied to her right now. Per design she must be helpless in one of three ways:
+     * incapacitated, in the {@link QueenLifecyclePhase#HIBERNATION} phase, or already secured with all four chains.
+     */
+    public boolean canBeInhibited() {
+        return isIncapacitated()
+                || lifecyclePhaseManager.getPhase() == QueenLifecyclePhase.HIBERNATION
+                || bindManager.isFullyBound();
+    }
+
+    /**
+     * Whether she is contained — subdued enough to be a captive breeder that grows a chained eggsack. For now this is
+     * the four-chain full bind; a human titanium enclosure becomes a second containment source later.
+     */
+    public boolean isContained() {
+        // Synced chain count (mirrors the bind anchors), so this is correct on both server and client
+        // — the chained-eggsack renderer reads it off the vehicle queen.
+        return bindChainCount.get() >= QueenBindManager.FULLY_BOUND_CHAINS;
     }
 
     public boolean isDigging() {

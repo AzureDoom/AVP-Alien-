@@ -27,6 +27,9 @@ public class QueenBindManager {
     /** Maximum chains on a queen: 4 to fully bind, plus 4 for extra securement. */
     public static final int MAX_CHAINS = 8;
 
+    /** Chains needed to count as fully bound / contained (the captive-breeder threshold). */
+    public static final int FULLY_BOUND_CHAINS = 4;
+
     private static final String TAG_ANCHORS = "BindAnchors";
     private static final String TAG_BIND_CHUNK = "BindChunk";
 
@@ -54,7 +57,7 @@ public class QueenBindManager {
 
     /** Fully restrained: 4+ chains, pinned at chunk center. (AI suppression that stops her fighting is a later slice.) */
     public boolean isFullyBound() {
-        return anchors.size() >= 4;
+        return anchors.size() >= FULLY_BOUND_CHAINS;
     }
 
     /** Live view of the bound anchors, attach-ordered. */

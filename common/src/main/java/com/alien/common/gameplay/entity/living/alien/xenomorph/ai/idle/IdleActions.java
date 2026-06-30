@@ -30,18 +30,18 @@ public class IdleActions {
     private static final int WANDER_TARGET_ATTEMPTS = 12;
 
     public static final Action<Xenomorph> WANDER = BLibAction.<Xenomorph>builder("WanderAction")
-            .addMasks(ActionMasks.MOVE)
-            .addPrecondition(GOAPSensors.HAS_ATTACK_TARGET.key(), Expressions.Boolean.isFalse())
-            .addPrecondition(IdleSensors.IS_BORED.key(), Expressions.Boolean.isTrue())
-            .addEffect(IdleSensors.IS_BORED.key().asDerived(), false)
-            .withPerformCallback(context -> {
-                return performWander(context);
-            })
-            .withFinishCallback(context -> {
-                NeoMoveToPosAction.onFinish(context);
-                context.getBlackboard(Blackboard.Scope.ACTION).clear();
-            })
-            .build();
+        .addMasks(ActionMasks.MOVE)
+        .addPrecondition(GOAPSensors.HAS_ATTACK_TARGET.key(), Expressions.Boolean.isFalse())
+        .addPrecondition(IdleSensors.IS_BORED.key(), Expressions.Boolean.isTrue())
+        .addEffect(IdleSensors.IS_BORED.key().asDerived(), false)
+        .withPerformCallback(context -> {
+            return performWander(context);
+        })
+        .withFinishCallback(context -> {
+            NeoMoveToPosAction.onFinish(context);
+            context.getBlackboard(Blackboard.Scope.ACTION).clear();
+        })
+        .build();
 
     private static Action.Signal performWander(Action.Context<? extends Xenomorph> context) {
         var actor = context.getActor();
@@ -100,8 +100,8 @@ public class IdleActions {
 
     private static boolean isHiveBoundIdleWanderer(Xenomorph actor) {
         return actor.getType().is(AlienEntityTypeTags.QUEENS)
-                || actor.getType().is(AlienEntityTypeTags.EMPRESSES)
-                || actor.getType().is(AlienEntityTypeTags.HARBINGERS);
+            || actor.getType().is(AlienEntityTypeTags.EMPRESSES)
+            || actor.getType().is(AlienEntityTypeTags.HARBINGERS);
     }
 
     private static @Nullable HiveLocation resolveHiveBoundWanderLocation(Xenomorph actor) {

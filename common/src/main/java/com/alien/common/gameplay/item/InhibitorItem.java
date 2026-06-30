@@ -1,6 +1,8 @@
 package com.alien.common.gameplay.item;
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
+import com.alien.common.gameplay.hive.lifecycle.QueenInhibitionService;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -15,7 +17,8 @@ import org.jetbrains.annotations.NotNull;
  * fight and defend. Chaining an inhibited queen later gives her the ridable chained eggsack to lay from.
  *
  * <p>Slice A scope: attach the device (set the synced + persisted flag, reveal the {@code gInhibitor} bone) and
- * consume the item. The behavioural effects land in their own slices.
+ * consume the item. Application is gated to a helpless queen — incapacitated, hibernating, or secured with all four
+ * chains (see {@link Queen#canBeInhibited()}). The behavioural effects land in their own slices.
  */
 public class InhibitorItem extends Item {
 
@@ -30,9 +33,10 @@ public class InhibitorItem extends Item {
             @NotNull LivingEntity target,
             @NotNull InteractionHand hand
     ) {
-        if (target instanceof Queen queen && !queen.isInhibited()) {
-            if (!player.level().isClientSide) {
+        if (target instanceof Queen queen && !queen.isInhibited() && queen.canBeInhibited()) {
+            if (player.level() instanceof ServerLevel serverLevel) {
                 queen.setInhibited(true);
+                QueenInhibitionService.onInhibited(serverLevel, queen);
                 if (!player.getAbilities().instabuild) {
                     stack.shrink(1);
                 }

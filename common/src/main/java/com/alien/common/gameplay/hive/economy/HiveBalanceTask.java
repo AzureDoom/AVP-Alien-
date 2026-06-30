@@ -29,8 +29,8 @@ import java.util.Map;
 public final class HiveBalanceTask {
 
     private static final TagKey<EntityType<?>>[] POPULATION_FILL_CASTES = new TagKey[] {
-        AlienEntityTypeTags.RUNNERS,
-        AlienEntityTypeTags.DRONES
+            AlienEntityTypeTags.RUNNERS,
+            AlienEntityTypeTags.DRONES
     };
 
     private HiveBalanceTask() {}
@@ -48,8 +48,8 @@ public final class HiveBalanceTask {
                 continue;
             }
             for (var location : new ArrayList<>(lineage.locationsById().values())) {
-                if (!location.isAlive()) {
-                    continue;
+                if (!location.isAlive() || location.isInhibited()) {
+                    continue; // inhibited locations run no economy — no biomass spend, no jelly, no purchases.
                 }
                 evaluate(location, lineage, populationPerChunk);
             }
@@ -85,11 +85,11 @@ public final class HiveBalanceTask {
     }
 
     private static boolean tryFillPopulation(
-        HiveLocation location,
-        LineageFactionData lineage,
-        Map<TagKey<EntityType<?>>, Integer> pop,
-        int chunks,
-        int totalPop
+            HiveLocation location,
+            LineageFactionData lineage,
+            Map<TagKey<EntityType<?>>, Integer> pop,
+            int chunks,
+            int totalPop
     ) {
         var ordered = populationFillOrder(pop, chunks);
         for (var caste : ordered) {
@@ -101,8 +101,8 @@ public final class HiveBalanceTask {
     }
 
     private static ArrayList<TagKey<EntityType<?>>> populationFillOrder(
-        Map<TagKey<EntityType<?>>, Integer> pop,
-        int chunks
+            Map<TagKey<EntityType<?>>, Integer> pop,
+            int chunks
     ) {
         var ordered = new ArrayList<TagKey<EntityType<?>>>();
         var drones = pop.getOrDefault(AlienEntityTypeTags.DRONES, 0);
@@ -134,11 +134,11 @@ public final class HiveBalanceTask {
     }
 
     private static boolean tryBalanceComposition(
-        HiveLocation location,
-        LineageFactionData lineage,
-        Map<TagKey<EntityType<?>>, Integer> pop,
-        int chunks,
-        int totalPop
+            HiveLocation location,
+            LineageFactionData lineage,
+            Map<TagKey<EntityType<?>>, Integer> pop,
+            int chunks,
+            int totalPop
     ) {
         var deficits = computeDeficits(pop, chunks, totalPop);
         if (deficits.isEmpty()) {
@@ -162,20 +162,20 @@ public final class HiveBalanceTask {
     }
 
     private static boolean tryCommitCaste(
-        HiveLocation location,
-        LineageFactionData lineage,
-        TagKey<EntityType<?>> caste,
-        int totalPop,
-        PurchasePopulationMode populationMode
+            HiveLocation location,
+            LineageFactionData lineage,
+            TagKey<EntityType<?>> caste,
+            int totalPop,
+            PurchasePopulationMode populationMode
     ) {
         var outputType = CasteResolver.entityTypeForCaste(lineage.variant(), caste);
         if (outputType == null) {
             return false;
         }
         if (
-            outputType.is(AlienEntityTypeTags.HARBINGERS)
-                && (CastePopulation.countCaste(location, AlienEntityTypeTags.HARBINGERS) >= 1
-                    || hasHarbingerAwayInRaid(location, lineage))
+                outputType.is(AlienEntityTypeTags.HARBINGERS)
+                        && (CastePopulation.countCaste(location, AlienEntityTypeTags.HARBINGERS) >= 1
+                        || hasHarbingerAwayInRaid(location, lineage))
         ) {
             return false;
         }
@@ -196,9 +196,9 @@ public final class HiveBalanceTask {
 
         var biomassCost = biomassCost(purchase, location);
         if (
-            location.biomass() < biomassCost
-                || location.royalJelly() < purchase.royalJelly()
-                || location.scourgeJelly() < purchase.scourgeJelly()
+                location.biomass() < biomassCost
+                        || location.royalJelly() < purchase.royalJelly()
+                        || location.scourgeJelly() < purchase.scourgeJelly()
         ) {
             return false;
         }
@@ -264,9 +264,9 @@ public final class HiveBalanceTask {
     }
 
     private static Map<TagKey<EntityType<?>>, Integer> computeDeficits(
-        Map<TagKey<EntityType<?>>, Integer> pop,
-        int chunks,
-        int totalPop
+            Map<TagKey<EntityType<?>>, Integer> pop,
+            int chunks,
+            int totalPop
     ) {
         var drone = pop.getOrDefault(AlienEntityTypeTags.DRONES, 0);
         var runner = pop.getOrDefault(AlienEntityTypeTags.RUNNERS, 0);
@@ -299,9 +299,9 @@ public final class HiveBalanceTask {
     }
 
     private static boolean conditionsHold(
-        HiveUnitPurchase purchase,
-        HiveLocation location,
-        int totalPop
+            HiveUnitPurchase purchase,
+            HiveLocation location,
+            int totalPop
     ) {
         for (var condition : purchase.conditions()) {
             switch (condition) {

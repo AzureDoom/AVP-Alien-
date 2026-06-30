@@ -1,8 +1,8 @@
 package com.alien.common.gameplay.command.debug;
 
 import com.alien.common.registry.init.item.AlienItems;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;

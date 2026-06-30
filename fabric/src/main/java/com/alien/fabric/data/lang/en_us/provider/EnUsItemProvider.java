@@ -179,9 +179,9 @@ public class EnUsItemProvider {
     };
 
     private static void addItem(
-            FabricLanguageProvider.TranslationBuilder translationBuilder,
-            Supplier<? extends Item> itemSupplier,
-            String value
+        FabricLanguageProvider.TranslationBuilder translationBuilder,
+        Supplier<? extends Item> itemSupplier,
+        String value
     ) {
         addItem(translationBuilder, itemSupplier.get(), value);
     }

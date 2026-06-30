@@ -58,6 +58,12 @@ public final class HiveLocationLoadedTickTask {
             HiveTerritoryAggroTask.run(serverLevel, location);
         }
 
+        // Inhibited (severed contained-breeder) locations run no autonomy below this line — no biomass income, no
+        // claim expansion, no abstract spread. Defense (aggro, above) and her own combat / egg-laying are unaffected.
+        if (location.isInhibited()) {
+            return;
+        }
+
         // Loaded biomass income — only for player-nearby locations (proxy: boss bar is showing). Cheap to call,
         // so we check every tick and let LoadedBiomassTicker decide whether this is its second.
         if (isPlayerNearby(serverLevel, location) && LoadedBiomassTicker.shouldFire(currentTick)) {
