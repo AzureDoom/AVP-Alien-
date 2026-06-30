@@ -10,6 +10,7 @@ import com.alien.common.gameplay.item.QueenHeadShieldItem;
 import com.alien.common.gameplay.item.SpitterHeadShieldItem;
 import com.alien.common.gameplay.item.XenomorphHeadItem;
 import com.alien.common.gameplay.item.XenomorphHeadShieldItem;
+import com.alien.common.gameplay.item.debug.DebugLimbStickItem;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.block.AlienBlocks;
 import net.minecraft.world.item.BlockItem;
@@ -101,6 +102,8 @@ public class AlienItems {
             "inhibitor",
             () -> new InhibitorItem(new Item.Properties().stacksTo(16))
     );
+
+    public static final BLibHolder<Item> DEBUG_LIMB_STICK = create("debug_limb_stick", DebugLimbStickItem::new);
 
     public static final BLibHolder<Item> QUEEN_HEAD = create(
             "queen_head",

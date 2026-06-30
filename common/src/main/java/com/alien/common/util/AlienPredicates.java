@@ -4,6 +4,11 @@ import com.alien.common.data.AlienVariantTypes;
 import com.alien.common.gameplay.entity.living.alien.Alien;
 import com.alien.common.gameplay.entity.living.alien.royal_cocoon.RoyalCocoon;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
+import com.alien.common.gameplay.hive.growth.BiomassIncome;
+import com.alien.common.gameplay.hive.id.HiveLocationId;
+import com.alien.common.gameplay.hive.id.HiveLocationIds;
+import com.alien.common.gameplay.hive.location.HiveLocation;
+import com.alien.common.gameplay.hive.location.HiveLocationRegistry;
 import com.alien.common.model.alien.Host;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.tag.AlienBlockTags;
@@ -21,10 +26,11 @@ import java.util.Objects;
 
 public class AlienPredicates {
 
+    private static final float LOW_BIOMASS_TARGET_THRESHOLD = 0.25F;
+
     public static boolean canTarget(@NotNull Alien alien, @NotNull LivingEntity potentialTarget) {
-        // Xenomorphs are permissive — anything valid is a target. Pacifist exemptions live in
-        // AlienEntityTypeTags.IGNORED_BY_XENOMORPHS, which isValidTarget consults.
-        return canContinueTargeting(alien, potentialTarget);
+        return canContinueTargeting(alien, potentialTarget)
+            && isTargetThreatAllowed(alien, potentialTarget);
     }
 
     public static boolean canAcquireTarget(@NotNull Alien alien, @NotNull LivingEntity potentialTarget) {
@@ -44,6 +50,60 @@ public class AlienPredicates {
             // AND, for a royal-change cocoon (a plain Mob with its strain encoded in its entity type), only a rival
             // strain may attack it -- a xenomorph never strikes its own strain's forming royal.
             && (!(potentialTarget instanceof RoyalCocoon cocoon) || alien.getVariant() != cocoon.getVariant());
+    }
+
+    private static boolean isTargetThreatAllowed(@NotNull Alien alien, @NotNull LivingEntity potentialTarget) {
+        if (isAlienTarget(alien, potentialTarget)) {
+            return true;
+        }
+
+        if (isHated(alien, potentialTarget)) {
+            return true;
+        }
+
+        if (potentialTarget.getType().is(AlienEntityTypeTags.XENOMORPH_THREAT_3_HIGH_DANGER)) {
+            return true;
+        }
+
+        if (potentialTarget.getType().is(AlienEntityTypeTags.XENOMORPH_THREAT_2_LOW_DANGER)) {
+            return isHiveLowOnBiomass(alien);
+        }
+
+        if (potentialTarget.getType().is(AlienEntityTypeTags.XENOMORPH_THREAT_1_PASSIVE)) {
+            return false;
+        }
+
+        // Match the old 1.21.1 aggro baseline: anything valid and not explicitly ignored/passive/high-danger is
+        // treated as low danger, so modded hostile mobs still enter the biomass-gated prey pool without a data tag.
+        return isHiveLowOnBiomass(alien);
+    }
+
+    private static boolean isHiveLowOnBiomass(@NotNull Alien alien) {
+        var location = findHomeLocation(alien);
+
+        if (location == null) {
+            return false;
+        }
+
+        var cap = BiomassIncome.biomassCap(location, HiveLocationRegistry.INSTANCE.config());
+
+        return cap > 0 && location.biomass() <= Math.ceil(cap * LOW_BIOMASS_TARGET_THRESHOLD);
+    }
+
+    private static HiveLocation findHomeLocation(@NotNull Alien alien) {
+        for (var factionId : com.alien.Alien.MOD.factions().getFactionIds(alien.getUUID())) {
+            if (!HiveLocationIds.isHiveLocationId(factionId)) {
+                continue;
+            }
+
+            var location = HiveLocationRegistry.INSTANCE.get(HiveLocationId.of(factionId));
+
+            if (location != null && location.isAlive()) {
+                return location;
+            }
+        }
+
+        return null;
     }
 
     public static boolean isAlienTarget(@NotNull Alien alien, @NotNull LivingEntity potentialTarget) {

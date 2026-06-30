@@ -10,6 +10,8 @@ public class ChrysalisAnimationRefs {
 
     public static final String SWIM_ANIMATION_NAME = "swim";
 
+    public static final String CRAWL_ANIMATION_NAME = "crawl";
+
     public static final String ATTACKBITE_ANIMATION_NAME = "attackbite";
 
     public static final String ATTACKCLAW_ANIMATION_NAME = "attackclaw";

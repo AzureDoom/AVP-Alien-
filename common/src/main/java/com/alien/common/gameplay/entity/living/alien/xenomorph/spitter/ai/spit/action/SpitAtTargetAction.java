@@ -18,6 +18,8 @@ public class SpitAtTargetAction {
 
     private static final StateKey<Boolean> KEY_HAS_FIRED = StateKey.sensed("spit_has_fired");
 
+    private static final StateKey<Boolean> KEY_ANIMATION_STARTED = StateKey.sensed("spit_animation_started");
+
     public static Action.Signal perform(Action.Context<? extends Spitter> context) {
         var spitter = context.getActor();
         var worldState = context.getWorldState();
@@ -48,6 +50,11 @@ public class SpitAtTargetAction {
         }
 
         var windUpRemaining = blackboard.getOrDefault(KEY_WIND_UP_REMAINING, WIND_UP_TICKS);
+
+        if (!blackboard.getOrDefault(KEY_ANIMATION_STARTED, false)) {
+            spitter.startAttack(Spitter.SPIT, target);
+            blackboard.set(KEY_ANIMATION_STARTED, true);
+        }
 
         if (windUpRemaining > 0) {
             blackboard.set(KEY_WIND_UP_REMAINING, windUpRemaining - 1);

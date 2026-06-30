@@ -42,6 +42,12 @@ public class Spitter extends Xenomorph implements GOAPUser<Spitter> {
         .sound(AlienSoundEvents.ENTITY_XENOMORPH_ATTACK)
         .build();
 
+    public static final AttackType SPIT = AttackType.builder("spitter_spit")
+        .requiresHead()
+        .defaultDurationInTicks(18)
+        .damageApplicator((xenomorph, target) -> {})
+        .build();
+
     private static final XenomorphConfig CONFIG = XenomorphConfig.builder(XenomorphPathConfig.MEDIUM_TALL, Spitter::getType)
         .attackConfig(
             XenomorphAttackConfig.builder()

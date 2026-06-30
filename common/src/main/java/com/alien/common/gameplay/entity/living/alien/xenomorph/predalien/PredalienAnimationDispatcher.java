@@ -48,6 +48,20 @@ public class PredalienAnimationDispatcher {
         AzDispatchMode.PLAY_IF_NOT_PLAYING
     );
 
+    private static final AzCommand<Predalien> CRAWL_ALL = AzAnimationUtil.compose(
+        AzAlienAnimationUtil.XENO_LIMBS,
+        "swim",
+        AzPlayBehaviors.LOOP,
+        AzDispatchMode.PLAY_IF_NOT_PLAYING
+    );
+
+    private static final AzCommand<Predalien> CRAWL_ALL_HOLD = AzAnimationUtil.compose(
+        AzAlienAnimationUtil.XENO_LIMBS,
+        "swim",
+        AzPlayBehaviors.HOLD_ON_LAST_FRAME,
+        AzDispatchMode.PLAY_IF_NOT_PLAYING
+    );
+
     private final Predalien predalien;
 
     public PredalienAnimationDispatcher(Predalien predalien) {
@@ -68,6 +82,24 @@ public class PredalienAnimationDispatcher {
 
     public void walk() {
         WALK_ALL.dispatchForEntity(predalien);
+    }
+
+    public void crawl() {
+        CRAWL_ALL.dispatchForEntity(predalien);
+    }
+
+    public void crawl(float speed) {
+        AzAlienAnimationUtil.composeWithSpeed(
+            AzAlienAnimationUtil.XENO_LIMBS,
+            "swim",
+            AzPlayBehaviors.LOOP,
+            AzDispatchMode.PLAY_IF_NOT_PLAYING,
+            speed
+        ).dispatchForEntity(predalien);
+    }
+
+    public void crawlHold() {
+        CRAWL_ALL_HOLD.dispatchForEntity(predalien);
     }
 
     public void biteAttack() {

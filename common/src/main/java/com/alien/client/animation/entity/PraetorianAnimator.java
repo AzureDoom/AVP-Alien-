@@ -79,20 +79,22 @@ public class PraetorianAnimator extends AzEntityAnimator<Praetorian> {
         }
 
         var isMovingOnGround = praetorian.isMovingHorizontally.get() && praetorian.onGround();
+        var isCrawling = praetorian.getCrawlingManager().isCrawling();
         Runnable animFunction;
 
         if (praetorian.isUnderWater()) {
             // TODO: idle swim
             animFunction = dispatcher::swim;
         } else if (isMovingOnGround) {
-            if (praetorian.isMovingQuickly.get()) {
+            if (isCrawling) {
+                animFunction = () -> dispatcher.crawl(AzAlienAnimationUtil.crawlAnimationSpeed(praetorian));
+            } else if (praetorian.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {
                 animFunction = dispatcher::walk;
             }
         } else {
-            // TODO: idle crawl
-            animFunction = dispatcher::idle;
+            animFunction = isCrawling ? dispatcher::crawlHold : dispatcher::idle;
         }
 
         animFunction.run();

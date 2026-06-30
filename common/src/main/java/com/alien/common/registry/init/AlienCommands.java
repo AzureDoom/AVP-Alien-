@@ -1,6 +1,7 @@
 package com.alien.common.registry.init;
 
 import com.alien.Alien;
+import com.alien.common.gameplay.command.debug.DebugLimbStickCommand;
 import com.alien.common.gameplay.command.count.CountCommand;
 import com.alien.common.gameplay.command.hive.NearestHiveCommand;
 import com.alien.common.gameplay.hive.command.HiveDebugCommands;
@@ -22,6 +23,7 @@ public class AlienCommands {
                             commandSourceStack -> commandSourceStack.hasPermission(Commands.LEVEL_GAMEMASTERS)
                         )
                         .then(CountCommand.create())
+                        .then(DebugLimbStickCommand.create())
                         .then(
                             Commands.literal("hive")
                                 .then(NearestHiveCommand.create())

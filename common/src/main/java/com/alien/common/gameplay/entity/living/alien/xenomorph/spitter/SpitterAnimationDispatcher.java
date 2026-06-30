@@ -23,6 +23,10 @@ public class SpitterAnimationDispatcher {
         .play(AzAlienAnimationUtil.BODY, SpitterAnimationRefs.FULL_ATTACK_TAIL_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
         .build();
 
+    private static final AzCommand<Spitter> SPIT_ATTACK = AzCommand.<Spitter>replay()
+        .play(AzAlienAnimationUtil.BODY, SpitterAnimationRefs.SPECIAL_ATTACK_SPIT_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+        .build();
+
     private static final AzCommand<Spitter> CRAWL = AzCommand.<Spitter>idempotent()
         .play(AzAlienAnimationUtil.BODY, SpitterAnimationRefs.CRAWL_ANIMATION_NAME, AzPlayBehaviors.LOOP)
         .build();
@@ -130,6 +134,18 @@ public class SpitterAnimationDispatcher {
     public void tailAttack(float speed) {
         AzCommand.<Spitter>replay()
             .play(AzAlienAnimationUtil.BODY, SpitterAnimationRefs.FULL_ATTACK_TAIL_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
+            .setSpeed(AzAlienAnimationUtil.BODY, speed)
+            .build()
+            .dispatchForEntity(spitter);
+    }
+
+    public void spitAttack() {
+        SPIT_ATTACK.dispatchForEntity(spitter);
+    }
+
+    public void spitAttack(float speed) {
+        AzCommand.<Spitter>replay()
+            .play(AzAlienAnimationUtil.BODY, SpitterAnimationRefs.SPECIAL_ATTACK_SPIT_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
             .setSpeed(AzAlienAnimationUtil.BODY, speed)
             .build()
             .dispatchForEntity(spitter);

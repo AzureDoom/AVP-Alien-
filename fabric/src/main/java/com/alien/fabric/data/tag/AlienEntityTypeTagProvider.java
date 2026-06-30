@@ -9,6 +9,7 @@ import mods.cybercat.gigeresque.common.tags.GigTags;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.entity.EntityType;
 
@@ -44,6 +45,7 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
         addRunnerHosts();
         addHosts();
         addIgnoredByXenomorphs();
+        addXenomorphThreatTiers();
         addIrradiatedAliens();
         addNetherAliens();
         addNormalAliens();
@@ -274,6 +276,7 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
                 EntityType.ALLAY,
                 EntityType.AXOLOTL,
                 EntityType.BAT,
+                EntityType.BEE,
                 EntityType.COD,
                 EntityType.CREEPER,
                 EntityType.GLOW_SQUID,
@@ -284,6 +287,81 @@ public class AlienEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagP
                 EntityType.TROPICAL_FISH,
                 EntityType.VEX
             );
+    }
+
+    private void addXenomorphThreatTiers() {
+        getOrCreateTagBuilder(AlienEntityTypeTags.XENOMORPH_THREAT_1_PASSIVE)
+            .addTag(AlienEntityTypeTags.HOSTS)
+            .add(
+                EntityType.CAMEL,
+                EntityType.CAT,
+                EntityType.CHICKEN,
+                EntityType.COW,
+                EntityType.DONKEY,
+                EntityType.FOX,
+                EntityType.GOAT,
+                EntityType.HORSE,
+                EntityType.MOOSHROOM,
+                EntityType.MULE,
+                EntityType.OCELOT,
+                EntityType.PANDA,
+                EntityType.PARROT,
+                EntityType.PIG,
+                EntityType.POLAR_BEAR,
+                EntityType.RABBIT,
+                EntityType.SHEEP,
+                EntityType.SNIFFER,
+                EntityType.STRIDER,
+                EntityType.TURTLE
+            );
+
+        getOrCreateTagBuilder(AlienEntityTypeTags.XENOMORPH_THREAT_2_LOW_DANGER)
+            .add(
+                EntityType.BLAZE,
+                EntityType.BOGGED,
+                EntityType.BREEZE,
+                EntityType.CAVE_SPIDER,
+                EntityType.DROWNED,
+                EntityType.ELDER_GUARDIAN,
+                EntityType.ENDERMAN,
+                EntityType.ENDERMITE,
+                EntityType.EVOKER,
+                EntityType.GHAST,
+                EntityType.GIANT,
+                EntityType.GUARDIAN,
+                EntityType.HOGLIN,
+                EntityType.HUSK,
+                EntityType.ILLUSIONER,
+                EntityType.IRON_GOLEM,
+                EntityType.MAGMA_CUBE,
+                EntityType.PHANTOM,
+                EntityType.PIGLIN,
+                EntityType.PIGLIN_BRUTE,
+                EntityType.PILLAGER,
+                EntityType.RAVAGER,
+                EntityType.SHULKER,
+                EntityType.SILVERFISH,
+                EntityType.SKELETON,
+                EntityType.SLIME,
+                EntityType.SPIDER,
+                EntityType.STRAY,
+                EntityType.VINDICATOR,
+                EntityType.WARDEN,
+                EntityType.WITCH,
+                EntityType.WITHER_SKELETON,
+                EntityType.WOLF,
+                EntityType.ZOGLIN,
+                EntityType.ZOMBIE,
+                EntityType.ZOMBIE_VILLAGER,
+                EntityType.ZOMBIFIED_PIGLIN
+            );
+
+        getOrCreateTagBuilder(AlienEntityTypeTags.XENOMORPH_THREAT_3_HIGH_DANGER)
+            .add(EntityType.PLAYER)
+            .addOptional(ResourceLocation.fromNamespaceAndPath("avp_human", "marine"))
+            .addOptional(ResourceLocation.fromNamespaceAndPath("avp_predator", "predator"))
+            .addOptional(ResourceLocation.fromNamespaceAndPath("avp_predator", "yautja"))
+            .addOptionalTag(ResourceLocation.fromNamespaceAndPath("avp_predator", "predators"));
     }
 
     private void addIrradiatedAliens() {

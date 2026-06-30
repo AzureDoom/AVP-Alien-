@@ -110,18 +110,21 @@ public class ChrysalisAnimator extends AzEntityAnimator<Chrysalis> {
         }
 
         var isMovingOnGround = chrysalis.isMovingHorizontally.get() && chrysalis.onGround();
+        var isCrawling = chrysalis.getCrawlingManager().isCrawling();
         Runnable animFunction;
 
         if (chrysalis.isUnderWater()) {
             animFunction = dispatcher::swim;
         } else if (isMovingOnGround) {
-            if (chrysalis.isMovingQuickly.get()) {
+            if (isCrawling) {
+                animFunction = () -> dispatcher.crawl(AzAlienAnimationUtil.crawlAnimationSpeed(chrysalis));
+            } else if (chrysalis.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {
                 animFunction = dispatcher::walk;
             }
         } else {
-            animFunction = dispatcher::idle;
+            animFunction = isCrawling ? dispatcher::crawlHold : dispatcher::idle;
         }
 
         animFunction.run();

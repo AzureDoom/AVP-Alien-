@@ -31,6 +31,14 @@ public class EmpressAnimationDispatcher {
         .play(AzAlienAnimationUtil.BODY, EmpressAnimationRefs.BACKHAND_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
         .build();
 
+    private static final AzCommand<Empress> CRAWL = AzCommand.<Empress>idempotent()
+        .play(AzAlienAnimationUtil.BODY, EmpressAnimationRefs.SWIM_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
+
+    private static final AzCommand<Empress> CRAWL_HOLD = AzCommand.<Empress>idempotent()
+        .play(AzAlienAnimationUtil.BODY, EmpressAnimationRefs.SWIM_ANIMATION_NAME, AzPlayBehaviors.HOLD_ON_LAST_FRAME)
+        .build();
+
     private static final AzCommand<Empress> SWIPEDOWN = AzCommand.<Empress>replay()
         .play(AzAlienAnimationUtil.BODY, EmpressAnimationRefs.SWIPEDOWN_ANIMATION_NAME, AzPlayBehaviors.PLAY_ONCE)
         .build();
@@ -59,6 +67,24 @@ public class EmpressAnimationDispatcher {
 
     public void swim() {
         SWIM.dispatchForEntity(empress);
+    }
+
+    public void crawl() {
+        CRAWL.dispatchForEntity(empress);
+    }
+
+    public void crawl(float speed) {
+        AzAlienAnimationUtil.singleWithSpeed(
+            AzAlienAnimationUtil.BODY,
+            EmpressAnimationRefs.SWIM_ANIMATION_NAME,
+            AzPlayBehaviors.LOOP,
+            AzDispatchMode.PLAY_IF_NOT_PLAYING,
+            speed
+        ).dispatchForEntity(empress);
+    }
+
+    public void crawlHold() {
+        CRAWL_HOLD.dispatchForEntity(empress);
     }
 
     public void walk() {

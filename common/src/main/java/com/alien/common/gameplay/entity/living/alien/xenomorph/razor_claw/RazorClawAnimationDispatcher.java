@@ -3,6 +3,7 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.razor_claw;
 import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.command.AzCommand;
 import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
+import com.blib.api.client.animation.v1.command.policy.AzDispatchMode;
 
 public class RazorClawAnimationDispatcher {
 
@@ -38,6 +39,14 @@ public class RazorClawAnimationDispatcher {
         .play(AzAlienAnimationUtil.BODY, "swim", AzPlayBehaviors.LOOP)
         .build();
 
+    private static final AzCommand<RazorClaw> CRAWL = AzCommand.<RazorClaw>idempotent()
+        .play(AzAlienAnimationUtil.BODY, "crawl", AzPlayBehaviors.LOOP)
+        .build();
+
+    private static final AzCommand<RazorClaw> CRAWL_HOLD = AzCommand.<RazorClaw>idempotent()
+        .play(AzAlienAnimationUtil.BODY, "crawl", AzPlayBehaviors.HOLD_ON_LAST_FRAME)
+        .build();
+
     private static final AzCommand<RazorClaw> WALK = AzCommand.<RazorClaw>idempotent()
         .play(AzAlienAnimationUtil.BODY, "walk", AzPlayBehaviors.LOOP)
         .build();
@@ -58,6 +67,24 @@ public class RazorClawAnimationDispatcher {
 
     public void swim() {
         SWIM.dispatchForEntity(razorClaw);
+    }
+
+    public void crawl() {
+        CRAWL.dispatchForEntity(razorClaw);
+    }
+
+    public void crawl(float speed) {
+        AzAlienAnimationUtil.singleWithSpeed(
+            AzAlienAnimationUtil.BODY,
+            "crawl",
+            AzPlayBehaviors.LOOP,
+            AzDispatchMode.PLAY_IF_NOT_PLAYING,
+            speed
+        ).dispatchForEntity(razorClaw);
+    }
+
+    public void crawlHold() {
+        CRAWL_HOLD.dispatchForEntity(razorClaw);
     }
 
     public void walk() {
