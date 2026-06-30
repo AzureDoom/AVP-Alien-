@@ -2,6 +2,7 @@ package com.alien.common.gameplay.hive.command;
 
 import com.alien.Alien;
 import com.alien.common.gameplay.hive.convoy.Convoy;
+import com.alien.common.gameplay.hive.convoy.ConvoyId;
 import com.alien.common.gameplay.hive.convoy.MigrationDispatch;
 import com.alien.common.gameplay.hive.convoy.RaidDispatch;
 import com.alien.common.gameplay.hive.convoy.ReinforcementDispatcher;
@@ -9,6 +10,7 @@ import com.alien.common.gameplay.hive.empress.EmpressEmergenceRitual;
 import com.alien.common.gameplay.hive.empress.EmpressEmergenceTask;
 import com.alien.common.gameplay.hive.faction.FactionAesthetics;
 import com.alien.common.gameplay.hive.faction.FactionNaming;
+import com.alien.common.gameplay.hive.faction.HiveLocationFactionProvisioner;
 import com.alien.common.gameplay.hive.faction.LineageFactionData;
 import com.alien.common.gameplay.hive.faction.LineageInvariantTask;
 import com.alien.common.gameplay.hive.faction.VariantFactionData;
@@ -23,9 +25,21 @@ import com.alien.common.gameplay.hive.lifecycle.LocationDeathHandler;
 import com.alien.common.gameplay.hive.lifecycle.QueenSettlementDetector;
 import com.alien.common.gameplay.hive.location.HiveLocation;
 import com.alien.common.gameplay.hive.location.HiveLocationRegistry;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.burster.Burster;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.carrier.Carrier;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.chrysalis.Chrysalis;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.harbinger.Harbinger;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.prowler.Prowler;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.ravager.Ravager;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.razor_claw.RazorClaw;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.runner.Runner;
+import com.alien.common.gameplay.entity.living.alien.xenomorph.warrior.Warrior;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.RaidWaveProfileRegistry;
 import com.alien.common.registry.init.AlienFactionDataTypes;
+import com.blib.api.common.entity.v1.EntityReserves;
 import com.blib.api.common.faction.v1.FactionMember;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -38,9 +52,12 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -219,6 +236,49 @@ public final class HiveDebugCommands {
                     .then(
                         Commands.argument(LINEAGE_ID_ARG, ResourceLocationArgument.id())
                             .executes(HiveDebugCommands::forceRaidOnSelf)
+                    )
+            )
+            .then(
+                Commands.literal("spawn_test_hive")
+                    .requires(CommandSourceStack::isPlayer)
+                    .executes(ctx -> spawnTestHive(ctx, AlienVariant.NORMAL))
+                    .then(
+                        Commands.argument(VARIANT_ARG, StringArgumentType.string())
+                            .executes(ctx -> {
+                                var variantName = StringArgumentType.getString(ctx, VARIANT_ARG)
+                                    .toUpperCase(Locale.ROOT);
+                                AlienVariant variant;
+
+                                try {
+                                    variant = AlienVariant.valueOf(variantName);
+                                } catch (IllegalArgumentException ignored) {
+                                    ctx.getSource()
+                                        .sendFailure(
+                                            Component.literal("Unknown variant: " + variantName)
+                                        );
+                                    return 0;
+                                }
+
+                                return spawnTestHive(ctx, variant);
+                            })
+                    )
+            )
+            .then(
+                Commands.literal("prep_nearest_hive")
+                    .requires(CommandSourceStack::isPlayer)
+                    .executes(HiveDebugCommands::prepNearestHive)
+            )
+            .then(
+                Commands.literal("raid_from_nearest_hive")
+                    .requires(CommandSourceStack::isPlayer)
+                    .executes(HiveDebugCommands::raidFromNearestHive)
+            )
+            .then(
+                Commands.literal("force_imaginary_raid")
+                    .requires(CommandSourceStack::isPlayer)
+                    .then(
+                        Commands.argument("wave", IntegerArgumentType.integer(1, Convoy.Raid.WAVE_COUNT))
+                            .executes(HiveDebugCommands::forceImaginaryRaid)
                     )
             )
             .then(
@@ -1679,6 +1739,265 @@ public final class HiveDebugCommands {
                 true
             );
         return ok ? 1 : 0;
+    }
+
+    private static int spawnTestHive(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx, AlienVariant variant) {
+        var minted = mintLineageAtPlayer(ctx, variant);
+        if (minted <= 0) {
+            return 0;
+        }
+
+        var player = Objects.requireNonNull(ctx.getSource().getPlayer());
+        var location = HiveLocationRegistry.INSTANCE.findNearestInDim(
+            player.level().dimension(),
+            player.blockPosition()
+        );
+        if (location == null) {
+            ctx.getSource().sendFailure(Component.literal("Minted a lineage, but no nearest hive location was found."));
+            return 0;
+        }
+
+        var prepared = prepHiveForRaid(ctx, location);
+        ctx.getSource()
+            .sendSuccess(
+                () -> Component.literal(
+                    "Spawned and prepped test hive " + location.id()
+                        + " (lineage=" + location.lineageFactionId() + ", variant=" + variant + ")."
+                ),
+                true
+            );
+        return prepared;
+    }
+
+    private static int prepNearestHive(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
+        var player = Objects.requireNonNull(ctx.getSource().getPlayer());
+        var location = HiveLocationRegistry.INSTANCE.findNearestInDim(
+            player.level().dimension(),
+            player.blockPosition()
+        );
+        if (location == null) {
+            ctx.getSource().sendFailure(Component.literal("No hive location found in this dimension."));
+            return 0;
+        }
+
+        return prepHiveForRaid(ctx, location);
+    }
+
+    private static int raidFromNearestHive(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
+        var player = Objects.requireNonNull(ctx.getSource().getPlayer());
+        var location = HiveLocationRegistry.INSTANCE.findNearestInDim(
+            player.level().dimension(),
+            player.blockPosition()
+        );
+        if (location == null) {
+            ctx.getSource().sendFailure(Component.literal("No hive location found in this dimension."));
+            return 0;
+        }
+
+        prepHiveForRaid(ctx, location);
+
+        var faction = Alien.MOD.factions().get(location.lineageFactionId());
+        if (faction == null || !(faction.data() instanceof LineageFactionData lineage)) {
+            ctx.getSource().sendFailure(Component.literal("Nearest hive has no valid lineage: " + location.lineageFactionId()));
+            return 0;
+        }
+
+        var ok = RaidDispatch.forceRaid(ctx.getSource().getServer(), lineage, location.lineageFactionId(), player);
+        ctx.getSource()
+            .sendSuccess(
+                () -> Component.literal(
+                    ok
+                        ? "Nearest hive " + location.id() + " dispatched a raid against " + player.getGameProfile().getName() + "."
+                        : "Nearest hive " + location.id() + " still could not dispatch a raid; inspect reserves/lineage state."
+                ),
+                true
+            );
+        return ok ? 1 : 0;
+    }
+
+    private static int forceImaginaryRaid(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
+        var player = Objects.requireNonNull(ctx.getSource().getPlayer());
+        var waveNumber = IntegerArgumentType.getInteger(ctx, "wave");
+        var waveIndex = Math.clamp(waveNumber - 1, 0, Convoy.Raid.WAVE_COUNT - 1);
+        var variant = AlienVariant.NORMAL;
+        var currentTick = ctx.getSource().getLevel().getGameTime();
+
+        var variantFaction = VariantFactionRegistry.getOrCreate(variant);
+        var lineageId = LineageIds.create();
+        var lineageFaction = Alien.MOD.factions().getOrCreate(lineageId, AlienFactionDataTypes.LINEAGE);
+        var lineage = lineageFaction.data();
+        if (lineage == null) {
+            ctx.getSource().sendFailure(Component.literal("Lineage data was null after imaginary raid lineage creation."));
+            return 0;
+        }
+
+        FactionAesthetics.applyDefaults(lineageFaction, variant, FactionAesthetics.Tier.LINEAGE);
+        lineage.setFactionId(lineageId);
+        var variantData = variantFaction.data();
+        var lineageNumber = variantData != null ? variantData.allocateLineageNumber() : 0L;
+        lineage.setLineageNumber(lineageNumber);
+        lineageFaction.setName(FactionNaming.forLineage(variant, lineageNumber));
+        lineage.setVariant(variant);
+        lineage.setParentVariantFactionId(variantFaction.id());
+        lineage.setDimension(player.level().dimension());
+        lineage.setFounderId(player.getUUID());
+        lineage.setEmpressId(player.getUUID());
+
+        var profile = RaidWaveProfileRegistry.forVariant(variant);
+        var composition = imaginaryRaidComposition(variant, waveIndex);
+        var playerPos = player.blockPosition();
+        var currentPos = new Vec3(playerPos.getX() + 0.5, playerPos.getY() + 0.5, playerPos.getZ() + 0.5);
+        var readyBreakTick = currentTick - Math.max(0L, profile.wave(waveIndex).bufferTicks());
+        var raid = new Convoy.Raid(
+            ConvoyId.fresh(),
+            lineageId,
+            player.level().dimension(),
+            HiveLocationIds.create(),
+            player.getUUID(),
+            currentPos,
+            playerPos,
+            composition,
+            Map.of(),
+            true,
+            waveIndex,
+            -1,
+            0,
+            readyBreakTick,
+            false,
+            Convoy.Raid.ReturnHomeReason.NONE,
+            null,
+            null,
+            currentTick,
+            Long.MAX_VALUE
+        );
+
+        lineage.convoys().add(raid);
+        lineage.markDirty();
+
+        ctx.getSource()
+            .sendSuccess(
+                () -> Component.literal(
+                    "Imaginary " + variant.name().toLowerCase(Locale.ROOT)
+                        + " raid " + raid.id()
+                        + " starts on wave " + waveNumber
+                        + " against " + player.getGameProfile().getName()
+                        + " with " + composition.getCount() + " reserve member(s)."
+                ),
+                true
+            );
+        return 1;
+    }
+
+    private static int prepHiveForRaid(
+        com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx,
+        HiveLocation location
+    ) {
+        var faction = Alien.MOD.factions().get(location.lineageFactionId());
+        if (faction == null || !(faction.data() instanceof LineageFactionData lineage)) {
+            ctx.getSource().sendFailure(Component.literal("Hive has no valid lineage: " + location.lineageFactionId()));
+            return 0;
+        }
+
+        var level = ctx.getSource().getServer().getLevel(location.dimension());
+        if (level == null) {
+            ctx.getSource().sendFailure(Component.literal("Hive dimension is not loaded: " + location.dimension().location()));
+            return 0;
+        }
+
+        HiveLocationFactionProvisioner.ensure(location, lineage);
+        location.setReproductiveEstablished(true);
+        location.setBiomass(Math.max(location.biomass(), 10000));
+        location.setRoyalJelly(Math.max(location.royalJelly(), 1000));
+        location.setScourgeJelly(Math.max(location.scourgeJelly(), 1000));
+        if (lineage.empressId() == null) {
+            var player = Objects.requireNonNull(ctx.getSource().getPlayer());
+            lineage.setEmpressId(player.getUUID());
+        }
+
+        var addedClaims = claimDebugRadius(level, location, 2);
+        var addedReserves = addDebugRaidReserves(location, lineage.variant());
+        lineage.markDirty();
+
+        ctx.getSource()
+            .sendSuccess(
+                () -> Component.literal(
+                    "Prepped hive " + location.id()
+                        + ": claimed +" + addedClaims + " chunks (total=" + location.claimedChunks().size() + ")"
+                        + ", reserves +" + addedReserves + " (total=" + location.localReserves().getReliableCount() + ")"
+                        + ", biomass=" + location.biomass()
+                        + ", royalJelly=" + location.royalJelly()
+                        + ", scourgeJelly=" + location.scourgeJelly()
+                        + ", empressSet=" + (lineage.empressId() != null)
+                ),
+                true
+            );
+        return 1;
+    }
+
+    private static int claimDebugRadius(net.minecraft.server.level.ServerLevel level, HiveLocation location, int radius) {
+        var centerChunk = new ChunkPos(location.centerPos());
+        var added = 0;
+        for (var dx = -radius; dx <= radius; dx++) {
+            for (var dz = -radius; dz <= radius; dz++) {
+                var chunk = new ChunkPos(centerChunk.x + dx, centerChunk.z + dz);
+                if (
+                    com.alien.common.gameplay.hive.growth.HiveLocationClaims.claim(
+                        level,
+                        location,
+                        chunk,
+                        level.getGameTime()
+                    )
+                ) {
+                    added++;
+                }
+            }
+        }
+        return added;
+    }
+
+    private static int addDebugRaidReserves(HiveLocation location, AlienVariant variant) {
+        var added = 0;
+        added += addReserveIfPresent(location, Queen.getType(variant), 1);
+        added += addReserveIfPresent(location, Drone.getType(variant), 24);
+        added += addReserveIfPresent(location, Runner.getType(variant), 24);
+        added += addReserveIfPresent(location, Warrior.getType(variant), 80);
+        added += addReserveIfPresent(location, Prowler.getType(variant), 80);
+        added += addReserveIfPresent(location, Chrysalis.getType(variant), 24);
+        added += addReserveIfPresent(location, RazorClaw.getType(variant), 24);
+        added += addReserveIfPresent(location, Burster.getType(variant), 24);
+        added += addReserveIfPresent(location, Ravager.getType(variant), 12);
+        added += addReserveIfPresent(location, Carrier.getType(variant), 12);
+        added += addReserveIfPresent(location, Harbinger.getType(variant), 3);
+        return added;
+    }
+
+    private static int addReserveIfPresent(HiveLocation location, EntityType<?> entityType, int count) {
+        if (entityType == null || count <= 0) {
+            return 0;
+        }
+        return location.localReserves().tryAdd(entityType, count) ? count : 0;
+    }
+
+    private static EntityReserves imaginaryRaidComposition(AlienVariant variant, int waveIndex) {
+        var composition = new EntityReserves();
+        if (waveIndex <= 0) {
+            addToComposition(composition, Warrior.getType(variant), 40);
+            addToComposition(composition, Prowler.getType(variant), 39);
+            addToComposition(composition, Chrysalis.getType(variant), 1);
+            addToComposition(composition, Harbinger.getType(variant), 1);
+            return composition;
+        }
+
+        addToComposition(composition, Warrior.getType(variant), 17);
+        addToComposition(composition, Prowler.getType(variant), 16);
+        addToComposition(composition, Harbinger.getType(variant), 1);
+        return composition;
+    }
+
+    private static void addToComposition(EntityReserves composition, EntityType<?> entityType, int count) {
+        if (entityType != null && count > 0) {
+            composition.add(entityType, count);
+        }
     }
 
     private static int inspectKillAttribution(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {

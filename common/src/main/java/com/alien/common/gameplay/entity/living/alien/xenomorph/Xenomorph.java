@@ -9,6 +9,7 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.cocoon.CocoonG
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.model.resin.ResinProducer;
 import com.alien.common.registry.init.AlienDataSyncKeys;
+import com.alien.common.registry.init.AlienMobEffects;
 import com.alien.common.registry.init.AlienSoundEvents;
 import com.alien.common.registry.tag.AlienBlockTags;
 import com.alien.common.registry.tag.AlienEntityTypeTags;
@@ -39,6 +40,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
@@ -50,12 +52,16 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.Minecart;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.DynamicGameEventListener;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -76,6 +82,8 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
     private static final float PATH_BLOCK_BREAK_MAX_HARDNESS = 6.0f;
 
     private static final float PATH_BLOCK_BREAK_DAMAGE_PER_TICK = 50.0f;
+
+    private static final int FRENZIED_RAID_BREAKOUT_INTERVAL_TICKS = 4;
 
     private static final ResourceLocation LOST_LIMB_MAX_HEALTH_MODIFIER = AlienResources.location("lost_limb_max_health");
 
@@ -195,7 +203,7 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         var evaluatorConfig = TerrainEvaluatorConfig.builder()
             .addTerrain(TerrainType.GROUND, 1.0f)
             .addTerrain(TerrainType.WATER, 1.5f)
-            .withTerrainClassifier(TerrainClassifiers.GROUND_AND_WATER)
+            .withTerrainClassifier((reader, pos) -> classifyGroundWaterAvoidingHumanRazorWire(reader, pos, pathConfig))
             .withEntitySize(pathConfig.entityWidth(), pathConfig.entityHeight())
             .withCrawlConfig(crawlConfig)
             .withWaterConfig(waterConfig)
@@ -212,6 +220,48 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         var classificationCache = TerrainCacheRegistry.getOrCreate(level, evaluatorConfig.getTerrainClassifier());
 
         return new PathNavigator(level, navigatorConfig, classificationCache);
+    }
+
+    private static @Nullable TerrainType classifyGroundWaterAvoidingHumanRazorWire(
+        LevelReader level,
+        BlockPos pos,
+        XenomorphPathConfig pathConfig
+    ) {
+        if (
+            hasBlockInPathVolume(
+                level,
+                pos,
+                pathConfig.entityWidth(),
+                pathConfig.entityHeight(),
+                AlienBlockTags.HUMAN_RAZOR_WIRE
+            )
+        ) {
+            return null;
+        }
+
+        return TerrainClassifiers.GROUND_AND_WATER.classify(level, pos);
+    }
+
+    private static boolean hasBlockInPathVolume(
+        LevelReader level,
+        BlockPos origin,
+        int width,
+        int height,
+        TagKey<Block> blockTag
+    ) {
+        var radius = Math.max(0, (width - 1) / 2);
+
+        for (var x = origin.getX() - radius; x <= origin.getX() + radius; x++) {
+            for (var y = origin.getY(); y < origin.getY() + height; y++) {
+                for (var z = origin.getZ() - radius; z <= origin.getZ() + radius; z++) {
+                    if (level.getBlockState(new BlockPos(x, y, z)).is(blockTag)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     private static boolean canPathBreakBlock(LevelReader level, BlockPos pos, BlockState state) {
@@ -384,6 +434,9 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
 
         if (!level().isClientSide) {
             applyLostLimbMaxHealthPenalty();
+            breakIntersectingCobwebs();
+            escapeHumanRazorWire();
+            breakFrenziedRaidObstructions();
         }
 
         crawlingManager.tick();
@@ -479,6 +532,170 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         return count;
     }
 
+    private void breakIntersectingCobwebs() {
+        var level = level();
+        var boundingBox = getBoundingBox();
+        var minX = Mth.floor(boundingBox.minX);
+        var minY = Mth.floor(boundingBox.minY);
+        var minZ = Mth.floor(boundingBox.minZ);
+        var maxX = Mth.floor(boundingBox.maxX);
+        var maxY = Mth.floor(boundingBox.maxY);
+        var maxZ = Mth.floor(boundingBox.maxZ);
+
+        for (var x = minX; x <= maxX; x++) {
+            for (var y = minY; y <= maxY; y++) {
+                for (var z = minZ; z <= maxZ; z++) {
+                    var pos = new BlockPos(x, y, z);
+
+                    if (level.getBlockState(pos).is(Blocks.COBWEB)) {
+                        level.destroyBlock(pos, false, this);
+                    }
+                }
+            }
+        }
+    }
+
+    private void escapeHumanRazorWire() {
+        var center = averageIntersectingBlockCenter(AlienBlockTags.HUMAN_RAZOR_WIRE);
+
+        if (center == null) {
+            return;
+        }
+
+        getNavigation().stop();
+        pathNavigator.stop();
+        hiveIntruderPathNavigator.stop();
+
+        var away = position().subtract(center.x, getY(), center.z);
+
+        if (away.horizontalDistanceSqr() < 1.0E-4D) {
+            away = Vec3.directionFromRotation(0.0F, getYRot());
+        }
+
+        var push = away.normalize().scale(0.18D);
+        setDeltaMovement(getDeltaMovement().add(push.x, 0.0D, push.z));
+    }
+
+    private void breakFrenziedRaidObstructions() {
+        if (tickCount % FRENZIED_RAID_BREAKOUT_INTERVAL_TICKS != 0) {
+            return;
+        }
+
+        if (!level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+            return;
+        }
+
+        if (!hasEffect(AlienMobEffects.getFrenzyHolder())) {
+            return;
+        }
+
+        var pos = firstIntersectingFrenzyBreakoutBlock();
+        if (pos == null) {
+            pos = firstLineOfSightFrenzyBreakoutBlock();
+        }
+        if (pos == null) {
+            return;
+        }
+
+        getNavigation().stop();
+        pathNavigator.stop();
+        hiveIntruderPathNavigator.stop();
+        level().destroyBlock(pos, false, this);
+    }
+
+    private @Nullable BlockPos firstIntersectingFrenzyBreakoutBlock() {
+        var level = level();
+        var boundingBox = getBoundingBox().inflate(0.08D);
+        var minX = Mth.floor(boundingBox.minX);
+        var minY = Mth.floor(boundingBox.minY);
+        var minZ = Mth.floor(boundingBox.minZ);
+        var maxX = Mth.floor(boundingBox.maxX);
+        var maxY = Mth.floor(boundingBox.maxY);
+        var maxZ = Mth.floor(boundingBox.maxZ);
+
+        for (var x = minX; x <= maxX; x++) {
+            for (var y = minY; y <= maxY; y++) {
+                for (var z = minZ; z <= maxZ; z++) {
+                    var pos = new BlockPos(x, y, z);
+                    if (canFrenziedRaidBreakoutBlock(level.getBlockState(pos), pos)) {
+                        return pos;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private @Nullable BlockPos firstLineOfSightFrenzyBreakoutBlock() {
+        var target = getTarget();
+        if (target == null || !target.isAlive() || getSensing().hasLineOfSight(target)) {
+            return null;
+        }
+
+        var clipContext = new ClipContext(
+            getEyePosition(),
+            target.getEyePosition(),
+            ClipContext.Block.COLLIDER,
+            ClipContext.Fluid.NONE,
+            this
+        );
+        var hit = level().clip(clipContext);
+        if (hit.getType() == HitResult.Type.MISS) {
+            return null;
+        }
+
+        var pos = hit.getBlockPos();
+        return canFrenziedRaidBreakoutBlock(level().getBlockState(pos), pos) ? pos : null;
+    }
+
+    private boolean canFrenziedRaidBreakoutBlock(BlockState state, BlockPos pos) {
+        if (state.isAir() || state.hasBlockEntity()) {
+            return false;
+        }
+        if (state.getDestroySpeed(level(), pos) < 0.0F) {
+            return false;
+        }
+
+        return state.is(AlienBlockTags.XENOMORPH_FRENZY_BREAKABLE);
+    }
+
+    private @Nullable Vec3 averageIntersectingBlockCenter(TagKey<Block> blockTag) {
+        var level = level();
+        var boundingBox = getBoundingBox();
+        var minX = Mth.floor(boundingBox.minX);
+        var minY = Mth.floor(boundingBox.minY);
+        var minZ = Mth.floor(boundingBox.minZ);
+        var maxX = Mth.floor(boundingBox.maxX);
+        var maxY = Mth.floor(boundingBox.maxY);
+        var maxZ = Mth.floor(boundingBox.maxZ);
+        var totalX = 0.0D;
+        var totalY = 0.0D;
+        var totalZ = 0.0D;
+        var count = 0;
+
+        for (var x = minX; x <= maxX; x++) {
+            for (var y = minY; y <= maxY; y++) {
+                for (var z = minZ; z <= maxZ; z++) {
+                    var pos = new BlockPos(x, y, z);
+
+                    if (level.getBlockState(pos).is(blockTag)) {
+                        totalX += x + 0.5D;
+                        totalY += y + 0.5D;
+                        totalZ += z + 0.5D;
+                        count++;
+                    }
+                }
+            }
+        }
+
+        if (count <= 0) {
+            return null;
+        }
+
+        return new Vec3(totalX / count, totalY / count, totalZ / count);
+    }
+
     private void updateDimensionsBasedOnWaterState() {
         if (wasUnderwaterLastTick != isUnderWater()) {
             refreshDimensions();
@@ -501,6 +718,15 @@ public abstract class Xenomorph extends Alien implements ResinProducer, EntitySe
         } else {
             super.travel(vec3);
         }
+    }
+
+    @Override
+    public void makeStuckInBlock(@NotNull BlockState blockState, @NotNull Vec3 movementMultiplier) {
+        if (blockState.is(Blocks.COBWEB) || blockState.is(AlienBlockTags.HUMAN_RAZOR_WIRE)) {
+            return;
+        }
+
+        super.makeStuckInBlock(blockState, movementMultiplier);
     }
 
     @Override

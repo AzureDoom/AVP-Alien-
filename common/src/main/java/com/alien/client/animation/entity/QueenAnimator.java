@@ -152,6 +152,7 @@ public class QueenAnimator extends AzEntityAnimator<Queen> {
         }
 
         var isMovingOnGround = queen.isMovingHorizontally.get() && queen.onGround();
+        var isCrawling = queen.getCrawlingManager().isCrawling();
         Runnable animFunction;
 
         if (queen.getOvipositorManager().hasOvipositor()) {
@@ -159,13 +160,15 @@ public class QueenAnimator extends AzEntityAnimator<Queen> {
         } else if (queen.isUnderWater()) {
             animFunction = dispatcher::swim;
         } else if (isMovingOnGround) {
-            if (queen.isMovingQuickly.get()) {
+            if (isCrawling) {
+                animFunction = () -> dispatcher.crawl(AzAlienAnimationUtil.crawlAnimationSpeed(queen));
+            } else if (queen.isMovingQuickly.get()) {
                 animFunction = dispatcher::run;
             } else {
                 animFunction = dispatcher::walk;
             }
         } else {
-            animFunction = dispatcher::idle;
+            animFunction = isCrawling ? dispatcher::crawlIdle : dispatcher::idle;
         }
 
         animFunction.run();
