@@ -3,6 +3,7 @@ package com.alien.common.gameplay.entity.living.alien.xenomorph.queen;
 import com.alien.common.util.AzAlienAnimationUtil;
 import com.blib.api.client.animation.v1.command.AzCommand;
 import com.blib.api.client.animation.v1.command.play_behavior.AzPlayBehaviors;
+import com.blib.api.client.animation.v1.command.policy.AzDispatchMode;
 
 public class QueenAnimationDispatcher {
 
@@ -16,6 +17,14 @@ public class QueenAnimationDispatcher {
 
     private static final AzCommand<Queen> INCAPACITATED = AzCommand.<Queen>idempotent()
         .play(AzAlienAnimationUtil.BODY, QueenAnimationRefs.INCAPACITATED_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
+
+    private static final AzCommand<Queen> CRAWL = AzCommand.<Queen>idempotent()
+        .play(AzAlienAnimationUtil.BODY, QueenAnimationRefs.CRAWL_ANIMATION_NAME, AzPlayBehaviors.LOOP)
+        .build();
+
+    private static final AzCommand<Queen> CRAWL_IDLE = AzCommand.<Queen>idempotent()
+        .play(AzAlienAnimationUtil.BODY, QueenAnimationRefs.CRAWL_IDLE_ANIMATION_NAME, AzPlayBehaviors.LOOP)
         .build();
 
     private static final AzCommand<Queen> RUN = AzCommand.<Queen>idempotent()
@@ -52,6 +61,24 @@ public class QueenAnimationDispatcher {
     /** Involuntary defeat collapse when downed/captured. Looping; driven while she is incapacitated. */
     public void incapacitated() {
         INCAPACITATED.dispatchForEntity(queen);
+    }
+
+    public void crawl() {
+        CRAWL.dispatchForEntity(queen);
+    }
+
+    public void crawl(float speed) {
+        AzAlienAnimationUtil.singleWithSpeed(
+            AzAlienAnimationUtil.BODY,
+            QueenAnimationRefs.CRAWL_ANIMATION_NAME,
+            AzPlayBehaviors.LOOP,
+            AzDispatchMode.PLAY_IF_NOT_PLAYING,
+            speed
+        ).dispatchForEntity(queen);
+    }
+
+    public void crawlIdle() {
+        CRAWL_IDLE.dispatchForEntity(queen);
     }
 
     public void run() {

@@ -29,6 +29,7 @@ public class EnUsBlockTagProvider {
         builder.add(AlienBlockTags.RESIN_REPLACEABLE, "Resins Replaceable");
         builder.add(AlienBlockTags.RESIN_VEINS, "Resin Veins");
         builder.add(AlienBlockTags.RESIN_WEBS, "Resin Webs");
+        builder.add(AlienBlockTags.XENOMORPH_FRENZY_BREAKABLE, "Xenomorph Frenzy Breakable");
         builder.add(AlienBlockTags.XENOMORPH_IMMUNE, "Xenomorph Immune");
     };
 }
