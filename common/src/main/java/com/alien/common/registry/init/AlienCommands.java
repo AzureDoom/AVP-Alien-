@@ -2,7 +2,6 @@ package com.alien.common.registry.init;
 
 import com.alien.Alien;
 import com.alien.common.gameplay.command.count.CountCommand;
-import com.alien.common.gameplay.command.debug.DebugLimbStickCommand;
 import com.alien.common.gameplay.command.hive.NearestHiveCommand;
 import com.alien.common.gameplay.hive.command.HiveDebugCommands;
 import com.blib.api.common.registry.v1.impl.BLibCommandRegistry;
@@ -16,20 +15,19 @@ public class AlienCommands {
 
     public static void initialize() {
         REGISTRY.register(
-            LiteralArgumentBuilder.<CommandSourceStack>literal(Alien.MOD.id())
-                .then(
-                    Commands.literal("debug")
-                        .requires(
-                            commandSourceStack -> commandSourceStack.hasPermission(Commands.LEVEL_GAMEMASTERS)
-                        )
-                        .then(CountCommand.create())
-                        .then(DebugLimbStickCommand.create())
+                LiteralArgumentBuilder.<CommandSourceStack>literal(Alien.MOD.id())
                         .then(
-                            Commands.literal("hive")
-                                .then(NearestHiveCommand.create())
+                                Commands.literal("debug")
+                                        .requires(
+                                                commandSourceStack -> commandSourceStack.hasPermission(Commands.LEVEL_GAMEMASTERS)
+                                        )
+                                        .then(CountCommand.create())
+                                        .then(
+                                                Commands.literal("hive")
+                                                        .then(NearestHiveCommand.create())
+                                        )
+                                        .then(HiveDebugCommands.create())
                         )
-                        .then(HiveDebugCommands.create())
-                )
         );
     }
 }

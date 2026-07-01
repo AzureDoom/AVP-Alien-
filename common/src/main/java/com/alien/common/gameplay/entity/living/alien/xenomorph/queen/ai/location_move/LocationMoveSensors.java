@@ -16,10 +16,10 @@ import org.jetbrains.annotations.Nullable;
  * queen's committed anchor straight off her {@link QueenLifecyclePhaseManager}, since no location exists yet.
  * <ul>
  * <li>{@link #IS_LOCATING} — true while she is a never-founded queen in {@link QueenLifecyclePhase#LOCATION} with a
- * committed anchor. The single on/off switch for the package: false ⇒ goal/action can never be selected. Also false
- * when the whole front-end is disabled (the manager never reaches LOCATION), so this package drops out with it.</li>
- * <li>{@link #IS_AT_ANCHOR} — true once she is within a small radius of the committed anchor (3D, since the anchor has
- * a specific target Y she dug down to).</li>
+ * committed anchor. The single on/off switch for the package: false ⇒ goal/action can never be selected. Also false when
+ * the whole front-end is disabled (the manager never reaches LOCATION), so this package drops out with it.</li>
+ * <li>{@link #IS_AT_ANCHOR} — true once she is within a small radius of the committed anchor (3D, since the anchor has a
+ * specific target Y she dug down to).</li>
  * </ul>
  */
 public final class LocationMoveSensors {
@@ -30,13 +30,13 @@ public final class LocationMoveSensors {
     private static final double AT_ANCHOR_RADIUS_SQ = AT_ANCHOR_RADIUS * AT_ANCHOR_RADIUS;
 
     public static final Sensor.Mono<Xenomorph, Boolean> IS_LOCATING = Sensors.map(
-        StateKey.sensed("location_move_is_locating"),
-        xenomorph -> locationAnchorOrNull(xenomorph) != null
+            StateKey.sensed("location_move_is_locating"),
+            xenomorph -> locationAnchorOrNull(xenomorph) != null
     );
 
     public static final Sensor.Mono<Xenomorph, Boolean> IS_AT_ANCHOR = Sensors.map(
-        StateKey.sensed("location_move_at_anchor"),
-        LocationMoveSensors::isAtAnchor
+            StateKey.sensed("location_move_at_anchor"),
+            LocationMoveSensors::isAtAnchor
     );
 
     /**
@@ -48,8 +48,9 @@ public final class LocationMoveSensors {
             return null;
         }
 
-        // A bound queen does not locate or dig — her front-end is frozen until she is fully released.
-        if (queen.getBindManager().hasAnyChain()) {
+        // A bound OR inhibited queen does not locate or dig — her front-end is frozen while she is chained or carries
+        // an inhibitor, so a captured queen whose chains are broken waits (to be freed) instead of re-locating.
+        if (queen.getBindManager().hasAnyChain() || queen.isInhibited()) {
             return null;
         }
 

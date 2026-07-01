@@ -108,7 +108,7 @@ public class AlienItems {
             () -> new TrackerItem(new Item.Properties().stacksTo(16))
     );
 
-    public static final BLibHolder<Item> QUEEN_HEAD = create(
+     public static final BLibHolder<Item> QUEEN_HEAD = create(
             "queen_head",
             () -> new QueenHeadItem(
                     AlienBlocks.QUEEN_HEAD.get(),

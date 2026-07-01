@@ -1,6 +1,8 @@
 package com.alien.common.gameplay.item;
 
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.Queen;
+import com.alien.common.gameplay.level.saveddata.TrackedQueenRegistry;
+import com.alien.common.model.alien.variant.AlienVariant;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -21,6 +23,16 @@ public class TrackerItem extends Item {
         super(properties);
     }
 
+    /** Readable label stored with the tracked queen, e.g. "Aberrant Queen"; plain "Queen" for the normal strain. */
+    private static String queenLabel(Queen queen) {
+        var variant = queen.getVariant();
+        if (variant == AlienVariant.NORMAL) {
+            return "Queen";
+        }
+        var name = variant.name();
+        return name.charAt(0) + name.substring(1).toLowerCase() + " Queen";
+    }
+
     @Override
     public @NotNull InteractionResult interactLivingEntity(
             @NotNull ItemStack stack,
@@ -31,6 +43,14 @@ public class TrackerItem extends Item {
         if (target instanceof Queen queen && !queen.isTracked()) {
             if (!player.level().isClientSide) {
                 queen.setTracked(true);
+                TrackedQueenRegistry.getOrCreate(queen.level())
+                        .ifSome(registry -> registry.track(
+                                queen.getUUID(),
+                                queen.blockPosition(),
+                                queen.level().dimension(),
+                                queenLabel(queen),
+                                queen.level().getGameTime()
+                        ));
                 if (!player.getAbilities().instabuild) {
                     stack.shrink(1);
                 }

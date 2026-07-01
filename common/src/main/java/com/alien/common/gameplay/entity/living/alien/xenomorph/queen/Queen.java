@@ -13,6 +13,7 @@ import com.alien.common.gameplay.entity.living.alien.xenomorph.ai.egg_laying.Egg
 import com.alien.common.gameplay.entity.living.alien.xenomorph.drone.Drone;
 import com.alien.common.gameplay.entity.living.alien.xenomorph.queen.ai.QueenGOAP;
 import com.alien.common.gameplay.level.saveddata.QueenSpawnChunkData;
+import com.alien.common.gameplay.level.saveddata.TrackedQueenRegistry;
 import com.alien.common.gameplay.level.saveddata.StrainLeakData;
 import com.alien.common.model.alien.variant.AlienVariant;
 import com.alien.common.registry.init.AlienEntityTypes;
@@ -33,6 +34,13 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.SwordItem;
+import com.alien.common.registry.init.item.AlienItems;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -150,6 +158,16 @@ public class Queen extends Xenomorph implements GOAPUser<Queen>, EggLayer {
         bindManager.tick();
         if (isInhibited() && tickCount % 20 == 0 && level() instanceof ServerLevel serverLevel) {
             QueenInhibitionService.tickFollow(serverLevel, this);
+        }
+
+        if (isTracked() && tickCount % 40 == 0 && level() instanceof ServerLevel trackedLevel) {
+            TrackedQueenRegistry.getOrCreate(trackedLevel)
+                    .ifSome(registry -> registry.updatePosition(
+                            getUUID(),
+                            blockPosition(),
+                            trackedLevel.dimension(),
+                            trackedLevel.getGameTime()
+                    ));
         }
     }
 
@@ -291,6 +309,40 @@ public class Queen extends Xenomorph implements GOAPUser<Queen>, EggLayer {
     }
 
     /** Whether the inhibitor device is attached (synced + persisted). */
+    @Override
+    public void die(@NotNull DamageSource damageSource) {
+        super.die(damageSource);
+
+        if (level() instanceof ServerLevel serverLevel) {
+            TrackedQueenRegistry.getOrCreate(serverLevel).ifSome(registry -> registry.untrack(getUUID()));
+        }
+    }
+
+    @Override
+    public @NotNull InteractionResult mobInteract(@NotNull Player player, @NotNull InteractionHand hand) {
+        var stack = player.getItemInHand(hand);
+
+        // Pry the inhibitor off: sneak + right-click an inhibited queen with a sword or axe. Re-enables her autonomy,
+        // tears down her inhibited claim, and drops the inhibitor so it's recoverable. Costs the tool some durability.
+        if (isInhibited()
+                && player.isShiftKeyDown()
+                && (stack.getItem() instanceof SwordItem || stack.getItem() instanceof AxeItem)) {
+            if (level() instanceof ServerLevel serverLevel) {
+                setInhibited(false);
+                QueenInhibitionService.onReleased(serverLevel, this);
+                spawnAtLocation(AlienItems.INHIBITOR.get());
+                stack.hurtAndBreak(
+                        5,
+                        player,
+                        hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND
+                );
+            }
+            return InteractionResult.sidedSuccess(level().isClientSide);
+        }
+
+        return super.mobInteract(player, hand);
+    }
+
     public boolean isInhibited() {
         return hasInhibitor.get();
     }

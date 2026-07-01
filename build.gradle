@@ -55,7 +55,7 @@ blib {
         id = 'avp_alien'
         license = 'All Rights Reserved'
         name = 'AVP (Alien)'
-        version = '0.2.0-alpha.1'
+        version = '0.2.0-alpha.2'
 
         publish {
             dryRun = true
